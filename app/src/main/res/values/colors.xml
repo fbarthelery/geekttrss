@@ -1,0 +1,45 @@
+<!--
+
+    Geekttrss is a RSS feed reader application on the Android Platform.
+
+    Copyright (C) 2017-2018 by Frederic-Charles Barthelery.
+
+    This file is part of Geekttrss.
+
+    Geekttrss is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Geekttrss is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <color name="material_blue_grey_100">#CFD8DC</color>
+    <color name="material_blue_grey_200">#B0BEC5</color>
+    <color name="material_blue_grey_300">#90A4AE</color>
+    <color name="material_blue_grey_500">#607D8b</color>
+    <color name="material_blue_grey_700">#455A64</color>
+    <!-- We use the same value -->
+    <color name="material_blue_grey_800" tools:override="true">#37474F</color>
+    <color name="material_blue_grey_900" tools:override="true">#263238</color>
+    <color name="material_green_a700">#00C853</color>
+
+    <color name="unreadCounterColor">#909090</color>
+    <color name="headlineExcerptTextColor">#323232</color>
+    <color name="headlineSecondaryTextColor">#909090</color>
+    <color name="articleHeaderSeparator">#cccccc</color>
+    <color name="primary">@color/material_blue_grey_500</color>
+    <color name="primary_dark">@color/material_blue_grey_700</color>
+    <color name="accent">@color/material_green_a700</color>
+    <color name="image_scrim">#ccffffff</color>
+    <color name="article_text_color">#8a000000</color>
+    <color name="background_add_feed_accounts_panel">@color/material_blue_grey_100</color>
+
+</resources>

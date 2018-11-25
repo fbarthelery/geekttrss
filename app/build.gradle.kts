@@ -1,0 +1,219 @@
+/**
+ * Geekttrss is a RSS feed reader application on the Android Platform.
+ *
+ * Copyright (C) 2017-2018 by Frederic-Charles Barthelery.
+ *
+ * This file is part of Geekttrss.
+ *
+ * Geekttrss is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Geekttrss is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import com.geekorum.build.computeChangesetVersionCode
+import com.geekorum.build.getChangeSet
+import org.gradle.kotlin.dsl.extra
+import org.gradle.kotlin.dsl.kotlin
+
+plugins {
+    id("com.android.application")
+    id("com.google.android.gms.oss-licenses-plugin")
+    kotlin("android")
+    kotlin("kapt")
+    id("kotlinx-serialization")
+    id("com.geekorum.build.android-tests")
+    id("com.geekorum.build.android-signing")
+    id("com.geekorum.build.android-genymotion")
+    id("com.geekorum.build.source-license-checker")
+    id("com.geekorum.build.play-store-publish")
+}
+
+android {
+    val compileSdkVersion: String by rootProject.extra
+    setCompileSdkVersion(compileSdkVersion)
+    defaultConfig {
+        applicationId = "com.geekorum.ttrss"
+        minSdkVersion(24)
+        targetSdkVersion(28)
+        val major = 0
+        val minor = 20
+        val patch = 0
+        versionCode = computeChangesetVersionCode(major, minor, patch)
+        versionName = "$major.$minor.$patch"
+        buildConfigField("String", "REPOSITORY_CHANGESET", "\"${getChangeSet()}\"")
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = mapOf(
+                    "room.schemaLocation" to "$projectDir/schemas")
+            }
+        }
+        sourceSets {
+            get("androidTest").assets.srcDir(files("$projectDir/schemas"))
+        }
+    }
+
+
+    lintOptions {
+        isAbortOnError = false
+        isCheckReleaseBuilds = false
+        disable("MissingTranslation")
+    }
+
+    buildTypes {
+        getByName("release") {
+            postprocessing {
+                isRemoveUnusedCode = true
+                isRemoveUnusedResources = true
+                isObfuscate = false
+                isOptimizeCode = true
+                proguardFile("proguard-rules.pro")
+            }
+        }
+    }
+
+    dataBinding {
+        isEnabled = true
+    }
+
+    compileOptions {
+        setSourceCompatibility(JavaVersion.VERSION_1_8)
+        setTargetCompatibility(JavaVersion.VERSION_1_8)
+    }
+
+    flavorDimensions("distribution")
+    productFlavors {
+        register("free") {
+            dimension = "distribution"
+            applicationIdSuffix = ".free"
+        }
+
+        register("google"){
+            dimension = "distribution"
+            versionNameSuffix = "-google"
+        }
+    }
+}
+
+//TODO remove once geekdroid is published
+repositories {
+    flatDir {
+        dirs("libs")
+    }
+}
+
+val lifecycleVersion: String by rootProject.extra
+val roomVersion: String by rootProject.extra
+val daggerVersion: String by rootProject.extra
+val kotlinVersion: String by rootProject.extra
+val corountinesVersion: String by rootProject.extra
+val GEEKDROID_PROJECT_DIR: String? by project
+val geekdroidExt = GEEKDROID_PROJECT_DIR?.let { "" } ?: "aar"
+
+dependencies {
+
+    // androidx ui
+    implementation("androidx.constraintlayout:constraintlayout:1.1.3")
+    implementation("androidx.cardview:cardview:1.0.0")
+    implementation("androidx.recyclerview:recyclerview:1.0.0")
+    implementation("androidx.coordinatorlayout:coordinatorlayout:1.0.0")
+    implementation("androidx.preference:preference-ktx:1.0.0")
+
+    // androidx others
+    implementation("androidx.browser:browser:1.0.0")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.9.0")
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.1.0")
+
+    implementation(group = "com.geekorum", name = "geekdroid", version = "0.0.1", ext = geekdroidExt)
+
+    implementation("com.google.android.material:material:1.0.0")
+    implementation("net.opacapp:multiline-collapsingtoolbar:1.3.0")
+    implementation("com.squareup.retrofit2:retrofit:2.3.0")
+    implementation("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")
+    implementation("com.squareup.okhttp3:okhttp:3.10.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:3.10.0")
+    implementation("com.squareup.picasso:picasso:2.5.2")
+    implementation("com.google.android.gms:play-services-oss-licenses:16.0.1")
+
+    implementation("org.jsoup:jsoup:1.10.2")
+
+
+    implementation("androidx.lifecycle:lifecycle-extensions:$lifecycleVersion")
+    kapt("androidx.lifecycle:lifecycle-compiler:$lifecycleVersion")
+    testImplementation("androidx.arch.core:core-testing:$lifecycleVersion")
+    implementation("androidx.paging:paging-runtime:2.0.0")
+
+    // dagger
+    implementation("com.google.dagger:dagger:$daggerVersion")
+    implementation("com.google.dagger:dagger-android:$daggerVersion")
+    implementation("com.google.dagger:dagger-android-support:$daggerVersion")
+    kapt("com.google.dagger:dagger-compiler:$daggerVersion")
+    kapt("com.google.dagger:dagger-android-processor:$daggerVersion")
+    kaptTest("com.google.dagger:dagger-compiler:$daggerVersion")
+    kaptTest("com.google.dagger:dagger-android-processor:$daggerVersion")
+
+    implementation("androidx.room:room-runtime:$roomVersion")
+    kapt("androidx.room:room-compiler:$roomVersion")
+    androidTestImplementation("androidx.room:room-testing:$roomVersion")
+    testImplementation("androidx.test.ext:truth:1.0.0")
+    androidTestImplementation("androidx.test.ext:truth:1.0.0")
+
+    implementation(kotlin("stdlib-jdk8", kotlinVersion))
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$corountinesVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$corountinesVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$corountinesVersion")
+
+    implementation("com.jakewharton.timber:timber:4.7.1")
+
+    add("googleImplementation", "com.crashlytics.sdk.android:crashlytics:2.9.5") {
+        isTransitive = true
+    }
+    // ensure that the free flavor don't get any firebase dependencies
+    configurations["freeImplementation"].exclude(group = "com.google.firebase")
+}
+
+
+// force usage of dagger 2.16 for now
+// https://issuetracker.google.com/issues/115738511
+// should be fixed on AGP 3.3.0-alpha-13 ?
+configurations.all {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "com.google.dagger") {
+            useVersion(daggerVersion)
+        }
+    }
+}
+
+tasks {
+    // add a publishRelease task to publish the release we want on play store
+    plugins.withId("com.github.triplet.play") {
+        val publishRelease by registering {
+            dependsOn(named("publishGoogleRelease"))
+        }
+        afterEvaluate {
+            named<Task>("promoteArtifact") {
+                dependsOn.remove(named("promoteFreeReleaseArtifact"))
+            }
+        }
+    }
+}
+
+
+apply {
+    val playServicesActivated = file("google-services.json").exists()
+    if (playServicesActivated) {
+        // needs to be applied after configuration
+        plugin("com.google.gms.google-services")
+        plugin("io.fabric")
+    }
+}

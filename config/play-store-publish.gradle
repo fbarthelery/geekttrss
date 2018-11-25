@@ -1,0 +1,28 @@
+// Configuration for "com.github.triplet.play" plugin
+// This configuration expects the given properties
+// PLAY_STORE_JSON_KEY_FILE: google play console service credentials json file to use
+// PLAY_STORE_TRACK: track to publish the build, default to internal but can be set to alpha, beta or production
+
+if (project.hasProperty("PLAY_STORE_JSON_KEY_FILE")) {
+    apply plugin: 'com.github.triplet.play'
+
+    play {
+        defaultToAppBundles = false
+        serviceAccountCredentials = file("${PLAY_STORE_JSON_KEY_FILE}")
+        track = project.properties.getOrDefault("PLAY_STORE_TRACK", "internal")
+    }
+
+    android.playAccountConfigs {
+        defaultAccountConfig {
+            serviceAccountCredentials = file("${PLAY_STORE_JSON_KEY_FILE}")
+        }
+    }
+
+    android.productFlavors {
+        google {
+            playAccountConfig = android.playAccountConfigs.defaultAccountConfig
+        }
+    }
+
+    play.track = project.properties.getOrDefault("PLAY_STORE_TRACK", "internal")
+}

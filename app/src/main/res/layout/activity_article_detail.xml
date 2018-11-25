@@ -1,0 +1,85 @@
+<!--
+
+    Geekttrss is a RSS feed reader application on the Android Platform.
+
+    Copyright (C) 2017-2018 by Frederic-Charles Barthelery.
+
+    This file is part of Geekttrss.
+
+    Geekttrss is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Geekttrss is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<layout>
+    <data>
+        <import type="android.text.Html" />
+
+        <import type="android.view.View" />
+        <variable
+            name="viewModel"
+            type="com.geekorum.ttrss.article_details.ArticleDetailsViewModel" />
+        <variable name="colorPrimary" type="int"/>
+    </data>
+
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                     xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                     xmlns:tools="http://schemas.android.com/tools"
+                                                     android:layout_width="match_parent"
+                                                     android:layout_height="match_parent"
+                                                     android:fitsSystemWindows="true"
+                                                     tools:context="com.geekorum.ttrss.article_details.ArticleDetailActivity"
+                                                     tools:ignore="MergeRootFrame">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?android:windowBackground"
+        app:liftOnScroll="true">
+
+        <androidx.appcompat.widget.Toolbar
+                android:id="@+id/detail_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?android:attr/actionBarSize"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <FrameLayout android:id="@+id/content"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_action_web_site"
+        app:layout_anchor="@+id/bottom_app_bar"
+        app:fabSize="auto"
+        android:onClick="@{() -> viewModel.openArticleInBrowser(context, viewModel.article) }"
+        style="@style/Widget.MaterialComponents.FloatingActionButton" />
+    
+    <com.geekorum.geekdroid.views.ReturningBottomAppBar
+            android:id="@+id/bottom_app_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            app:backgroundTint="@{!viewModel.article.transientUnread ? @color/material_grey_600 : colorPrimary }"
+            app:fabAlignmentMode="end"
+            app:hideOnScroll="true"
+            android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"/>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>

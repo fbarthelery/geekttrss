@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+
+    Geekttrss is a RSS feed reader application on the Android Platform.
+
+    Copyright (C) 2017-2018 by Frederic-Charles Barthelery.
+
+    This file is part of Geekttrss.
+
+    Geekttrss is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Geekttrss is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<resources>
+    <string name="app_name">Geekttrss</string>
+
+    <string name="path_star_mask_filled">M0,24 L24,24 L24,0 L0,0 Z</string>
+    <string name="path_star_mask_empty">M0,24 L24,24 L24,24 L0,24 Z</string>
+    <string name="ttrss_account">Tiny Tiny RSS</string>
+    <!-- Login activity -->
+    <string name="prompt_url">Tiny Tiny RSS server url</string>
+    <string name="prompt_username">Username</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Login</string>
+    <string name="action_sign_in_short">Login</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="error_invalid_http_url">Invalid http(s) url</string>
+    <string name="error_incorrect_password">Incorrect password</string>
+
+    <string name="title_article_list">Articles</string>
+    <string name="title_article_detail">Articles detail</string>
+
+    <string name="drawer_open">Open drawer</string>
+    <string name="drawer_close">Close drawer</string>
+    <string name="drawer_btn_settings">Settings</string>
+
+    <string name="star_article">Add to favorites</string>
+
+    <!-- article detail activity -->
+    <string name="article_flavor_image_content_description">article image</string>
+
+    <!-- Strings related to Settings -->
+    <string name="activity_settings_title">Settings</string>
+    <string name="pref_title_theme">Theme</string>
+    <string name="theme_auto">Automatic</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="pref_category_user_interface">User interface</string>
+    <string name="pref_category_about">About</string>
+    <string name="pref_title_about_version">Version %1$s</string>
+    <string name="pref_summary_about_version">%1$s-%2$s</string>
+
+
+    <!-- article list items -->
+    <string name="mark_as_read">Mark as read</string>
+    <string name="mark_as_unread">Mark as unread</string>
+    <plurals name="undo_set_articles_read_text">
+        <item quantity="one">%d article marked as read</item>
+        <item quantity="other">%d articles marked as read</item>
+    </plurals>
+    <string name="undo_set_articles_read_btn">Undo</string>
+    <string name="author_formatted">by %1$s</string>
+    <string name="fragment_articles_list_no_articles_lbl">No articles</string>
+    <string name="fragment_articles_list_no_articles_and_sync_lbl">No articles.\nFirst synchronization may take a while...</string>
+
+    <!-- activity add feed -->
+    <string name="activity_add_feed_title">Subscribe to feed</string>
+    <string name="activity_add_feed_no_feeds_available">No feeds available</string>
+    <string name="activity_add_feed_looking_for_feed">Looking for feed</string>
+    <string name="activity_add_feed_account_subtitle">Account</string>
+    <string name="activity_add_feed_btn_subscribe">Subscribe</string>
+
+    <!-- activity room migration -->
+    <string name="activity_title_room_migration">Database migration</string>
+    <string name="activity_room_migration_label">We are migrating the database. Please be patient</string>
+    <string name="activity_room_migration_label_success">Migration is complete. Everything went fine</string>
+    <string name="activity_room_migration_label_failed">Something wrong happened :/</string>
+    <string name="notif_room_migration_title">Migrating database</string>
+
+    <!-- Menus -->
+    <string name="share_article">Share article</string>
+    <string name="context_selection_toggle_unread">(Un)Read</string>
+
+    <!-- Api error messages -->
+    <string name="error_unknown">Error: Unknown error (see log)</string>
+    <string name="error_http_unauthorized">Error: 401 unauthorized</string>
+    <string name="error_http_forbidden">Error: 403 forbidden</string>
+    <string name="error_http_not_found">Error: 404 not found</string>
+    <string name="error_http_server_error">Error: 500 server error</string>
+    <string name="error_http_other_error">Error: other HTTP error (see log)</string>
+    <string name="error_ssl_rejected">Error: SSL certificate rejected</string>
+    <string name="error_parse_error">Error: JSON parse failed</string>
+    <string name="error_io_error">Error: I/O failure (server down?)</string>
+    <string name="error_other_error">Error: unknown error (see log)</string>
+    <string name="error_api_disabled">Error: Please enable external API access in tt-rss Settings - Advanced</string>
+    <string name="error_api_unknown">Error: unknown API error (see log)</string>
+    <string name="error_api_incorrect_usage">Error: incorrect API usage</string>
+    <string name="error_login_failed">Error: username or password incorrect</string>
+    <string name="error_invalid_api_url">Error: invalid API URL</string>
+    <string name="error_ssl_hostname_rejected">Error: SSL hostname not verified</string>
+    <string name="error_api_unknown_method">Error: unknown API method</string>
+    <string name="error_network_unavailable">Error: network unavailable</string>
+</resources>

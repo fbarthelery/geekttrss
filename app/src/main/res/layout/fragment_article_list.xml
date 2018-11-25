@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+
+    Geekttrss is a RSS feed reader application on the Android Platform.
+
+    Copyright (C) 2017-2018 by Frederic-Charles Barthelery.
+
+    This file is part of Geekttrss.
+
+    Geekttrss is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Geekttrss is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:context=".articles_list.ArticlesListFragment">
+
+    <data>
+        <import type="android.view.View" />
+        <variable name="activityViewModel" type="com.geekorum.ttrss.articles_list.ActivityViewModel" />
+        <variable name="fragmentViewModel" type="com.geekorum.ttrss.articles_list.FragmentViewModel" />
+    </data>
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_refresh_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:refreshing="@{safeUnbox(activityViewModel.refreshing)}">
+
+        <FrameLayout android:layout_width="match_parent" android:layout_height="match_parent">
+            <TextView android:id="@+id/empty"
+                      android:layout_width="match_parent"
+                      android:layout_height="match_parent"
+                      android:gravity="center"
+                      android:textAppearance="?textAppearanceHeadline4"
+                      android:padding="@dimen/activity_horizontal_margin"
+                      android:text="@{activityViewModel.refreshing ? @string/fragment_articles_list_no_articles_and_sync_lbl : @string/fragment_articles_list_no_articles_lbl}"
+                      android:visibility="@{fragmentViewModel.haveZeroArticles ? View.VISIBLE : View.GONE}"
+                    />
+
+            <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/article_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    android:orientation="vertical"
+                    tools:context="com.geekorum.ttrss.articles_list.ArticleListActivity"
+                    tools:listitem="@layout/headlines_row"
+                    android:visibility="@{fragmentViewModel.articles.size == 0 ? View.GONE : View.VISIBLE}"
+                    />
+
+        </FrameLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+
+</layout>

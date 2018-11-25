@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+
+    Geekttrss is a RSS feed reader application on the Android Platform.
+
+    Copyright (C) 2017-2018 by Frederic-Charles Barthelery.
+
+    This file is part of Geekttrss.
+
+    Geekttrss is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Geekttrss is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="120dp"
+    android:orientation="vertical"
+    android:weightSum="1"
+    android:clickable="false">
+
+    <ImageView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:id="@+id/imageView"
+            android:scaleType="fitXY"
+            android:src="@drawable/drawer_header_dark"
+            tools:ignore="ContentDescription" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:background="@android:color/transparent"
+        android:layout_height="match_parent">
+
+        <ImageButton
+            android:id="@+id/drawer_settings_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_settings"
+            android:layout_gravity="bottom|end"
+            android:layout_marginBottom="10dp"
+            android:layout_marginEnd="8dp"
+            android:transitionName="SETTINGS_REVEAL"
+            android:contentDescription="@string/drawer_btn_settings"
+            android:theme="@style/ThemeOverlay.AppTheme.TranslucentButton" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:orientation="vertical"
+            android:id="@+id/linearLayout"
+            android:layout_gravity="center_horizontal|bottom">
+
+            <TextView
+                android:id="@+id/drawer_header_login"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:textColor="@android:color/primary_text_dark"
+                tools:text="test"
+                android:textSize="14sp"
+                android:textStyle="bold"
+
+                />
+
+            <TextView
+                android:id="@+id/drawer_header_server"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/primary_text_dark"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="5dp"
+                tools:text="example.org"
+                android:textSize="14sp"
+                android:textStyle="normal"
+
+                />
+        </LinearLayout>
+    </FrameLayout>
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleHorizontal"
+        android:visibility="invisible"
+        android:indeterminate="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/feeds_loading_bar"
+        android:layout_gravity="bottom" />
+</FrameLayout>

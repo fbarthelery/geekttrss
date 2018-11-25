@@ -1,0 +1,7 @@
+Un lecteur pour Tiny Tiny Rss avec un mode hors-ligne automatique
+
+Il est nécéssaire d'installer d'abord l'application web Tiny Tiny Rss (https://tt-rss.org/) et d'activer l'accès aux APIs. Il sera ensuite possible d'accéder à votre compte Tiny Tiny Rss depuis l'application.
+
+Geekttrss est une application open source qui est disponible sous les termes de la licence "GNU General Public License 3" et version supérieure. Cela signifie que vous pouvez prendre le code source de GeekTtRss et le modifier pour l'adapter à vos besoins à condition que vous publiez aussi vos changements afin que tout le monde en bénéficie.
+
+Geekttrss est créé et maintenu par une communauté de bénévoles.

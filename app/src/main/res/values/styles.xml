@@ -1,0 +1,69 @@
+<!--
+
+    Geekttrss is a RSS feed reader application on the Android Platform.
+
+    Copyright (C) 2017-2018 by Frederic-Charles Barthelery.
+
+    This file is part of Geekttrss.
+
+    Geekttrss is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Geekttrss is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <!-- use the material Blue Grey palette -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/material_blue_grey_700</item>
+        <item name="colorAccent">@color/material_green_a700</item>
+        <!-- used to configure style on the content webview -->
+        <item name="articleBackground">?android:colorBackground</item>
+        <!-- must be a color, not a drawable -->
+        <item name="articleTextColor">@color/article_text_color</item>
+        <item name="linkColor">?android:textColorLink</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="ThemeOverlay.AppTheme.DayNight" parent="@style/ThemeOverlay.MaterialComponents.Light"/>
+    <style name="ThemeOverlay.AppTheme.DayNight.Inverse" parent="@style/ThemeOverlay.MaterialComponents.Dark" />
+
+    <style name="AppTheme.ArticleListActivity" parent="AppTheme.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">?android:windowBackground</item>
+    </style>
+
+    <style name="AppTheme.ArticleDetailActivity" parent="AppTheme.NoActionBar">
+        <item name="android:navigationBarColor">?android:windowBackground</item>
+    </style>
+
+    <style name="AppTheme.AddFeedActivity" parent="@style/Theme.Geekdroid.Light.BottomSheetDialogActivity">
+        <!-- use the material Blue Grey palette -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/material_blue_grey_700</item>
+        <item name="colorAccent">@color/material_green_a700</item>
+    </style>
+
+    <style name="ThemeOverlay.AppTheme.AddFeedActivity.AccountsPanel" parent="ThemeOverlay.AppTheme.DayNight">
+        <item name="android:colorBackground">@color/material_blue_grey_200</item>
+    </style>
+
+    <style name="ThemeOverlay.AppTheme.TranslucentButton" parent="ThemeOverlay.AppTheme.DayNight">
+        <item name="colorButtonNormal">@android:color/transparent</item>
+    </style>
+
+</resources>
