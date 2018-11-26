@@ -1,7 +1,7 @@
 Geekttrss
 ==========
 
-Geekttrss is an Tiny Rss reader application with transparent offline mode.
+Geekttrss is an Tiny Tiny Rss reader application with transparent offline mode for the Android platform.
 
 You will need to install the web application [Tiny Tiny Rss](https://tt-rss.org/) and enable API access.
 Then you will be able to access your Tiny Tiny Rss account from anywhere.

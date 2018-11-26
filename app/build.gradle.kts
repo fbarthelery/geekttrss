@@ -44,8 +44,8 @@ android {
         applicationId = "com.geekorum.ttrss"
         minSdkVersion(24)
         targetSdkVersion(28)
-        val major = 0
-        val minor = 20
+        val major = 1
+        val minor = 0
         val patch = 0
         versionCode = computeChangesetVersionCode(major, minor, patch)
         versionName = "$major.$minor.$patch"
