@@ -54,6 +54,9 @@ public abstract class TinyrssApiModule {
 
     @Provides
     static TinyRssApi providesTinyRssApi(OkHttpClient okHttpClient, Optional<LoggedRequestInterceptorFactory> interceptorFactory2, @Named("tinyrssServerUrl") String tinyrssApiUrl) {
+        if (!tinyrssApiUrl.endsWith("/")) {
+            tinyrssApiUrl += "/";
+        }
         Retrofit.Builder retrofitBuilder = new Retrofit.Builder()
                 .baseUrl(tinyrssApiUrl);
 
