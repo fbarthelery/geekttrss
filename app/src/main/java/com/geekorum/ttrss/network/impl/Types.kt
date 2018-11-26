@@ -122,6 +122,8 @@ data class FeedCategory(
 @Serializable
 data class Headline(
     val id: Long = 0,
+    @Optional
+    val guid: String = "",
     val title: String = "",
     val link: String = "",
     @Optional
