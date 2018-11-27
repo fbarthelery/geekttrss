@@ -34,6 +34,8 @@ import dagger.android.HasActivityInjector;
 import dagger.android.HasServiceInjector;
 import timber.log.Timber;
 
+import java.util.Set;
+
 import javax.inject.Inject;
 
 import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_AUTO;
@@ -51,7 +53,7 @@ public class Application extends android.app.Application implements HasActivityI
     DispatchingAndroidInjector<Service> dispatchingServiceInjector;
 
     @Inject
-    Timber.Tree timberTree;
+    Set<Timber.Tree> timberTrees;
 
     @Inject
     Picasso picasso;
@@ -62,7 +64,7 @@ public class Application extends android.app.Application implements HasActivityI
     public void onCreate() {
         injectIfNecessary();
         super.onCreate();
-        Timber.plant(timberTree);
+        Timber.plant(timberTrees.toArray(new Timber.Tree[0]));
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String nighModeStr = sharedPreferences.getString(SettingsActivity.KEY_THEME, Integer.toString(MODE_NIGHT_AUTO));
         int nighMode = Integer.valueOf(nighModeStr);
