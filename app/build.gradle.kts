@@ -175,7 +175,7 @@ dependencies {
 
     implementation("com.jakewharton.timber:timber:4.7.1")
 
-    add("googleImplementation", "com.crashlytics.sdk.android:crashlytics:2.9.5") {
+    add("googleImplementation", "com.crashlytics.sdk.android:crashlytics:2.9.6") {
         isTransitive = true
     }
     // ensure that the free flavor don't get any firebase dependencies
