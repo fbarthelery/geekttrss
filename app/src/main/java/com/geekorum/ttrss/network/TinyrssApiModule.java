@@ -53,14 +53,14 @@ public abstract class TinyrssApiModule {
     }
 
     @Provides
-    static TinyRssApi providesTinyRssApi(OkHttpClient okHttpClient, Optional<LoggedRequestInterceptorFactory> interceptorFactory2, @Named("tinyrssServerUrl") String tinyrssApiUrl) {
+    static TinyRssApi providesTinyRssApi(OkHttpClient okHttpClient, Optional<LoggedRequestInterceptorFactory> loggedRequestInterceptorFactory, @Named("tinyrssServerUrl") String tinyrssApiUrl) {
         if (!tinyrssApiUrl.endsWith("/")) {
             tinyrssApiUrl += "/";
         }
         Retrofit.Builder retrofitBuilder = new Retrofit.Builder()
                 .baseUrl(tinyrssApiUrl);
 
-        interceptorFactory2.ifPresent(retrofitBuilder::addConverterFactory);
+        loggedRequestInterceptorFactory.ifPresent(retrofitBuilder::addConverterFactory);
 
         JSON.Companion json = JSON.Companion;
         retrofitBuilder.addConverterFactory(KotlinSerializationConverterFactory.stringBased(

@@ -21,7 +21,9 @@
 package com.geekorum.ttrss.di;
 
 import android.app.Application;
+import androidx.annotation.Nullable;
 import com.geekorum.geekdroid.network.PicassoOkHttp3Downloader;
+import com.geekorum.ttrss.logging.RetrofitInvocationLogger;
 import com.squareup.picasso.Picasso;
 import dagger.Module;
 import dagger.Provides;
@@ -36,18 +38,41 @@ import javax.inject.Singleton;
 @Module
 public class NetworkModule {
     private static final boolean DEBUG_REQUEST = false;
+    private static final boolean DEBUG_RETROFIT_CALL = true;
+
 
     @Provides
     @Singleton
-    static OkHttpClient providesOkHttpclient(Cache cache) {
+    static OkHttpClient providesOkHttpclient(Cache cache, @Nullable HttpLoggingInterceptor requestLogger, @Nullable RetrofitInvocationLogger retrofitInvocationLogger) {
         OkHttpClient.Builder okHttpBuilder = new OkHttpClient.Builder();
-        if (DEBUG_REQUEST) {
-            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
-            okHttpBuilder.addInterceptor(logging);
+        if (retrofitInvocationLogger != null) {
+            okHttpBuilder.addInterceptor(retrofitInvocationLogger);
+        }
+        if (requestLogger != null) {
+            okHttpBuilder.addInterceptor(requestLogger);
         }
         okHttpBuilder.cache(cache);
         return okHttpBuilder.build();
+    }
+
+    @Provides
+    @Singleton
+    static @Nullable HttpLoggingInterceptor providesHttpRequestLogger() {
+        if (DEBUG_REQUEST) {
+            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+            return logging;
+        }
+        return null;
+    }
+
+    @Provides
+    @Singleton
+    static @Nullable RetrofitInvocationLogger providesRetrofitInvocationLogger() {
+        if (DEBUG_RETROFIT_CALL) {
+            return new RetrofitInvocationLogger();
+        }
+        return null;
     }
 
     @Provides

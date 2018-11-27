@@ -138,9 +138,9 @@ dependencies {
 
     implementation("com.google.android.material:material:1.0.0")
     implementation("net.opacapp:multiline-collapsingtoolbar:1.3.0")
-    implementation("com.squareup.retrofit2:retrofit:2.3.0")
+    implementation("com.squareup.retrofit2:retrofit:2.5.0")
     implementation("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")
-    implementation("com.squareup.okhttp3:okhttp:3.10.0")
+    implementation("com.squareup.okhttp3:okhttp:3.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:3.10.0")
     implementation("com.squareup.picasso:picasso:2.5.2")
     implementation("com.google.android.gms:play-services-oss-licenses:16.0.1")
