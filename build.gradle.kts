@@ -36,7 +36,7 @@ extra["daggerVersion"] = "2.16"
 extra["lifecycleVersion"] = "2.0.0"
 extra["roomVersion"] = "2.0.0"
 extra["kotlinVersion"] = "1.3.0"
-extra["corountinesVersion"] = "1.0.0"
+extra["corountinesVersion"] = "1.0.1"
 
 
 allprojects {
