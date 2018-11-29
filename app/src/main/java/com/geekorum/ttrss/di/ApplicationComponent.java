@@ -20,6 +20,7 @@
  */
 package com.geekorum.ttrss.di;
 
+import com.geekorum.geekdroid.dagger.AndroidFrameworkModule;
 import com.geekorum.ttrss.Application;
 import com.geekorum.ttrss.accounts.AndroidTinyrssAccountManagerModule;
 import com.geekorum.ttrss.data.ArticlesDatabaseModule;
@@ -39,7 +40,7 @@ import javax.inject.Singleton;
         AndroidBindingsModule.class,
         ViewModelsModule.class,
         NetworkModule.class,
-        AndroidApplicationModule.class,
+        AndroidFrameworkModule.class,
         ArticlesDatabaseModule.class,
         LoggingModule.class,
         com.geekorum.ttrss.article_details.ActivitiesInjectorModule.class,

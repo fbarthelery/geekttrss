@@ -21,8 +21,8 @@
 package com.geekorum.ttrss.providers;
 
 import android.content.Context;
-import com.geekorum.ttrss.di.AndroidComponentsModule;
-import com.geekorum.ttrss.di.PerAndroidComponent;
+import com.geekorum.geekdroid.dagger.AndroidComponentsModule;
+import com.geekorum.geekdroid.dagger.PerAndroidComponent;
 import dagger.BindsInstance;
 import dagger.Subcomponent;
 
