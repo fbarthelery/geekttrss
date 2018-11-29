@@ -20,8 +20,10 @@
  */
 package com.geekorum.ttrss.room_migration;
 
+import android.content.Context;
 import com.geekorum.ttrss.di.AndroidComponentsModule;
 import com.geekorum.ttrss.di.PerAndroidComponent;
+import dagger.BindsInstance;
 import dagger.Subcomponent;
 
 /**
@@ -34,7 +36,10 @@ public interface RoomMigrationComponent {
 
     @Subcomponent.Builder
     interface Builder {
-        Builder androidComponentsModule(AndroidComponentsModule androidComponentsModule);
+
+        @BindsInstance
+        Builder bindAndroidComponent(Context context);
+
         RoomMigrationComponent build();
     }
 }

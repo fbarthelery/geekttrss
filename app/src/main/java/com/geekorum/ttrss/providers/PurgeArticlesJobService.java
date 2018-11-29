@@ -26,7 +26,6 @@ import android.os.Build;
 import com.geekorum.geekdroid.jobs.JobThread;
 import com.geekorum.geekdroid.jobs.ThreadedJobService;
 import com.geekorum.ttrss.Application;
-import com.geekorum.ttrss.di.AndroidComponentsModule;
 import com.geekorum.ttrss.di.ApplicationComponent;
 
 import javax.inject.Inject;
@@ -52,7 +51,7 @@ public class PurgeArticlesJobService extends ThreadedJobService {
 
     private ArticleProviderComponent createArticleProviderComponent() {
         return getApplicationComponent().createArticleProviderComponent()
-                .androidComponentsModule(new AndroidComponentsModule(this))
+                .bindAndroidComponent(this)
                 .build();
     }
 

@@ -31,21 +31,9 @@ import dagger.Provides;
 @Module
 public class AndroidComponentsModule {
 
-    private Context context;
-
-    public AndroidComponentsModule(Context context) {
-        this.context = context;
-    }
-
     @Provides
     @PerAndroidComponent
-    Context providesContext() {
-        return context;
-    }
-
-    @Provides
-    @PerAndroidComponent
-    ContentResolver providesContentResolver() {
+    ContentResolver providesContentResolver(Context context) {
         return context.getContentResolver();
     }
 

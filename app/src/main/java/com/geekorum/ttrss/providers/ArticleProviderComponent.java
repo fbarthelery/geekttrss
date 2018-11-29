@@ -20,8 +20,10 @@
  */
 package com.geekorum.ttrss.providers;
 
+import android.content.Context;
 import com.geekorum.ttrss.di.AndroidComponentsModule;
 import com.geekorum.ttrss.di.PerAndroidComponent;
+import dagger.BindsInstance;
 import dagger.Subcomponent;
 
 /**
@@ -36,7 +38,10 @@ public interface ArticleProviderComponent {
 
     @Subcomponent.Builder
     interface Builder {
-        ArticleProviderComponent.Builder androidComponentsModule(AndroidComponentsModule androidComponentsModule);
+
+        @BindsInstance
+        Builder bindAndroidComponent(Context context);
+
         ArticleProviderComponent build();
     }
 }

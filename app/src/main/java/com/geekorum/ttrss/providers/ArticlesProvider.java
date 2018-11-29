@@ -20,8 +20,6 @@
  */
 package com.geekorum.ttrss.providers;
 
-import androidx.sqlite.db.SupportSQLiteDatabase;
-import androidx.sqlite.db.SupportSQLiteOpenHelper;
 import android.content.ContentProvider;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
@@ -36,9 +34,10 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.sqlite.db.SupportSQLiteDatabase;
+import androidx.sqlite.db.SupportSQLiteOpenHelper;
 import com.geekorum.ttrss.Application;
 import com.geekorum.ttrss.data.ArticlesDatabase;
-import com.geekorum.ttrss.di.AndroidComponentsModule;
 import com.geekorum.ttrss.di.ApplicationComponent;
 
 import java.util.ArrayList;
@@ -89,7 +88,7 @@ public class ArticlesProvider extends ContentProvider {
 
     private ArticleProviderComponent createArticleProviderComponent() {
         return getApplicationComponent().createArticleProviderComponent()
-                .androidComponentsModule(new AndroidComponentsModule(getContext()))
+                .bindAndroidComponent(getContext())
                 .build();
     }
 

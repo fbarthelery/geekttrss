@@ -32,7 +32,6 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import com.geekorum.ttrss.Application;
 import com.geekorum.ttrss.NotificationCenter;
 import com.geekorum.ttrss.R;
-import com.geekorum.ttrss.di.AndroidComponentsModule;
 import com.geekorum.ttrss.di.ApplicationComponent;
 import com.geekorum.ttrss.providers.DbHelper;
 
@@ -139,7 +138,7 @@ public class RoomMigrationService extends IntentService {
         ApplicationComponent applicationComponent = ((Application) getApplication()).getApplicationComponent();
         return applicationComponent
                 .createRoomMigrationComponent()
-                .androidComponentsModule(new AndroidComponentsModule(this))
+                .bindAndroidComponent(this)
                 .build();
     }
 
