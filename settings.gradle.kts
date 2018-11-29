@@ -64,6 +64,7 @@ GEEKDROID_PROJECT_DIR?.let {
     includeBuild(it) {
         dependencySubstitution {
             substitute(module("com.geekorum:geekdroid")).with(project(":library"))
+            substitute(module("com.geekorum:geekdroid-firebase")).with(project(":geekdroid-firebase"))
         }
     }
 }

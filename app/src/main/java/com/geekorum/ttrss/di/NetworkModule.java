@@ -43,7 +43,9 @@ public class NetworkModule {
 
     @Provides
     @Singleton
-    static OkHttpClient providesOkHttpclient(Cache cache, @Nullable HttpLoggingInterceptor requestLogger, @Nullable RetrofitInvocationLogger retrofitInvocationLogger) {
+    static OkHttpClient providesOkHttpclient(Cache cache,
+                                             @Nullable HttpLoggingInterceptor requestLogger,
+                                             @Nullable RetrofitInvocationLogger retrofitInvocationLogger) {
         OkHttpClient.Builder okHttpBuilder = new OkHttpClient.Builder();
         if (retrofitInvocationLogger != null) {
             okHttpBuilder.addInterceptor(retrofitInvocationLogger);

@@ -135,6 +135,9 @@ dependencies {
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.1.0")
 
     implementation(group = "com.geekorum", name = "geekdroid", version = "0.0.1", ext = geekdroidExt)
+    create(group = "com.geekorum", name = "geekdroid-firebase", version = "0.0.1", ext = geekdroidExt).also {
+        add("googleImplementation", it)
+    }
 
     implementation("com.google.android.material:material:1.0.0")
     implementation("net.opacapp:multiline-collapsingtoolbar:1.3.0")
@@ -169,15 +172,16 @@ dependencies {
     androidTestImplementation("androidx.test.ext:truth:1.0.0")
 
     implementation(kotlin("stdlib-jdk8", kotlinVersion))
+
+    val corountinesVersion: String by rootProject.extra
+    enforceCoroutinesPlatform(corountinesVersion)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$corountinesVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$corountinesVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$corountinesVersion")
 
     implementation("com.jakewharton.timber:timber:4.7.1")
 
-    add("googleImplementation", "com.crashlytics.sdk.android:crashlytics:2.9.6") {
-        isTransitive = true
-    }
+    add("googleImplementation", "com.crashlytics.sdk.android:crashlytics:2.9.6")
     // ensure that the free flavor don't get any firebase dependencies
     configurations["freeImplementation"].exclude(group = "com.google.firebase")
 }
