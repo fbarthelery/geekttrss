@@ -89,10 +89,6 @@
                 android:parentActivityName="com.geekorum.ttrss.articles_list.ArticleListActivity">
         </activity>
 
-        <activity android:name="com.geekorum.ttrss.room_migration.RoomMigrationActivity"
-                android:label="@string/activity_title_room_migration"
-                android:launchMode="singleTop"/>
-
         <activity android:name=".add_feed.AddFeedActivity"
                   android:label="@string/activity_add_feed_title"
                   android:theme="@style/AppTheme.AddFeedActivity"

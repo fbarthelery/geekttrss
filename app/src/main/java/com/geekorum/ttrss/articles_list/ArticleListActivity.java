@@ -46,8 +46,6 @@ import com.geekorum.ttrss.data.Feed;
 import com.geekorum.ttrss.databinding.ActivityArticleListBinding;
 import com.geekorum.ttrss.di.ViewModelsFactory;
 import com.geekorum.ttrss.providers.ArticlesContract;
-import com.geekorum.ttrss.room_migration.RoomMigrationActivity;
-import com.geekorum.ttrss.room_migration.RoomMigrationService;
 import com.geekorum.ttrss.session.SessionActivity;
 
 import javax.inject.Inject;
@@ -87,7 +85,6 @@ public class ArticleListActivity extends SessionActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        runRoomMigrationIfNeeded();
         setupPeriodicJobs();
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false);
 
@@ -151,14 +148,6 @@ public class ArticleListActivity extends SessionActivity {
             activityViewModel.setSelectedFeed(feed);
         }
         setupActionBar();
-    }
-
-    private void runRoomMigrationIfNeeded() {
-        if (RoomMigrationService.needMigration(this)) {
-            Intent intent = new Intent(this, RoomMigrationActivity.class);
-            startActivity(intent);
-            finish();
-        }
     }
 
     private void setupActionBar() {

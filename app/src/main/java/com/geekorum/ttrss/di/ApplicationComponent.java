@@ -25,7 +25,6 @@ import com.geekorum.ttrss.accounts.AndroidTinyrssAccountManagerModule;
 import com.geekorum.ttrss.data.ArticlesDatabaseModule;
 import com.geekorum.ttrss.logging.LoggingModule;
 import com.geekorum.ttrss.providers.ArticleProviderComponent;
-import com.geekorum.ttrss.room_migration.RoomMigrationComponent;
 import dagger.BindsInstance;
 import dagger.Component;
 import dagger.android.AndroidInjectionModule;
@@ -62,8 +61,6 @@ public interface ApplicationComponent {
     }
 
     void inject(Application application);
-
-    RoomMigrationComponent.Builder createRoomMigrationComponent();
 
     ArticleProviderComponent.Builder createArticleProviderComponent();
 

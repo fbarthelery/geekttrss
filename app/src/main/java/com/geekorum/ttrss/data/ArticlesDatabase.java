@@ -23,7 +23,6 @@ package com.geekorum.ttrss.data;
 import androidx.room.Database;
 import androidx.room.RoomDatabase;
 import com.geekorum.ttrss.providers.ArticlesProvidersDao;
-import com.geekorum.ttrss.room_migration.RoomMigrationDao;
 
 @Database(entities = {Article.class, Category.class, Feed.class, Transaction.class},
         version = 4)
@@ -32,8 +31,6 @@ public abstract class ArticlesDatabase extends RoomDatabase {
     public static final String DATABASE_NAME = "room_articles.db";
 
     public abstract ArticleDao articleDao();
-
-    public abstract RoomMigrationDao roomMigrationDao();
 
     public abstract TransactionsDao transactionsDao();
 

@@ -80,13 +80,6 @@
     <string name="activity_add_feed_account_subtitle">Account</string>
     <string name="activity_add_feed_btn_subscribe">Subscribe</string>
 
-    <!-- activity room migration -->
-    <string name="activity_title_room_migration">Database migration</string>
-    <string name="activity_room_migration_label">We are migrating the database. Please be patient</string>
-    <string name="activity_room_migration_label_success">Migration is complete. Everything went fine</string>
-    <string name="activity_room_migration_label_failed">Something wrong happened :/</string>
-    <string name="notif_room_migration_title">Migrating database</string>
-
     <!-- Menus -->
     <string name="share_article">Share article</string>
     <string name="context_selection_toggle_unread">(Un)Read</string>
