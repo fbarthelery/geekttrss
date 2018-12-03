@@ -24,8 +24,8 @@ import android.app.Application;
 import androidx.sqlite.db.SupportSQLiteOpenHelper;
 import androidx.room.Room;
 import com.geekorum.ttrss.data.migrations.ArticlesDatabaseFrom1To2;
-import com.geekorum.ttrss.data.migrations.ArticlesDatabaseFrom2To3;
-import com.geekorum.ttrss.data.migrations.ArticlesDatabaseFrom3To4;
+import com.geekorum.ttrss.data.migrations.MigrationFrom2To3;
+import com.geekorum.ttrss.data.migrations.MigrationFrom3To4;
 import com.geekorum.ttrss.providers.ArticlesProvidersDao;
 import dagger.Module;
 import dagger.Provides;
@@ -43,8 +43,8 @@ public class ArticlesDatabaseModule {
     ArticlesDatabase providesAppDatabase(Application application) {
         return Room.databaseBuilder(application, ArticlesDatabase.class, ArticlesDatabase.DATABASE_NAME)
                 .addMigrations(new ArticlesDatabaseFrom1To2(),
-                        new ArticlesDatabaseFrom2To3(),
-                        new ArticlesDatabaseFrom3To4())
+                        MigrationFrom2To3.INSTANCE,
+                        MigrationFrom3To4.INSTANCE)
                 .build();
     }
 

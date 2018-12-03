@@ -20,15 +20,15 @@
  */
 package com.geekorum.ttrss.data.migrations
 
-import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 
 /**
  * Migrations for the ArticleDatabase
  */
 
 /** This migration makes fields non nullable **/
-class ArticlesDatabaseFrom2To3 : Migration(2, 3) {
+object MigrationFrom2To3 : Migration(2, 3) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.beginTransaction()
         try {
@@ -133,7 +133,7 @@ class ArticlesDatabaseFrom2To3 : Migration(2, 3) {
 
 
 /** This migration add some cascade on delete constraints **/
-class ArticlesDatabaseFrom3To4 : Migration(3, 4) {
+object MigrationFrom3To4 : Migration(3, 4) {
     override fun migrate(database: SupportSQLiteDatabase) {
         database.beginTransaction()
         try {

@@ -121,6 +121,8 @@ val geekdroidExt = GEEKDROID_PROJECT_DIR?.let { "" } ?: "aar"
 
 dependencies {
 
+    implementation("androidx.core:core-ktx:1.0.1")
+
     // androidx ui
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")
     implementation("androidx.cardview:cardview:1.0.0")
