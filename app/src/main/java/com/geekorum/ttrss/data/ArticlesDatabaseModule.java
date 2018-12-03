@@ -21,9 +21,9 @@
 package com.geekorum.ttrss.data;
 
 import android.app.Application;
-import androidx.sqlite.db.SupportSQLiteOpenHelper;
 import androidx.room.Room;
-import com.geekorum.ttrss.data.migrations.ArticlesDatabaseFrom1To2;
+import androidx.sqlite.db.SupportSQLiteOpenHelper;
+import com.geekorum.ttrss.data.migrations.MigrationFrom1To2;
 import com.geekorum.ttrss.data.migrations.MigrationFrom2To3;
 import com.geekorum.ttrss.data.migrations.MigrationFrom3To4;
 import com.geekorum.ttrss.providers.ArticlesProvidersDao;
@@ -42,7 +42,7 @@ public class ArticlesDatabaseModule {
     @Singleton
     ArticlesDatabase providesAppDatabase(Application application) {
         return Room.databaseBuilder(application, ArticlesDatabase.class, ArticlesDatabase.DATABASE_NAME)
-                .addMigrations(new ArticlesDatabaseFrom1To2(),
+                .addMigrations(MigrationFrom1To2.INSTANCE,
                         MigrationFrom2To3.INSTANCE,
                         MigrationFrom3To4.INSTANCE)
                 .build();

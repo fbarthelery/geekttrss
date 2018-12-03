@@ -55,7 +55,7 @@ class ArticlesDatabaseMigrationTest {
 
         // Re-open the database with version 2 and provide
         // MIGRATION_1_2 as the migration process.
-        helper.runMigrationsAndValidate(TEST_DB, 2, true, MIGRATION_1_2).use {
+        helper.runMigrationsAndValidate(TEST_DB, 2, true, MigrationFrom1To2).use {
             // MigrationTestHelper automatically verifies the schema changes,
             // but you need to validate that the data was migrated properly.
             assertMigration1To2DataIntegrity(it)
@@ -136,7 +136,7 @@ class ArticlesDatabaseMigrationTest {
         }
 
         helper.runMigrationsAndValidate(TEST_DB, 3, true,
-            MIGRATION_1_2, MigrationFrom2To3).use {
+            MigrationFrom1To2, MigrationFrom2To3).use {
             // MigrationTestHelper automatically verifies the schema changes,
             // but you need to validate that the data was migrated properly.
             assertMigration1To2DataIntegrity(it)
@@ -156,7 +156,7 @@ class ArticlesDatabaseMigrationTest {
         }
 
         helper.runMigrationsAndValidate(TEST_DB, 4, true,
-            MIGRATION_1_2, MigrationFrom2To3, MigrationFrom3To4).use {
+            MigrationFrom1To2, MigrationFrom2To3, MigrationFrom3To4).use {
             // MigrationTestHelper automatically verifies the schema changes,
             // but you need to validate that the data was migrated properly.
             assertMigration1To2DataIntegrity(it)
@@ -164,8 +164,6 @@ class ArticlesDatabaseMigrationTest {
     }
 
     companion object {
-
         private val TEST_DB = "migration-test"
-        private val MIGRATION_1_2 = ArticlesDatabaseFrom1To2()
     }
 }
