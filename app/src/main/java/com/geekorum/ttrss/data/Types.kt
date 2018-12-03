@@ -20,18 +20,18 @@
  */
 package com.geekorum.ttrss.data
 
+import android.provider.BaseColumns
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import androidx.room.Ignore
 import androidx.room.PrimaryKey
-import android.provider.BaseColumns
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import java.text.DateFormat
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.TimeZone
 import java.util.regex.Pattern
 
 /**
@@ -41,12 +41,12 @@ import java.util.regex.Pattern
 //TODO Consider setting foreign key constraints as deferred. see ForeignKey#deferred()
 
 @Entity(tableName = "articles",
-        foreignKeys = arrayOf(ForeignKey(
-                entity = Feed::class,
-                parentColumns = arrayOf("_id"),
-                childColumns = arrayOf("feed_id")
-            )))
-data class Article @Ignore constructor(
+        foreignKeys = [ForeignKey(
+            entity = Feed::class,
+            parentColumns = ["_id"],
+            childColumns = ["feed_id"]
+        )])
+data class Article constructor(
 
         @PrimaryKey(autoGenerate = true)
         @ColumnInfo(name = BaseColumns._ID)
@@ -92,7 +92,6 @@ data class Article @Ignore constructor(
         var contentExcerpt: String = ""
 ) {
 
-    constructor() : this(0, "", false, false, false, false, 0, 0, false, "", 0, "", "", "", "", "")
 
     fun getDateString(): String {
         val df: DateFormat
@@ -196,44 +195,44 @@ data class Article @Ignore constructor(
 
 
 @Entity(tableName = "categories")
-data class Category @Ignore constructor(
-        @PrimaryKey
-        @ColumnInfo(name = BaseColumns._ID)
-        var id: Long = 0,
+data class Category(
+    @PrimaryKey
+    @ColumnInfo(name = BaseColumns._ID)
+    var id: Long = 0,
 
-        var title: String = "",
+    var title: String = "",
 
-        @ColumnInfo(name = "unread_count")
-        var unreadCount: Int = 0
-) {
-    constructor() : this(0, "", 0)
-}
+    @ColumnInfo(name = "unread_count")
+    var unreadCount: Int = 0
+)
 
 
 @Entity(tableName = "feeds",
-        foreignKeys = arrayOf(ForeignKey(entity = Category::class,
-                parentColumns = arrayOf("_id"),
-                childColumns = arrayOf("cat_id"))))
-data class Feed @Ignore constructor(
+        foreignKeys = [ForeignKey(entity = Category::class,
+            parentColumns = ["_id"],
+            childColumns = ["cat_id"])
+        ])
+data class Feed(
 
-        @PrimaryKey
-        @ColumnInfo(name = BaseColumns._ID)
-        var id: Long = 0,
+    @PrimaryKey
+    @ColumnInfo(name = BaseColumns._ID)
+    var id: Long = 0,
 
-        var url: String = "",
-        var title: String = "",
+    var url: String = "",
+    var title: String = "",
 
-        @ColumnInfo(name = "cat_id", index = true)
-        var catId: Long = 0,
+    @ColumnInfo(name = "cat_id", index = true)
+    var catId: Long = 0,
 
-        @ColumnInfo(name = "display_title")
-        var displayTitle: String = "",
+    @ColumnInfo(name = "display_title")
+    var displayTitle: String = "",
 
-        @ColumnInfo(name = "last_time_update")
-        var lastTimeUpdate: Long = 0,
+    @ColumnInfo(name = "last_time_update")
+    var lastTimeUpdate: Long = 0,
 
-        @ColumnInfo(name = "unread_count")
-        var unreadCount: Int = 0) {
+    @ColumnInfo(name = "unread_count")
+    var unreadCount: Int = 0
+) {
 
     val isFreshFeed
         get() = id == FEED_ID_FRESH
@@ -250,9 +249,6 @@ data class Feed @Ignore constructor(
     val isAllArticlesFeed
         get() = id == FEED_ID_ALL_ARTICLES
 
-    constructor() : this(0, "", "", 0, "", 0, 0)
-
-
     companion object {
 
         // special feed ids when it's not a category
@@ -262,7 +258,7 @@ data class Feed @Ignore constructor(
         const val FEED_ID_FRESH = -3L
         const val FEED_ID_ALL_ARTICLES = -4L
 
-        val virtualFeedsIds by lazy {
+        private val virtualFeedsIds by lazy {
             listOf(FEED_ID_ARCHIVED, FEED_ID_STARRED, FEED_ID_PUBLISHED, FEED_ID_FRESH, FEED_ID_ALL_ARTICLES)
         }
 
@@ -289,22 +285,20 @@ data class Feed @Ignore constructor(
 
 
 @Entity(tableName = "transactions",
-        foreignKeys = arrayOf(ForeignKey(
-                entity = Article::class,
-                parentColumns = arrayOf("_id"),
-                childColumns = arrayOf("article_id"),
-                onDelete = ForeignKey.CASCADE
-        )))
-data class Transaction @Ignore constructor(
-        @PrimaryKey(autoGenerate = true)
-        @ColumnInfo(name = BaseColumns._ID)
-        var id: Long = 0,
+        foreignKeys = [ForeignKey(
+            entity = Article::class,
+            parentColumns = ["_id"],
+            childColumns = ["article_id"],
+            onDelete = ForeignKey.CASCADE
+        )])
+data class Transaction(
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = BaseColumns._ID)
+    var id: Long = 0,
 
-        @ColumnInfo(name = "article_id", index = true)
-        var articleId: Long = 0,
+    @ColumnInfo(name = "article_id", index = true)
+    var articleId: Long = 0,
 
-        var field: String = "",
-        var value: Boolean = false
-) {
-    constructor() : this(0, 0, "", false)
-}
+    var field: String = "",
+    var value: Boolean = false
+)
