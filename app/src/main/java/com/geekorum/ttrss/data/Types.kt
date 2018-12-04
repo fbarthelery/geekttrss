@@ -22,6 +22,7 @@ package com.geekorum.ttrss.data
 
 import android.provider.BaseColumns
 import androidx.room.ColumnInfo
+import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
@@ -46,52 +47,70 @@ import java.util.regex.Pattern
             parentColumns = ["_id"],
             childColumns = ["feed_id"]
         )])
-data class Article constructor(
+data class Article(
 
-        @PrimaryKey(autoGenerate = true)
-        @ColumnInfo(name = BaseColumns._ID)
-        var id: Long = 0,
+    @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = BaseColumns._ID)
+    var id: Long = 0,
 
-        var title: String = "",
+    @Embedded
+    var contentData: ArticleContentIndexed = ArticleContentIndexed(),
 
-        @ColumnInfo(name = "unread")
-        var isUnread: Boolean = false,
+    @ColumnInfo(name = "unread")
+    var isUnread: Boolean = false,
 
-        @ColumnInfo(name = "transiant_unread")
-        var isTransientUnread: Boolean = false,
+    @ColumnInfo(name = "transiant_unread")
+    var isTransientUnread: Boolean = false,
 
-        @ColumnInfo(name = "marked")
-        var isStarred: Boolean = false,
+    @ColumnInfo(name = "marked")
+    var isStarred: Boolean = false,
 
-        @ColumnInfo(name = "published")
-        var isPublished: Boolean = false,
+    @ColumnInfo(name = "published")
+    var isPublished: Boolean = false,
 
-        var score: Int = 0,
+    var score: Int = 0,
 
-        @ColumnInfo(name = "last_time_update")
-        var lastTimeUpdate: Long = 0,
+    @ColumnInfo(name = "last_time_update")
+    var lastTimeUpdate: Long = 0,
 
-        @ColumnInfo(name = "is_updated")
-        var isUpdated: Boolean = false,
+    @ColumnInfo(name = "is_updated")
+    var isUpdated: Boolean = false,
 
-        var link: String = "",
+    var link: String = "",
 
-        @ColumnInfo(name = "feed_id", index = true)
-        var feedId: Long = 0,
+    @ColumnInfo(name = "feed_id", index = true)
+    var feedId: Long = 0,
 
-        var tags: String = "",
+    @ColumnInfo(name = "flavor_image_uri")
+    var flavorImageUri: String = "",
 
-        var content: String = "",
-
-        var author: String = "",
-
-        @ColumnInfo(name = "flavor_image_uri")
-        var flavorImageUri: String = "",
-
-        @ColumnInfo(name = "content_excerpt")
-        var contentExcerpt: String = ""
+    @ColumnInfo(name = "content_excerpt")
+    var contentExcerpt: String = ""
 ) {
 
+    var title: String
+        get() = contentData.title
+        set(value) {
+            contentData.title = value
+        }
+
+    var tags: String
+        get() = contentData.tags
+        set(value) {
+            contentData.tags = value
+        }
+
+    var content: String
+        get() = contentData.content
+        set(value) {
+            contentData.content = value
+        }
+
+    var author: String
+        get() = contentData.author
+        set(value) {
+            contentData.author = value
+        }
 
     fun getDateString(): String {
         val df: DateFormat
@@ -192,6 +211,12 @@ data class Article constructor(
     }
 
 }
+
+data class ArticleContentIndexed(
+    var title: String = "",
+    var tags: String = "",
+    var content: String = "",
+    var author: String = "")
 
 
 @Entity(tableName = "categories")
