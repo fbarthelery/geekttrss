@@ -20,6 +20,7 @@
  */
 
 import com.geekorum.build.computeChangesetVersionCode
+import com.geekorum.build.dualTestImplementation
 import com.geekorum.build.getChangeSet
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.kotlin
@@ -155,7 +156,7 @@ dependencies {
 
     implementation("androidx.lifecycle:lifecycle-extensions:$lifecycleVersion")
     kapt("androidx.lifecycle:lifecycle-compiler:$lifecycleVersion")
-    testImplementation("androidx.arch.core:core-testing:$lifecycleVersion")
+    dualTestImplementation("androidx.arch.core:core-testing:$lifecycleVersion")
     implementation("androidx.paging:paging-runtime:2.0.0")
 
     // dagger

@@ -31,8 +31,8 @@ import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.providers.DbHelper
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
-import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.test.Test
 
 /**
  * Testsuite for [ArticlesDatabase] migrations.

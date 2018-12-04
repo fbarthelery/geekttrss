@@ -85,7 +85,7 @@ internal fun Project.configureTests() {
     }
 }
 
-internal fun DependencyHandler.dualTestImplementation(dependencyNotation: Any) {
+fun DependencyHandler.dualTestImplementation(dependencyNotation: Any) {
     add("androidTestImplementation", dependencyNotation)
     add("testImplementation", dependencyNotation)
 }
