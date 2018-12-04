@@ -25,6 +25,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
+import androidx.room.Fts4
 import androidx.room.PrimaryKey
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -218,6 +219,13 @@ data class ArticleContentIndexed(
     var content: String = "",
     var author: String = "")
 
+
+@Entity
+@Fts4(contentEntity = Article::class)
+data class ArticleFTS(
+    @Embedded
+    val content: ArticleContentIndexed
+)
 
 @Entity(tableName = "categories")
 data class Category(

@@ -275,7 +275,30 @@ object MigrationFrom3To4 : Migration(3, 4) {
 }
 
 
-private fun <V> SupportSQLiteDatabase.runInTransaction(body: () -> V): V {
+/**
+ * This migration add virtual FTS tables
+ */
+object MigrationFrom4To5 : Migration(4, 5) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        database.runInTransaction {
+            migrateArticleFTSTable(database)
+        }
+    }
+
+    private fun migrateArticleFTSTable(database: SupportSQLiteDatabase) {
+        with(database) {
+            execSQL("""CREATE VIRTUAL TABLE IF NOT EXISTS `ArticleFTS` USING FTS4(
+                |`title` TEXT NOT NULL,
+                |`tags` TEXT NOT NULL,
+                |`content` TEXT NOT NULL,
+                |`author` TEXT NOT NULL,
+                |content=`articles`)""".trimMargin())
+        }
+    }
+}
+
+
+fun <V> SupportSQLiteDatabase.runInTransaction(body: () -> V): V {
     beginTransaction()
     try {
         val result = body()
@@ -289,4 +312,3 @@ private fun <V> SupportSQLiteDatabase.runInTransaction(body: () -> V): V {
         endTransaction()
     }
 }
-
