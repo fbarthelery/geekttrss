@@ -90,3 +90,24 @@ internal data class SubscribeToFeedResponseContent(
     val feedId: Long = 0,
     override var error: String? = null
 ) : BaseContent()
+
+
+/*    public void unsubscribeFeed(final Feed feed) {
+    org.fox.ttrss.ApiRequest req = new org.fox.ttrss.ApiRequest(getApplicationContext()) {
+        protected void onPostExecute(JsonElement result) {
+            refresh();
+        }
+    };
+
+    @SuppressWarnings("serial")
+    HashMap<String, String> map = new HashMap<String, String>() {
+        {
+            put("sid", "sessionId");
+            put("op", "unsubscribeFeed");
+            put("feed_id", String.valueOf(feed.id));
+        }
+    };
+
+    req.execute(map);
+
+}*/

@@ -133,6 +133,7 @@ dependencies {
 
     // androidx others
     implementation("androidx.browser:browser:1.0.0")
+    implementation("androidx.fragment:fragment-ktx:1.0.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.9.0")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.1.0")
@@ -155,6 +156,7 @@ dependencies {
 
 
     implementation("androidx.lifecycle:lifecycle-extensions:$lifecycleVersion")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
     kapt("androidx.lifecycle:lifecycle-compiler:$lifecycleVersion")
     dualTestImplementation("androidx.arch.core:core-testing:$lifecycleVersion")
     implementation("androidx.paging:paging-runtime:2.0.0")
