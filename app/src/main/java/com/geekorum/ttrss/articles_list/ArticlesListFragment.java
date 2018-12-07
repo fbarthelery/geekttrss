@@ -119,7 +119,6 @@ public class ArticlesListFragment extends Fragment {
         fragmentViewModel = ViewModelProviders.of(this, viewModelFactory).get(FragmentViewModel.class);
         fragmentViewModel.init(feedId);
         fragmentViewModel.getArticles().observe(this, articles -> adapter.submitList(articles));
-        fragmentViewModel.getFeed().observe(this, feed -> requireActivity().setTitle(feed.getTitle()));
 
         fragmentViewModel.getPendingArticlesSetUnread().observe(this, nbArticles -> {
             if (nbArticles > 0) {

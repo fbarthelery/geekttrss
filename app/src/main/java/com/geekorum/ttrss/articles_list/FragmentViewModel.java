@@ -90,7 +90,7 @@ public class FragmentViewModel extends ViewModel {
         return articles;
     }
 
-    public LiveData<Feed> getFeed() {
+    private LiveData<Feed> getFeed() {
         if (feed == null) {
             feed = Transformations.switchMap(feedId, id -> {
                         if (Feed.isVirtualFeed(id)) {

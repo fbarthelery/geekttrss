@@ -58,8 +58,8 @@ import javax.inject.Inject
  */
 class ArticleListActivity : SessionActivity() {
     companion object {
-        private val FRAGMENT_ARTICLES_LIST = "articles_list"
-        private val FRAGMENT_FEEDS_LIST = "feeds_list"
+        private const val FRAGMENT_ARTICLES_LIST = "articles_list"
+        private const val FRAGMENT_FEEDS_LIST = "feeds_list"
     }
 
     /**
@@ -135,21 +135,25 @@ class ArticleListActivity : SessionActivity() {
             val feed = Feed.createVirtualFeedForId(Feed.FEED_ID_ALL_ARTICLES)
             activityViewModel.setSelectedFeed(feed)
         }
-        setupActionBar()
+        setupToolbar()
     }
 
-    private fun setupActionBar() {
+    private fun setupToolbar() {
         val toolbar = binding.toolbar.toolbar
-        setSupportActionBar(toolbar)
         toolbar.title = title
         if (!twoPane) {
             actionBarDrawerToggle = ActionBarDrawerToggle(this, binding.headlinesDrawer, toolbar,
                 R.string.drawer_open, R.string.drawer_close)
             binding.headlinesDrawer?.addDrawerListener(actionBarDrawerToggle!!)
+        } else {
+            toolbar.setNavigationIcon(R.drawable.ic_menu_24dp)
+            toolbar.setNavigationOnClickListener {
+                binding.middlePaneLayout.visibility = View.GONE
+                binding.startPaneLayout.visibility = View.VISIBLE
+            }
         }
-
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
     }
+
 
     private fun setupPeriodicJobs() {
         backgroundJobManager.setupPeriodicJobs()
@@ -163,16 +167,6 @@ class ArticleListActivity : SessionActivity() {
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         actionBarDrawerToggle?.onConfigurationChanged(newConfig)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (actionBarDrawerToggle?.onOptionsItemSelected(item) == true) {
-            return true
-        } else if (twoPane && item.itemId == android.R.id.home) {
-            binding.middlePaneLayout.visibility = View.GONE
-            binding.startPaneLayout.visibility = View.VISIBLE
-        }
-        return super.onOptionsItemSelected(item)
     }
 
     private fun onArticleSelected(position: Int, item: Article) {
@@ -197,6 +191,8 @@ class ArticleListActivity : SessionActivity() {
      *  From MasterActivity
      */
     private fun onFeedSelected(feed: Feed) {
+        title = feed.title
+        binding.toolbar.toolbar.title = title
         supportFragmentManager.transaction {
             val hf = ArticlesListFragment.newInstance(feed.id)
             replace(R.id.middle_pane_layout, hf, FRAGMENT_ARTICLES_LIST)
@@ -206,6 +202,6 @@ class ArticleListActivity : SessionActivity() {
             binding.startPaneLayout.visibility = View.GONE
         }
         drawerLayout?.closeDrawers()
-
     }
+
 }
