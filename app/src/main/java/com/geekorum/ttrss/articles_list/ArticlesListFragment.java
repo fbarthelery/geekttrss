@@ -23,31 +23,22 @@ package com.geekorum.ttrss.articles_list;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.PopupMenu;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ShareCompat;
-import androidx.databinding.ViewDataBinding;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
-import androidx.paging.PagedListAdapter;
 import androidx.recyclerview.widget.DefaultItemAnimator;
-import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.geekorum.geekdroid.views.recyclerview.ItemSwiper;
 import com.geekorum.geekdroid.views.recyclerview.ScrollFromBottomAppearanceItemAnimator;
-import com.geekorum.geekdroid.views.recyclerview.SpacingItemDecoration;
-import com.geekorum.ttrss.BR;
 import com.geekorum.ttrss.R;
 import com.geekorum.ttrss.data.Article;
 import com.geekorum.ttrss.databinding.FragmentArticleListBinding;
-import com.geekorum.ttrss.databinding.HeadlinesRowBinding;
 import com.geekorum.ttrss.di.ViewModelsFactory;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
@@ -63,7 +54,7 @@ public class ArticlesListFragment extends Fragment {
 
     private long feedId;
 
-    private ArticlesListAdapter adapter;
+    private SwipingArticlesListAdapter adapter;
     private FragmentArticleListBinding binding;
 
     @Inject
@@ -153,11 +144,10 @@ public class ArticlesListFragment extends Fragment {
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView, SwipeRefreshLayout swipeRefresh) {
-        adapter = new ArticlesListAdapter();
+        CardEventHandler eventHandler = new ArticleEventHandler(requireActivity());
+        adapter = new SwipingArticlesListAdapter(getLayoutInflater(), eventHandler);
         recyclerView.setAdapter(adapter);
-        int spacing = getResources().getDimensionPixelSize(R.dimen.article_list_spacing);
-        recyclerView.addItemDecoration(new SpacingItemDecoration(
-                spacing, spacing));
+        ArticleCardsListKt.setupCardSpacing(recyclerView);
 
         swipeRefresh.setOnRefreshListener(() -> {
             activityViewModel.refresh();
@@ -173,33 +163,12 @@ public class ArticlesListFragment extends Fragment {
         changeReadSwiper.attachToRecyclerView(recyclerView);
     }
 
-    public class ArticlesListAdapter
-            extends PagedListAdapter<Article, ArticlesListAdapter.BindingViewHolder>
+    public class SwipingArticlesListAdapter
+            extends ArticlesListAdapter
             implements ChangeReadDecoration.ArticleProvider {
 
-        private final ArticleEventHandler handler = new ArticleEventHandler();
-        private LayoutInflater layoutInflater;
-
-        ArticlesListAdapter() {
-            super(ARTICLE_DIFF_CALLBACK);
-            setHasStableIds(true);
-            layoutInflater = LayoutInflater.from(getActivity());
-        }
-
-        @Override
-        public long getItemId(int position) {
-            Article item = getItem(position);
-            if (item == null) {
-                return RecyclerView.NO_ID;
-            }
-            return item.getId();
-        }
-
-        @NonNull
-        @Override
-        public BindingViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-            ViewDataBinding binding = HeadlinesRowBinding.inflate(layoutInflater, parent, false);
-            return new BindingViewHolder(binding);
+        public SwipingArticlesListAdapter(@NonNull LayoutInflater layoutInflater, @NonNull CardEventHandler eventHandler) {
+            super(layoutInflater, eventHandler);
         }
 
         @Nullable
@@ -211,40 +180,13 @@ public class ArticlesListFragment extends Fragment {
             }
             return null;
         }
-
-        @Override
-        public void onBindViewHolder(@NonNull final BindingViewHolder holder, int position) {
-            final Article article = getItem(position);
-            ViewDataBinding binding = holder.binding;
-            holder.setArticle(article);
-            holder.setPosition(position);
-            holder.setHandler(handler);
-            binding.executePendingBindings();
-        }
-
-        public class BindingViewHolder extends RecyclerView.ViewHolder {
-            private ViewDataBinding binding;
-
-            BindingViewHolder(ViewDataBinding binding) {
-                super(binding.getRoot());
-                this.binding = binding;
-            }
-
-            public void setArticle(Article article) {
-                binding.setVariable(BR.article, article);
-            }
-
-            public void setHandler(ArticleEventHandler articleEventHandler) {
-                binding.setVariable(BR.handler, articleEventHandler);
-            }
-
-            public void setPosition(int position) {
-                binding.setVariable(BR.position, position);
-            }
-        }
     }
 
-    public class ArticleEventHandler {
+    public class ArticleEventHandler extends CardEventHandler {
+
+        ArticleEventHandler(@NonNull Context context) {
+            super(context);
+        }
 
         public void onCardClicked(View card, Article article, int position) {
             activityViewModel.displayArticle(position, article);
@@ -263,43 +205,12 @@ public class ArticlesListFragment extends Fragment {
             startActivity(shareIntent.createChooserIntent());
         }
 
-        public void onMenuButtonClicked(View button, final Article article, final int position) {
-            PopupMenu popup = new PopupMenu(getActivity(), button);
-            MenuInflater inflater = popup.getMenuInflater();
-            inflater.inflate(R.menu.item_article, popup.getMenu());
-
-            popup.setOnMenuItemClickListener(item -> onArticleMenuItemSelected(item, article, position));
-
-            popup.show();
-
-        }
-
-        private boolean onArticleMenuItemSelected(MenuItem item, Article article, int position) {
-            if (article == null) {
-                return false;
-            }
-
-            switch (item.getItemId()) {
-                case R.id.headlines_article_unread:
-                    fragmentViewModel.setArticleUnread(article.getId(), !article.isTransientUnread());
-                    return true;
-                default:
-                    return false;
-            }
+        @Override
+        public void onMenuToggleReadSelected(@NonNull Article article) {
+            fragmentViewModel.setArticleUnread(article.getId(), !article.isTransientUnread());
         }
     }
 
-    private static final DiffUtil.ItemCallback<Article> ARTICLE_DIFF_CALLBACK = new DiffUtil.ItemCallback<Article>() {
-        @Override
-        public boolean areItemsTheSame(@NonNull Article oldItem, @NonNull Article newItem) {
-            return oldItem.getId() == newItem.getId();
-        }
-
-        @Override
-        public boolean areContentsTheSame(@NonNull Article oldItem, @NonNull Article newItem) {
-            return oldItem.equals(newItem);
-        }
-    };
 
     class ChangeReadSwiper extends ItemSwiper {
 

@@ -37,7 +37,7 @@
             name="position"
             type="int" />
         <variable name="handler"
-            type="com.geekorum.ttrss.articles_list.ArticlesListFragment.ArticleEventHandler"/>
+            type="com.geekorum.ttrss.articles_list.CardEventHandler"/>
     </data>
 <com.google.android.material.card.MaterialCardView
     android:id="@+id/headlines_row"
