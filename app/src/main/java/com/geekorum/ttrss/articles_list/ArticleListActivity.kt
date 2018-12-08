@@ -281,4 +281,11 @@ class ArticleListActivity : SessionActivity() {
         supportFragmentManager.popBackStack(FRAGMENT_BACKSTACK_SEARCH, POP_BACK_STACK_INCLUSIVE)
     }
 
+    override fun onBackPressed() {
+        if (drawerLayout?.isDrawerOpen(GravityCompat.START) == true) {
+            drawerLayout?.closeDrawers()
+        } else {
+            super.onBackPressed()
+        }
+    }
 }
