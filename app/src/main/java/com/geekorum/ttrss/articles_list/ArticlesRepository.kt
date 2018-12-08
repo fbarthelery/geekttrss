@@ -93,6 +93,10 @@ class ArticlesRepository
         val setStarredAction = setFieldActionFactory.createSetStarredAction(articleId, newValue)
         setStarredAction.execute()
     }
+
+    fun searchArticles(query: String): DataSource.Factory<Int, Article> {
+        return articleDao.searchArticles(query)
+    }
 }
 
 

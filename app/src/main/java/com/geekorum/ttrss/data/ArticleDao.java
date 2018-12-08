@@ -73,6 +73,7 @@ public interface ArticleDao {
     long updateArticleMarked(long articleId, boolean isMarked);
 
     @Query("SELECT articles.* FROM ArticleFTS JOIN articles ON (ArticleFTS.rowid = _id) "
-            + "WHERE ArticleFTS MATCH :keyword")
-    DataSource.Factory<Integer, Article> searchArticles(String keyword);
+            + "WHERE ArticleFTS MATCH :query "
+            + "ORDER BY last_time_update DESC")
+    DataSource.Factory<Integer, Article> searchArticles(String query);
 }

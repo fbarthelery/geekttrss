@@ -54,6 +54,7 @@ abstract class ActivitiesInjectorModule {
     @ContributesAndroidInjector(modules = [
         com.geekorum.ttrss.articles_list.FragmentsInjectorModule::class,
         com.geekorum.ttrss.article_details.FragmentsInjectorModule::class,
+        com.geekorum.ttrss.articles_list.search.FragmentsInjectorModule::class,
         NetworkLoginModule::class,
         SelectedAccountModule::class])
     @PerAccount
