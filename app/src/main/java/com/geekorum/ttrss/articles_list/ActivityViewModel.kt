@@ -32,6 +32,9 @@ import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.geekdroid.app.lifecycle.EmptyEvent.Companion.makeEmptyEvent as RefreshEvent
+import com.geekorum.geekdroid.app.lifecycle.EmptyEvent.Companion.makeEmptyEvent as SearchClosedEvent
+import com.geekorum.geekdroid.app.lifecycle.EmptyEvent.Companion.makeEmptyEvent as SearchOpenedEvent
+
 
 /**
  * [ViewModel] for the [ArticleListActivity]
@@ -44,6 +47,15 @@ class ActivityViewModel : ViewModel() {
     val refreshEvent: LiveData<EmptyEvent> = _refreshEvent
     private val _articleSelectedEvent = MutableLiveData<Event<ArticleSelectedParameters>>()
     val articleSelectedEvent: LiveData<Event<ArticleSelectedParameters>> = _articleSelectedEvent
+
+    private val _searchOpenedEvent = MutableLiveData<EmptyEvent>()
+    val searchOpenedEvent: LiveData<EmptyEvent> = _searchOpenedEvent
+
+    private val _searchClosedEvent = MutableLiveData<EmptyEvent>()
+    val searchClosedEvent: LiveData<EmptyEvent> = _searchClosedEvent
+
+    private val _searchQuery = MutableLiveData<String>()
+    val searchQuery: LiveData<String> = _searchQuery
 
     val isRefreshing: LiveData<Boolean> = Transformations.switchMap(account) {
         SyncInProgressLiveData(it, ArticlesContract.AUTHORITY)
@@ -63,6 +75,18 @@ class ActivityViewModel : ViewModel() {
 
     fun displayArticle(position: Int, article: Article) {
         _articleSelectedEvent.value = ArticleSelectedEvent(position, article)
+    }
+
+    fun onSearchOpened() {
+        _searchOpenedEvent.value = SearchOpenedEvent()
+    }
+
+    fun onSearchClosed() {
+        _searchClosedEvent.value = SearchClosedEvent()
+    }
+
+    fun setSearchQuery(query: String) {
+        _searchQuery.value = query
     }
 
     class ArticleSelectedParameters internal constructor(val position: Int, val article: Article)

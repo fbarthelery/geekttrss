@@ -29,6 +29,7 @@ import android.preference.PreferenceManager
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.ActionBarDrawerToggle
+import androidx.appcompat.widget.SearchView
 import androidx.core.view.children
 import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
@@ -59,6 +60,7 @@ import javax.inject.Inject
 class ArticleListActivity : SessionActivity() {
     companion object {
         private const val FRAGMENT_ARTICLES_LIST = "articles_list"
+        private const val FRAGMENT_BACKSTACK_SEARCH = "search"
         private const val FRAGMENT_FEEDS_LIST = "feeds_list"
     }
 
@@ -95,6 +97,14 @@ class ArticleListActivity : SessionActivity() {
 
         activityViewModel.articleSelectedEvent.observe(this, EventObserver { parameters ->
             onArticleSelected(parameters.position, parameters.article)
+        })
+
+        activityViewModel.searchOpenedEvent.observe(this, EventObserver {
+            navigateToSearch()
+        })
+
+        activityViewModel.searchClosedEvent.observe(this, EventObserver {
+            navigateUpToList()
         })
 
         accountViewModel = ViewModelProviders.of(this, viewModelFactory).get()
@@ -141,10 +151,13 @@ class ArticleListActivity : SessionActivity() {
     private fun setupToolbar() {
         val toolbar = binding.toolbar.toolbar
         toolbar.title = title
+        setupSearch()
+
         if (!twoPane) {
             actionBarDrawerToggle = ActionBarDrawerToggle(this, binding.headlinesDrawer, toolbar,
-                R.string.drawer_open, R.string.drawer_close)
-            binding.headlinesDrawer?.addDrawerListener(actionBarDrawerToggle!!)
+                R.string.drawer_open, R.string.drawer_close).also {
+                binding.headlinesDrawer?.addDrawerListener(it)
+            }
         } else {
             toolbar.setNavigationIcon(R.drawable.ic_menu_24dp)
             toolbar.setNavigationOnClickListener {
@@ -154,6 +167,50 @@ class ArticleListActivity : SessionActivity() {
         }
     }
 
+    private fun setupSearch() {
+        val searchItem = with(binding.toolbar.toolbar) {
+            inflateMenu(R.menu.activity_articles_list)
+            menu.findItem(R.id.articles_search)
+        }
+
+        searchItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+            override fun onMenuItemActionExpand(item: MenuItem): Boolean {
+                activityViewModel.onSearchOpened()
+                return true
+            }
+
+            override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
+                activityViewModel.onSearchClosed()
+                return true
+            }
+        })
+
+        val searchView = searchItem.actionView as SearchView
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                activityViewModel.setSearchQuery(query)
+                return true
+            }
+
+            override fun onQueryTextChange(query: String): Boolean {
+                activityViewModel.setSearchQuery(query)
+                return true
+            }
+        })
+
+        supportFragmentManager.addOnBackStackChangedListener {
+            val isOnSearchFragment = supportFragmentManager.run {
+                if (backStackEntryCount > 0) {
+                    val backStackEntry = getBackStackEntryAt(backStackEntryCount - 1)
+                    return@run backStackEntry.name == FRAGMENT_BACKSTACK_SEARCH
+                }
+                false
+            }
+            if (!isOnSearchFragment) {
+                searchItem.collapseActionView()
+            }
+        }
+    }
 
     private fun setupPeriodicJobs() {
         backgroundJobManager.setupPeriodicJobs()
@@ -202,6 +259,12 @@ class ArticleListActivity : SessionActivity() {
             binding.startPaneLayout.visibility = View.GONE
         }
         drawerLayout?.closeDrawers()
+    }
+
+    private fun navigateToSearch() {
+    }
+
+    private fun navigateUpToList() {
     }
 
 }

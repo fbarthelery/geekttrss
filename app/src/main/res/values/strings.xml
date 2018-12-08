@@ -83,6 +83,7 @@
     <!-- Menus -->
     <string name="share_article">Share article</string>
     <string name="context_selection_toggle_unread">(Un)Read</string>
+    <string name="search">Search</string>
 
     <!-- Api error messages -->
     <string name="error_unknown">Error: Unknown error (see log)</string>
