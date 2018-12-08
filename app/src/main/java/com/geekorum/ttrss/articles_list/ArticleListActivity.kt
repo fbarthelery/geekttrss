@@ -30,9 +30,11 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.GravityCompat
 import androidx.core.view.children
 import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import androidx.fragment.app.transaction
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -42,6 +44,7 @@ import com.geekorum.ttrss.BackgroundJobManager
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.article_details.ArticleDetailActivity
 import com.geekorum.ttrss.article_details.ArticleDetailFragment
+import com.geekorum.ttrss.articles_list.search.ArticlesSearchFragment
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.databinding.ActivityArticleListBinding
@@ -262,9 +265,20 @@ class ArticleListActivity : SessionActivity() {
     }
 
     private fun navigateToSearch() {
+        supportFragmentManager.transaction {
+            val hf = ArticlesSearchFragment()
+            replace(R.id.middle_pane_layout, hf, FRAGMENT_ARTICLES_LIST)
+            addToBackStack(FRAGMENT_BACKSTACK_SEARCH)
+        }
+        if (twoPane) {
+            binding.middlePaneLayout.visibility = View.VISIBLE
+            binding.startPaneLayout.visibility = View.GONE
+        }
+        drawerLayout?.closeDrawers()
     }
 
     private fun navigateUpToList() {
+        supportFragmentManager.popBackStack(FRAGMENT_BACKSTACK_SEARCH, POP_BACK_STACK_INCLUSIVE)
     }
 
 }
