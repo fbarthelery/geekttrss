@@ -65,6 +65,7 @@ class ArticleListActivity : SessionActivity() {
         private const val FRAGMENT_ARTICLES_LIST = "articles_list"
         private const val FRAGMENT_BACKSTACK_SEARCH = "search"
         private const val FRAGMENT_FEEDS_LIST = "feeds_list"
+        private const val STATE_FEED_ID = "feed_id"
     }
 
     /**
@@ -95,11 +96,11 @@ class ArticleListActivity : SessionActivity() {
         setupPeriodicJobs()
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false)
 
-        activityViewModel = ViewModelProviders.of(this).get()
+        activityViewModel = ViewModelProviders.of(this, viewModelFactory).get()
         activityViewModel.selectedFeed.observe(this, Observer<Feed> { onFeedSelected(it) })
 
-        activityViewModel.articleSelectedEvent.observe(this, EventObserver { parameters ->
-            onArticleSelected(parameters.position, parameters.article)
+        activityViewModel.articleSelectedEvent.observe(this, EventObserver { (position, article) ->
+            onArticleSelected(position, article)
         })
 
         activityViewModel.searchOpenedEvent.observe(this, EventObserver {
@@ -145,15 +146,14 @@ class ArticleListActivity : SessionActivity() {
             supportFragmentManager.transaction {
                 replace(R.id.start_pane_layout, feedListFragment, FRAGMENT_FEEDS_LIST)
             }
-            val feed = Feed.createVirtualFeedForId(Feed.FEED_ID_ALL_ARTICLES)
-            activityViewModel.setSelectedFeed(feed)
         }
+        val feedId = savedInstanceState?.getLong(STATE_FEED_ID) ?: Feed.FEED_ID_ALL_ARTICLES
+        activityViewModel.setSelectedFeed(feedId)
         setupToolbar()
     }
 
     private fun setupToolbar() {
         val toolbar = binding.toolbar.toolbar
-        toolbar.title = title
         setupSearch()
 
         if (!twoPane) {
@@ -227,6 +227,11 @@ class ArticleListActivity : SessionActivity() {
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         actionBarDrawerToggle?.onConfigurationChanged(newConfig)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putLong(STATE_FEED_ID, activityViewModel.selectedFeed.value?.id ?: Feed.FEED_ID_ALL_ARTICLES)
     }
 
     private fun onArticleSelected(position: Int, item: Article) {

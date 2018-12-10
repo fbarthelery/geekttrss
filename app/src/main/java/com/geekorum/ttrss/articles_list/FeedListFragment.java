@@ -237,8 +237,9 @@ public class FeedListFragment extends Fragment implements NavigationView.OnNavig
 
         // find feed
         for (Feed feed : currentFeeds) {
-            if (feed.getId() == item.getItemId()) {
-                activityViewModel.setSelectedFeed(feed);
+            long feedId = feed.getId();
+            if (feedId == item.getItemId()) {
+                activityViewModel.setSelectedFeed(feedId);
                 return true;
             }
         }
@@ -269,7 +270,7 @@ public class FeedListFragment extends Fragment implements NavigationView.OnNavig
                     feed.setId(category.getId());
                     feed.setTitle(category.getTitle());
                     // TODO is cat = true);
-                    activityViewModel.setSelectedFeed(feed);
+//                    activityViewModel.setSelectedFeed(feed);
                 } else {
                     displayFeedCategory(category);
                 }

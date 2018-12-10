@@ -28,9 +28,11 @@ import androidx.lifecycle.ViewModel
 import com.geekorum.geekdroid.accounts.SyncInProgressLiveData
 import com.geekorum.geekdroid.app.lifecycle.EmptyEvent
 import com.geekorum.geekdroid.app.lifecycle.Event
+import com.geekorum.ttrss.BackgroundJobManager
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.providers.ArticlesContract
+import javax.inject.Inject
 import com.geekorum.geekdroid.app.lifecycle.EmptyEvent.Companion.makeEmptyEvent as RefreshEvent
 import com.geekorum.geekdroid.app.lifecycle.EmptyEvent.Companion.makeEmptyEvent as SearchClosedEvent
 import com.geekorum.geekdroid.app.lifecycle.EmptyEvent.Companion.makeEmptyEvent as SearchOpenedEvent
@@ -39,12 +41,15 @@ import com.geekorum.geekdroid.app.lifecycle.EmptyEvent.Companion.makeEmptyEvent 
 /**
  * [ViewModel] for the [ArticleListActivity]
  */
-class ActivityViewModel : ViewModel() {
+class ActivityViewModel @Inject constructor(
+    private val feedsRepository: FeedsRepository,
+    private val backgroundJobManager: BackgroundJobManager
+) : ViewModel() {
     private val account = MutableLiveData<Account>()
-    private val _selectedFeed = MutableLiveData<Feed>()
-    val selectedFeed: LiveData<Feed> = _selectedFeed
-    private val _refreshEvent = MutableLiveData<EmptyEvent>()
-    val refreshEvent: LiveData<EmptyEvent> = _refreshEvent
+    private val _selectedFeed = MutableLiveData<Long>()
+    val selectedFeed: LiveData<Feed> = Transformations.switchMap(_selectedFeed) {
+        feedsRepository.getFeedById(it)
+    }
     private val _articleSelectedEvent = MutableLiveData<Event<ArticleSelectedParameters>>()
     val articleSelectedEvent: LiveData<Event<ArticleSelectedParameters>> = _articleSelectedEvent
 
@@ -65,12 +70,17 @@ class ActivityViewModel : ViewModel() {
         this.account.value = account
     }
 
-    fun setSelectedFeed(feed: Feed) {
-        _selectedFeed.value = feed
+    fun setSelectedFeed(id: Long) {
+        _selectedFeed.value = id
     }
 
     fun refresh() {
-        _refreshEvent.value = RefreshEvent()
+        val feed = selectedFeed.value
+        if (feed != null) {
+            backgroundJobManager.refreshFeed(account.value, feed.id)
+        } else {
+            backgroundJobManager.refresh(account.value)
+        }
     }
 
     fun displayArticle(position: Int, article: Article) {
@@ -89,7 +99,7 @@ class ActivityViewModel : ViewModel() {
         _searchQuery.value = query
     }
 
-    class ArticleSelectedParameters internal constructor(val position: Int, val article: Article)
+    data class ArticleSelectedParameters(val position: Int, val article: Article)
 
     @Suppress("FunctionName")
     private fun ArticleSelectedEvent(position: Int, article: Article) =

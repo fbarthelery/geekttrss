@@ -22,6 +22,7 @@ package com.geekorum.ttrss.articles_list
 
 import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
@@ -67,7 +68,14 @@ class FeedsRepository
             return feedsDao.allUnreadCategories
         }
 
-    fun getFeedById(feedId: Long): LiveData<Feed> = feedsDao.getFeedById(feedId)
+    fun getFeedById(feedId: Long): LiveData<Feed> {
+        return when {
+            Feed.isVirtualFeed(feedId) -> MutableLiveData<Feed>().apply {
+                value = Feed.createVirtualFeedForId(feedId)
+            }
+            else -> feedsDao.getFeedById(feedId)
+        }
+    }
 
     private fun addSpecialFeeds(feeds: List<Feed>): List<Feed> {
         // add special feeds

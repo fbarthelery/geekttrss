@@ -55,6 +55,8 @@ abstract class ActivitiesInjectorModule {
         com.geekorum.ttrss.articles_list.FragmentsInjectorModule::class,
         com.geekorum.ttrss.article_details.FragmentsInjectorModule::class,
         com.geekorum.ttrss.articles_list.search.FragmentsInjectorModule::class,
+        ActivityViewModelModule::class,
+        TinyrssApiModule::class,
         NetworkLoginModule::class,
         SelectedAccountModule::class])
     @PerAccount
@@ -68,14 +70,10 @@ abstract class ActivitiesInjectorModule {
 @Module
 abstract class FragmentsInjectorModule {
 
-    @ContributesAndroidInjector(modules = [
-        ViewModelModule::class,
-        TinyrssApiModule::class])
+    @ContributesAndroidInjector(modules = [ViewModelModule::class])
     internal abstract fun contributesArticleListFragmentInjector(): ArticlesListFragment
 
-    @ContributesAndroidInjector(modules = [
-        ViewModelModule::class,
-        TinyrssApiModule::class])
+    @ContributesAndroidInjector(modules = [ViewModelModule::class])
     internal abstract fun contributesFeedListFragmentInjector(): FeedListFragment
 
 }
@@ -92,6 +90,15 @@ private abstract class ViewModelModule {
     @IntoMap
     @ClassKey(FeedsViewModel::class)
     abstract fun getFeedsViewModel(feedsViewModel: FeedsViewModel): ViewModel
+
+}
+
+@Module
+private abstract class ActivityViewModelModule{
+    @Binds
+    @IntoMap
+    @ClassKey(ActivityViewModel::class)
+    abstract fun getActivityViewModel(activityViewModel: ActivityViewModel): ViewModel
 
 }
 

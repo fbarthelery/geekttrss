@@ -120,11 +120,6 @@ public class ArticlesListFragment extends Fragment {
         activityViewModel = ViewModelProviders.of(requireActivity()).get(ActivityViewModel.class);
         binding.setActivityViewModel(activityViewModel);
         binding.setFragmentViewModel(fragmentViewModel);
-        activityViewModel.getRefreshEvent().observe(this, event -> {
-            if (event.getContentIfNotHandled() != null) {
-                fragmentViewModel.refresh();
-            }
-        });
     }
 
     private void updateSetUnreadSnackbar(Integer nbArticles) {

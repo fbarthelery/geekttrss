@@ -92,13 +92,7 @@ public class FragmentViewModel extends ViewModel {
 
     private LiveData<Feed> getFeed() {
         if (feed == null) {
-            feed = Transformations.switchMap(feedId, id -> {
-                        if (Feed.isVirtualFeed(id)) {
-                            return createFeedLivedata(Feed.createVirtualFeedForId(id));
-                        }
-                        return feedsRepository.getFeedById(id);
-                    }
-            );
+            feed = Transformations.switchMap(feedId, id -> feedsRepository.getFeedById(id));
         }
         return feed;
     }
