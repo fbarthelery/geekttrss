@@ -26,7 +26,7 @@ import com.geekorum.ttrss.providers.ArticlesProvidersDao;
 
 @Database(entities = {Article.class, ArticleFTS.class,
         Category.class, Feed.class, Transaction.class},
-        version = 5)
+        version = 6)
 public abstract class ArticlesDatabase extends RoomDatabase {
 
     public static final String DATABASE_NAME = "room_articles.db";

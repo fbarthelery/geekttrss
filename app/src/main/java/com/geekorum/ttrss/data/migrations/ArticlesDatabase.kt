@@ -297,6 +297,14 @@ object MigrationFrom4To5 : Migration(4, 5) {
     }
 }
 
+/**
+ * This migration is caused by an upgrade of room. No changes are necessary
+ */
+object MigrationFrom5To6 : Migration(5, 6) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+    }
+}
+
 
 fun <V> SupportSQLiteDatabase.runInTransaction(body: () -> V): V {
     beginTransaction()

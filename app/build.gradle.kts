@@ -171,6 +171,7 @@ dependencies {
     kaptTest("com.google.dagger:dagger-android-processor:$daggerVersion")
 
     implementation("androidx.room:room-runtime:$roomVersion")
+    implementation("androidx.room:room-coroutines:$roomVersion")
     kapt("androidx.room:room-compiler:$roomVersion")
     androidTestImplementation("androidx.room:room-testing:$roomVersion")
     testImplementation("androidx.test.ext:truth:1.0.0")

@@ -181,6 +181,25 @@ class ArticlesDatabaseMigrationTest {
         }
     }
 
+    @Test
+    fun migrate5To6() {
+        helper.createDatabase(TEST_DB, 5).use {
+            // db has schema version 5. insert some contentData using SQL queries.
+            // You cannot use DAO classes because they expect the latest schema.
+            // as our schema for this migration doesn't change much from the previous
+            // we can reuse the same function
+            createSomeArticles(it)
+        }
+
+        helper.runMigrationsAndValidate(TEST_DB, 6, true,
+            MigrationFrom1To2, MigrationFrom2To3, MigrationFrom3To4, MigrationFrom4To5,
+            MigrationFrom5To6).use {
+            // MigrationTestHelper automatically verifies the schema changes,
+            // but you need to validate that the contentData was migrated properly.
+            assertMigration1To2DataIntegrity(it)
+        }
+    }
+
     companion object {
         private val TEST_DB = "migration-test"
     }
