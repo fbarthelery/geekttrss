@@ -141,6 +141,9 @@ internal class LoginViewModel @Inject constructor(
                         || response.error == ApiCallException.ApiError.NOT_LOGGED_IN ->
                     loginFailedEvent.value = LoginFailedEvent(R.string.error_login_failed)
 
+                response.error == ApiCallException.ApiError.API_DISABLED ->
+                    loginFailedEvent.value = LoginFailedEvent(R.string.error_api_disabled)
+
                 else -> loginFailedEvent.value = LoginFailedEvent(R.string.error_unknown)
             }
         } catch (e: Exception) {
