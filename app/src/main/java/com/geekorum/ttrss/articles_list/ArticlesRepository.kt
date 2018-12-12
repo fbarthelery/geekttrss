@@ -30,6 +30,7 @@ import com.geekorum.ttrss.data.TransactionsDao
 import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.session.Action
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
@@ -82,13 +83,6 @@ class ArticlesRepository
         return setUnreadAction
     }
 
-    private fun saveTransaction(articleId: Long, field: ArticlesContract.Transaction.Field, value: Boolean) {
-        val transaction = Transaction(articleId = articleId,
-            field = field.toString(),
-            value = value)
-        transactionsDao.insertTransaction(transaction)
-    }
-
     fun setArticleStarred(articleId: Long, newValue: Boolean) {
         val setStarredAction = setFieldActionFactory.createSetStarredAction(articleId, newValue)
         setStarredAction.execute()
@@ -111,13 +105,15 @@ open class SetArticleFieldAction(
     private var executionJob: Job? = null
 
     override fun execute() {
-        executionJob = GlobalScope.launch{
+        executionJob = GlobalScope.launch(Dispatchers.IO) {
             updateArticleField(newValue)
         }
     }
 
     override fun undo() {
-        GlobalScope.launch{
+        GlobalScope.launch(Dispatchers.IO) {
+            // wait for the request to be cancelled and done
+            // to be sure that the new one happens after
             executionJob?.cancelAndJoin()
             updateArticleField(!newValue)
         }

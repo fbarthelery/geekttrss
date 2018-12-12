@@ -35,9 +35,6 @@ abstract class TransactionsDao {
     abstract fun insertTransaction(transaction: Transaction)
 
     @Delete
-    abstract fun deleteTransactions(vararg transactions: Transaction)
-
-    @Delete
     abstract fun deleteTransactions(transactions: Collection<Transaction>)
 
 
