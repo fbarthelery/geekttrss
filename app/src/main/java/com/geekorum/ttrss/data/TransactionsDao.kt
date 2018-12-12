@@ -32,17 +32,17 @@ import androidx.room.Query
 @Dao
 abstract class TransactionsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insertTransaction(transaction: Transaction)
+    abstract fun insertTransaction(transaction: Transaction)
 
     @Delete
-    abstract suspend fun deleteTransactions(vararg transactions: Transaction)
+    abstract fun deleteTransactions(vararg transactions: Transaction)
 
     @Delete
-    abstract suspend fun deleteTransactions(transactions: Collection<Transaction>)
+    abstract fun deleteTransactions(transactions: Collection<Transaction>)
 
 
     @Query("SELECT * FROM transactions WHERE article_id=:articleId AND field=:field")
-    abstract suspend fun getTransactionForArticleAndType(articleId: Long, field: String): List<Transaction>
+    abstract fun getTransactionForArticleAndType(articleId: Long, field: String): List<Transaction>
 
     /**
      * Insert a unique transaction for a [Transaction.articleId] [Transaction.field] pair.
@@ -50,7 +50,7 @@ abstract class TransactionsDao {
      * @param transaction
      */
     @androidx.room.Transaction
-    open suspend fun insertUniqueTransaction(transaction: Transaction) {
+    open fun insertUniqueTransaction(transaction: Transaction) {
         val existingTransactions = getTransactionForArticleAndType(transaction.articleId, transaction.field)
         deleteTransactions(existingTransactions)
         insertTransaction(transaction)

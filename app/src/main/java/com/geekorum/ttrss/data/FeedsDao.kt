@@ -40,8 +40,8 @@ abstract class FeedsDao {
     @get:Query("SELECT * FROM feeds ORDER BY title")
     abstract val allFeeds: LiveData<List<Feed>>
 
-    @Query("SELECT * FROM feeds")
-    internal abstract suspend fun getAllFeedsList(): List<Feed>
+    @get:Query("SELECT * FROM feeds")
+    internal abstract val allFeedsList: List<Feed>
 
     @get:Query("SELECT * FROM categories ORDER BY title")
     abstract val allCategories: LiveData<List<Category>>
@@ -49,20 +49,20 @@ abstract class FeedsDao {
     @get:Query("SELECT * FROM categories WHERE unread_count > 0 ORDER BY title")
     abstract val allUnreadCategories: LiveData<List<Category>>
 
-    @Query("SELECT * FROM categories")
-    abstract suspend fun getAllCategoriesList(): List<Category>
+    @get:Query("SELECT * FROM categories")
+    internal abstract val allCategoriesList: List<Category>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insertFeeds(feeds: Collection<Feed>)
+    abstract fun insertFeeds(feeds: Collection<Feed>)
 
     @Delete
-    internal abstract suspend fun deleteFeeds(feeds: Collection<Feed>)
+    internal abstract fun deleteFeeds(feeds: Collection<Feed>)
 
     @Query("DELETE FROM ARTICLES where feed_id=:feedId")
     internal abstract fun deleteArticleFromFeed(feedId: Long)
 
     @Transaction
-    open suspend fun deleteFeedsAndArticles(toBeDelete: List<Feed>) {
+    open fun deleteFeedsAndArticles(toBeDelete: List<Feed>) {
         for ((id) in toBeDelete) {
             deleteArticleFromFeed(id)
         }
@@ -74,10 +74,10 @@ abstract class FeedsDao {
     abstract fun getFeedById(id: Long): LiveData<Feed>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insertCategories(categories: Collection<Category>)
+    abstract fun insertCategories(categories: Collection<Category>)
 
     @Delete
-    abstract suspend fun deleteCategories(categories: Collection<Category>)
+    abstract fun deleteCategories(categories: Collection<Category>)
 
     @Query("SELECT * FROM feeds WHERE unread_count > 0 AND cat_id=:catId ORDER BY title")
     abstract fun getUnreadFeedsForCategory(catId: Long): LiveData<List<Feed>>
@@ -86,23 +86,25 @@ abstract class FeedsDao {
     abstract fun getFeedsForCategory(catId: Long): LiveData<List<Feed>>
 
     @Transaction
-    open suspend fun setFeedsAndCategories(feeds: Collection<Feed>, categories: Collection<Category>) {
+    open fun setFeedsAndCategories(feeds: Collection<Feed>, categories: Collection<Category>) {
         setCategories(categories)
         setFeeds(feeds)
     }
 
-    private suspend fun setFeeds(feeds: Collection<Feed>) {
+    private fun setFeeds(feeds: Collection<Feed>) {
         val feedsIds: List<Long> = feeds.map { it.id }
-        val toDelete = getAllFeedsList().filter { it.id !in feedsIds }
+        val toDelete = allFeedsList.filter { it.id !in feedsIds }
 
         deleteFeedsAndArticles(toDelete)
         insertFeeds(feeds)
     }
 
-    private suspend fun setCategories(categories: Collection<Category>) {
+    private fun setCategories(categories: Collection<Category>) {
         val categoriesIds: List<Long> = categories.map { category -> category.id }
-        val toDelete = getAllCategoriesList().filter { it.id !in categoriesIds }
+        val toDelete = allCategoriesList.filter { it.id !in categoriesIds }
         deleteCategories(toDelete)
         insertCategories(categories)
     }
+
+
 }

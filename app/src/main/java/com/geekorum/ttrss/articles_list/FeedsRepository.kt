@@ -29,7 +29,6 @@ import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.data.FeedsDao
 import com.geekorum.ttrss.network.ApiCallException
 import com.geekorum.ttrss.network.ApiService
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -99,7 +98,7 @@ class FeedsRepository
         return feedsDao.getFeedsForCategory(catId)
     }
 
-    private fun refresh() = GlobalScope.launch(Dispatchers.IO) {
+    private fun refresh() = GlobalScope.launch {
         try {
             val feeds = apiService.getFeeds()
             val categories = apiService.getCategories()
