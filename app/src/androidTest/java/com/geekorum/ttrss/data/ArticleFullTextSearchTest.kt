@@ -30,7 +30,6 @@ import androidx.room.Room
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.geekorum.ttrss.data.migrations.runInTransaction
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.providers.DbHelper
 import com.google.common.truth.Truth.assertThat
@@ -94,65 +93,62 @@ class ArticleFullTextSearchTest {
 
 
     private fun createSomeArticles(db: SupportSQLiteDatabase) {
-        db.runInTransaction {
-            var values = contentValuesOf(
-                ArticlesContract.Category._ID to 0,
-                ArticlesContract.Category.TITLE to "category",
-                ArticlesContract.Category.UNREAD_COUNT to 2
-            )
-            db.insert(DbHelper.TABLE_CATEGORIES, SQLiteDatabase.CONFLICT_NONE, values)
+        var values = contentValuesOf(
+            ArticlesContract.Category._ID to 0,
+            ArticlesContract.Category.TITLE to "category",
+            ArticlesContract.Category.UNREAD_COUNT to 2
+        )
+        db.insert(DbHelper.TABLE_CATEGORIES, SQLiteDatabase.CONFLICT_NONE, values)
 
-            values = contentValuesOf(
-                ArticlesContract.Feed.TITLE to "feed title",
-                ArticlesContract.Feed.URL to "feed url",
-                ArticlesContract.Feed.CAT_ID to 0,
-                ArticlesContract.Feed.UNREAD_COUNT to 2,
-                ArticlesContract.Feed.LAST_TIME_UPDATE to 0,
-                ArticlesContract.Feed.DISPLAY_TITLE to "display title"
-            )
-            db.insert(DbHelper.TABLE_FEEDS, SQLiteDatabase.CONFLICT_NONE, values)
+        values = contentValuesOf(
+            ArticlesContract.Feed.TITLE to "feed title",
+            ArticlesContract.Feed.URL to "feed url",
+            ArticlesContract.Feed.CAT_ID to 0,
+            ArticlesContract.Feed.UNREAD_COUNT to 2,
+            ArticlesContract.Feed.LAST_TIME_UPDATE to 0,
+            ArticlesContract.Feed.DISPLAY_TITLE to "display title"
+        )
+        db.insert(DbHelper.TABLE_FEEDS, SQLiteDatabase.CONFLICT_NONE, values)
 
-            values = contentValuesOf(
-                ArticlesContract.Article._ID to 0,
-                ArticlesContract.Article.TITLE to "article title",
-                ArticlesContract.Article.CONTENT to "a content",
-                ArticlesContract.Article.SCORE to 0,
-                ArticlesContract.Article.PUBLISHED to 1,
-                ArticlesContract.Article.LAST_TIME_UPDATE to 0,
-                ArticlesContract.Article.UNREAD to 1,
-                ArticlesContract.Article.TRANSIENT_UNREAD to 1,
-                ArticlesContract.Article.STARRED to 1,
-                ArticlesContract.Article.IS_UPDATED to 1,
-                ArticlesContract.Article.FEED_ID to 1,
-                ArticlesContract.Article.LINK to "article links",
-                ArticlesContract.Article.TAGS to "article tags",
-                ArticlesContract.Article.AUTHOR to "article author",
-                ArticlesContract.Article.FLAVOR_IMAGE_URI to "article flavor image uri",
-                ArticlesContract.Article.CONTENT_EXCERPT to "a content excerpt"
-            )
-            db.insert(DbHelper.TABLE_ARTICLES, SQLiteDatabase.CONFLICT_NONE, values)
+        values = contentValuesOf(
+            ArticlesContract.Article._ID to 0,
+            ArticlesContract.Article.TITLE to "article title",
+            ArticlesContract.Article.CONTENT to "a content",
+            ArticlesContract.Article.SCORE to 0,
+            ArticlesContract.Article.PUBLISHED to 1,
+            ArticlesContract.Article.LAST_TIME_UPDATE to 0,
+            ArticlesContract.Article.UNREAD to 1,
+            ArticlesContract.Article.TRANSIENT_UNREAD to 1,
+            ArticlesContract.Article.STARRED to 1,
+            ArticlesContract.Article.IS_UPDATED to 1,
+            ArticlesContract.Article.FEED_ID to 1,
+            ArticlesContract.Article.LINK to "article links",
+            ArticlesContract.Article.TAGS to "article tags",
+            ArticlesContract.Article.AUTHOR to "article author",
+            ArticlesContract.Article.FLAVOR_IMAGE_URI to "article flavor image uri",
+            ArticlesContract.Article.CONTENT_EXCERPT to "a content excerpt"
+        )
+        db.insert(DbHelper.TABLE_ARTICLES, SQLiteDatabase.CONFLICT_NONE, values)
 
-            values = contentValuesOf(
-                ArticlesContract.Article._ID to 1,
-                ArticlesContract.Article.TITLE to "Comment Linux est devenu un enjeu strategique pour la silicon valley",
-                ArticlesContract.Article.CONTENT to """L’emblématique système d’exploitation libre est devenu un outil-clé
+        values = contentValuesOf(
+            ArticlesContract.Article._ID to 1,
+            ArticlesContract.Article.TITLE to "Comment Linux est devenu un enjeu strategique pour la silicon valley",
+            ArticlesContract.Article.CONTENT to """L’emblématique système d’exploitation libre est devenu un outil-clé
                     |de tous les grands groupes du Web, comme l’illustre le rachat de Red Hat. […]""".trimMargin(),
-                ArticlesContract.Article.SCORE to 0,
-                ArticlesContract.Article.PUBLISHED to 1,
-                ArticlesContract.Article.LAST_TIME_UPDATE to 0,
-                ArticlesContract.Article.UNREAD to 1,
-                ArticlesContract.Article.TRANSIENT_UNREAD to 1,
-                ArticlesContract.Article.STARRED to 1,
-                ArticlesContract.Article.IS_UPDATED to 1,
-                ArticlesContract.Article.FEED_ID to 1,
-                ArticlesContract.Article.LINK to "article links",
-                ArticlesContract.Article.TAGS to "article tags",
-                ArticlesContract.Article.AUTHOR to "article author",
-                ArticlesContract.Article.FLAVOR_IMAGE_URI to "article flavor image uri",
-                ArticlesContract.Article.CONTENT_EXCERPT to "a content excerpt"
-            )
-            db.insert(DbHelper.TABLE_ARTICLES, SQLiteDatabase.CONFLICT_NONE, values)
-        }
-
+            ArticlesContract.Article.SCORE to 0,
+            ArticlesContract.Article.PUBLISHED to 1,
+            ArticlesContract.Article.LAST_TIME_UPDATE to 0,
+            ArticlesContract.Article.UNREAD to 1,
+            ArticlesContract.Article.TRANSIENT_UNREAD to 1,
+            ArticlesContract.Article.STARRED to 1,
+            ArticlesContract.Article.IS_UPDATED to 1,
+            ArticlesContract.Article.FEED_ID to 1,
+            ArticlesContract.Article.LINK to "article links",
+            ArticlesContract.Article.TAGS to "article tags",
+            ArticlesContract.Article.AUTHOR to "article author",
+            ArticlesContract.Article.FLAVOR_IMAGE_URI to "article flavor image uri",
+            ArticlesContract.Article.CONTENT_EXCERPT to "a content excerpt"
+        )
+        db.insert(DbHelper.TABLE_ARTICLES, SQLiteDatabase.CONFLICT_NONE, values)
     }
 }

@@ -37,12 +37,10 @@ object MigrationFrom1To2 : Migration(1, 2) {
 
     override fun migrate(database: SupportSQLiteDatabase) {
         // Migrate primitive field to add not null constraint
-        database.runInTransaction {
-            migrateCategoriesTable(database)
-            migrateFeedsTable(database)
-            migrateTransactionTable(database)
-            migrateArticlesTable(database)
-        }
+        migrateCategoriesTable(database)
+        migrateFeedsTable(database)
+        migrateTransactionTable(database)
+        migrateArticlesTable(database)
     }
 
     private fun migrateCategoriesTable(database: SupportSQLiteDatabase) {
@@ -135,13 +133,10 @@ object MigrationFrom1To2 : Migration(1, 2) {
 /** This migration makes fields non nullable **/
 object MigrationFrom2To3 : Migration(2, 3) {
     override fun migrate(database: SupportSQLiteDatabase) {
-        database.runInTransaction {
-            migrateCategoriesTables(database)
-            migrateTransactionTable(database)
-            migrateFeedsTable(database)
-            migrateArticlesTable(database)
-
-        }
+        migrateCategoriesTables(database)
+        migrateTransactionTable(database)
+        migrateFeedsTable(database)
+        migrateArticlesTable(database)
     }
 
     private fun migrateCategoriesTables(database: SupportSQLiteDatabase) {
@@ -249,9 +244,7 @@ object MigrationFrom2To3 : Migration(2, 3) {
 /** This migration add some cascade on delete constraints **/
 object MigrationFrom3To4 : Migration(3, 4) {
     override fun migrate(database: SupportSQLiteDatabase) {
-        database.runInTransaction {
-            migrateTransactionTable(database)
-        }
+        migrateTransactionTable(database)
     }
 
     private fun migrateTransactionTable(database: SupportSQLiteDatabase) {
@@ -280,9 +273,7 @@ object MigrationFrom3To4 : Migration(3, 4) {
  */
 object MigrationFrom4To5 : Migration(4, 5) {
     override fun migrate(database: SupportSQLiteDatabase) {
-        database.runInTransaction {
-            migrateArticleFTSTable(database)
-        }
+        migrateArticleFTSTable(database)
     }
 
     private fun migrateArticleFTSTable(database: SupportSQLiteDatabase) {
@@ -302,21 +293,6 @@ object MigrationFrom4To5 : Migration(4, 5) {
  */
 object MigrationFrom5To6 : Migration(5, 6) {
     override fun migrate(database: SupportSQLiteDatabase) {
-    }
-}
-
-
-fun <V> SupportSQLiteDatabase.runInTransaction(body: () -> V): V {
-    beginTransaction()
-    try {
-        val result = body()
-        setTransactionSuccessful()
-        return result
-    } catch (e: RuntimeException) {
-        throw e
-    } catch (e: Exception) {
-        throw RuntimeException("Exception in transaction", e)
-    } finally {
-        endTransaction()
+        // nothing to do here
     }
 }
