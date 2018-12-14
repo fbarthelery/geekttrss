@@ -256,6 +256,7 @@ class ArticleListActivity : SessionActivity() {
      *  From MasterActivity
      */
     private fun onFeedSelected(feed: Feed) {
+        navigateUpToList()
         title = feed.title
         binding.toolbar.toolbar.title = title
         supportFragmentManager.transaction {
