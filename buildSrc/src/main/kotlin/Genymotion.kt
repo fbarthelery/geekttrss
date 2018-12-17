@@ -45,7 +45,7 @@ internal fun Project.configureGenymotionDevices(useLocalDevices: Boolean = false
         }
         if (useLocalDevices) {
             devices(closureOf<NamedDomainObjectContainer<VDLaunchDsl>> {
-                create("nexus9-v24") {
+                register("nexus9-v24") {
                     template = "Google Nexus 9 - 7.0.0 - API 24 - 1536x2048"
                 }
             })
@@ -53,13 +53,13 @@ internal fun Project.configureGenymotionDevices(useLocalDevices: Boolean = false
 
         if (useCloudDevices) {
             cloudDevices(closureOf<NamedDomainObjectContainer<CloudVDLaunchDsl>> {
-                create("nexus9-v24") {
+                register("nexus9-v24") {
                     template = "Google Nexus 9 - 7.0.0 - API 24 - 1536x2048"
                 }
             })
 
             cloudDevices(closureOf<NamedDomainObjectContainer<CloudVDLaunchDsl>> {
-                create("pixel2-v26") {
+                register("pixel2-v26") {
                     template = "Google Pixel 2 - 8.0 - API 26 - 1080x1920"
                 }
             })

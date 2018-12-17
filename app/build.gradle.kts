@@ -59,7 +59,9 @@ android {
             }
         }
         sourceSets {
-            get("androidTest").assets.srcDir(files("$projectDir/schemas"))
+            named("androidTest") {
+                assets.srcDir(files("$projectDir/schemas"))
+            }
         }
     }
 
@@ -112,14 +114,7 @@ repositories {
     }
 }
 
-val lifecycleVersion: String by rootProject.extra
-val roomVersion: String by rootProject.extra
 val daggerVersion: String by rootProject.extra
-val kotlinVersion: String by rootProject.extra
-val corountinesVersion: String by rootProject.extra
-val GEEKDROID_PROJECT_DIR: String? by project
-val geekdroidExt = GEEKDROID_PROJECT_DIR?.let { "" } ?: "aar"
-
 dependencies {
 
     implementation("androidx.core:core-ktx:1.0.1")
@@ -138,6 +133,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.9.0")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.1.0")
 
+    val GEEKDROID_PROJECT_DIR: String? by project
+    val geekdroidExt = GEEKDROID_PROJECT_DIR?.let { "" } ?: "aar"
     implementation(group = "com.geekorum", name = "geekdroid", version = "0.0.1", ext = geekdroidExt)
     create(group = "com.geekorum", name = "geekdroid-firebase", version = "0.0.1", ext = geekdroidExt).also {
         add("googleImplementation", it)
@@ -154,7 +151,7 @@ dependencies {
 
     implementation("org.jsoup:jsoup:1.10.2")
 
-
+    val lifecycleVersion: String by rootProject.extra
     implementation("androidx.lifecycle:lifecycle-extensions:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
     kapt("androidx.lifecycle:lifecycle-compiler:$lifecycleVersion")
@@ -170,15 +167,17 @@ dependencies {
     kaptTest("com.google.dagger:dagger-compiler:$daggerVersion")
     kaptTest("com.google.dagger:dagger-android-processor:$daggerVersion")
 
+    val roomVersion: String by rootProject.extra
     implementation("androidx.room:room-runtime:$roomVersion")
     implementation("androidx.room:room-coroutines:$roomVersion")
     kapt("androidx.room:room-compiler:$roomVersion")
     androidTestImplementation("androidx.room:room-testing:$roomVersion")
-    testImplementation("androidx.test.ext:truth:1.0.0")
-    androidTestImplementation("androidx.test.ext:truth:1.0.0")
+    dualTestImplementation("androidx.test.ext:truth:1.1.0")
 
+    val kotlinVersion: String by rootProject.extra
     implementation(kotlin("stdlib-jdk8", kotlinVersion))
 
+    val corountinesVersion: String by rootProject.extra
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$corountinesVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$corountinesVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$corountinesVersion")

@@ -21,10 +21,11 @@
 
 plugins {
     `kotlin-dsl`
-    `kotlin-dsl-precompiled-script-plugins`
-    `java-gradle-plugin`
 }
 
+kotlinDslPluginOptions {
+    experimentalWarning.set(false)
+}
 
 version = "1.0"
 

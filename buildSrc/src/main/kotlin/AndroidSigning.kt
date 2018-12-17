@@ -31,7 +31,7 @@ internal fun Project.configureReleaseSigningConfig() {
 
     extensions.configure<BaseExtension>("android") {
         signingConfigs {
-            create("release") {
+            register("release") {
                 storeFile =  file(releaseStoreFile)
                 storePassword = releaseStorePassword
                 keyAlias = releaseKeyAlias
@@ -40,7 +40,9 @@ internal fun Project.configureReleaseSigningConfig() {
         }
 
         buildTypes {
-            getByName("release").signingConfig = signingConfigs.getByName("release")
+            named("release") {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
 }

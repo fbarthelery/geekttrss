@@ -51,7 +51,7 @@ fun Project.computeChangesetVersionCode(major: Int = 0, minor: Int = 0, patch: I
     return base + (getHgLocalRevisionNumber()?.trim()?.toIntOrNull() ?: 0)
 }
 
-private fun runCommand(
+private fun Project.runCommand(
     command: String,
     workingDir: File = File("."),
     timeoutAmount: Long = 60,
@@ -66,7 +66,7 @@ private fun runCommand(
                 waitFor(timeoutAmount, timeoutUnit)
             }.inputStream.bufferedReader().readText()
     } catch (e: IOException) {
-        e.printStackTrace()
+        logger.info("Unable to run command", e)
         null
     }
 }

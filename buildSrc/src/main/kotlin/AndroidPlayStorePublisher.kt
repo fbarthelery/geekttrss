@@ -29,6 +29,9 @@ import org.gradle.api.plugins.ExtensionAware
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.get
+import org.gradle.kotlin.dsl.getValue
+import org.gradle.kotlin.dsl.provideDelegate
+import org.gradle.kotlin.dsl.registering
 import org.gradle.kotlin.dsl.the
 
 
@@ -55,4 +58,19 @@ internal fun Project.configureAndroidPlayStorePublisher(): Unit {
     playAccountConfigs.register("google") {
         serviceAccountCredentials = file(properties["PLAY_STORE_JSON_KEY_FILE"]!!)
     }
+
+    tasks.apply {
+        register("publishToGooglePlayStore") {
+            group = "Continuous Delivery"
+            description = "Publish project to Google play store"
+            dependsOn(named("publishGoogleRelease"))
+        }
+
+        register("promoteOnGooglePlayStore") {
+            group = "Continuous Delivery"
+            description = "Promote project Google play store"
+            dependsOn(named("promoteGoogleReleaseArtifact"))
+        }
+    }
+
 }
