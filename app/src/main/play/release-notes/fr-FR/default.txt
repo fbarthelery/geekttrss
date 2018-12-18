@@ -1,0 +1,2 @@
+Vous pouvez maintenant effectuer une recherche parmi vos flux RSS !
+Tout cela est accompagné de corrections de bugs divers.

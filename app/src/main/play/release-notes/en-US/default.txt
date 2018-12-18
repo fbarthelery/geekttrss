@@ -1,0 +1,2 @@
+You can now search from all your feeds!
+Also there are a few bug fixes.
