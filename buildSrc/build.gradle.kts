@@ -23,21 +23,27 @@ plugins {
     `kotlin-dsl`
 }
 
+version = "1.0"
+
 kotlinDslPluginOptions {
     experimentalWarning.set(false)
 }
 
-version = "1.0"
 
 repositories {
     gradlePluginPortal()
     jcenter()
     google()
+    maven {
+        // Workaround for genymotion plugin not working on gradle 5.0
+        // we publish 1.4.1 version with fixes
+        url = URI("https://raw.githubusercontent.com/fbarthelery/genymotion-gradle-plugin/master/repo/")
+    }
 }
 
 dependencies {
     implementation("com.android.tools.build:gradle:3.2.1")
-    implementation("com.genymotion:plugin:1.4")
+    implementation("com.genymotion:plugin:1.4.1")
     implementation("gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.14.0")
     implementation("com.github.triplet.gradle:play-publisher:2.0.0-rc2")
 }
