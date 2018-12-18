@@ -24,9 +24,9 @@ plugins {
     id("com.google.android.gms.oss-licenses-plugin") version "0.9.3.1" apply false
     id("com.google.gms.google-services") version "3.2.0" apply false
     id("io.fabric") version "1.25.4" apply false
-    kotlin("android") version "1.3.0" apply false
-    kotlin("kapt") version "1.3.0" apply false
-    id("kotlinx-serialization") version "1.3.0" apply false
+    kotlin("android") version "1.3.11" apply false
+    kotlin("kapt") version "1.3.11" apply false
+    id("kotlinx-serialization") version "1.3.11" apply false
 }
 
 
@@ -35,7 +35,7 @@ extra["compileSdkVersion"] = "android-28"
 extra["daggerVersion"] = "2.16"
 extra["lifecycleVersion"] = "2.0.0"
 extra["roomVersion"] = "2.1.0-alpha03"
-extra["kotlinVersion"] = "1.3.0"
+extra["kotlinVersion"] = "1.3.11"
 extra["corountinesVersion"] = "1.0.1"
 
 
