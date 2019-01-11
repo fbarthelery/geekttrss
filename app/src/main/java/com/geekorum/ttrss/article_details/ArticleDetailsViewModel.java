@@ -1,4 +1,4 @@
-/**
+/*
  * Geekttrss is a RSS feed reader application on the Android Platform.
  *
  * Copyright (C) 2017-2018 by Frederic-Charles Barthelery.
@@ -123,6 +123,11 @@ public class ArticleDetailsViewModel extends ViewModel {
 
     public void toggleArticleRead() {
         Article articleInfo = article.getValue();
-        articlesRepository.setArticleUnread(articleInfo.getId(), !articleInfo.isUnread());
+        setArticleUnread(!articleInfo.isUnread());
+    }
+
+    public void setArticleUnread(boolean read) {
+        Article articleInfo = article.getValue();
+        articlesRepository.setArticleUnread(articleInfo.getId(), read);
     }
 }

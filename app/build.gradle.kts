@@ -192,7 +192,7 @@ dependencies {
 
 // force usage of dagger 2.16 for now
 // https://issuetracker.google.com/issues/115738511
-// should be fixed on AGP 3.3.0-alpha-13 ?
+// should be fixed on AGP 3.3.0-beta03 ?
 configurations.all {
     resolutionStrategy.eachDependency {
         if (requested.group == "com.google.dagger") {
