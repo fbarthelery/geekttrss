@@ -126,8 +126,8 @@ public class ArticleDetailsViewModel extends ViewModel {
         setArticleUnread(!articleInfo.isUnread());
     }
 
-    public void setArticleUnread(boolean read) {
+    public void setArticleUnread(boolean unread) {
         Article articleInfo = article.getValue();
-        articlesRepository.setArticleUnread(articleInfo.getId(), read);
+        articlesRepository.setArticleUnread(articleInfo.getId(), unread);
     }
 }

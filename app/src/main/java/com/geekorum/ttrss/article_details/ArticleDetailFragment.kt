@@ -38,6 +38,7 @@ import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
+import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -48,6 +49,10 @@ import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.databinding.FragmentArticleDetailBinding
 import com.geekorum.ttrss.di.ViewModelsFactory
 import dagger.android.support.AndroidSupportInjection
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 
 import java.util.Locale
@@ -73,6 +78,8 @@ class ArticleDetailFragment : Fragment() {
     lateinit var viewModelFactory: ViewModelsFactory
     @Inject
     lateinit var okHttpClient: OkHttpClient
+
+    private var markReadJob: Job? = null
 
     private val cssOverride: String
         get() {
@@ -103,8 +110,20 @@ class ArticleDetailFragment : Fragment() {
     ): View? {
         binding = FragmentArticleDetailBinding.inflate(inflater, container, false)
         binding.setLifecycleOwner(this)
-        configureWebView()
         return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        configureWebView()
+
+        binding.root.setOnScrollChangeListener { v, _, scrollY, _, _ ->
+            val root = v as NestedScrollView
+            if (root.isAtEndOfArticle) {
+                markReadJob?.cancel()
+                articleDetailsViewModel.setArticleUnread(false)
+            }
+        }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -227,6 +246,7 @@ class ArticleDetailFragment : Fragment() {
     override fun onStop() {
         super.onStop()
         chromeClient.onHideCustomView()
+        markReadJob?.cancel()
     }
 
     private inner class FSVideoChromeClient : WebChromeClient() {
@@ -282,12 +302,35 @@ class ArticleDetailFragment : Fragment() {
             articleDetailsViewModel.openUrlInBrowser(view.context, request.url)
             return true
         }
+
+        override fun onPageFinished(view: WebView?, url: String?) {
+            super.onPageFinished(view, url)
+            val root = binding.root as NestedScrollView
+            if (root.isAtEndOfArticle) {
+                markReadJob = GlobalScope.launch {
+                    delay(2000)
+                    articleDetailsViewModel.setArticleUnread(false)
+                }
+            }
+        }
     }
 
     private fun Int.toRgbaCall(): String {
         return "rgba(%d, %d, %d, %.2f)".format(Locale.ENGLISH,
             Color.red(this), Color.green(this), Color.blue(this), Color.alpha(this) / 255f)
     }
+
+    private val NestedScrollView.scrollRange: Int
+        get() = getChildAt(0)?.let { child ->
+            val lp = child.layoutParams as ViewGroup.MarginLayoutParams
+            val childSize = child.height + lp.topMargin + lp.bottomMargin
+            val parentSpace = height - paddingTop - paddingBottom
+            Math.max(0, childSize - parentSpace)
+        } ?: 0
+
+    private val NestedScrollView.isAtEndOfArticle: Boolean
+        // consider it done when we have enough space to show bottom appbar
+        get() = scrollY >= scrollRange - paddingBottom
 
     companion object {
 
