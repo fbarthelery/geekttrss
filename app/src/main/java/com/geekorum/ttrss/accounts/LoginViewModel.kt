@@ -26,16 +26,15 @@ import androidx.annotation.VisibleForTesting
 import androidx.databinding.InverseMethod
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
-import com.geekorum.geekdroid.app.lifecycle.CoroutinesViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.geekorum.geekdroid.app.lifecycle.Event
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.network.ApiCallException
 import com.geekorum.ttrss.network.impl.LoginRequestPayload
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 /**
  * ViewModel for LoginActivity
@@ -43,7 +42,7 @@ import kotlin.coroutines.CoroutineContext
 internal class LoginViewModel @Inject constructor(
     private val accountManager: TinyrssAccountManager,
     private val networkComponentBuilder: AuthenticatorNetworkComponent.Builder
-) : CoroutinesViewModel() {
+) : ViewModel() {
 
     var username = ""
     var password = ""
@@ -114,7 +113,7 @@ internal class LoginViewModel @Inject constructor(
     fun confirmLogin(id: Int = EditorInfo.IME_NULL): Boolean {
         val handleAction = (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL)
         if (handleAction && checkFieldsCorrect()) {
-            launch {
+            viewModelScope.launch {
                 doLogin()
             }
         }
@@ -122,7 +121,7 @@ internal class LoginViewModel @Inject constructor(
     }
 
     @VisibleForTesting
-    internal suspend fun doLogin(context: CoroutineContext = coroutineContext) = withContext(context) {
+    internal suspend fun doLogin() {
         val urlModule = TinyRssUrlModule(httpUrl!!.toString())
         val networkComponent = networkComponentBuilder
             .tinyRssUrlModule(urlModule)

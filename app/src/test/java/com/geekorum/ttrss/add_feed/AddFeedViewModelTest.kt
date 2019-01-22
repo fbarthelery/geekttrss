@@ -89,7 +89,7 @@ class AddFeedViewModelTest {
             FeedInformation(HttpUrl.parse("https://apple.com")!!, "type2", "title2"))
         every { feedExtractor.extract(any<String>()) }.returns( feeds)
         coEvery { okHttpClient.newCall(any()).execute().body()!!.string() } returns("anything")
-        coEvery { okHttpClient.newCall(any()).execute()!!.close() } just Runs
+        coEvery { okHttpClient.newCall(any()).execute().close() } just Runs
 
         var result: List<FeedInformation>? = null
         val observer = Observer<List<FeedInformation>> {
@@ -97,7 +97,7 @@ class AddFeedViewModelTest {
         }
         target.availableFeeds.observeForever(observer)
         runBlocking {
-            target.initWithUrl(HttpUrl.parse("https://some.google.com/")!!, coroutineContext)
+            target.initWithUrl(HttpUrl.parse("https://some.google.com/")!!)
         }
 
         assertThat(result).isEqualTo(feeds)
@@ -114,7 +114,7 @@ class AddFeedViewModelTest {
         }
         target.availableFeeds.observeForever(observer)
         runBlocking {
-            target.initWithUrl(HttpUrl.parse("https://some.google.com/")!!, coroutineContext)
+            target.initWithUrl(HttpUrl.parse("https://some.google.com/")!!)
         }
 
         assertThat(result).isEmpty()

@@ -28,8 +28,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.geekorum.geekdroid.accounts.AccountsLiveData
-import com.geekorum.geekdroid.app.lifecycle.CoroutinesViewModel
 import com.geekorum.geekdroid.app.lifecycle.EmptyEvent
 import com.geekorum.ttrss.BackgroundJobManager
 import com.geekorum.ttrss.accounts.AccountAuthenticator
@@ -43,7 +43,6 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import java.io.IOException
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 import com.geekorum.geekdroid.app.lifecycle.EmptyEvent.Companion.makeEmptyEvent as CompleteEvent
 
 /**
@@ -54,7 +53,7 @@ class AddFeedViewModel @Inject constructor(
     private val okHttpClient: OkHttpClient,
     private val backgroundJobManager: BackgroundJobManager,
     accountManager: AccountManager
-) : CoroutinesViewModel() {
+) : ViewModel() {
 
     private val feedsInformation = MutableLiveData<List<FeedInformation>>()
     val availableFeeds = feedsInformation as LiveData<List<FeedInformation>>
@@ -90,12 +89,12 @@ class AddFeedViewModel @Inject constructor(
         accounts.removeObserver(accountObserver)
     }
 
-    fun init(documentUrl: HttpUrl) = launch {
-        initWithUrl(documentUrl, coroutineContext)
+    fun init(documentUrl: HttpUrl) = viewModelScope.launch {
+        initWithUrl(documentUrl)
     }
 
     @VisibleForTesting()
-    internal suspend fun initWithUrl(documentUrl: HttpUrl, context: CoroutineContext = coroutineContext)  = withContext(context){
+    internal suspend fun initWithUrl(documentUrl: HttpUrl) {
         try {
             val document = getHtmlDocument(documentUrl)
             init(document)

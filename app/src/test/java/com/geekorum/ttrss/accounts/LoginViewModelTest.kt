@@ -93,7 +93,7 @@ class LoginViewModelTest {
         viewModel.httpUrl = HttpUrl.parse("http://localhost")
 
         runBlocking {
-            viewModel.doLogin(coroutineContext)
+            viewModel.doLogin()
         }
 
         verifySequence {
@@ -116,7 +116,7 @@ class LoginViewModelTest {
         viewModel.httpUrl = HttpUrl.parse("http://localhost")
 
         runBlocking {
-            viewModel.doLogin(coroutineContext)
+            viewModel.doLogin()
         }
         verify {
             observer.onChanged(match {
@@ -140,7 +140,7 @@ class LoginViewModelTest {
         viewModel.httpUrl = HttpUrl.parse("http://localhost")
 
         runBlocking {
-            viewModel.doLogin(coroutineContext)
+            viewModel.doLogin()
         }
         verify { observer.onChanged(any()) }
     }

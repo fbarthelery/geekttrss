@@ -21,8 +21,8 @@
 package com.geekorum.ttrss.articles_list
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.distinctUntilChanged
 import androidx.paging.DataSource
-import com.geekorum.geekdroid.getDistinct
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleDao
 import com.geekorum.ttrss.data.Transaction
@@ -75,7 +75,7 @@ class ArticlesRepository
         return articleDao.getAllUnreadArticlesUpdatedAfterTime(time)
     }
 
-    fun getArticleById(articleId: Long): LiveData<Article> = articleDao.getArticleById(articleId).getDistinct()
+    fun getArticleById(articleId: Long): LiveData<Article> = articleDao.getArticleById(articleId).distinctUntilChanged()
 
     fun setArticleUnread(articleId: Long, newValue: Boolean): Action {
         val setUnreadAction = setFieldActionFactory.createSetUnreadAction(articleId, newValue)
