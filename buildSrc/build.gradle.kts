@@ -46,5 +46,5 @@ dependencies {
     implementation("com.android.tools.build:gradle:3.3.0")
     implementation("com.genymotion:plugin:1.4.1")
     implementation("gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.14.0")
-    implementation("com.github.triplet.gradle:play-publisher:2.0.0-rc2")
+    implementation("com.github.triplet.gradle:play-publisher:2.1.0")
 }

@@ -192,22 +192,6 @@ dependencies {
     configurations["freeImplementation"].exclude(group = "com.google.firebase")
 }
 
-
-tasks {
-    // add a publishRelease task to publish the release we want on play store
-    plugins.withId("com.github.triplet.play") {
-        val publishRelease by registering {
-            dependsOn(named("publishGoogleRelease"))
-        }
-        afterEvaluate {
-            named<Task>("promoteArtifact") {
-                dependsOn.remove(named("promoteFreeReleaseArtifact"))
-            }
-        }
-    }
-}
-
-
 apply {
     val playServicesActivated = file("google-services.json").exists()
     if (playServicesActivated) {

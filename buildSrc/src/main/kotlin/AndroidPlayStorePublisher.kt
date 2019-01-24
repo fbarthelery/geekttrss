@@ -29,6 +29,7 @@ import org.gradle.api.plugins.ExtensionAware
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.get
+import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.getValue
 import org.gradle.kotlin.dsl.provideDelegate
 import org.gradle.kotlin.dsl.registering
@@ -45,20 +46,20 @@ internal fun Project.configureAndroidPlayStorePublisher(): Unit {
     apply<PlayPublisherPlugin>()
     configure<PlayPublisherExtension> {
         defaultToAppBundles = false
-        serviceAccountCredentials = file(properties["PLAY_STORE_JSON_KEY_FILE"]!!)
         track = properties.getOrDefault("PLAY_STORE_TRACK", "internal") as String
         fromTrack = properties.getOrDefault("PLAY_STORE_FROM_TRACK", "internal") as String
     }
 
-    val android = the<AppExtension>()
-    val androidExtensionsAware = android as ExtensionAware
-    val playAccountConfigs =
-        androidExtensionsAware.extensions["playConfigs"] as NamedDomainObjectContainer<PlayPublisherExtension>
+    val android = the<AppExtension>() as ExtensionAware
+    val playAccountConfigs: NamedDomainObjectContainer<PlayPublisherExtension> = android.extensions.getByType()
 
     playAccountConfigs.register("google") {
         serviceAccountCredentials = file(properties["PLAY_STORE_JSON_KEY_FILE"]!!)
     }
 
+    // On GPP-2.1.0 flavors publishing tasks for variant without credentials are skipped
+    // However the flavors will still be build for nothing
+    // Use publishToGooglePlayStore task to specify exactly which variant to build and publish
     tasks.apply {
         register("publishToGooglePlayStore") {
             group = "Continuous Delivery"
@@ -66,10 +67,11 @@ internal fun Project.configureAndroidPlayStorePublisher(): Unit {
             dependsOn(named("publishGoogleRelease"))
         }
 
+        // only there for consistent naming scheme
         register("promoteOnGooglePlayStore") {
             group = "Continuous Delivery"
             description = "Promote project Google play store"
-            dependsOn(named("promoteGoogleReleaseArtifact"))
+            dependsOn(named("promoteArtifact"))
         }
     }
 
