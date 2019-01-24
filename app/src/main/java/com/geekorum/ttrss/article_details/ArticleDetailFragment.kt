@@ -54,9 +54,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
-
 import java.util.Locale
-
 import javax.inject.Inject
 
 /**
@@ -117,10 +115,10 @@ class ArticleDetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         configureWebView()
 
-        binding.root.setOnScrollChangeListener { v, _, scrollY, _, _ ->
+        binding.root.setOnScrollChangeListener { v, _, _, _, _ ->
+            markReadJob?.cancel()
             val root = v as NestedScrollView
             if (root.isAtEndOfArticle) {
-                markReadJob?.cancel()
                 articleDetailsViewModel.setArticleUnread(false)
             }
         }
