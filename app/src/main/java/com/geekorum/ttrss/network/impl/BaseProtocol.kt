@@ -24,12 +24,15 @@ import androidx.annotation.Keep
 import com.geekorum.ttrss.network.ApiCallException
 import kotlinx.serialization.CompositeDecoder
 import kotlinx.serialization.Decoder
+import kotlinx.serialization.Encoder
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialDescriptor
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Serializer
 import kotlinx.serialization.Transient
 import kotlinx.serialization.internal.IntSerializer
+import kotlinx.serialization.internal.SerialClassDescImpl
 import kotlinx.serialization.internal.makeNullable
 import kotlinx.serialization.json.JsonParsingException
 import kotlinx.serialization.list
@@ -142,6 +145,16 @@ data class ListContent<T>(
         val contentSerializer: KSerializer<E>
     ) : KSerializer<ListContent<E>> {
 
+        override val descriptor: SerialDescriptor = object : SerialClassDescImpl("ListContentSerializer") {
+            init {
+                addElement("error")
+            }
+        }
+
+        override fun serialize(output: Encoder, obj: ListContent<E>) {
+            TODO("not implemented")
+        }
+
         override fun deserialize(input: Decoder): ListContent<E> {
             // fallback to error parsing
             return deserializeList(input) ?: deserializeBaseContent(input)
@@ -203,6 +216,18 @@ data class ListResponsePayload<T>(
     class ListResponsePayloadSerializer<E>(
         val contentSerializer: KSerializer<E>
     ) : KSerializer<ListResponsePayload<E>> {
+
+        override val descriptor: SerialDescriptor = object : SerialClassDescImpl("ListResponsePayloadSerializer") {
+            init {
+                addElement("seq")
+                addElement("status")
+                addElement("content")
+            }
+        }
+
+        override fun serialize(output: Encoder, obj: ListResponsePayload<E>) {
+            TODO("not implemented")
+        }
 
         override fun deserialize(input: Decoder): ListResponsePayload<E> {
             val contentDecoder = input.beginStructure(descriptor)

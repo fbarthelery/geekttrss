@@ -177,7 +177,8 @@ dependencies {
     dualTestImplementation("androidx.test.ext:truth:1.1.0")
 
     val kotlinVersion: String by rootProject.extra
-    implementation(kotlin("stdlib-jdk8", kotlinVersion))
+    implementation(enforcedPlatform(kotlin("bom", kotlinVersion)))
+    implementation(kotlin("stdlib-jdk8"))
 
     val corountinesVersion: String by rootProject.extra
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$corountinesVersion")
