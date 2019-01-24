@@ -24,16 +24,21 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.net.Uri;
-import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.core.app.ShareCompat;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 import com.geekorum.geekdroid.ArchComponentsExtKt;
+import com.geekorum.geekdroid.network.BrowserLauncher;
+import com.geekorum.ttrss.R;
 import com.geekorum.ttrss.articles_list.ArticlesRepository;
 import com.geekorum.ttrss.data.Article;
-import com.geekorum.ttrss.network.BrowserLauncher;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
@@ -47,19 +52,29 @@ public class ArticleDetailsViewModel extends ViewModel {
     private LiveData<Article> article;
     private LiveData<String> articleContent;
 
+    private static final String[] PREFFERED_PACKAGES_LIST = new String[]{
+            "org.mozilla.focus"
+    };
+
     @Inject
     public ArticleDetailsViewModel(ArticlesRepository articlesRepository, BrowserLauncher browserLauncher) {
         this.articlesRepository = articlesRepository;
         this.browserLauncher = browserLauncher;
-        browserLauncher.warmUp();
+        browserLauncher.warmUp((BrowserLauncher.PreferredPackageSelector) this::orderPreferredPackages);
     }
 
+    @NotNull
+    private List<String> orderPreferredPackages(List<String> availablePackages) {
+        return Stream.concat(Stream.of(PREFFERED_PACKAGES_LIST).filter(availablePackages::contains),
+                availablePackages.stream())
+                .distinct().collect(Collectors.toList());
+    }
 
     public void init(long articleId) {
         if (article == null) {
             LiveData<Article> tempArticle = Transformations.switchMap(this.articleId, articlesRepository::getArticleById);
             article = Transformations.map(tempArticle, a -> {
-                browserLauncher.mayLaunchUri(Uri.parse(a.getLink()));
+                browserLauncher.mayLaunchUrl(Uri.parse(a.getLink()));
                 return a;
             });
             articleContent = ArchComponentsExtKt.getDistinct(Transformations.map(article, Article::getContent));
@@ -86,7 +101,13 @@ public class ArticleDetailsViewModel extends ViewModel {
     }
 
     public void openUrlInBrowser(Context context, Uri uri) {
-        browserLauncher.launchUrl(context, uri, CustomTabsIntent.Builder::addDefaultShareMenuItem);
+        browserLauncher.launchUrl(context, uri, builder -> {
+            int tabColor = context.getColor(R.color.primary);
+            builder.addDefaultShareMenuItem()
+                    .setToolbarColor(tabColor)
+                    .setShowTitle(true)
+                    .enableUrlBarHiding();
+        });
     }
 
     public void shareArticle(Activity activity) {
