@@ -28,7 +28,7 @@ import com.geekorum.ttrss.logging.LoggingModule;
 import com.geekorum.ttrss.providers.ArticleProviderComponent;
 import dagger.BindsInstance;
 import dagger.Component;
-import dagger.android.AndroidInjectionModule;
+import dagger.android.support.AndroidSupportInjectionModule;
 
 import javax.inject.Singleton;
 
@@ -36,7 +36,7 @@ import javax.inject.Singleton;
  * Main component for the application
  */
 @Component(modules = {
-        AndroidInjectionModule.class,
+        AndroidSupportInjectionModule.class,
         AndroidBindingsModule.class,
         ViewModelsModule.class,
         NetworkModule.class,
