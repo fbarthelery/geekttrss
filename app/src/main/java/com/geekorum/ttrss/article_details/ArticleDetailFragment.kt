@@ -38,6 +38,7 @@ import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
+import androidx.core.view.doOnNextLayout
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -304,10 +305,14 @@ class ArticleDetailFragment : Fragment() {
         override fun onPageFinished(view: WebView?, url: String?) {
             super.onPageFinished(view, url)
             val root = binding.root as NestedScrollView
-            if (root.isAtEndOfArticle) {
-                markReadJob = GlobalScope.launch {
-                    delay(2000)
-                    articleDetailsViewModel.setArticleUnread(false)
+            // sometimes onPageFinished is called before updating the webview.
+            // wait for next layout pass to calculate if we have reached end
+            root.doOnNextLayout {
+                if (root.isAtEndOfArticle) {
+                    markReadJob = GlobalScope.launch {
+                        delay(2000)
+                        articleDetailsViewModel.setArticleUnread(false)
+                    }
                 }
             }
         }
