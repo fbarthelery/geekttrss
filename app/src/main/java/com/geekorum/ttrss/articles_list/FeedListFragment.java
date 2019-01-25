@@ -1,4 +1,4 @@
-/**
+/*
  * Geekttrss is a RSS feed reader application on the Android Platform.
  *
  * Copyright (C) 2017-2018 by Frederic-Charles Barthelery.
@@ -20,7 +20,6 @@
  */
 package com.geekorum.ttrss.articles_list;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -36,27 +35,23 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.ActivityOptionsCompat;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProviders;
+import com.geekorum.ttrss.BaseFragment;
 import com.geekorum.ttrss.R;
 import com.geekorum.ttrss.SettingsActivity;
 import com.geekorum.ttrss.data.Category;
 import com.geekorum.ttrss.data.Feed;
 import com.geekorum.ttrss.databinding.FragmentFeedsBinding;
 import com.geekorum.ttrss.databinding.MenuFeedActionViewBinding;
-import com.geekorum.ttrss.di.ViewModelsFactory;
 import com.google.android.material.navigation.NavigationView;
-import dagger.android.support.AndroidSupportInjection;
 
 import java.util.List;
-
-import javax.inject.Inject;
 
 /**
  * Display the list of feeds.
  */
-public class FeedListFragment extends Fragment implements NavigationView.OnNavigationItemSelectedListener {
+public class FeedListFragment extends BaseFragment implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final int MENU_GROUP_ID_SPECIAL = 1;
 
@@ -68,15 +63,6 @@ public class FeedListFragment extends Fragment implements NavigationView.OnNavig
     private ActivityViewModel activityViewModel;
     private LiveData<List<Feed>> feedsForCategory;
     private TtrssAccountViewModel accountViewModel;
-
-    @Inject
-    ViewModelsFactory viewModelFactory;
-
-    @Override
-    public void onAttach(Context context) {
-        AndroidSupportInjection.inject(this);
-        super.onAttach(context);
-    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -103,7 +89,7 @@ public class FeedListFragment extends Fragment implements NavigationView.OnNavig
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         boolean showUnreadOnly = preferences.getBoolean("show_unread_only", true);
-        feedsViewModel = ViewModelProviders.of(this, viewModelFactory).get(FeedsViewModel.class);
+        feedsViewModel = ViewModelProviders.of(this, getViewModelsFactory()).get(FeedsViewModel.class);
         feedsViewModel.setOnlyUnread(showUnreadOnly);
 
         categoriesDisplayed = preferences.getBoolean("enable_cats", false);
@@ -118,7 +104,7 @@ public class FeedListFragment extends Fragment implements NavigationView.OnNavig
                 transformFeedsInMenuEntry(binding.navigationView.getMenu(), feeds);
             });
         }
-        activityViewModel = ViewModelProviders.of(requireActivity(), viewModelFactory).get(ActivityViewModel.class);
+        activityViewModel = ViewModelProviders.of(requireActivity(), getViewModelsFactory()).get(ActivityViewModel.class);
         activityViewModel.getSelectedFeed().observe(this, feed -> {
             Menu menu = binding.navigationView.getMenu();
             MenuItem item = menu.findItem((int) feed.getId());
@@ -127,7 +113,7 @@ public class FeedListFragment extends Fragment implements NavigationView.OnNavig
             }
         });
 
-        accountViewModel = ViewModelProviders.of(requireActivity(), viewModelFactory).get(TtrssAccountViewModel.class);
+        accountViewModel = ViewModelProviders.of(requireActivity(), getViewModelsFactory()).get(TtrssAccountViewModel.class);
         accountViewModel.getSelectedAccount().observe(this, account -> {
             if (account != null) {
                 View headerView = binding.navigationView.getHeaderView(0);

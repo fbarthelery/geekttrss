@@ -1,4 +1,4 @@
-/**
+/*
  * Geekttrss is a RSS feed reader application on the Android Platform.
  *
  * Copyright (C) 2017-2018 by Frederic-Charles Barthelery.
@@ -20,42 +20,31 @@
  */
 package com.geekorum.ttrss.articles_list.search
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ShareCompat
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
-import androidx.lifecycle.get
+import com.geekorum.ttrss.BaseFragment
+import com.geekorum.ttrss.activityViewModels
 import com.geekorum.ttrss.articles_list.ActivityViewModel
 import com.geekorum.ttrss.articles_list.ArticlesListAdapter
 import com.geekorum.ttrss.articles_list.CardEventHandler
 import com.geekorum.ttrss.articles_list.setupCardSpacing
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.databinding.FragmentArticlesSearchBinding
-import com.geekorum.ttrss.di.ViewModelsFactory
-import dagger.android.support.AndroidSupportInjection
-import javax.inject.Inject
+import com.geekorum.ttrss.viewModels
 
 /**
  * Display search results
  */
-class ArticlesSearchFragment : Fragment() {
+class ArticlesSearchFragment : BaseFragment() {
 
-    @Inject
-    lateinit var viewModelsFactory: ViewModelsFactory
     lateinit var binding: FragmentArticlesSearchBinding
-    lateinit var activityViewModel: ActivityViewModel
-    lateinit var searchViewModel: SearchViewModel
+    private val activityViewModel: ActivityViewModel by activityViewModels()
+    private val searchViewModel: SearchViewModel by viewModels()
     private lateinit var adapter: ArticlesListAdapter
-
-    override fun onAttach(context: Context) {
-        AndroidSupportInjection.inject(this)
-        super.onAttach(context)
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentArticlesSearchBinding.inflate(inflater, container, false)
@@ -75,11 +64,9 @@ class ArticlesSearchFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        activityViewModel = ViewModelProviders.of(requireActivity(), viewModelsFactory).get()
         activityViewModel.searchQuery.observe(this, Observer {
             searchViewModel.setSearchQuery(it)
         })
-        searchViewModel = ViewModelProviders.of(this, viewModelsFactory).get()
         searchViewModel.articles.observe(this, Observer {
             adapter.submitList(it)
         })

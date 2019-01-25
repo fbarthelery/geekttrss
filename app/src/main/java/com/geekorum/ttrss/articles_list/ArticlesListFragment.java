@@ -1,4 +1,4 @@
-/**
+/*
  * Geekttrss is a RSS feed reader application on the Android Platform.
  *
  * Copyright (C) 2017-2018 by Frederic-Charles Barthelery.
@@ -28,7 +28,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ShareCompat;
-import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -36,20 +35,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.geekorum.geekdroid.views.recyclerview.ItemSwiper;
 import com.geekorum.geekdroid.views.recyclerview.ScrollFromBottomAppearanceItemAnimator;
+import com.geekorum.ttrss.BaseFragment;
 import com.geekorum.ttrss.R;
 import com.geekorum.ttrss.data.Article;
 import com.geekorum.ttrss.databinding.FragmentArticleListBinding;
-import com.geekorum.ttrss.di.ViewModelsFactory;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
 import dagger.android.support.AndroidSupportInjection;
 
-import javax.inject.Inject;
-
 /**
  * Display all the articles in a list.
  */
-public class ArticlesListFragment extends Fragment {
+public class ArticlesListFragment extends BaseFragment {
     private static final String ARG_FEED_ID = "feed_id";
 
     private long feedId;
@@ -57,8 +54,6 @@ public class ArticlesListFragment extends Fragment {
     private SwipingArticlesListAdapter adapter;
     private FragmentArticleListBinding binding;
 
-    @Inject
-    ViewModelsFactory viewModelFactory;
     private FragmentViewModel fragmentViewModel;
     private ActivityViewModel activityViewModel;
     private Snackbar setUnreadSnackbar = null;
@@ -107,7 +102,7 @@ public class ArticlesListFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        fragmentViewModel = ViewModelProviders.of(this, viewModelFactory).get(FragmentViewModel.class);
+        fragmentViewModel = ViewModelProviders.of(this, getViewModelsFactory()).get(FragmentViewModel.class);
         fragmentViewModel.init(feedId);
         fragmentViewModel.getArticles().observe(this, articles -> adapter.submitList(articles));
 
@@ -162,7 +157,7 @@ public class ArticlesListFragment extends Fragment {
             extends ArticlesListAdapter
             implements ChangeReadDecoration.ArticleProvider {
 
-        public SwipingArticlesListAdapter(@NonNull LayoutInflater layoutInflater, @NonNull CardEventHandler eventHandler) {
+        SwipingArticlesListAdapter(@NonNull LayoutInflater layoutInflater, @NonNull CardEventHandler eventHandler) {
             super(layoutInflater, eventHandler);
         }
 
@@ -183,15 +178,15 @@ public class ArticlesListFragment extends Fragment {
             super(context);
         }
 
-        public void onCardClicked(View card, Article article, int position) {
+        public void onCardClicked(@NonNull View card, @NonNull Article article, int position) {
             activityViewModel.displayArticle(position, article);
         }
 
-        public void onStarChanged(Article article, boolean newValue) {
+        public void onStarChanged(@NonNull Article article, boolean newValue) {
             fragmentViewModel.setArticleStarred(article.getId(), newValue);
         }
 
-        public void onShareClicked(Article article) {
+        public void onShareClicked(@NonNull Article article) {
             ShareCompat.IntentBuilder shareIntent = ShareCompat.IntentBuilder.from(requireActivity());
             shareIntent.setSubject(article.getTitle())
                     .setHtmlText(article.getContent())

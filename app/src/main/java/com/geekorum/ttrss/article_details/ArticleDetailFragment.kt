@@ -21,7 +21,6 @@
 package com.geekorum.ttrss.article_details
 
 import android.content.ContentUris
-import android.content.Context
 import android.content.res.Resources
 import android.graphics.Color
 import android.net.Uri
@@ -40,16 +39,14 @@ import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.core.view.doOnNextLayout
 import androidx.core.widget.NestedScrollView
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import com.geekorum.geekdroid.network.OkHttpWebViewClient
+import com.geekorum.ttrss.BaseFragment
 import com.geekorum.ttrss.R
+import com.geekorum.ttrss.activityViewModels
 import com.geekorum.ttrss.articles_list.ArticleListActivity
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.databinding.FragmentArticleDetailBinding
-import com.geekorum.ttrss.di.ViewModelsFactory
-import dagger.android.support.AndroidSupportInjection
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -64,17 +61,15 @@ import javax.inject.Inject
  * in two-pane mode (on tablets) or a [com.geekorum.ttrss.article_details.ArticleDetailActivity]
  * on handsets.
  */
-class ArticleDetailFragment : Fragment() {
+class ArticleDetailFragment : BaseFragment() {
 
     private lateinit var binding: FragmentArticleDetailBinding
-    private lateinit var articleDetailsViewModel: ArticleDetailsViewModel
+    private val articleDetailsViewModel: ArticleDetailsViewModel by activityViewModels()
     private lateinit var articleUri: Uri
     private lateinit var chromeClient: FSVideoChromeClient
     private var article: Article? = null
     private var customView: View? = null
 
-    @Inject
-    lateinit var viewModelFactory: ViewModelsFactory
     @Inject
     lateinit var okHttpClient: OkHttpClient
 
@@ -92,11 +87,6 @@ class ArticleDetailFragment : Fragment() {
             cssOverride += " a:link {color: $linkHexColor;} a:visited { color: $linkHexColor;}"
             return cssOverride
         }
-
-    override fun onAttach(context: Context) {
-        AndroidSupportInjection.inject(this)
-        super.onAttach(context)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -127,8 +117,6 @@ class ArticleDetailFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        articleDetailsViewModel =
-                ViewModelProviders.of(requireActivity(), viewModelFactory).get(ArticleDetailsViewModel::class.java)
         articleDetailsViewModel.init(ContentUris.parseId(articleUri))
         articleDetailsViewModel.article.observe(this, Observer { this.article = it })
         articleDetailsViewModel.articleContent.observe(this, Observer { renderContent(it) })
