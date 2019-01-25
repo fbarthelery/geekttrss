@@ -118,6 +118,8 @@ val daggerVersion: String by rootProject.extra
 dependencies {
 
     implementation("androidx.core:core-ktx:1.0.1")
+    implementation("androidx.fragment:fragment-ktx:1.1.0-alpha03")
+    implementation("androidx.activity:activity-ktx:1.0.0-alpha03")
 
     // androidx ui
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")
@@ -128,7 +130,6 @@ dependencies {
 
     // androidx others
     implementation("androidx.browser:browser:1.0.0")
-    implementation("androidx.fragment:fragment-ktx:1.0.0")
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.9.0")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.1.0")
