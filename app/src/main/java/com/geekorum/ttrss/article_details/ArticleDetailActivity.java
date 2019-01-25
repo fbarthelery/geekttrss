@@ -51,14 +51,12 @@ public class ArticleDetailActivity extends SessionActivity {
 
     private ArticleDetailsViewModel articleDetailsViewModel;
 
-    @Inject ViewModelsFactory viewModelFactory;
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_article_detail);
         binding.setLifecycleOwner(this);
-        articleDetailsViewModel = ViewModelProviders.of(this, viewModelFactory).get(ArticleDetailsViewModel.class);
+        articleDetailsViewModel = ViewModelProviders.of(this, getViewModelsFactory()).get(ArticleDetailsViewModel.class);
         binding.setViewModel(articleDetailsViewModel);
 
         Resources.Theme theme = getTheme();

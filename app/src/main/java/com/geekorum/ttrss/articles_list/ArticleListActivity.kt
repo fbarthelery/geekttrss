@@ -35,10 +35,8 @@ import androidx.core.view.children
 import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
-import androidx.fragment.app.transaction
+import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
-import androidx.lifecycle.get
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.BackgroundJobManager
 import com.geekorum.ttrss.R
@@ -50,6 +48,7 @@ import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.databinding.ActivityArticleListBinding
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.session.SessionActivity
+import com.geekorum.ttrss.viewModels
 import javax.inject.Inject
 
 /**
@@ -88,15 +87,14 @@ class ArticleListActivity : SessionActivity() {
     @Inject
     lateinit var accountManager: AccountManager
 
-    lateinit var activityViewModel: ActivityViewModel
-    lateinit var accountViewModel: TtrssAccountViewModel
+    private val activityViewModel: ActivityViewModel by viewModels()
+    private val accountViewModel: TtrssAccountViewModel by viewModels()
 
-    public override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setupPeriodicJobs()
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false)
 
-        activityViewModel = ViewModelProviders.of(this, viewModelFactory).get()
         activityViewModel.selectedFeed.observe(this, Observer<Feed> { onFeedSelected(it) })
 
         activityViewModel.articleSelectedEvent.observe(this, EventObserver { (position, article) ->
@@ -111,7 +109,6 @@ class ArticleListActivity : SessionActivity() {
             navigateUpToList()
         })
 
-        accountViewModel = ViewModelProviders.of(this, viewModelFactory).get()
         accountViewModel.selectedAccount.observe(this, Observer { account ->
             if (account != null) {
                 activityViewModel.setAccount(account)
@@ -143,7 +140,7 @@ class ArticleListActivity : SessionActivity() {
 
         if (savedInstanceState == null) {
             val feedListFragment = FeedListFragment()
-            supportFragmentManager.transaction {
+            supportFragmentManager.commit {
                 replace(R.id.start_pane_layout, feedListFragment, FRAGMENT_FEEDS_LIST)
             }
         }
@@ -238,7 +235,7 @@ class ArticleListActivity : SessionActivity() {
         val articleUri = ContentUris.withAppendedId(ArticlesContract.Article.CONTENT_URI, item.id)
         if (twoPane) {
             val articleDetailFragment = ArticleDetailFragment.newInstance(articleUri)
-            supportFragmentManager.transaction {
+            supportFragmentManager.commit {
                 replace(R.id.article_detail_container, articleDetailFragment)
             }
             binding.startPaneLayout.visibility = View.GONE
@@ -259,7 +256,7 @@ class ArticleListActivity : SessionActivity() {
         navigateUpToList()
         title = feed.title
         binding.toolbar.toolbar.title = title
-        supportFragmentManager.transaction {
+        supportFragmentManager.commit {
             val hf = ArticlesListFragment.newInstance(feed.id)
             replace(R.id.middle_pane_layout, hf, FRAGMENT_ARTICLES_LIST)
         }
@@ -271,7 +268,7 @@ class ArticleListActivity : SessionActivity() {
     }
 
     private fun navigateToSearch() {
-        supportFragmentManager.transaction {
+        supportFragmentManager.commit {
             val hf = ArticlesSearchFragment()
             replace(R.id.middle_pane_layout, hf, FRAGMENT_ARTICLES_LIST)
             addToBackStack(FRAGMENT_BACKSTACK_SEARCH)

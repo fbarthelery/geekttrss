@@ -1,4 +1,4 @@
-/**
+/*
  * Geekttrss is a RSS feed reader application on the Android Platform.
  *
  * Copyright (C) 2017-2018 by Frederic-Charles Barthelery.
@@ -20,26 +20,19 @@
  */
 package com.geekorum.ttrss
 
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.articles_list.ArticleListActivity
 import com.geekorum.ttrss.articles_list.TtrssAccountViewModel
-import com.geekorum.ttrss.di.ViewModelsFactory
-import dagger.android.AndroidInjection
-import javax.inject.Inject
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
 
-    @Inject lateinit var viewModelsFactory: ViewModelsFactory
+    private val accountViewModel: TtrssAccountViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
-        val accountViewModel = ViewModelProviders.of(this, viewModelsFactory).get(TtrssAccountViewModel::class.java)
         accountViewModel.selectedAccount.observe(this, Observer { account ->
             if (account != null) {
                 val intent = Intent(this, ArticleListActivity::class.java)
@@ -51,5 +44,4 @@ class MainActivity : AppCompatActivity() {
         })
         accountViewModel.noAccountSelectedEvent.observe(this, EventObserver { finish() })
     }
-
 }

@@ -21,19 +21,12 @@
 package com.geekorum.ttrss.session
 
 import android.accounts.Account
-import androidx.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import androidx.appcompat.app.AppCompatActivity
+import com.geekorum.ttrss.BaseActivity
 import com.geekorum.ttrss.MainActivity
 import com.geekorum.ttrss.articles_list.TtrssAccountViewModel
-import com.geekorum.ttrss.di.ViewModelsFactory
-import dagger.android.AndroidInjection
-import dagger.android.AndroidInjector
-import dagger.android.DispatchingAndroidInjector
-import dagger.android.support.HasSupportFragmentInjector
-import javax.inject.Inject
+import com.geekorum.ttrss.viewModels
 
 /**
  * Base Activity for a Session that starts with a Logged Account interacting with the backend.
@@ -41,23 +34,14 @@ import javax.inject.Inject
  * It is the responsibility of subclasses to observe the current account and discard any
  * account dependencies when it changes. The TtrssAccountViewModel can be used to observe the current account.
  */
-abstract class SessionActivity : AppCompatActivity(),
-        HasSupportFragmentInjector {
+abstract class SessionActivity : BaseActivity() {
 
-    @Inject lateinit var supportFragmentInjector :DispatchingAndroidInjector<Fragment>
-
-    override fun supportFragmentInjector(): AndroidInjector<Fragment> = supportFragmentInjector
-
-    @Inject lateinit var viewModelFactory: ViewModelsFactory
-
-    private lateinit var accountViewModel: TtrssAccountViewModel
+    private val accountViewModel: TtrssAccountViewModel by viewModels()
 
     var account: Account? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
-        accountViewModel = ViewModelProviders.of(this, viewModelFactory).get(TtrssAccountViewModel::class.java)
         account = savedInstanceState?.getParcelable(SAVED_ACCOUNT)
         if (account == null || !accountViewModel.isExistingAccount(account)) {
             account = accountViewModel.selectedAccount.value
