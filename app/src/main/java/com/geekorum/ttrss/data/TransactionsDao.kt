@@ -25,6 +25,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import kotlinx.coroutines.runBlocking
 
 /**
  * Dao to read/modify transactions.
@@ -32,14 +33,14 @@ import androidx.room.Query
 @Dao
 abstract class TransactionsDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertTransaction(transaction: Transaction)
+    abstract suspend fun insertTransaction(transaction: Transaction)
 
     @Delete
-    abstract fun deleteTransactions(transactions: Collection<Transaction>)
+    abstract suspend fun deleteTransactions(transactions: Collection<Transaction>)
 
 
     @Query("SELECT * FROM transactions WHERE article_id=:articleId AND field=:field")
-    abstract fun getTransactionForArticleAndType(articleId: Long, field: String): List<Transaction>
+    abstract suspend fun getTransactionForArticleAndType(articleId: Long, field: String): List<Transaction>
 
     /**
      * Insert a unique transaction for a [Transaction.articleId] [Transaction.field] pair.
@@ -47,7 +48,7 @@ abstract class TransactionsDao {
      * @param transaction
      */
     @androidx.room.Transaction
-    open fun insertUniqueTransaction(transaction: Transaction) {
+    open fun insertUniqueTransaction(transaction: Transaction) = runBlocking {
         val existingTransactions = getTransactionForArticleAndType(transaction.articleId, transaction.field)
         deleteTransactions(existingTransactions)
         insertTransaction(transaction)
