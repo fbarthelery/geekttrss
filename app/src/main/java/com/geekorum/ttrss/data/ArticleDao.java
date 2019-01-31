@@ -67,10 +67,10 @@ public interface ArticleDao {
     void updateArticleTransientUnread(long articleId, boolean isUnread);
 
     @Query("UPDATE articles SET transiant_unread=:isUnread, unread=:isUnread WHERE _id=:articleId")
-    long updateArticleUnread(long articleId, boolean isUnread);
+    int updateArticleUnread(long articleId, boolean isUnread);
 
     @Query("UPDATE articles SET marked=:isMarked WHERE _id=:articleId")
-    long updateArticleMarked(long articleId, boolean isMarked);
+    int updateArticleMarked(long articleId, boolean isMarked);
 
     @Query("SELECT articles.* FROM ArticleFTS JOIN articles ON (ArticleFTS.rowid = _id) "
             + "WHERE ArticleFTS MATCH :query "
