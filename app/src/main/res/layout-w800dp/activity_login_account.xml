@@ -24,19 +24,25 @@
         xmlns:tools="http://schemas.android.com/tools" xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+
         <import type="com.geekorum.ttrss.accounts.LoginViewModel" />
+
         <variable name="viewModel" type="com.geekorum.ttrss.accounts.LoginViewModel" />
     </data>
 
-    <LinearLayout android:layout_height="match_parent"
-                  android:layout_width="match_parent"
-                  android:orientation="vertical"
-            >
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:context="com.geekorum.ttrss.accounts.LoginActivity">
 
         <com.google.android.material.appbar.AppBarLayout
                 android:id="@+id/app_bar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="@dimen/app_bar_height"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
             <androidx.appcompat.widget.Toolbar
@@ -47,12 +53,19 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <include android:id="@+id/form"
-                 layout="@layout/include_form_login"
-                 android:layout_width="match_parent"
-                 android:layout_height="match_parent"
-                 android:layout_margin="@dimen/activity_horizontal_margin"
-                 app:viewModel="@{viewModel}" />
-    </LinearLayout>
+        <com.google.android.material.card.MaterialCardView
+                android:layout_width="560dp"
+                android:layout_height="match_parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="?actionBarSize"
+                app:contentPadding="@dimen/activity_horizontal_margin"
+                app:cardElevation="8dp">
 
+            <include android:id="@+id/form" layout="@layout/include_form_login"
+                     app:viewModel="@{viewModel}"/>
+        </com.google.android.material.card.MaterialCardView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

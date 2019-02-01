@@ -66,6 +66,7 @@ class LoginActivity : AccountAuthenticatorAppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login_account)
         binding.setLifecycleOwner(this)
+        setSupportActionBar(binding.toolbar)
         val loginViewModel = ViewModelProviders.of(this, viewModelFactory)[LoginViewModel::class.java]
         val account = intent.getParcelableExtra<Account>(EXTRA_ACCOUNT)?.let {
             accountManager.fromAndroidAccount(it)
@@ -91,10 +92,10 @@ class LoginActivity : AccountAuthenticatorAppCompatActivity() {
 
         loginViewModel.fieldErrors.observe(this, Observer { errorStatus ->
             val error = checkNotNull(errorStatus)
-            setFieldError(binding.url, error.invalidUrlMsgId)
+            setFieldError(binding.form.url, error.invalidUrlMsgId)
             if (error.hasAttemptLogin) {
-                setFieldError(binding.username, error.invalidNameMsgId)
-                setFieldError(binding.password, error.invalidPasswordMsgId)
+                setFieldError(binding.form.username, error.invalidNameMsgId)
+                setFieldError(binding.form.password, error.invalidPasswordMsgId)
             }
         })
     }
@@ -134,8 +135,8 @@ class LoginActivity : AccountAuthenticatorAppCompatActivity() {
 
     private fun showProgress(show: Boolean) {
         TransitionManager.beginDelayedTransition(binding.root as ViewGroup)
-        binding.loginForm.visibility = if (show) View.GONE else View.VISIBLE
-        binding.loginProgress.visibility = if (show) View.VISIBLE else View.GONE
+        binding.form.loginForm.visibility = if (show) View.GONE else View.VISIBLE
+        binding.form.loginProgress.visibility = if (show) View.VISIBLE else View.GONE
     }
 
 

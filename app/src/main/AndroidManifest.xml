@@ -79,8 +79,9 @@
         </activity>
 
         <activity android:name="com.geekorum.ttrss.accounts.LoginActivity"
-            android:excludeFromRecents="true"
-            android:taskAffinity="com.geekorum.ttrss.account" />
+                  android:excludeFromRecents="true"
+                  android:taskAffinity="com.geekorum.ttrss.account"
+                  android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
                 android:name="com.geekorum.ttrss.SettingsActivity"
