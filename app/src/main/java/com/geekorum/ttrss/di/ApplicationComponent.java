@@ -28,6 +28,8 @@ import com.geekorum.ttrss.logging.LoggingModule;
 import com.geekorum.ttrss.providers.ArticleProviderComponent;
 import dagger.BindsInstance;
 import dagger.Component;
+import dagger.android.AndroidInjectionModule;
+import dagger.android.AndroidInjector;
 import dagger.android.support.AndroidSupportInjectionModule;
 
 import javax.inject.Singleton;
@@ -51,7 +53,7 @@ import javax.inject.Singleton;
         AndroidTinyrssAccountManagerModule.class
 })
 @Singleton
-public interface ApplicationComponent {
+public interface ApplicationComponent extends AndroidInjector<Application> {
 
     @Component.Builder
     interface Builder {

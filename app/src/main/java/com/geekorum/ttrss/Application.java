@@ -20,8 +20,6 @@
  */
 package com.geekorum.ttrss;
 
-import android.app.Activity;
-import android.app.Service;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -29,9 +27,7 @@ import com.geekorum.ttrss.di.ApplicationComponent;
 import com.geekorum.ttrss.di.DaggerApplicationComponent;
 import com.squareup.picasso.Picasso;
 import dagger.android.AndroidInjector;
-import dagger.android.DispatchingAndroidInjector;
-import dagger.android.HasActivityInjector;
-import dagger.android.HasServiceInjector;
+import dagger.android.support.DaggerApplication;
 import timber.log.Timber;
 
 import java.util.Set;
@@ -43,14 +39,9 @@ import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_AUTO;
 /**
  * Initialize global component for the TTRSS application.
  */
-public class Application extends android.app.Application implements HasActivityInjector, HasServiceInjector {
-    @Inject
-    ApplicationComponent applicationComponent;
+public class Application extends DaggerApplication {
 
-    @Inject
-    DispatchingAndroidInjector<Activity> dispatchinActivityInjector;
-    @Inject
-    DispatchingAndroidInjector<Service> dispatchingServiceInjector;
+    private ApplicationComponent applicationComponent;
 
     @Inject
     Set<Timber.Tree> timberTrees;
@@ -58,12 +49,10 @@ public class Application extends android.app.Application implements HasActivityI
     @Inject
     Picasso picasso;
 
-    private boolean needToInject = true;
-
     @Override
     public void onCreate() {
-        injectIfNecessary();
         super.onCreate();
+        setupPicasso();
         Timber.plant(timberTrees.toArray(new Timber.Tree[0]));
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String nighModeStr = sharedPreferences.getString(SettingsActivity.KEY_THEME, Integer.toString(MODE_NIGHT_AUTO));
@@ -71,37 +60,22 @@ public class Application extends android.app.Application implements HasActivityI
         AppCompatDelegate.setDefaultNightMode(nighMode);
     }
 
-    public void injectIfNecessary() {
-        if (needToInject) {
-            synchronized (this) {
-                if (needToInject) {
-                    DaggerApplicationComponent.builder()
-                            .bindApplication(this)
-                            .build().inject(this);
-                    setupPicasso();
-                    needToInject = false;
-                }
-            }
-        }
-    }
 
     public ApplicationComponent getApplicationComponent() {
         // Content providers can be created before Application.onCreate() is called
-        injectIfNecessary();
         return applicationComponent;
     }
 
-    @Override
-    public AndroidInjector<Activity> activityInjector() {
-        return dispatchinActivityInjector;
-    }
 
     private void setupPicasso() {
         Picasso.setSingletonInstance(picasso);
     }
 
     @Override
-    public AndroidInjector<Service> serviceInjector() {
-        return dispatchingServiceInjector;
+    protected AndroidInjector<? extends DaggerApplication> applicationInjector() {
+        if (applicationComponent == null) {
+            applicationComponent = DaggerApplicationComponent.builder().bindApplication(this).build();
+        }
+        return applicationComponent;
     }
 }
