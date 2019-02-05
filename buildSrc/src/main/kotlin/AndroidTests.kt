@@ -31,11 +31,11 @@ import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.kotlin
 import org.gradle.kotlin.dsl.provideDelegate
 
-val espressoVersion = "3.1.0"
-val androidxTestRunnerVersion = "1.1.0"
-val androidxTestCoreVersion = "1.0.0"
-val androidxTestExtVersion = "1.0.0"
-val robolectricVersion = "4.0.2"
+const val espressoVersion = "3.1.1"
+const val androidxTestRunnerVersion = "1.1.1"
+const val androidxTestCoreVersion = "1.1.0"
+const val androidxTestExtVersion = "1.1.0"
+const val robolectricVersion = "4.1"
 
 
 /*
@@ -47,6 +47,7 @@ internal fun Project.configureTests() {
     extensions.configure<BaseExtension>("android") {
         defaultConfig {
             testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+            testInstrumentationRunnerArgument("clearPackageData", "true")
         }
 
         testOptions {
@@ -64,10 +65,9 @@ internal fun Project.configureTests() {
 
         androidTestUtil("androidx.test:orchestrator:$androidxTestRunnerVersion")
         androidTestImplementation("androidx.test:runner:$androidxTestRunnerVersion")
-        dualTestImplementation("androidx.test.ext:junit:$androidxTestExtVersion")
+        dualTestImplementation("androidx.test.ext:junit-ktx:$androidxTestExtVersion")
 
-        // core-ktx not yet released
-        dualTestImplementation("androidx.test:core:$androidxTestCoreVersion")
+        dualTestImplementation("androidx.test:core-ktx:$androidxTestCoreVersion")
         dualTestImplementation("androidx.test:rules:$androidxTestRunnerVersion")
 
         dualTestImplementation("androidx.test.espresso:espresso-core:$espressoVersion")
@@ -79,7 +79,7 @@ internal fun Project.configureTests() {
         dualTestImplementation("androidx.test.ext:truth:$androidxTestExtVersion")
 
         // mock
-        testImplementation("io.mockk:mockk:1.8.13.kotlin13")
+        testImplementation("io.mockk:mockk:1.9")
         testImplementation("org.robolectric:robolectric:$robolectricVersion")
 
     }
