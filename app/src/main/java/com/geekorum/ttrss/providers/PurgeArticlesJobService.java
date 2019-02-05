@@ -1,4 +1,4 @@
-/**
+/*
  * Geekttrss is a RSS feed reader application on the Android Platform.
  *
  * Copyright (C) 2017-2018 by Frederic-Charles Barthelery.
@@ -25,8 +25,7 @@ import android.app.job.JobParameters;
 import android.os.Build;
 import com.geekorum.geekdroid.jobs.JobThread;
 import com.geekorum.geekdroid.jobs.ThreadedJobService;
-import com.geekorum.ttrss.Application;
-import com.geekorum.ttrss.di.ApplicationComponent;
+import dagger.android.AndroidInjection;
 
 import javax.inject.Inject;
 
@@ -40,19 +39,8 @@ public class PurgeArticlesJobService extends ThreadedJobService {
 
     @Override
     public void onCreate() {
+        AndroidInjection.inject(this);
         super.onCreate();
-        createArticleProviderComponent()
-                .inject(this);
-    }
-
-    private ApplicationComponent getApplicationComponent() {
-        return ((Application) getApplication()).getApplicationComponent();
-    }
-
-    private ArticleProviderComponent createArticleProviderComponent() {
-        return getApplicationComponent().createArticleProviderComponent()
-                .bindAndroidComponent(this)
-                .build();
     }
 
     @Override

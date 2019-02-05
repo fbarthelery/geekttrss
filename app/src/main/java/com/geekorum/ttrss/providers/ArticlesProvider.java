@@ -1,4 +1,4 @@
-/**
+/*
  * Geekttrss is a RSS feed reader application on the Android Platform.
  *
  * Copyright (C) 2017-2018 by Frederic-Charles Barthelery.
@@ -20,7 +20,6 @@
  */
 package com.geekorum.ttrss.providers;
 
-import android.content.ContentProvider;
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
 import android.content.ContentResolver;
@@ -36,9 +35,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 import androidx.sqlite.db.SupportSQLiteOpenHelper;
-import com.geekorum.ttrss.Application;
 import com.geekorum.ttrss.data.ArticlesDatabase;
-import com.geekorum.ttrss.di.ApplicationComponent;
+import dagger.android.DaggerContentProvider;
 
 import java.util.ArrayList;
 
@@ -47,7 +45,7 @@ import javax.inject.Inject;
 /**
  * Manage tt-rss content data, mostly articles
  */
-public class ArticlesProvider extends ContentProvider {
+public class ArticlesProvider extends DaggerContentProvider {
 
     private static final int MATCH_ROOT = 0;
     private static final UriMatcher uriMatcher = new UriMatcher(MATCH_ROOT);
@@ -73,23 +71,6 @@ public class ArticlesProvider extends ContentProvider {
         uriMatcher.addURI(ArticlesContract.AUTHORITY, "feeds", MATCH_FEEDS);
         uriMatcher.addURI(ArticlesContract.AUTHORITY, "categories/#", MATCH_CATEGORIES_ID);
         uriMatcher.addURI(ArticlesContract.AUTHORITY, "categories", MATCH_CATEGORIES);
-    }
-
-    @Override
-    public boolean onCreate() {
-        createArticleProviderComponent()
-                .inject(this);
-        return true;
-    }
-
-    private ApplicationComponent getApplicationComponent() {
-        return ((Application) getContext().getApplicationContext()).getApplicationComponent();
-    }
-
-    private ArticleProviderComponent createArticleProviderComponent() {
-        return getApplicationComponent().createArticleProviderComponent()
-                .bindAndroidComponent(getContext())
-                .build();
     }
 
     @Nullable

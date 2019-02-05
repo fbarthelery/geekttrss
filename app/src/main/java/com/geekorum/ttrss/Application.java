@@ -1,4 +1,4 @@
-/**
+/*
  * Geekttrss is a RSS feed reader application on the Android Platform.
  *
  * Copyright (C) 2017-2018 by Frederic-Charles Barthelery.
@@ -26,7 +26,6 @@ import androidx.appcompat.app.AppCompatDelegate;
 import com.geekorum.ttrss.di.ApplicationComponent;
 import com.geekorum.ttrss.di.DaggerApplicationComponent;
 import com.squareup.picasso.Picasso;
-import dagger.android.AndroidInjector;
 import dagger.android.support.DaggerApplication;
 import timber.log.Timber;
 
@@ -60,19 +59,12 @@ public class Application extends DaggerApplication {
         AppCompatDelegate.setDefaultNightMode(nighMode);
     }
 
-
-    public ApplicationComponent getApplicationComponent() {
-        // Content providers can be created before Application.onCreate() is called
-        return applicationComponent;
-    }
-
-
     private void setupPicasso() {
         Picasso.setSingletonInstance(picasso);
     }
 
     @Override
-    protected AndroidInjector<? extends DaggerApplication> applicationInjector() {
+    protected ApplicationComponent applicationInjector() {
         if (applicationComponent == null) {
             applicationComponent = DaggerApplicationComponent.builder().bindApplication(this).build();
         }

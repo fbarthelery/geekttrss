@@ -1,4 +1,4 @@
-/**
+/*
  * Geekttrss is a RSS feed reader application on the Android Platform.
  *
  * Copyright (C) 2017-2018 by Frederic-Charles Barthelery.
@@ -25,10 +25,8 @@ import com.geekorum.ttrss.Application;
 import com.geekorum.ttrss.accounts.AndroidTinyrssAccountManagerModule;
 import com.geekorum.ttrss.data.ArticlesDatabaseModule;
 import com.geekorum.ttrss.logging.LoggingModule;
-import com.geekorum.ttrss.providers.ArticleProviderComponent;
 import dagger.BindsInstance;
 import dagger.Component;
-import dagger.android.AndroidInjectionModule;
 import dagger.android.AndroidInjector;
 import dagger.android.support.AndroidSupportInjectionModule;
 
@@ -50,6 +48,7 @@ import javax.inject.Singleton;
         com.geekorum.ttrss.sync.ServiceInjectorModule.class,
         com.geekorum.ttrss.accounts.ServicesInjectorModule.class,
         com.geekorum.ttrss.add_feed.AndroidInjectorsModule.class,
+        com.geekorum.ttrss.providers.AndroidInjectorsModule.class,
         AndroidTinyrssAccountManagerModule.class
 })
 @Singleton
@@ -64,7 +63,5 @@ public interface ApplicationComponent extends AndroidInjector<Application> {
     }
 
     void inject(Application application);
-
-    ArticleProviderComponent.Builder createArticleProviderComponent();
 
 }
