@@ -20,9 +20,14 @@
  */
 package com.geekorum.ttrss.logging
 
+import android.app.Application
+import com.geekorum.geekdroid.dagger.AppInitializer
+import dagger.Binds
 import dagger.Module
+import dagger.multibindings.IntoSet
 import dagger.multibindings.Multibinds
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * Declare multibindings for [Timber.Tree]
@@ -32,4 +37,19 @@ abstract class TimberModule {
 
     @Multibinds
     abstract fun providesTimberTrees(): Set<Timber.Tree>
+
+    @Binds
+    @IntoSet
+    abstract fun providesTimberInitializer(timberInitializer: TimberInitializer): AppInitializer
+
 }
+
+class TimberInitializer @Inject constructor(
+    // dagger provides java.util.set which is mutable
+    private val timberTrees: MutableSet<Timber.Tree>
+) : AppInitializer {
+    override fun initialize(app: Application) {
+        Timber.plant(*timberTrees.toTypedArray())
+    }
+}
+
