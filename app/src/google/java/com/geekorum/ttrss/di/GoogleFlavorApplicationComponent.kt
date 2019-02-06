@@ -1,4 +1,4 @@
-/**
+/*
  * Geekttrss is a RSS feed reader application on the Android Platform.
  *
  * Copyright (C) 2017-2018 by Frederic-Charles Barthelery.
@@ -18,22 +18,23 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.geekorum.ttrss.logging
+package com.geekorum.ttrss.di
 
-import com.geekorum.geekdroid.firebase.logging.CrashlyticsLoggingTree
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
-import timber.log.Timber
+import com.geekorum.ttrss.logging.CrashlyticsLoggingModule
+import dagger.Component
+import javax.inject.Singleton
 
 /**
- *A module to provide logging utilities
+ * [ApplicationComponent] for the Google flavor.
+ * It has additional modules beside the [FlavorLessModule]
  */
-@Module
-class LoggingModule {
-    @Provides @IntoSet
-    fun provideDebugLoggingTree(): Timber.Tree = Timber.DebugTree()
+@Component(modules = [
+    FlavorLessModule::class,
+    CrashlyticsLoggingModule::class
+])
+@Singleton
+interface GoogleFlavorApplicationComponent : ApplicationComponent {
 
-    @Provides @IntoSet
-    fun provideCrashlyticsLoggingTree(): Timber.Tree = CrashlyticsLoggingTree()
+    @Component.Builder
+    interface Builder : ApplicationComponent.Builder
 }

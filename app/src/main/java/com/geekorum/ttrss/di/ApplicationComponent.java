@@ -20,15 +20,10 @@
  */
 package com.geekorum.ttrss.di;
 
-import com.geekorum.geekdroid.dagger.AndroidFrameworkModule;
 import com.geekorum.ttrss.Application;
-import com.geekorum.ttrss.accounts.AndroidTinyrssAccountManagerModule;
-import com.geekorum.ttrss.data.ArticlesDatabaseModule;
-import com.geekorum.ttrss.logging.LoggingModule;
 import dagger.BindsInstance;
 import dagger.Component;
 import dagger.android.AndroidInjector;
-import dagger.android.support.AndroidSupportInjectionModule;
 
 import javax.inject.Singleton;
 

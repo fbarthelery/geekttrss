@@ -40,8 +40,6 @@ import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_AUTO;
  */
 public class Application extends DaggerApplication {
 
-    private ApplicationComponent applicationComponent;
-
     @Inject
     Set<Timber.Tree> timberTrees;
 
@@ -65,9 +63,6 @@ public class Application extends DaggerApplication {
 
     @Override
     protected ApplicationComponent applicationInjector() {
-        if (applicationComponent == null) {
-            applicationComponent = DaggerApplicationComponent.builder().bindApplication(this).build();
-        }
-        return applicationComponent;
+        return DaggerApplicationComponent.builder().bindApplication(this).build();
     }
 }

@@ -23,7 +23,7 @@ package com.geekorum.ttrss.di
 import com.geekorum.geekdroid.dagger.AndroidFrameworkModule
 import com.geekorum.ttrss.accounts.AndroidTinyrssAccountManagerModule
 import com.geekorum.ttrss.data.ArticlesDatabaseModule
-import com.geekorum.ttrss.logging.LoggingModule
+import com.geekorum.ttrss.logging.LogcatLoggingModule
 import dagger.Module
 
 /**
@@ -35,7 +35,7 @@ import dagger.Module
     ViewModelsModule::class,
     NetworkModule::class,
     ArticlesDatabaseModule::class,
-    LoggingModule::class,
+    LogcatLoggingModule::class,
     AndroidTinyrssAccountManagerModule::class,
     com.geekorum.ttrss.article_details.ActivitiesInjectorModule::class,
     com.geekorum.ttrss.articles_list.ActivitiesInjectorModule::class,

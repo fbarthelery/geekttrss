@@ -1,4 +1,4 @@
-/**
+/*
  * Geekttrss is a RSS feed reader application on the Android Platform.
  *
  * Copyright (C) 2017-2018 by Frederic-Charles Barthelery.
@@ -22,6 +22,8 @@ package com.geekorum.ttrss
 
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.core.CrashlyticsCore
+import com.geekorum.ttrss.di.ApplicationComponent
+import com.geekorum.ttrss.di.DaggerGoogleFlavorApplicationComponent
 import io.fabric.sdk.android.Fabric
 
 class GoogleFlavorApplication : Application() {
@@ -36,5 +38,9 @@ class GoogleFlavorApplication : Application() {
             .core(CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build())
             .build()
         Fabric.with(this, crashlytics)
+    }
+
+    override fun applicationInjector(): ApplicationComponent {
+        return DaggerGoogleFlavorApplicationComponent.builder().bindApplication(this).build()
     }
 }
