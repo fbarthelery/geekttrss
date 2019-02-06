@@ -61,3 +61,6 @@ google-services.json
 
 # generated third party licenses information
 res/raw/third_party_license*
+
+# Android studio captures
+captures/
