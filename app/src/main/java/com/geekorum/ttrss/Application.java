@@ -23,11 +23,11 @@ package com.geekorum.ttrss;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import androidx.appcompat.app.AppCompatDelegate;
+import com.geekorum.geekdroid.dagger.AppInitializer;
+import com.geekorum.geekdroid.dagger.AppInitializersKt;
 import com.geekorum.ttrss.di.ApplicationComponent;
 import com.geekorum.ttrss.di.DaggerApplicationComponent;
-import com.squareup.picasso.Picasso;
 import dagger.android.support.DaggerApplication;
-import timber.log.Timber;
 
 import java.util.Set;
 
@@ -41,24 +41,16 @@ import static androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_AUTO;
 public class Application extends DaggerApplication {
 
     @Inject
-    Set<Timber.Tree> timberTrees;
-
-    @Inject
-    Picasso picasso;
+    Set<AppInitializer> appInitializers;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        setupPicasso();
-        Timber.plant(timberTrees.toArray(new Timber.Tree[0]));
+        AppInitializersKt.initialize(appInitializers, this);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String nighModeStr = sharedPreferences.getString(SettingsActivity.KEY_THEME, Integer.toString(MODE_NIGHT_AUTO));
         int nighMode = Integer.valueOf(nighModeStr);
         AppCompatDelegate.setDefaultNightMode(nighMode);
-    }
-
-    private void setupPicasso() {
-        Picasso.setSingletonInstance(picasso);
     }
 
     @Override

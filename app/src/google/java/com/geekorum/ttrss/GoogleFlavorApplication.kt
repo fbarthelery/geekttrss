@@ -20,25 +20,10 @@
  */
 package com.geekorum.ttrss
 
-import com.crashlytics.android.Crashlytics
-import com.crashlytics.android.core.CrashlyticsCore
 import com.geekorum.ttrss.di.ApplicationComponent
 import com.geekorum.ttrss.di.DaggerGoogleFlavorApplicationComponent
-import io.fabric.sdk.android.Fabric
 
 class GoogleFlavorApplication : Application() {
-
-    override fun onCreate() {
-        super.onCreate()
-        initializeCrashlytics()
-    }
-
-    private fun initializeCrashlytics() {
-        val crashlytics =  Crashlytics.Builder()
-            .core(CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build())
-            .build()
-        Fabric.with(this, crashlytics)
-    }
 
     override fun applicationInjector(): ApplicationComponent {
         return DaggerGoogleFlavorApplicationComponent.builder().bindApplication(this).build()
