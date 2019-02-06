@@ -31,6 +31,7 @@ import com.geekorum.ttrss.network.ApiCallException
 import com.geekorum.ttrss.network.ApiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -101,9 +102,9 @@ class FeedsRepository
 
     private fun refresh() = GlobalScope.launch(Dispatchers.IO) {
         try {
-            val feeds = apiService.getFeeds()
-            val categories = apiService.getCategories()
-            feedsDao.setFeedsAndCategories(feeds, categories)
+            val feeds = async { apiService.getFeeds() }
+            val categories = async { apiService.getCategories() }
+            feedsDao.setFeedsAndCategories(feeds.await(), categories.await())
         } catch (e: ApiCallException) {
             Log.w(TAG, "Unable to refresh feeds and categories", e)
         }

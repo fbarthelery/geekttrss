@@ -29,7 +29,6 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
-import com.geekorum.geekdroid.ArchComponentsExtKt;
 import com.geekorum.geekdroid.network.BrowserLauncher;
 import com.geekorum.ttrss.R;
 import com.geekorum.ttrss.articles_list.ArticlesRepository;
@@ -77,7 +76,7 @@ public class ArticleDetailsViewModel extends ViewModel {
                 browserLauncher.mayLaunchUrl(Uri.parse(a.getLink()));
                 return a;
             });
-            articleContent = ArchComponentsExtKt.getDistinct(Transformations.map(article, Article::getContent));
+            articleContent =  Transformations.distinctUntilChanged(Transformations.map(article, Article::getContent));
         }
         this.articleId.setValue(articleId);
     }
