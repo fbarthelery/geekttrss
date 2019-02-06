@@ -21,21 +21,26 @@
 package com.geekorum.ttrss.di;
 
 import android.app.Application;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import com.geekorum.geekdroid.dagger.AppInitializer;
+import com.geekorum.geekdroid.dagger.AppInitializersModule;
 import com.geekorum.geekdroid.network.PicassoOkHttp3Downloader;
 import com.geekorum.ttrss.logging.RetrofitInvocationLogger;
 import com.squareup.picasso.Picasso;
 import dagger.Module;
 import dagger.Provides;
+import dagger.multibindings.IntoSet;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 
 import java.io.File;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
-@Module
+@Module(includes = {AppInitializersModule.class})
 public class NetworkModule {
     private static final boolean DEBUG_REQUEST = false;
     private static final boolean DEBUG_RETROFIT_CALL = true;
@@ -95,4 +100,25 @@ public class NetworkModule {
         return picasso;
     }
 
+    @Provides
+    @IntoSet
+    static AppInitializer providesPicassoInitializer(Picasso picasso) {
+        return new PicassoInitializer(picasso);
+    }
+
+}
+
+class PicassoInitializer implements AppInitializer {
+    private final Picasso picasso;
+
+    @Inject
+    PicassoInitializer(Picasso picasso) {
+        this.picasso = picasso;
+    }
+
+    @Override
+    public void initialize(@NonNull Application application) {
+        Picasso.setSingletonInstance(picasso);
+
+    }
 }

@@ -20,23 +20,22 @@
  */
 package com.geekorum.ttrss.logging
 
+import android.app.Application
+import com.crashlytics.android.Crashlytics
+import com.crashlytics.android.core.CrashlyticsCore
 import com.geekorum.geekdroid.dagger.AppInitializer
-import com.geekorum.geekdroid.firebase.logging.CrashlyticsLoggingTree
-import dagger.Module
-import dagger.Provides
-import dagger.multibindings.IntoSet
-import timber.log.Timber
+import com.geekorum.ttrss.BuildConfig
+import io.fabric.sdk.android.Fabric
 
 /**
- * Provides logging output to Crashlytics
+ * [AppInitializer] to initialize crashlytics
  */
-@Module(includes = [TimberModule::class])
-class CrashlyticsLoggingModule {
-    @Provides
-    @IntoSet
-    fun provideCrashlyticsLoggingTree(): Timber.Tree = CrashlyticsLoggingTree()
+class CrashlyticsInitializer : AppInitializer {
+    override fun initialize(app: Application) {
+        val crashlytics = Crashlytics.Builder()
+            .core(CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build())
+            .build()
+        Fabric.with(app, crashlytics)
+    }
 
-    @Provides
-    @IntoSet
-    fun providesCrahslyticsInitializer(): AppInitializer = CrashlyticsInitializer()
 }
