@@ -36,20 +36,7 @@ import javax.inject.Singleton;
  * Main component for the application
  */
 @Component(modules = {
-        AndroidSupportInjectionModule.class,
-        AndroidBindingsModule.class,
-        ViewModelsModule.class,
-        NetworkModule.class,
-        AndroidFrameworkModule.class,
-        ArticlesDatabaseModule.class,
-        LoggingModule.class,
-        com.geekorum.ttrss.article_details.ActivitiesInjectorModule.class,
-        com.geekorum.ttrss.articles_list.ActivitiesInjectorModule.class,
-        com.geekorum.ttrss.sync.ServiceInjectorModule.class,
-        com.geekorum.ttrss.accounts.ServicesInjectorModule.class,
-        com.geekorum.ttrss.add_feed.AndroidInjectorsModule.class,
-        com.geekorum.ttrss.providers.AndroidInjectorsModule.class,
-        AndroidTinyrssAccountManagerModule.class
+        FlavorLessModule.class
 })
 @Singleton
 public interface ApplicationComponent extends AndroidInjector<Application> {

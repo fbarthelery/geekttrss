@@ -23,11 +23,12 @@ package com.geekorum.ttrss.di;
 import com.geekorum.ttrss.MainActivity;
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;
+import dagger.android.support.AndroidSupportInjectionModule;
 
 /**
  * Provides some binding modules to inject Android components.
  */
-@Module
+@Module(includes = {AndroidSupportInjectionModule.class})
 public abstract class AndroidBindingsModule {
 
     @ContributesAndroidInjector
