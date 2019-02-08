@@ -112,9 +112,9 @@ class AndroidTinyrssAccountManager @Inject constructor(
     private fun decrypt(encryptedPassword: String): String {
         val lines = encryptedPassword.lines()
         val encryptedPasswordPart = lines[0]
-        val iv = Base64.decode(lines[1], Base64.DEFAULT)
+        val iv = Base64.decode(lines[1], Base64.NO_WRAP)
         val tlen = lines[2].toInt()
-        val input = Base64.decode(encryptedPasswordPart, Base64.DEFAULT)
+        val input = Base64.decode(encryptedPasswordPart, Base64.NO_WRAP)
         val gcmParameterSpec = GCMParameterSpec(tlen, iv)
         val output = secretCipher.decrypt(input, gcmParameterSpec)
         return output.toString(Charsets.UTF_8)
@@ -123,10 +123,10 @@ class AndroidTinyrssAccountManager @Inject constructor(
     private fun encrypt(plaintextPassword: String): String {
         val input = plaintextPassword.toByteArray(Charsets.UTF_8)
         val output = secretCipher.encrypt(input)
-        val base64EncryptedPassword = Base64.encodeToString(output, Base64.DEFAULT)
+        val base64EncryptedPassword = Base64.encodeToString(output, Base64.NO_WRAP)
         val gcmParameterSpec = secretCipher.parametersSpec
-        val base64IV = Base64.encodeToString(gcmParameterSpec.iv, Base64.DEFAULT)
-        return base64EncryptedPassword + base64IV + gcmParameterSpec.tLen
+        val base64IV = Base64.encodeToString(gcmParameterSpec.iv, Base64.NO_WRAP)
+        return "${base64EncryptedPassword}\n$${base64IV}\n${gcmParameterSpec.tLen}\n"
     }
 }
 

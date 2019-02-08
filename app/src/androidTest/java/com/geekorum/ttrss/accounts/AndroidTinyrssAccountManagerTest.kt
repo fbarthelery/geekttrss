@@ -1,4 +1,4 @@
-/**
+/*
  * Geekttrss is a RSS feed reader application on the Android Platform.
  *
  * Copyright (C) 2017-2018 by Frederic-Charles Barthelery.
@@ -66,10 +66,25 @@ class AndroidTinyrssAccountManagerTest {
     @Test
     fun testThatAddAccountWorks() {
         val account = modelAccount
-        val result = accountManager.addAccount(account, "password")
+        val password = "password"
+        val result = accountManager.addAccount(account, password)
         assertThat(result).isTrue()
         assertThat(androidAccountManager.getAccountsByType(AndroidTinyrssAccountManager.ACCOUNT_TYPE)).asList().contains(
             androidAccount)
+        val retrievedPassword = accountManager.getPassword(account)
+        assertThat(retrievedPassword).isEqualTo(password)
+    }
+
+    @Test
+    fun testThatAccountWithLongPasswordWorks() {
+        val account = modelAccount
+        val password = "9a266fc8b42966fb624d852bafa241d8fd05b47d36153ff6684ab344bd1ae57bba96a7de8fc12ec0bb016583735d7f5bca6dd7d9bc6482c2a3ac6bf6f9ec323f"
+        val result = accountManager.addAccount(account, password)
+        assertThat(result).isTrue()
+        assertThat(androidAccountManager.getAccountsByType(AndroidTinyrssAccountManager.ACCOUNT_TYPE)).asList().contains(
+            androidAccount)
+        val retrievedPassword = accountManager.getPassword(account)
+        assertThat(retrievedPassword).isEqualTo(password)
     }
 
 
