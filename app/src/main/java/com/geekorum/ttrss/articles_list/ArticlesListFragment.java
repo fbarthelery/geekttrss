@@ -27,7 +27,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ShareCompat;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -187,17 +186,17 @@ public class ArticlesListFragment extends BaseFragment {
         }
 
         public void onShareClicked(@NonNull Article article) {
-            ShareCompat.IntentBuilder shareIntent = ShareCompat.IntentBuilder.from(requireActivity());
-            shareIntent.setSubject(article.getTitle())
-                    .setHtmlText(article.getContent())
-                    .setText(article.getLink())
-                    .setType("text/plain");
-            startActivity(shareIntent.createChooserIntent());
+            startActivity(createShareIntent(requireActivity(), article));
         }
 
         @Override
         public void onMenuToggleReadSelected(@NonNull Article article) {
             fragmentViewModel.setArticleUnread(article.getId(), !article.isTransientUnread());
+        }
+
+        @Override
+        public void onOpenButtonClicked(@NonNull View button, @NonNull Article article) {
+            activityViewModel.displayArticleInBrowser(getContext(), article);
         }
     }
 

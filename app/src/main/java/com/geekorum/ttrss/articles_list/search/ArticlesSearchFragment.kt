@@ -24,7 +24,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.app.ShareCompat
 import androidx.lifecycle.Observer
 import com.geekorum.ttrss.BaseFragment
 import com.geekorum.ttrss.activityViewModels
@@ -73,6 +72,11 @@ class ArticlesSearchFragment : BaseFragment() {
     }
 
     inner class EventHandler : CardEventHandler(requireContext()) {
+
+        override fun onOpenButtonClicked(button: View, article: Article) {
+            activityViewModel.displayArticleInBrowser(context, article)
+        }
+
         override fun onCardClicked(card: View, article: Article, position: Int) {
             activityViewModel.displayArticle(position, article)
         }
@@ -82,12 +86,7 @@ class ArticlesSearchFragment : BaseFragment() {
         }
 
         override fun onShareClicked(article: Article) {
-            val shareIntent = ShareCompat.IntentBuilder.from(requireActivity())
-            shareIntent.setSubject(article.title)
-                .setHtmlText(article.content)
-                .setText(article.link)
-                .setType("text/plain")
-            startActivity(shareIntent.createChooserIntent())
+            startActivity(createShareIntent(requireActivity(), article))
         }
 
         override fun onMenuToggleReadSelected(article: Article) {

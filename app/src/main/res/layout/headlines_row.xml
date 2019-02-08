@@ -140,6 +140,19 @@
                 android:textSize="12sp"
                 android:textStyle="italic" />
 
+            <ImageView
+                    android:id="@+id/open"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_weight="0"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:padding="12dp"
+                    android:onClick="@{(v) -> handler.onOpenButtonClicked(v, article)}"
+                    android:tint="?colorControlNormal"
+                    android:src="@drawable/ic_action_web_site" />
+
             <com.geekorum.geekdroid.views.CheckableImageView
                 android:id="@+id/marked"
                 android:layout_width="wrap_content"

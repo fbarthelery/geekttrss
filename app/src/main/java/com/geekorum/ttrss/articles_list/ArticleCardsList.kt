@@ -20,12 +20,15 @@
  */
 package com.geekorum.ttrss.articles_list
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import androidx.core.app.ShareCompat
 import androidx.databinding.ViewDataBinding
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -91,7 +94,7 @@ internal class BindingViewHolder(val binding: ViewDataBinding) :
 
 
 abstract class CardEventHandler(
-    private val context: Context
+    val context: Context
 ) {
 
     abstract fun onCardClicked(card: View, article: Article, position: Int)
@@ -101,6 +104,8 @@ abstract class CardEventHandler(
     abstract fun onShareClicked(article: Article)
 
     abstract fun onMenuToggleReadSelected(article: Article)
+
+    abstract fun onOpenButtonClicked(button: View, article: Article)
 
     fun onMenuButtonClicked(button: View, article: Article, position: Int) {
         PopupMenu(context, button).run {
@@ -118,6 +123,15 @@ abstract class CardEventHandler(
             }
             else -> false
         }
+    }
+
+    protected fun createShareIntent(activity: Activity, article: Article): Intent {
+        val shareIntent = ShareCompat.IntentBuilder.from(activity)
+        shareIntent.setSubject(article.title)
+            .setHtmlText(article.content)
+            .setText(article.link)
+            .setType("text/plain")
+        return shareIntent.createChooserIntent()
     }
 }
 

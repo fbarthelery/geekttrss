@@ -21,6 +21,8 @@
 package com.geekorum.ttrss.articles_list
 
 import android.accounts.Account
+import android.content.Context
+import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
@@ -31,6 +33,7 @@ import com.geekorum.geekdroid.app.lifecycle.Event
 import com.geekorum.ttrss.BackgroundJobManager
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.Feed
+import com.geekorum.ttrss.network.TtRssBrowserLauncher
 import com.geekorum.ttrss.providers.ArticlesContract
 import javax.inject.Inject
 import com.geekorum.geekdroid.app.lifecycle.EmptyEvent.Companion.makeEmptyEvent as RefreshEvent
@@ -43,7 +46,8 @@ import com.geekorum.geekdroid.app.lifecycle.EmptyEvent.Companion.makeEmptyEvent 
  */
 class ActivityViewModel @Inject constructor(
     private val feedsRepository: FeedsRepository,
-    private val backgroundJobManager: BackgroundJobManager
+    private val backgroundJobManager: BackgroundJobManager,
+    private val browserLauncher: TtRssBrowserLauncher
 ) : ViewModel() {
     private val account = MutableLiveData<Account>()
     private val _selectedFeed = MutableLiveData<Long>()
@@ -64,6 +68,10 @@ class ActivityViewModel @Inject constructor(
 
     val isRefreshing: LiveData<Boolean> = Transformations.switchMap(account) {
         SyncInProgressLiveData(it, ArticlesContract.AUTHORITY)
+    }
+
+    init {
+        browserLauncher.warmUp()
     }
 
     fun setAccount(account: Account) {
@@ -87,6 +95,10 @@ class ActivityViewModel @Inject constructor(
         _articleSelectedEvent.value = ArticleSelectedEvent(position, article)
     }
 
+    fun displayArticleInBrowser(context: Context, article: Article) {
+        browserLauncher.launchUrl(context, article.link.toUri())
+    }
+
     fun onSearchOpened() {
         _searchOpenedEvent.value = SearchOpenedEvent()
     }
@@ -97,6 +109,10 @@ class ActivityViewModel @Inject constructor(
 
     fun setSearchQuery(query: String) {
         _searchQuery.value = query
+    }
+
+    override fun onCleared() {
+        browserLauncher.shutdown()
     }
 
     data class ArticleSelectedParameters(val position: Int, val article: Article)
