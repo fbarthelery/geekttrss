@@ -18,39 +18,30 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.geekorum.ttrss.logging
+package com.geekorum.ttrss
 
-import android.app.Application
 import com.geekorum.geekdroid.dagger.AppInitializer
-import com.geekorum.geekdroid.dagger.AppInitializersModule
-import dagger.Binds
-import dagger.Module
-import dagger.multibindings.IntoSet
-import dagger.multibindings.Multibinds
-import timber.log.Timber
+import com.geekorum.geekdroid.dagger.initialize
+import com.geekorum.ttrss.di.ApplicationComponent
+import com.geekorum.ttrss.di.DaggerApplicationComponent
+import dagger.android.support.DaggerApplication
+
 import javax.inject.Inject
 
 /**
- * Declare multibindings for [Timber.Tree]
+ * Initialize global component for the TTRSS application.
  */
-@Module(includes = [AppInitializersModule::class])
-abstract class TimberModule {
+open class Application : DaggerApplication() {
 
-    @Multibinds
-    abstract fun providesTimberTrees(): Set<Timber.Tree>
+    @Inject
+    lateinit var appInitializers: MutableSet<AppInitializer>
 
-    @Binds
-    @IntoSet
-    abstract fun providesTimberInitializer(timberInitializer: TimberInitializer): AppInitializer
+    override fun onCreate() {
+        super.onCreate()
+        appInitializers.initialize(this)
+    }
 
-}
-
-class TimberInitializer @Inject constructor(
-    // dagger provides java.util.set which is mutable
-    private val timberTrees: MutableSet<Timber.Tree>
-) : AppInitializer {
-    override fun initialize(app: Application) {
-        Timber.plant(*timberTrees.toTypedArray())
+    override fun applicationInjector(): ApplicationComponent {
+        return DaggerApplicationComponent.builder().bindApplication(this).build()
     }
 }
-

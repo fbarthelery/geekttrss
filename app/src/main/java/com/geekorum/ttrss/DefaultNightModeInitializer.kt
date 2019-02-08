@@ -18,39 +18,33 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.geekorum.ttrss.logging
+package com.geekorum.ttrss
 
 import android.app.Application
+import android.preference.PreferenceManager
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_AUTO
 import com.geekorum.geekdroid.dagger.AppInitializer
 import com.geekorum.geekdroid.dagger.AppInitializersModule
-import dagger.Binds
+import dagger.BindsInstance
 import dagger.Module
+import dagger.Provides
 import dagger.multibindings.IntoSet
-import dagger.multibindings.Multibinds
-import timber.log.Timber
-import javax.inject.Inject
 
-/**
- * Declare multibindings for [Timber.Tree]
- */
-@Module(includes = [AppInitializersModule::class])
-abstract class TimberModule {
 
-    @Multibinds
-    abstract fun providesTimberTrees(): Set<Timber.Tree>
-
-    @Binds
-    @IntoSet
-    abstract fun providesTimberInitializer(timberInitializer: TimberInitializer): AppInitializer
-
-}
-
-class TimberInitializer @Inject constructor(
-    // dagger provides java.util.set which is mutable
-    private val timberTrees: MutableSet<Timber.Tree>
-) : AppInitializer {
+class DefaultNightModeInitializer : AppInitializer {
     override fun initialize(app: Application) {
-        Timber.plant(*timberTrees.toTypedArray())
+        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(app)
+        val nighModeStr = sharedPreferences.getString(SettingsActivity.KEY_THEME, Integer.toString(MODE_NIGHT_AUTO))
+        val nighMode = Integer.valueOf(nighModeStr!!)
+        AppCompatDelegate.setDefaultNightMode(nighMode)
     }
 }
 
+@Module(includes = [AppInitializersModule::class])
+class DefaultNightModeModule {
+
+    @Provides
+    @IntoSet
+    fun providesDefaultNightModeInitializer(): AppInitializer = DefaultNightModeInitializer()
+}
