@@ -29,15 +29,9 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
-import com.geekorum.geekdroid.network.BrowserLauncher;
-import com.geekorum.ttrss.R;
 import com.geekorum.ttrss.articles_list.ArticlesRepository;
 import com.geekorum.ttrss.data.Article;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import com.geekorum.ttrss.network.TtRssBrowserLauncher;
 
 import javax.inject.Inject;
 
@@ -46,27 +40,16 @@ import javax.inject.Inject;
  */
 public class ArticleDetailsViewModel extends ViewModel {
     private final ArticlesRepository articlesRepository;
-    private final BrowserLauncher browserLauncher;
+    private final TtRssBrowserLauncher browserLauncher;
     private final MutableLiveData<Long> articleId = new MutableLiveData<>();
     private LiveData<Article> article;
     private LiveData<String> articleContent;
 
-    private static final String[] PREFFERED_PACKAGES_LIST = new String[]{
-            "org.mozilla.focus"
-    };
-
     @Inject
-    public ArticleDetailsViewModel(ArticlesRepository articlesRepository, BrowserLauncher browserLauncher) {
+    public ArticleDetailsViewModel(ArticlesRepository articlesRepository, TtRssBrowserLauncher browserLauncher) {
         this.articlesRepository = articlesRepository;
         this.browserLauncher = browserLauncher;
-        browserLauncher.warmUp((BrowserLauncher.PreferredPackageSelector) this::orderPreferredPackages);
-    }
-
-    @NotNull
-    private List<String> orderPreferredPackages(List<String> availablePackages) {
-        return Stream.concat(Stream.of(PREFFERED_PACKAGES_LIST).filter(availablePackages::contains),
-                availablePackages.stream())
-                .distinct().collect(Collectors.toList());
+        browserLauncher.warmUp();
     }
 
     public void init(long articleId) {
@@ -76,7 +59,7 @@ public class ArticleDetailsViewModel extends ViewModel {
                 browserLauncher.mayLaunchUrl(Uri.parse(a.getLink()));
                 return a;
             });
-            articleContent =  Transformations.distinctUntilChanged(Transformations.map(article, Article::getContent));
+            articleContent = Transformations.distinctUntilChanged(Transformations.map(article, Article::getContent));
         }
         this.articleId.setValue(articleId);
     }
@@ -100,13 +83,7 @@ public class ArticleDetailsViewModel extends ViewModel {
     }
 
     public void openUrlInBrowser(Context context, Uri uri) {
-        browserLauncher.launchUrl(context, uri, builder -> {
-            int tabColor = context.getColor(R.color.primary);
-            builder.addDefaultShareMenuItem()
-                    .setToolbarColor(tabColor)
-                    .setShowTitle(true)
-                    .enableUrlBarHiding();
-        });
+        browserLauncher.launchUrl(context, uri);
     }
 
     public void shareArticle(Activity activity) {
