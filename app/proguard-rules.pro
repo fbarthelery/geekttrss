@@ -72,9 +72,9 @@
     kotlinx.serialization.KSerializer serializer(...);
 }
 
-# can't find reference field in program class for these
--dontwarn com.geekorum.ttrss.network.impl.ListContent$ListContentSerializer
--dontwarn  com.geekorum.ttrss.network.impl.ListResponsePayload$ListResponsePayloadSerializer
+# can't find reference field in program class for these because we don't use navigation
+-dontwarn  com.geekorum.geekdroid.navigation.**
+
 
 # Most of volatile fields are updated with AFU and should not be mangled
 -keepclassmembernames class kotlinx.** {
