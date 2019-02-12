@@ -21,6 +21,7 @@
 package com.geekorum.ttrss.di;
 
 import androidx.lifecycle.ViewModel;
+import com.geekorum.ttrss.ForceNightModeViewModel;
 import com.geekorum.ttrss.articles_list.TtrssAccountViewModel;
 import dagger.Binds;
 import dagger.Module;
@@ -37,6 +38,11 @@ public abstract class ViewModelsModule {
     @IntoMap
     @ClassKey(TtrssAccountViewModel.class)
     public abstract ViewModel getTtrssAccountViewModel(TtrssAccountViewModel ttrssAccountViewModel);
+
+    @Binds
+    @IntoMap
+    @ClassKey(ForceNightModeViewModel.class)
+    public abstract ViewModel getForceNightViewModel(ForceNightModeViewModel ttrssAccountViewModel);
 
 
 }

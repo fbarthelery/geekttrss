@@ -26,7 +26,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_AUTO
 import com.geekorum.geekdroid.dagger.AppInitializer
 import com.geekorum.geekdroid.dagger.AppInitializersModule
-import dagger.BindsInstance
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet

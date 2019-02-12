@@ -125,8 +125,6 @@
                        android:resource="@xml/articlesyncadapter" />
         </service>
 
-        <service android:name="com.geekorum.ttrss.room_migration.RoomMigrationService" />
-
         <provider android:authorities="${applicationId}.providers.articles"
             android:name="com.geekorum.ttrss.providers.ArticlesProvider"
             android:exported="false"/>
