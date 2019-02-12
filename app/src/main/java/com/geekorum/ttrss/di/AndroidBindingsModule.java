@@ -21,6 +21,7 @@
 package com.geekorum.ttrss.di;
 
 import com.geekorum.ttrss.MainActivity;
+import com.geekorum.ttrss.SettingsActivity;
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;
 import dagger.android.support.AndroidSupportInjectionModule;
@@ -33,4 +34,8 @@ public abstract class AndroidBindingsModule {
 
     @ContributesAndroidInjector
     abstract MainActivity contributesMainActivityInjector();
+
+    @ContributesAndroidInjector
+    abstract SettingsActivity contributesSettingsActivityInjector();
+
 }

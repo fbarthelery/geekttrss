@@ -24,7 +24,6 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.os.Build;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.databinding.DataBindingUtil;
 import androidx.preference.ListPreference;
@@ -34,7 +33,7 @@ import androidx.preference.PreferenceFragmentCompat;
 import com.geekorum.geekdroid.preferences.PreferenceSummaryBinder;
 import com.geekorum.ttrss.databinding.ActivitySettingsBinding;
 
-public class SettingsActivity extends AppCompatActivity {
+public class SettingsActivity extends BatteryFriendlyActivity {
 
     public static final String KEY_THEME = "theme";
     public static final String KEY_ABOUT_VERSION = "about_version";

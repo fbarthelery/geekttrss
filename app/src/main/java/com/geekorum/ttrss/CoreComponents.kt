@@ -64,7 +64,7 @@ inline fun <reified VM : ViewModel> ViewModelProviderFragment.activityViewModels
  * As it supports Dagger injection, the Activity must have a corresponding [AndroidInjector]
  */
 @SuppressLint("Registered")
-open class BaseActivity : ViewModelProviderActivity()
+open class BaseActivity : BatteryFriendlyActivity()
 
 /**
  * Common base Fragment for the application.
