@@ -64,6 +64,7 @@
     <!-- article list items -->
     <string name="mark_as_read">Mark as read</string>
     <string name="mark_as_unread">Mark as unread</string>
+    <string name="open_article_in_browser">View article in browser</string>
     <plurals name="undo_set_articles_read_text">
         <item quantity="one">%d article marked as read</item>
         <item quantity="other">%d articles marked as read</item>
@@ -71,7 +72,7 @@
     <string name="undo_set_articles_read_btn">Undo</string>
     <string name="author_formatted">by %1$s</string>
     <string name="fragment_articles_list_no_articles_lbl">No articles</string>
-    <string name="fragment_articles_list_no_articles_and_sync_lbl">No articles.\nFirst synchronization may take a while...</string>
+    <string name="fragment_articles_list_no_articles_and_sync_lbl">No articles.\nFirst synchronization may take a while…</string>
 
     <!-- activity add feed -->
     <string name="activity_add_feed_title">Subscribe to feed</string>

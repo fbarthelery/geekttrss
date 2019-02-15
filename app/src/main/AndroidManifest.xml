@@ -108,7 +108,8 @@
         <service android:name="com.geekorum.ttrss.add_feed.AddFeedService"
                  android:permission="android.permission.BIND_JOB_SERVICE" />
 
-        <service android:name="com.geekorum.ttrss.accounts.AuthenticatorService">
+        <service android:name="com.geekorum.ttrss.accounts.AuthenticatorService"
+                 tools:ignore="ExportedService">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
@@ -116,7 +117,8 @@
                        android:resource="@xml/authenticator"/>
         </service>
 
-        <service android:name="com.geekorum.ttrss.sync.ArticleSyncService">
+        <service android:name="com.geekorum.ttrss.sync.ArticleSyncService"
+                 tools:ignore="ExportedService">
             <!--TODO run in another process-->
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />

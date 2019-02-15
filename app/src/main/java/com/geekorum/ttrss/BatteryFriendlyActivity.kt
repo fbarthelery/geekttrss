@@ -43,6 +43,7 @@ open class BatteryFriendlyActivity : ViewModelProviderActivity() {
 
     private val nightViewModel: ForceNightModeViewModel by viewModels()
 
+    @SuppressLint("WrongConstant")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         nightViewModel.forceNightMode.observe(this) {

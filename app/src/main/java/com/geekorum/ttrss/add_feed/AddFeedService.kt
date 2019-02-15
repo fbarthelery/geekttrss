@@ -24,7 +24,6 @@ import android.accounts.Account
 import android.app.Application
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import androidx.annotation.WorkerThread
 import androidx.core.app.JobIntentService
 import com.geekorum.ttrss.BackgroundJobManager
@@ -32,6 +31,7 @@ import com.geekorum.ttrss.network.ApiService
 import dagger.android.AndroidInjection
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -59,10 +59,10 @@ class AddFeedService : JobIntentService() {
             launch {
                 try {
                     if (!addFeedJob.addFeed()) {
-                        Log.e("TAG", "Unable to add feed")
+                        Timber.e("Unable to add feed")
                     }
                 } catch (e: Exception) {
-                    Log.w("TAG", "Unable to add feed", e)
+                    Timber.w(e, "Unable to add feed")
                     rescheduleJob(addFeedJob)
                 }
             }

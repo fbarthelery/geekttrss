@@ -71,7 +71,8 @@
                 android:scaleType="fitCenter"
                 app:grayscale="@{!article.transientUnread}"
                 app:imageUrl="@{article.flavorImageUri}"
-                tools:src="@tools:sample/backgrounds/scenic" />
+                tools:src="@tools:sample/backgrounds/scenic"
+                tools:ignore="ContentDescription"/>
             <TextView
                 android:id="@+id/title"
                 android:layout_width="match_parent"
@@ -151,7 +152,8 @@
                     android:padding="12dp"
                     android:onClick="@{(v) -> handler.onOpenButtonClicked(v, article)}"
                     android:tint="?colorControlNormal"
-                    android:src="@drawable/ic_action_web_site" />
+                    android:src="@drawable/ic_action_web_site"
+                    android:contentDescription="@string/open_article_in_browser" />
 
             <com.geekorum.geekdroid.views.CheckableImageView
                 android:id="@+id/marked"
@@ -173,7 +175,8 @@
                 android:focusable="true"
                 android:padding="12dp"
                 android:onClick="@{() -> handler.onShareClicked(article)}"
-                android:src="@drawable/ic_share_24dp" />
+                android:src="@drawable/ic_share_24dp"
+                android:contentDescription="@string/share_article" />
 
             <ImageView
                 android:id="@+id/article_menu_button"
@@ -185,7 +188,8 @@
                 android:focusable="true"
                 android:padding="12dp"
                 android:onClick="@{(v) -> handler.onMenuButtonClicked(v, article, position)}"
-                android:src="@drawable/ic_dots_vert" />
+                android:src="@drawable/ic_dots_vert"
+                android:contentDescription="@string/star_article" />
         </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
