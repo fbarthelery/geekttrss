@@ -46,7 +46,9 @@ open class BatteryFriendlyActivity : ViewModelProviderActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         nightViewModel.forceNightMode.observe(this) {
-            val mode = if (it) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+            // we need to reset the local night mode to unspecified
+            // otherwise the default night mode is not picked
+            val mode = if (it) AppCompatDelegate.MODE_NIGHT_YES else -100 // unspecified night mode
             delegate.setLocalNightMode(mode)
         }
     }
