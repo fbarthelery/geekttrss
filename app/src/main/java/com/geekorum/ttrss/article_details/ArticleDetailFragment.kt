@@ -295,6 +295,10 @@ class ArticleDetailFragment : BaseFragment() {
             val root = binding.root as NestedScrollView
             // sometimes onPageFinished is called before updating the webview.
             // wait for next layout pass to calculate if we have reached end
+            // and request a layout pass if not
+            if (!root.isInLayout) {
+                root.requestLayout()
+            }
             root.doOnNextLayout {
                 if (root.isAtEndOfArticle) {
                     markReadJob = GlobalScope.launch {
