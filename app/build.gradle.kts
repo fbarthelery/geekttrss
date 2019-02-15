@@ -118,8 +118,8 @@ val daggerVersion: String by rootProject.extra
 dependencies {
 
     implementation("androidx.core:core-ktx:1.0.1")
-    implementation("androidx.fragment:fragment-ktx:1.1.0-alpha03")
-    implementation("androidx.activity:activity-ktx:1.0.0-alpha03")
+    implementation("androidx.fragment:fragment-ktx:1.1.0-alpha04")
+    implementation("androidx.activity:activity-ktx:1.0.0-alpha04")
 
     // androidx ui
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")
@@ -148,7 +148,7 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:3.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:3.10.0")
     implementation("com.squareup.picasso:picasso:2.5.2")
-    implementation("com.google.android.gms:play-services-oss-licenses:16.0.1")
+    implementation("com.google.android.gms:play-services-oss-licenses:16.0.2")
 
     implementation("org.jsoup:jsoup:1.10.2")
 
@@ -159,7 +159,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
     kapt("androidx.lifecycle:lifecycle-compiler:$lifecycleVersion")
     dualTestImplementation("androidx.arch.core:core-testing:2.0.0")
-    implementation("androidx.paging:paging-runtime:2.0.0")
+    implementation("androidx.paging:paging-runtime:2.1.0")
 
     // dagger
     implementation("com.google.dagger:dagger:$daggerVersion")
