@@ -1,2 +1,5 @@
-Vous pouvez maintenant effectuer une recherche parmi vos flux RSS !
-Tout cela est accompagné de corrections de bugs divers.
+Correction d'un bug empéchant les utilisateurs ayant un mot de passe long de se connecter
+Marque l'article comme lu lors d'un scroll jusqu'à la fin de la page
+Ajout d'un bouton pour voir l'article dans un navigateur
+Passe sur un theme sombre quand la batterie est faible
+Corrections diverses

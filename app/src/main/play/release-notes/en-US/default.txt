@@ -1,2 +1,5 @@
-You can now search from all your feeds!
-Also there are a few bug fixes.
+Fix bug preventing users with long password to log in
+Mark article as read when you reach the end of the page
+Add a button to view an article in browser from the article card
+Switch to dark theme when the device is on low battery
+Various bug fixes
