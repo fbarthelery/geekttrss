@@ -20,7 +20,6 @@
  */
 package com.geekorum.ttrss.articles_list
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
@@ -32,7 +31,9 @@ import com.geekorum.ttrss.network.ApiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -44,8 +45,6 @@ class FeedsRepository
         private val feedsDao: FeedsDao,
         private val apiService: ApiService
 ) {
-    private val TAG = FeedsRepository::class.java.simpleName
-
     val allUnreadFeeds: LiveData<List<Feed>>
         get() {
             refresh()
@@ -102,11 +101,13 @@ class FeedsRepository
 
     private fun refresh() = GlobalScope.launch(Dispatchers.IO) {
         try {
-            val feeds = async { apiService.getFeeds() }
-            val categories = async { apiService.getCategories() }
-            feedsDao.setFeedsAndCategories(feeds.await(), categories.await())
+            coroutineScope {
+                val feeds = async { apiService.getFeeds() }
+                val categories = async { apiService.getCategories() }
+                feedsDao.setFeedsAndCategories(feeds.await(), categories.await())
+            }
         } catch (e: ApiCallException) {
-            Log.w(TAG, "Unable to refresh feeds and categories", e)
+            Timber.w(e, "Unable to refresh feeds and categories")
         }
     }
 }
