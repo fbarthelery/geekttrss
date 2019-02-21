@@ -28,6 +28,7 @@ import com.geekorum.ttrss.data.migrations.MigrationFrom2To3;
 import com.geekorum.ttrss.data.migrations.MigrationFrom3To4;
 import com.geekorum.ttrss.data.migrations.MigrationFrom4To5;
 import com.geekorum.ttrss.data.migrations.MigrationFrom5To6;
+import com.geekorum.ttrss.data.migrations.MigrationFrom6To7;
 import com.geekorum.ttrss.providers.ArticlesProvidersDao;
 import dagger.Module;
 import dagger.Provides;
@@ -48,7 +49,8 @@ public class ArticlesDatabaseModule {
                         MigrationFrom2To3.INSTANCE,
                         MigrationFrom3To4.INSTANCE,
                         MigrationFrom4To5.INSTANCE,
-                        MigrationFrom5To6.INSTANCE)
+                        MigrationFrom5To6.INSTANCE,
+                        MigrationFrom6To7.INSTANCE)
                 .build();
     }
 

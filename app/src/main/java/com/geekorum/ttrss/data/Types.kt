@@ -40,13 +40,12 @@ import java.util.regex.Pattern
  * Types for the data storage layer
  */
 
-//TODO Consider setting foreign key constraints as deferred. see ForeignKey#deferred()
-
 @Entity(tableName = "articles",
         foreignKeys = [ForeignKey(
             entity = Feed::class,
             parentColumns = ["_id"],
-            childColumns = ["feed_id"]
+            childColumns = ["feed_id"],
+            onDelete = ForeignKey.CASCADE
         )])
 data class Article(
 
@@ -243,7 +242,8 @@ data class Category(
 @Entity(tableName = "feeds",
         foreignKeys = [ForeignKey(entity = Category::class,
             parentColumns = ["_id"],
-            childColumns = ["cat_id"])
+            childColumns = ["cat_id"],
+            deferred = true)
         ])
 data class Feed(
 

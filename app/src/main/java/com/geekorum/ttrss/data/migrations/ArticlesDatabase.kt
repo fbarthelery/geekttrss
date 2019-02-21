@@ -296,3 +296,72 @@ object MigrationFrom5To6 : Migration(5, 6) {
         // nothing to do here
     }
 }
+
+/**
+ * This migration changes some foreign keys constraints
+ */
+object MigrationFrom6To7 : Migration(6, 7) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        migrateArticlesTable(database)
+        migrateFeedsTable(database)
+    }
+
+    private fun migrateArticlesTable(database: SupportSQLiteDatabase) {
+        with(database) {
+            execSQL(
+                """CREATE TABLE IF NOT EXISTS `articles_new` (
+                    |`_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    |`unread` INTEGER NOT NULL,
+                    |`transiant_unread` INTEGER NOT NULL,
+                    |`marked` INTEGER NOT NULL,
+                    |`published` INTEGER NOT NULL,
+                    |`score` INTEGER NOT NULL,
+                    |`last_time_update` INTEGER NOT NULL,
+                    |`is_updated` INTEGER NOT NULL,
+                    |`link` TEXT NOT NULL,
+                    |`feed_id` INTEGER NOT NULL,
+                    |`flavor_image_uri` TEXT NOT NULL,
+                    |`content_excerpt` TEXT NOT NULL,
+                    |`title` TEXT NOT NULL,
+                    |`tags` TEXT NOT NULL,
+                    |`content` TEXT NOT NULL,
+                    |`author` TEXT NOT NULL,
+                    |FOREIGN KEY(`feed_id`) REFERENCES `feeds`(`_id`)
+                    |ON UPDATE NO ACTION ON DELETE CASCADE
+                    |)""".trimMargin())
+
+            execSQL("DROP INDEX IF EXISTS `index_articles_feed_id`;")
+            execSQL("CREATE  INDEX `index_articles_feed_id` ON `articles_new` (`feed_id`);")
+
+            execSQL("INSERT INTO articles_new SELECT * FROM articles;")
+            execSQL("DROP TABLE articles;")
+            execSQL("ALTER TABLE articles_new RENAME TO articles;")
+        }
+    }
+
+    private fun migrateFeedsTable(database: SupportSQLiteDatabase) {
+        with(database) {
+            execSQL(
+                """CREATE TABLE IF NOT EXISTS `feeds_new` (
+                    |`_id` INTEGER NOT NULL,
+                    |`url` TEXT NOT NULL,
+                    |`title` TEXT NOT NULL,
+                    |`cat_id` INTEGER NOT NULL,
+                    |`display_title` TEXT NOT NULL,
+                    |`last_time_update` INTEGER NOT NULL,
+                    |`unread_count` INTEGER NOT NULL,
+                    |PRIMARY KEY(`_id`),
+                    |FOREIGN KEY(`cat_id`) REFERENCES `categories`(`_id`)
+                    |ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED
+                    |)""".trimMargin())
+
+            execSQL("DROP INDEX IF EXISTS `index_feeds_cat_id`;")
+            execSQL("CREATE  INDEX `index_feeds_cat_id` ON `feeds_new` (`cat_id`);")
+
+            execSQL("INSERT INTO feeds_new SELECT * FROM feeds;")
+            execSQL("DROP TABLE feeds;")
+            execSQL("ALTER TABLE feeds_new RENAME TO feeds;")
+        }
+    }
+
+}
