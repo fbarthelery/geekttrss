@@ -51,7 +51,7 @@ class ActivityViewModel @Inject constructor(
 ) : ViewModel() {
     private val account = MutableLiveData<Account>()
     private val _selectedFeed = MutableLiveData<Long>()
-    val selectedFeed: LiveData<Feed> = Transformations.switchMap(_selectedFeed) {
+    val selectedFeed: LiveData<Feed?> = Transformations.switchMap(_selectedFeed) {
         feedsRepository.getFeedById(it)
     }
     private val _articleSelectedEvent = MutableLiveData<Event<ArticleSelectedParameters>>()

@@ -56,10 +56,17 @@ public class ArticleDetailsViewModel extends ViewModel {
         if (article == null) {
             LiveData<Article> tempArticle = Transformations.switchMap(this.articleId, articlesRepository::getArticleById);
             article = Transformations.map(tempArticle, a -> {
-                browserLauncher.mayLaunchUrl(Uri.parse(a.getLink()));
+                if (a != null) {
+                    browserLauncher.mayLaunchUrl(Uri.parse(a.getLink()));
+                }
                 return a;
             });
-            articleContent = Transformations.distinctUntilChanged(Transformations.map(article, Article::getContent));
+            articleContent = Transformations.distinctUntilChanged(Transformations.map(article, a -> {
+                if (a != null) {
+                    return a.getContent();
+                }
+                return "";
+            }));
         }
         this.articleId.setValue(articleId);
     }

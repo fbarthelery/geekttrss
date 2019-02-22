@@ -75,7 +75,7 @@ class ArticlesRepository
         return articleDao.getAllUnreadArticlesUpdatedAfterTime(time)
     }
 
-    fun getArticleById(articleId: Long): LiveData<Article> = articleDao.getArticleById(articleId).distinctUntilChanged()
+    fun getArticleById(articleId: Long): LiveData<Article?> = articleDao.getArticleById(articleId).distinctUntilChanged()
 
     fun setArticleUnread(articleId: Long, newValue: Boolean): Action {
         val setUnreadAction = setFieldActionFactory.createSetUnreadAction(articleId, newValue)

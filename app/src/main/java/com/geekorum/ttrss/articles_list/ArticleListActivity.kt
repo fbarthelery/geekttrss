@@ -37,6 +37,7 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.BackgroundJobManager
 import com.geekorum.ttrss.R
@@ -95,7 +96,7 @@ class ArticleListActivity : SessionActivity() {
         setupPeriodicJobs()
         PreferenceManager.setDefaultValues(this, R.xml.pref_general, false)
 
-        activityViewModel.selectedFeed.observe(this, Observer<Feed> { onFeedSelected(it) })
+        activityViewModel.selectedFeed.observe(this, Observer { onFeedSelected(it) })
 
         activityViewModel.articleSelectedEvent.observe(this, EventObserver { (position, article) ->
             onArticleSelected(position, article)
@@ -252,7 +253,10 @@ class ArticleListActivity : SessionActivity() {
     /*
      *  From MasterActivity
      */
-    private fun onFeedSelected(feed: Feed) {
+    private fun onFeedSelected(feed: Feed?) {
+        if (feed == null) {
+            return
+        }
         navigateUpToList()
         title = feed.title
         binding.toolbar.toolbar.title = title

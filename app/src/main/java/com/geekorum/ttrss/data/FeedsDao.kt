@@ -73,7 +73,7 @@ abstract class FeedsDao {
 
 
     @Query("SELECT * FROM feeds WHERE _id=:id")
-    abstract fun getFeedById(id: Long): LiveData<Feed>
+    abstract fun getFeedById(id: Long): LiveData<Feed?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertCategories(categories: Collection<Category>)

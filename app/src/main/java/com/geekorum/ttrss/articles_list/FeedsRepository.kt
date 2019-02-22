@@ -69,7 +69,7 @@ class FeedsRepository
             return feedsDao.allUnreadCategories
         }
 
-    fun getFeedById(feedId: Long): LiveData<Feed> {
+    fun getFeedById(feedId: Long): LiveData<Feed?> {
         return when {
             Feed.isVirtualFeed(feedId) -> MutableLiveData<Feed>().apply {
                 value = Feed.createVirtualFeedForId(feedId)
