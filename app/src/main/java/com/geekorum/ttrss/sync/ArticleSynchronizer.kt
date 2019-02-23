@@ -1,4 +1,4 @@
-/**
+/*
  * Geekttrss is a RSS feed reader application on the Android Platform.
  *
  * Copyright (C) 2017-2018 by Frederic-Charles Barthelery.
@@ -34,6 +34,8 @@ import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.sync.SyncContract.EXTRA_FEED_ID
 import com.geekorum.ttrss.sync.SyncContract.EXTRA_NUMBER_OF_LATEST_ARTICLES_TO_REFRESH
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -41,14 +43,13 @@ import kotlinx.coroutines.yield
 import okhttp3.HttpUrl
 import timber.log.Timber
 import java.io.IOException
-import javax.inject.Inject
 
 /**
  * Synchronize Articles from the network.
  */
-class ArticleSynchronizer private constructor(
+class ArticleSynchronizer @AssistedInject constructor(
     private val apiService: ApiService,
-    params: Bundle,
+    @Assisted params: Bundle,
     private val backgroundDataUsageManager: BackgroundDataUsageManager,
     private val accountPreferences: SharedPreferences,
     private val databaseService: DatabaseService,
@@ -56,19 +57,9 @@ class ArticleSynchronizer private constructor(
     private val imageUrlExtractor: ImageUrlExtractor
 ) : CancellableSyncAdapter.CancellableSync() {
 
-    class Factory @Inject constructor(
-        private val apiService: ApiService,
-        private val backgroundDataUsageManager: BackgroundDataUsageManager,
-        private val accountPreferences: SharedPreferences,
-        private val httpCacher: HttpCacher,
-        private val databaseService: DatabaseService,
-        private val imageUrlExtractor: ImageUrlExtractor
-    ) {
-
-        fun create(params: Bundle): ArticleSynchronizer {
-            return ArticleSynchronizer(apiService, params,
-                backgroundDataUsageManager, accountPreferences, databaseService, httpCacher, imageUrlExtractor)
-        }
+    @AssistedInject.Factory
+    interface Factory {
+        fun create(params: Bundle): ArticleSynchronizer
     }
 
     private val PREF_LATEST_ARTICLE_SYNCED_ID = "latest_article_sync_id"

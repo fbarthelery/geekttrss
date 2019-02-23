@@ -26,6 +26,7 @@ import android.content.SharedPreferences
 import com.geekorum.ttrss.accounts.NetworkLoginModule
 import com.geekorum.ttrss.accounts.PerAccount
 import com.geekorum.ttrss.data.plugins.SynchronizationFacade
+import com.geekorum.ttrss.di.AssistedFactoriesModule
 import com.geekorum.ttrss.network.TinyrssApiModule
 import dagger.Binds
 import dagger.BindsInstance
@@ -55,8 +56,11 @@ abstract class ServiceInjectorModule {
 private abstract class SyncComponentModule
 
 
-@Subcomponent(modules = [NetworkLoginModule::class, TinyrssApiModule::class,
-                         AccountPreferenceModule::class, DatabaseAccessModule::class])
+@Subcomponent(modules = [
+    AssistedFactoriesModule::class,
+    NetworkLoginModule::class, TinyrssApiModule::class,
+    AccountPreferenceModule::class, DatabaseAccessModule::class
+])
 @PerAccount
 internal interface SyncComponent {
 
@@ -93,5 +97,5 @@ internal class AccountPreferenceModule {
 @Module
 internal abstract class DatabaseAccessModule {
     @Binds
-    abstract fun providesDatabaseService(synchronizationFacade: SynchronizationFacade) : DatabaseService
+    abstract fun providesDatabaseService(synchronizationFacade: SynchronizationFacade): DatabaseService
 }
