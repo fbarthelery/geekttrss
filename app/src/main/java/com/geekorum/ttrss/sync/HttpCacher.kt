@@ -1,4 +1,4 @@
-/**
+/*
  * Geekttrss is a RSS feed reader application on the Android Platform.
  *
  * Copyright (C) 2017-2018 by Frederic-Charles Barthelery.
@@ -36,8 +36,6 @@ import javax.inject.Inject
  */
 class HttpCacher @Inject constructor(httpClient: OkHttpClient) {
 
-    private val TAG = HttpCacher::class.java.simpleName
-
     /** Dangerous interceptor that rewrites the server's cache-control header.  */
     private object RewriteCacheControlInterceptor : Interceptor {
 
@@ -57,9 +55,9 @@ class HttpCacher @Inject constructor(httpClient: OkHttpClient) {
         .build()
 
     @Throws(IOException::class)
-    fun cacheHttpRequest(url: String) = cacheHttpRequest(checkNotNull(HttpUrl.parse(url), {
+    fun cacheHttpRequest(url: String) = cacheHttpRequest(checkNotNull(HttpUrl.parse(url)) {
         "Invalid http/https url"
-    }))
+    })
 
     @Throws(IOException::class)
     @WorkerThread

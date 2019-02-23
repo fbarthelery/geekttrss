@@ -24,6 +24,7 @@ import android.content.OperationApplicationException
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.RemoteException
+import android.security.NetworkSecurityPolicy
 import com.geekorum.geekdroid.accounts.CancellableSyncAdapter
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.Category
@@ -37,6 +38,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.yield
+import okhttp3.HttpUrl
 import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
@@ -235,12 +237,27 @@ class ArticleSynchronizer private constructor(
             .forEach {
                 launch {
                     try {
-                        httpCacher.cacheHttpRequest(it)
+                        cacheHttpRequest(it)
                     } catch (e: IOException) {
-                        Timber.d(e,"Unable to cache request $it")
+                        Timber.w(e,"Unable to cache request $it")
                     }
                 }
             }
+    }
+
+    @Throws(IOException::class)
+    private fun cacheHttpRequest(it: HttpUrl) {
+        if (it.canBeCache()) {
+            httpCacher.cacheHttpRequest(it)
+        }
+    }
+
+    private fun HttpUrl.canBeCache(): Boolean {
+        if (scheme() == "http" && !NetworkSecurityPolicy.getInstance().isCleartextTrafficPermitted(host())) {
+            Timber.d("Can't cache $this, clear text traffic not permitted")
+            return false
+        }
+        return true
     }
 
     private fun updateArticleMetadata(articles: List<Article>) {
