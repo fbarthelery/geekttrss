@@ -1,4 +1,4 @@
-/**
+/*
  * Geekttrss is a RSS feed reader application on the Android Platform.
  *
  * Copyright (C) 2017-2018 by Frederic-Charles Barthelery.
@@ -21,13 +21,14 @@
 package com.geekorum.ttrss.add_feed
 
 import android.accounts.Account
-import android.app.Application
 import android.content.Context
 import android.content.Intent
 import androidx.annotation.WorkerThread
 import androidx.core.app.JobIntentService
 import com.geekorum.ttrss.BackgroundJobManager
 import com.geekorum.ttrss.network.ApiService
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
 import dagger.android.AndroidInjection
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -80,8 +81,8 @@ class AddFeedService : JobIntentService() {
     }
 
     private fun rescheduleJob(job: AddFeedJob) {
-        with (job) {
-            backgroundJobManager.subscribeToFeed(account,feedUrl, categoryId, feedLogin, feedPassword)
+        with(job) {
+            backgroundJobManager.subscribeToFeed(account, feedUrl, categoryId, feedLogin, feedPassword)
         }
     }
 
@@ -107,28 +108,21 @@ class AddFeedService : JobIntentService() {
 }
 
 
-class AddFeedJob private constructor(
-    val application: Application,
+class AddFeedJob @AssistedInject internal constructor(
     val account: Account,
     val apiService: ApiService,
-    val feedUrl: String,
-    val categoryId: Long,
-    val feedLogin: String,
-    val feedPassword: String
+    @Assisted val feedUrl: String,
+    @Assisted val categoryId: Long,
+    @Assisted val feedLogin: String,
+    @Assisted val feedPassword: String
 ) {
     suspend fun addFeed(): Boolean {
         return apiService.subscribeToFeed(feedUrl, categoryId, feedLogin, feedPassword)
     }
 
-    class Factory @Inject constructor(
-        val application: Application,
-        val account: Account,
-        private val apiService: ApiService
-    ) {
-
-        fun create(feedUrl: String, categoryId: Long, feedLogin: String, feedPassword: String): AddFeedJob {
-            return AddFeedJob(application, account, apiService, feedUrl, categoryId, feedLogin, feedPassword)
-        }
+    @AssistedInject.Factory
+    interface Factory {
+        fun create(feedUrl: String, categoryId: Long, feedLogin: String, feedPassword: String): AddFeedJob
     }
 
 }

@@ -24,6 +24,7 @@ import android.accounts.Account
 import androidx.lifecycle.ViewModel
 import com.geekorum.ttrss.accounts.NetworkLoginModule
 import com.geekorum.ttrss.accounts.PerAccount
+import com.geekorum.ttrss.di.AssistedFactoriesModule
 import com.geekorum.ttrss.network.TinyrssApiModule
 import dagger.Binds
 import dagger.BindsInstance
@@ -58,7 +59,7 @@ abstract class AndroidInjectorsModule {
 private abstract class AddFeedComponentModule
 
 
-@Subcomponent(modules = [NetworkLoginModule::class, TinyrssApiModule::class])
+@Subcomponent(modules = [AssistedFactoriesModule::class, NetworkLoginModule::class, TinyrssApiModule::class])
 @PerAccount
 internal interface AddFeedComponent {
 
