@@ -1,4 +1,4 @@
-/**
+/*
  * Geekttrss is a RSS feed reader application on the Android Platform.
  *
  * Copyright (C) 2017-2018 by Frederic-Charles Barthelery.
@@ -30,6 +30,8 @@ import com.geekorum.ttrss.data.TransactionsDao
 import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.session.Action
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
@@ -43,7 +45,6 @@ import javax.inject.Inject
 class ArticlesRepository
 @Inject constructor(
     private val articleDao: ArticleDao,
-    private val transactionsDao: TransactionsDao,
     private val setFieldActionFactory: SetArticleFieldAction.Factory
 ) {
 
@@ -134,32 +135,23 @@ open class SetArticleFieldAction(
         transactionsDao.insertUniqueTransaction(transaction)
     }
 
-    class Factory @Inject constructor(
-        private val articleDao: ArticleDao,
-        private val transactionsDao: TransactionsDao,
-        private val apiService: ApiService
-    ) {
+    class Factory @Inject internal constructor(
+        private val setUnreadActionFactory: SetUnreadAction.Factory,
+        private val setStarredActionFactory: SetStarredAction.Factory
+    ) : SetUnreadAction.Factory by setUnreadActionFactory, SetStarredAction.Factory by setStarredActionFactory
 
-        fun createSetUnreadAction(articleId: Long, value: Boolean): Action {
-            return SetUnreadAction(articleDao, transactionsDao, apiService, articleId, value)
-        }
-
-        fun createSetStarredAction(articleId: Long, value: Boolean): Action {
-            return SetStarredAction(articleDao, transactionsDao, apiService, articleId, value)
-        }
-    }
 }
 
 
 /**
  * Action to set the unread field value of an article.
  */
-private class SetUnreadAction internal constructor(
+internal class SetUnreadAction @AssistedInject internal constructor(
     private val articleDao: ArticleDao,
     transactionsDao: TransactionsDao,
     apiService: ApiService,
-    private val articleId: Long,
-    newValue: Boolean
+    @Assisted private val articleId: Long,
+    @Assisted newValue: Boolean
 ) : SetArticleFieldAction(transactionsDao, apiService, articleId,
     ArticlesContract.Transaction.Field.UNREAD, newValue) {
 
@@ -169,17 +161,22 @@ private class SetUnreadAction internal constructor(
             super.updateArticleField(value)
         }
     }
+
+    @AssistedInject.Factory
+    interface Factory {
+        fun createSetUnreadAction(articleId: Long, newValue: Boolean): Action
+    }
 }
 
 /**
  * Action to set the starred field value of an article.
  */
-private class SetStarredAction(
+internal class SetStarredAction @AssistedInject internal constructor(
     private val articleDao: ArticleDao,
     transactionsDao: TransactionsDao,
     val apiService: ApiService,
-    val articleId: Long,
-    newValue: Boolean
+    @Assisted val articleId: Long,
+    @Assisted newValue: Boolean
 ) : SetArticleFieldAction(transactionsDao, apiService, articleId, ArticlesContract.Transaction.Field.STARRED,
     newValue) {
 
@@ -188,6 +185,11 @@ private class SetStarredAction(
         if (changed > 0) {
             super.updateArticleField(value)
         }
+    }
+
+    @AssistedInject.Factory
+    interface Factory {
+        fun createSetStarredAction(articleId: Long, newValue: Boolean): Action
     }
 
 }
