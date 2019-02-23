@@ -327,7 +327,7 @@ object MigrationFrom6To7 : Migration(6, 7) {
                     |`content` TEXT NOT NULL,
                     |`author` TEXT NOT NULL,
                     |FOREIGN KEY(`feed_id`) REFERENCES `feeds`(`_id`)
-                    |ON UPDATE NO ACTION ON DELETE CASCADE
+                    |ON UPDATE NO ACTION ON DELETE NO ACTION
                     |)""".trimMargin())
 
             execSQL("DROP INDEX IF EXISTS `index_articles_feed_id`;")

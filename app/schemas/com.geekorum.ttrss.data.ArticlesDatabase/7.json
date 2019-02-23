@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 7,
-    "identityHash": "5d78553ce41550a9dd8efa0c64f512f4",
+    "identityHash": "2fed6d61e426718694eaeb7c54b81f2d",
     "entities": [
       {
         "tableName": "articles",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `unread` INTEGER NOT NULL, `transiant_unread` INTEGER NOT NULL, `marked` INTEGER NOT NULL, `published` INTEGER NOT NULL, `score` INTEGER NOT NULL, `last_time_update` INTEGER NOT NULL, `is_updated` INTEGER NOT NULL, `link` TEXT NOT NULL, `feed_id` INTEGER NOT NULL, `flavor_image_uri` TEXT NOT NULL, `content_excerpt` TEXT NOT NULL, `title` TEXT NOT NULL, `tags` TEXT NOT NULL, `content` TEXT NOT NULL, `author` TEXT NOT NULL, FOREIGN KEY(`feed_id`) REFERENCES `feeds`(`_id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`_id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `unread` INTEGER NOT NULL, `transiant_unread` INTEGER NOT NULL, `marked` INTEGER NOT NULL, `published` INTEGER NOT NULL, `score` INTEGER NOT NULL, `last_time_update` INTEGER NOT NULL, `is_updated` INTEGER NOT NULL, `link` TEXT NOT NULL, `feed_id` INTEGER NOT NULL, `flavor_image_uri` TEXT NOT NULL, `content_excerpt` TEXT NOT NULL, `title` TEXT NOT NULL, `tags` TEXT NOT NULL, `content` TEXT NOT NULL, `author` TEXT NOT NULL, FOREIGN KEY(`feed_id`) REFERENCES `feeds`(`_id`) ON UPDATE NO ACTION ON DELETE NO ACTION )",
         "fields": [
           {
             "fieldPath": "id",
@@ -124,7 +124,7 @@
         "foreignKeys": [
           {
             "table": "feeds",
-            "onDelete": "CASCADE",
+            "onDelete": "NO ACTION",
             "onUpdate": "NO ACTION",
             "columns": [
               "feed_id"
@@ -360,7 +360,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"5d78553ce41550a9dd8efa0c64f512f4\")"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, \"2fed6d61e426718694eaeb7c54b81f2d\")"
     ]
   }
 }

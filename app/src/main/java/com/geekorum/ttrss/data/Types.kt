@@ -40,12 +40,13 @@ import java.util.regex.Pattern
  * Types for the data storage layer
  */
 
+// Can't have ON DELETE CASCADE constraint because we use some REPLACE conflict resolution
+// and this seems to make a delete then an insert. The delete with cascade suppress all articles
 @Entity(tableName = "articles",
         foreignKeys = [ForeignKey(
             entity = Feed::class,
             parentColumns = ["_id"],
-            childColumns = ["feed_id"],
-            onDelete = ForeignKey.CASCADE
+            childColumns = ["feed_id"]
         )])
 data class Article(
 
