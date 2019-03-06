@@ -56,7 +56,7 @@ class ArticleDetailsViewModel
             it
         }
 
-    val articleContent: LiveData<String> = article.distinctUntilChanged().map { it?.content ?: "" }
+    val articleContent: LiveData<String> = article.map { it?.content ?: "" }.distinctUntilChanged()
 
     init {
         browserLauncher.warmUp()
