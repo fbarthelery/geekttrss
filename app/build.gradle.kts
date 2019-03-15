@@ -20,7 +20,11 @@
  */
 
 import com.geekorum.build.computeChangesetVersionCode
+import com.geekorum.build.configureJavaVersion
 import com.geekorum.build.dualTestImplementation
+import com.geekorum.build.enforcedAndroidxLifecyclePlatform
+import com.geekorum.build.enforcedCoroutinesPlatform
+import com.geekorum.build.enforcedDaggerPlatform
 import com.geekorum.build.getChangeSet
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.kotlin
@@ -88,10 +92,7 @@ android {
         isEnabled = true
     }
 
-    compileOptions {
-        setSourceCompatibility(JavaVersion.VERSION_1_8)
-        setTargetCompatibility(JavaVersion.VERSION_1_8)
-    }
+    configureJavaVersion()
 
     flavorDimensions("distribution")
     productFlavors {
@@ -114,7 +115,6 @@ repositories {
     }
 }
 
-val daggerVersion: String by rootProject.extra
 dependencies {
 
     implementation("androidx.core:core-ktx:1.0.1")
@@ -153,6 +153,7 @@ dependencies {
     implementation("org.jsoup:jsoup:1.10.2")
 
     val lifecycleVersion: String by rootProject.extra
+    implementation(enforcedAndroidxLifecyclePlatform(lifecycleVersion))
     implementation("androidx.lifecycle:lifecycle-extensions:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-livedata-core-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
@@ -162,6 +163,9 @@ dependencies {
     implementation("androidx.paging:paging-runtime:2.1.0")
 
     // dagger
+    val daggerVersion: String by rootProject.extra
+    implementation(enforcedDaggerPlatform(daggerVersion))
+    kapt(enforcedDaggerPlatform(daggerVersion))
     implementation("com.google.dagger:dagger:$daggerVersion")
     implementation("com.google.dagger:dagger-android:$daggerVersion")
     implementation("com.google.dagger:dagger-android-support:$daggerVersion")
@@ -183,10 +187,11 @@ dependencies {
     implementation(enforcedPlatform(kotlin("bom", kotlinVersion)))
     implementation(kotlin("stdlib-jdk8"))
 
-    val corountinesVersion: String by rootProject.extra
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$corountinesVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$corountinesVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$corountinesVersion")
+    val coroutinesVersion: String by rootProject.extra
+    implementation(enforcedCoroutinesPlatform(coroutinesVersion))
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$coroutinesVersion")
 
     implementation("com.jakewharton.timber:timber:4.7.1")
 

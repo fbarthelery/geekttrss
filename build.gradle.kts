@@ -18,6 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
+import com.geekorum.build.setupGoogleContent
 import java.net.URI
 
 plugins {
@@ -36,12 +37,12 @@ extra["daggerVersion"] = "2.21"
 extra["lifecycleVersion"] = "2.1.0-alpha01"
 extra["roomVersion"] = "2.1.0-alpha04"
 extra["kotlinVersion"] = "1.3.20"
-extra["corountinesVersion"] = "1.1.0"
+extra["coroutinesVersion"] = "1.1.0"
 
 
 allprojects {
     repositories {
-        google()
+        google().setupGoogleContent()
         jcenter()
         // for kotlinx
         maven { url = URI("https://kotlin.bintray.com/kotlinx") }
