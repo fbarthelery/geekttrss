@@ -162,7 +162,7 @@ class FakeTinyrssApiModule(val tinyRssApi: TinyRssApi) {
     }
 }
 
-@Component(modules = [TinyRssUrlModule::class, FakeTinyrssApiModule::class])
+@Component(modules = [TinyRssServerInformationModule::class, FakeTinyrssApiModule::class])
 internal interface TestAuthenticatorNetworkComponent : AuthenticatorNetworkComponent {
 
     @Component.Builder

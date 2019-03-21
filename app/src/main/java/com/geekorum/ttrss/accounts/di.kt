@@ -38,7 +38,6 @@ import dagger.Subcomponent
 import dagger.android.ContributesAndroidInjector
 import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
-import javax.inject.Named
 import javax.inject.Scope
 import kotlin.annotation.AnnotationRetention.RUNTIME
 
@@ -107,9 +106,11 @@ class NetworkLoginModule {
     }
 
     @Provides
-    @Named("tinyrssServerUrl")
-    fun providesServerUrl(accountManager: AccountManager, account: Account): String {
-        return accountManager.getUserData(account, AccountAuthenticator.USERDATA_URL)
+    fun providesServerInformation(accountManager: AndroidTinyrssAccountManager, account: Account): ServerInformation {
+        return with(accountManager) {
+            val ttRssAccount = fromAndroidAccount(account)
+            getServerInformation(ttRssAccount)
+        }
     }
 
 }
@@ -134,7 +135,7 @@ internal class AuthenticatorActivityModule {
 }
 
 
-@Subcomponent(modules = [TinyRssUrlModule::class, TinyrssApiModule::class])
+@Subcomponent(modules = [TinyRssServerInformationModule::class, TinyrssApiModule::class])
 internal interface AuthenticatorNetworkComponent {
     fun getTinyRssApi(): TinyRssApi
 
@@ -142,15 +143,17 @@ internal interface AuthenticatorNetworkComponent {
     interface Builder {
         fun build(): AuthenticatorNetworkComponent
 
-        fun tinyRssUrlModule(module: TinyRssUrlModule): Builder
+        fun tinyRssServerInformationModule(module: TinyRssServerInformationModule): Builder
     }
 }
 
 @Module
-internal class TinyRssUrlModule(val url: String) {
+internal class TinyRssServerInformationModule(val serverInformation: ServerInformation) {
     @Provides
-    @Named("tinyrssServerUrl")
-    fun providesTinyrssServerUrl() = url
+    fun providesServerInformation(): ServerInformation {
+        return serverInformation
+    }
+
 }
 
 @Module

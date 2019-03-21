@@ -21,6 +21,7 @@
 package com.geekorum.ttrss.network;
 
 import com.geekorum.geekdroid.network.TokenRetriever;
+import com.geekorum.ttrss.accounts.ServerInformation;
 import com.geekorum.ttrss.network.impl.LoggedRequestInterceptorFactory;
 import com.geekorum.ttrss.network.impl.TinyRssApi;
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory;
@@ -35,8 +36,6 @@ import retrofit2.Retrofit;
 
 import java.util.Objects;
 import java.util.Optional;
-
-import javax.inject.Named;
 
 /**
  * This module provides an {@link ApiService} to access a TinyRss server
@@ -53,7 +52,8 @@ public abstract class TinyrssApiModule {
     }
 
     @Provides
-    static TinyRssApi providesTinyRssApi(OkHttpClient okHttpClient, Optional<LoggedRequestInterceptorFactory> loggedRequestInterceptorFactory, @Named("tinyrssServerUrl") String tinyrssApiUrl) {
+    static TinyRssApi providesTinyRssApi(OkHttpClient okHttpClient, ServerInformation serverInformation, Optional<LoggedRequestInterceptorFactory> loggedRequestInterceptorFactory) {
+        String tinyrssApiUrl = serverInformation.getApiUrl();
         if (!tinyrssApiUrl.endsWith("/")) {
             tinyrssApiUrl += "/";
         }

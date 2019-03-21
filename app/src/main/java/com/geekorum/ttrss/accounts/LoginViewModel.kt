@@ -122,9 +122,10 @@ internal class LoginViewModel @Inject constructor(
 
     @VisibleForTesting
     internal suspend fun doLogin() {
-        val urlModule = TinyRssUrlModule(httpUrl!!.toString())
+        val serverInformation = DataServerInformation(httpUrl!!.toString())
+        val urlModule = TinyRssServerInformationModule(serverInformation)
         val networkComponent = networkComponentBuilder
-            .tinyRssUrlModule(urlModule)
+            .tinyRssServerInformationModule(urlModule)
             .build()
         val tinyRssApi = networkComponent.getTinyRssApi()
         val loginPayload = LoginRequestPayload(username, password)
@@ -183,6 +184,12 @@ internal class LoginViewModel @Inject constructor(
         }
         return null
     }
+
+    private data class DataServerInformation(
+        override val apiUrl: String,
+        override val basicHttpAuthUsername: String? = null,
+        override val basicHttpAuthPassword: String? = null
+    ) : ServerInformation()
 
     data class LoginFailedError(@StringRes val errorMsgId: Int)
     private fun LoginFailedEvent(errorMsgId: Int) = Event(LoginFailedError(errorMsgId))

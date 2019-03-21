@@ -1,4 +1,4 @@
-/**
+/*
  * Geekttrss is a RSS feed reader application on the Android Platform.
  *
  * Copyright (C) 2017-2018 by Frederic-Charles Barthelery.
@@ -28,6 +28,7 @@ import com.geekorum.geekdroid.security.SecretCipher
 import com.geekorum.ttrss.BackgroundJobManager
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.sync.SyncContract
+import timber.log.Timber
 import java.security.GeneralSecurityException
 import javax.crypto.spec.GCMParameterSpec
 import javax.inject.Inject
@@ -36,6 +37,15 @@ import javax.inject.Inject
  * Represents a Tinyrss account
  */
 data class Account(val username: String, val url: String)
+
+/**
+ * Holds information about the TinyTinyRss server we are connecting to.
+ */
+abstract class ServerInformation {
+    abstract val apiUrl: String
+    abstract val basicHttpAuthUsername: String?
+    abstract val basicHttpAuthPassword: String?
+}
 
 /**
  * API of the AccountManager for Tinyrss
@@ -108,6 +118,40 @@ class AndroidTinyrssAccountManager @Inject constructor(
         val url = accountManager.getUserData(androidAccount, AccountAuthenticator.USERDATA_URL)
         return Account(androidAccount.name, url)
     }
+
+    fun updateServerInformation(account: Account, serverInformation: ServerInformation) {
+        val androidAccount = android.accounts.Account(account.username, ACCOUNT_TYPE)
+        val encryptedPassword = serverInformation.basicHttpAuthPassword?.let { encrypt(it) }
+        accountManager.run {
+            setUserData(androidAccount, AccountAuthenticator.USERDATA_URL, serverInformation.apiUrl)
+            setUserData(androidAccount, AccountAuthenticator.USERDATA_BASIC_HTTP_AUTH_USERNAME, serverInformation.basicHttpAuthUsername)
+            setUserData(androidAccount, AccountAuthenticator.USERDATA_BASIC_HTTP_AUTH_PASSWORD, encryptedPassword)
+        }
+    }
+
+    fun getServerInformation(account: Account) : ServerInformation {
+        val androidAccount = android.accounts.Account(account.username, ACCOUNT_TYPE)
+        return object : ServerInformation() {
+            override val apiUrl: String
+                get() =  accountManager.getUserData(androidAccount, AccountAuthenticator.USERDATA_URL)
+
+            override val basicHttpAuthUsername: String?
+                get() =  accountManager.getUserData(androidAccount, AccountAuthenticator.USERDATA_BASIC_HTTP_AUTH_USERNAME)
+
+            override val basicHttpAuthPassword: String?
+                get() {
+                    val encryptedPassword = accountManager.getUserData(androidAccount,
+                        AccountAuthenticator.USERDATA_BASIC_HTTP_AUTH_PASSWORD)
+                    return try {
+                        encryptedPassword?.let { decrypt(it) }
+                    } catch (e: Exception) {
+                        Timber.w(e, "unable to decrypt basic http auth password")
+                        null
+                    }
+                }
+        }
+    }
+
 
     private fun decrypt(encryptedPassword: String): String {
         val lines = encryptedPassword.lines()

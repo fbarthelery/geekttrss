@@ -1,4 +1,4 @@
-/**
+/*
  * Geekttrss is a RSS feed reader application on the Android Platform.
  *
  * Copyright (C) 2017-2018 by Frederic-Charles Barthelery.
@@ -50,6 +50,8 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
     public static final int ERROR_CODE_AUTHENTICATOR_FAILURE = 500;
     public static final int ERROR_CODE_NOT_SUPPORTED = 501;
     public static final String USERDATA_URL = "url";
+    public static final String USERDATA_BASIC_HTTP_AUTH_USERNAME = "basic_http_auth_username";
+    public static final String USERDATA_BASIC_HTTP_AUTH_PASSWORD = "basic_http_auth_password";
 
     private final Context context;
     private final AndroidTinyrssAccountManager accountManager;
@@ -105,8 +107,10 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
             Timber.w(e, "Unable to get encrypted password");
             return getRevalidateCredentialResponse(account);
         }
+        ServerInformation serverInformation = accountManager.getServerInformation(ttRssAccount);
+
         try {
-            LoginResponsePayload responsePayload = login(ttRssAccount.getUrl(), ttRssAccount.getUsername(), password);
+            LoginResponsePayload responsePayload = login(ttRssAccount.getUsername(), password, serverInformation);
             if (responsePayload.isStatusOk()) {
                 String sessionId = responsePayload.getSessionId();
                 result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
@@ -138,10 +142,10 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
         return result;
     }
 
-    private LoginResponsePayload login(String url, String user, String password) throws ExecutionException, InterruptedException {
-        TinyRssUrlModule urlModule = new TinyRssUrlModule(url);
+    private LoginResponsePayload login(String user, String password, ServerInformation serverInformation) throws ExecutionException, InterruptedException {
+        TinyRssServerInformationModule urlModule = new TinyRssServerInformationModule(serverInformation);
         AuthenticatorNetworkComponent authenticatorNetworkComponent = authenticatorBuilder
-                .tinyRssUrlModule(urlModule)
+                .tinyRssServerInformationModule(urlModule)
                 .build();
         TinyRssApi api = authenticatorNetworkComponent.getTinyRssApi();
         LoginRequestPayload payload = new LoginRequestPayload(user, password);
