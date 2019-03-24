@@ -51,32 +51,29 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <FrameLayout
-            android:id="@+id/headline_header"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@+id/excerpt"
-            app:layout_constraintVertical_chainStyle="packed" >
-            <ImageView
+        <ImageView
                 android:id="@+id/flavor_image"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:paddingBottom="16dp"
                 android:adjustViewBounds="true"
                 android:cropToPadding="true"
                 android:scaleType="fitCenter"
                 app:grayscale="@{!article.transientUnread}"
                 app:imageUrl="@{article.flavorImageUri}"
                 tools:src="@tools:sample/backgrounds/scenic"
-                tools:ignore="ContentDescription"/>
-            <TextView
+                tools:ignore="ContentDescription" />
+
+        <TextView
                 android:id="@+id/title"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                tools:background="#ccffffff"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
                 android:background="@{!TextUtils.isEmpty(article.flavorImageUri) ? @color/image_scrim : 0 }"
                 android:paddingTop="24dp"
                 android:paddingBottom="16dp"
@@ -84,53 +81,51 @@
                 android:paddingLeft="16dp"
                 android:paddingEnd="16dp"
                 android:paddingRight="16dp"
-                tools:text="Title for article"
                 app:textStyle="@{article.transientUnread ? Typeface.BOLD : Typeface.NORMAL}"
-                tools:textStyle="bold"
                 android:text="@{Html.fromHtml(article.title ?? ``)}"
                 android:textColor="?android:textColorPrimary"
                 android:textSize="24sp"
                 android:maxLines="3"
-                android:ellipsize="end" />
-        </FrameLayout>
+                android:ellipsize="end"
+                tools:text="Title for article"
+                tools:background="#ccffffff"
+                tools:textStyle="bold"
+                />
 
+        <androidx.constraintlayout.widget.Barrier
+                android:id="@+id/header_barrier"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:barrierDirection="bottom"
+                app:constraint_referenced_ids="title,flavor_image" />
 
         <TextView
-            android:id="@+id/excerpt"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/headline_header"
-            app:layout_constraintBottom_toTopOf="@+id/headline_footer"
-            android:visibility="@{TextUtils.isEmpty(article.getContentExcerpt()) ? View.GONE : View.VISIBLE}"
-            android:ellipsize="end"
-            android:lineSpacingExtra="2sp"
-            android:maxLines="5"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:paddingBottom="16dp"
-            android:text="@{article.getContentExcerpt()}"
-            tools:text="Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-            />
+                android:id="@+id/excerpt"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/header_barrier"
+                android:visibility="@{TextUtils.isEmpty(article.getContentExcerpt()) ? View.GONE : View.VISIBLE}"
+                android:ellipsize="end"
+                android:lineSpacingExtra="2sp"
+                android:maxLines="5"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:paddingBottom="16dp"
+                android:text="@{article.getContentExcerpt()}"
+                tools:text="Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                />
 
-        <LinearLayout
-            android:id="@+id/headline_footer"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/excerpt"
-            android:gravity="center_vertical"
-            >
-
-            <TextView
+        <TextView
                 android:id="@+id/author"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:layout_marginStart="16dp"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/open"
+                app:layout_constraintTop_toBottomOf="@+id/excerpt"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:padding="16dp"
                 android:ellipsize="end"
                 android:fontFamily="sans-serif-light"
                 android:gravity="center_vertical"
@@ -140,56 +135,50 @@
                 android:textSize="12sp"
                 android:textStyle="italic" />
 
-            <ImageView
+        <ImageView
                     android:id="@+id/open"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_weight="0"
-                    android:background="?attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:padding="12dp"
+                    app:layout_constraintStart_toEndOf="@+id/author"
+                    app:layout_constraintEnd_toStartOf="@+id/marked"
+                    app:layout_constraintTop_toBottomOf="@+id/excerpt"
                     android:onClick="@{(v) -> handler.onOpenButtonClicked(v, article)}"
                     android:tint="?colorControlNormal"
                     android:src="@drawable/ic_action_web_site"
-                    android:contentDescription="@string/open_article_in_browser" />
+                    android:contentDescription="@string/open_article_in_browser"
+                    android:background="?attr/selectableItemBackground"
+                    style="@style/HeadlineCardFooterButton" />
 
-            <com.geekorum.geekdroid.views.CheckableImageView
+        <com.geekorum.geekdroid.views.CheckableImageView
                 android:id="@+id/marked"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="12dp"
+                app:layout_constraintStart_toEndOf="@+id/open"
+                app:layout_constraintEnd_toStartOf="@+id/share"
+                app:layout_constraintTop_toTopOf="@+id/open"
                 android:src="@drawable/asl_ic_star"
                 android:checked="@{article.starred}"
                 app:onCheckedChanged="@{(view, checked) -> handler.onStarChanged(article, checked)}"
-                />
+                style="@style/HeadlineCardFooterButton"/>
 
-            <ImageView
+        <ImageView
                 android:id="@+id/share"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="0"
+                app:layout_constraintStart_toEndOf="@+id/marked"
+                app:layout_constraintEnd_toStartOf="@+id/article_menu_button"
+                app:layout_constraintTop_toTopOf="@+id/open"
                 android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"
-                android:padding="12dp"
                 android:onClick="@{() -> handler.onShareClicked(article)}"
                 android:src="@drawable/ic_share_24dp"
-                android:contentDescription="@string/share_article" />
+                android:contentDescription="@string/share_article"
+                style="@style/HeadlineCardFooterButton" />
 
-            <ImageView
+        <ImageView
                 android:id="@+id/article_menu_button"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_weight="0"
+                app:layout_constraintStart_toEndOf="@+id/share"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/open"
                 android:background="?attr/selectableItemBackground"
-                android:clickable="true"
-                android:focusable="true"
-                android:padding="12dp"
                 android:onClick="@{(v) -> handler.onMenuButtonClicked(v, article, position)}"
                 android:src="@drawable/ic_dots_vert"
-                android:contentDescription="@string/star_article" />
-        </LinearLayout>
+                android:contentDescription="@string/star_article"
+                style="@style/HeadlineCardFooterButton"
+                />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -30,7 +30,6 @@
         <item name="colorSecondary">@color/secondary</item>
         <item name="colorSecondaryVariant">@color/secondary_dark</item>
         <item name="colorOnSecondary">@android:color/white</item>
-
         <!-- used to configure style on the content webview -->
         <item name="articleBackground">?android:colorBackground</item>
         <!-- must be a color, not a drawable -->
@@ -76,6 +75,14 @@
 
     <style name="ThemeOverlay.AppTheme.LoginForm" parent="ThemeOverlay.AppTheme.DayNight">
         <item name="textInputStyle">@style/LoginForm.TextInputStyle</item>
+    </style>
+
+    <style name="HeadlineCardFooterButton">
+        <item name="android:layout_width">48dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:padding">12dp</item>
     </style>
 
 </resources>
