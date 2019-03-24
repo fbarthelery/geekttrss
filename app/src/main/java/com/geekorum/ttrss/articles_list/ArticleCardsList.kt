@@ -27,9 +27,9 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.widget.PopupMenu
 import androidx.core.app.ShareCompat
-import androidx.databinding.ViewDataBinding
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -38,6 +38,8 @@ import com.geekorum.ttrss.BR
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.databinding.HeadlinesRowBinding
+import com.squareup.picasso.Picasso
+import kotlin.math.roundToInt
 
 
 internal fun RecyclerView.setupCardSpacing() {
@@ -50,7 +52,7 @@ internal fun RecyclerView.setupCardSpacing() {
 internal open class ArticlesListAdapter(
     private val layoutInflater: LayoutInflater,
     private val eventHandler: CardEventHandler
-) : PagedListAdapter<Article, BindingViewHolder>(ARTICLE_DIFF_CALLBACK) {
+) : PagedListAdapter<Article, HeadlinesBindingViewHolder>(ARTICLE_DIFF_CALLBACK) {
 
     init {
         setHasStableIds(true)
@@ -60,12 +62,12 @@ internal open class ArticlesListAdapter(
         return getItem(position)?.id ?: RecyclerView.NO_ID
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BindingViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HeadlinesBindingViewHolder {
         val binding = HeadlinesRowBinding.inflate(layoutInflater, parent, false)
-        return BindingViewHolder(binding)
+        return HeadlinesBindingViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: BindingViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: HeadlinesBindingViewHolder, position: Int) {
         with(holder) {
             val article = getItem(position)
             setArticle(article)
@@ -76,11 +78,12 @@ internal open class ArticlesListAdapter(
     }
 }
 
-internal class BindingViewHolder(val binding: ViewDataBinding) :
+internal class HeadlinesBindingViewHolder(val binding: HeadlinesRowBinding) :
     RecyclerView.ViewHolder(binding.root) {
 
     fun setArticle(article: Article?) {
         binding.setVariable(BR.article, article)
+        setArticleFlavorImage(article?.flavorImageUri)
     }
 
     fun setHandler(cardEventHandler: CardEventHandler) {
@@ -89,6 +92,28 @@ internal class BindingViewHolder(val binding: ViewDataBinding) :
 
     fun setPosition(position: Int) {
         binding.setVariable(BR.position, position)
+    }
+
+    private fun setArticleFlavorImage(url: String?) {
+        val view = binding.flavorImage
+        val parent = view.parent as View
+        parent.viewTreeObserver.addOnPreDrawListener(object: ViewTreeObserver.OnPreDrawListener {
+
+            override fun onPreDraw(): Boolean {
+                // wait for the parent to be laid out
+                val width: Float = parent.width.takeIf { it != 0 }?.toFloat() ?: return true
+                val height = width * 9 / 16
+                val finalUrl = url.takeUnless { it.isNullOrEmpty() }
+                Picasso.with(view.context)
+                    .load(finalUrl)
+                    .resize(0, height.roundToInt())
+                    .onlyScaleDown()
+                    .into(view)
+
+                parent.viewTreeObserver.removeOnPreDrawListener(this)
+                return true
+            }
+        })
     }
 }
 
