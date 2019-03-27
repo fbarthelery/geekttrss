@@ -36,8 +36,6 @@ import com.geekorum.ttrss.databinding.ToolbarArticleDetailsBinding;
 import com.geekorum.ttrss.session.SessionActivity;
 import com.google.android.material.bottomappbar.BottomAppBar;
 
-import javax.inject.Inject;
-
 /**
  * An activity representing a single Article detail screen. This
  * activity is only used narrow width devices. On tablet-size devices,
@@ -76,7 +74,7 @@ public class ArticleDetailActivity extends SessionActivity {
         Uri articleUri = intent.getData();
 
         if (savedInstanceState == null) {
-            ArticleDetailFragment articleDetailFragment = ArticleDetailFragment.newInstance(articleUri);
+            ArticleDetailFragment articleDetailFragment = ArticleDetailFragment.newInstance(daggerDelegateFragmentFactory, articleUri);
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.content, articleDetailFragment)
                     .commit();

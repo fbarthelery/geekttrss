@@ -42,19 +42,20 @@ import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.core.view.doOnNextLayout
 import androidx.core.widget.NestedScrollView
+import androidx.fragment.app.FragmentFactory
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import com.geekorum.geekdroid.dagger.DaggerDelegateFragmentFactory
+import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory
 import com.geekorum.geekdroid.network.OkHttpWebViewClient
-import com.geekorum.ttrss.BaseFragment
+import com.geekorum.ttrss.BaseFragment2
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.activityViewModels
 import com.geekorum.ttrss.articles_list.ArticleListActivity
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.databinding.FragmentArticleDetailBinding
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import java.util.Locale
 import javax.inject.Inject
@@ -65,17 +66,18 @@ import javax.inject.Inject
  * in two-pane mode (on tablets) or a [com.geekorum.ttrss.article_details.ArticleDetailActivity]
  * on handsets.
  */
-class ArticleDetailFragment : BaseFragment() {
+class ArticleDetailFragment @Inject constructor(
+    viewModelsFactory: DaggerDelegateViewModelsFactory,
+    fragmentFactory: DaggerDelegateFragmentFactory,
+    private val okHttpClient: OkHttpClient
+) : BaseFragment2(viewModelsFactory) {
 
     private lateinit var binding: FragmentArticleDetailBinding
     private val articleDetailsViewModel: ArticleDetailsViewModel by activityViewModels()
     private lateinit var articleUri: Uri
-    private lateinit var chromeClient: FSVideoChromeClient
+    private val chromeClient = FSVideoChromeClient()
     private var article: Article? = null
     private var customView: View? = null
-
-    @Inject
-    lateinit var okHttpClient: OkHttpClient
 
     private var markReadJob: Job? = null
 
@@ -92,23 +94,22 @@ class ArticleDetailFragment : BaseFragment() {
             return cssOverride
         }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        articleUri = requireNotNull(arguments?.getParcelable(ARG_ARTICLE_URI))
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         binding = FragmentArticleDetailBinding.inflate(inflater, container, false)
         binding.setLifecycleOwner(this)
+        binding.viewModel = articleDetailsViewModel
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         configureWebView()
+
+        articleDetailsViewModel.article.observe(this, Observer { this.article = it })
+        articleDetailsViewModel.articleContent.observe(this, Observer { renderContent(it) })
 
         binding.root.setOnScrollChangeListener { v, _, _, _, _ ->
             markReadJob?.cancel()
@@ -121,10 +122,8 @@ class ArticleDetailFragment : BaseFragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        articleUri = requireNotNull(arguments?.getParcelable(ARG_ARTICLE_URI))
         articleDetailsViewModel.init(ContentUris.parseId(articleUri))
-        articleDetailsViewModel.article.observe(this, Observer { this.article = it })
-        articleDetailsViewModel.articleContent.observe(this, Observer { renderContent(it) })
-        binding.viewModel = articleDetailsViewModel
     }
 
     private fun renderContent(articleContent: String) {
@@ -187,7 +186,6 @@ class ArticleDetailFragment : BaseFragment() {
             mediaPlaybackRequiresUserGesture = false
         }
 
-        chromeClient = FSVideoChromeClient()
         binding.articleContent.webChromeClient = chromeClient
     }
 
@@ -346,10 +344,11 @@ class ArticleDetailFragment : BaseFragment() {
         private const val ARG_ARTICLE_URI = "article_uri"
 
         @JvmStatic
-        fun newInstance(articleUri: Uri): ArticleDetailFragment {
-            return ArticleDetailFragment().apply {
+        fun newInstance(fragmentFactory: FragmentFactory, articleUri: Uri): ArticleDetailFragment {
+            return fragmentFactory.instantiate(ArticleDetailFragment::class.java.classLoader,
+                ArticleDetailFragment::class.java.name).apply {
                 arguments = bundleOf(ARG_ARTICLE_URI to articleUri)
-            }
+            } as ArticleDetailFragment
         }
     }
 

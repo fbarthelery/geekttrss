@@ -21,11 +21,14 @@
 package com.geekorum.ttrss
 
 import android.annotation.SuppressLint
+import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.geekorum.geekdroid.dagger.DaggerDelegateFragmentFactory
 import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory
 import dagger.android.AndroidInjector
 import dagger.android.support.DaggerAppCompatActivity
@@ -59,15 +62,39 @@ inline fun <reified VM : ViewModel> ViewModelProviderFragment.activityViewModels
     return activityViewModels { viewModelsFactory }
 }
 
+open class ViewModelProviderFragment2(
+    val viewModelsFactory: DaggerDelegateViewModelsFactory
+) : Fragment()
+
+inline fun <reified VM : ViewModel> ViewModelProviderFragment2.viewModels(): Lazy<VM> {
+    return viewModels { viewModelsFactory }
+}
+
+inline fun <reified VM : ViewModel> ViewModelProviderFragment2.activityViewModels(): Lazy<VM> {
+    return activityViewModels { viewModelsFactory }
+}
+
+
 /**
  * Common base Activity for the application.
  * As it supports Dagger injection, the Activity must have a corresponding [AndroidInjector]
  */
 @SuppressLint("Registered")
-open class BaseActivity : BatteryFriendlyActivity()
+open class BaseActivity : BatteryFriendlyActivity() {
+    @Inject
+    lateinit var daggerDelegateFragmentFactory: DaggerDelegateFragmentFactory
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        supportFragmentManager.fragmentFactory = daggerDelegateFragmentFactory
+    }
+}
 
 /**
  * Common base Fragment for the application.
  * As it supports Dagger injection, the Fragment must have a corresponding [AndroidInjector]
  */
+@Deprecated("Use a constructor injectable Fragment or BaseFragment2")
 open class BaseFragment : ViewModelProviderFragment()
+
+open class BaseFragment2(viewModelsFactory: ViewModelsFactory) : ViewModelProviderFragment2(viewModelsFactory)

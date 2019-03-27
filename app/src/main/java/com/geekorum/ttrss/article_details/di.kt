@@ -23,7 +23,9 @@
 package com.geekorum.ttrss.article_details
 
 import android.accounts.Account
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
+import com.geekorum.geekdroid.dagger.FragmentKey
 import com.geekorum.geekdroid.dagger.ViewModelKey
 import com.geekorum.ttrss.accounts.NetworkLoginModule
 import com.geekorum.ttrss.accounts.PerAccount
@@ -59,7 +61,6 @@ abstract class ViewModelsModule {
 abstract class ActivitiesInjectorModule {
     @ContributesAndroidInjector(modules = [
         AssistedFactoriesModule::class,
-        ViewModelsModule::class,
         NetworkLoginModule::class,
         TinyrssApiModule::class,
         SelectedAccountModule::class,
@@ -72,13 +73,13 @@ abstract class ActivitiesInjectorModule {
 /**
  * Provides the Fragments injectors subcomponents.
  */
-@Module
+@Module(includes = [ViewModelsModule::class])
 abstract class FragmentsInjectorModule {
 
-    @ContributesAndroidInjector(modules = [
-        ViewModelsModule::class,
-        TinyrssApiModule::class])
-    internal abstract fun contributesArticleDetailsFragmentInjector(): ArticleDetailFragment
+    @Binds
+    @IntoMap
+    @FragmentKey(ArticleDetailFragment::class)
+    internal abstract fun providesArticleDetailsFragment(fragment: ArticleDetailFragment): Fragment
 
 }
 

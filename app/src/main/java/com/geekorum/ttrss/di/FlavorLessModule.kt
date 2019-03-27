@@ -21,6 +21,7 @@
 package com.geekorum.ttrss.di
 
 import com.geekorum.geekdroid.dagger.AndroidFrameworkModule
+import com.geekorum.geekdroid.dagger.FragmentFactoriesModule
 import com.geekorum.ttrss.BackgroundJobsModule
 import com.geekorum.ttrss.DefaultNightModeModule
 import com.geekorum.ttrss.accounts.AndroidTinyrssAccountManagerModule
@@ -37,6 +38,7 @@ import dagger.Module
     AndroidFrameworkModule::class,
     AndroidBindingsModule::class,
     ViewModelsModule::class,
+    FragmentFactoriesModule::class,
     DefaultNightModeModule::class,
     BackgroundJobsModule::class,
     NetworkModule::class,
