@@ -27,25 +27,29 @@ import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentFactory;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import com.geekorum.geekdroid.dagger.DaggerDelegateFragmentFactory;
+import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory;
 import com.geekorum.geekdroid.views.recyclerview.ItemSwiper;
 import com.geekorum.geekdroid.views.recyclerview.ScrollFromBottomAppearanceItemAnimator;
-import com.geekorum.ttrss.BaseFragment;
+import com.geekorum.ttrss.BaseFragment2;
 import com.geekorum.ttrss.R;
 import com.geekorum.ttrss.data.Article;
 import com.geekorum.ttrss.databinding.FragmentArticleListBinding;
 import com.google.android.material.snackbar.BaseTransientBottomBar;
 import com.google.android.material.snackbar.Snackbar;
-import dagger.android.support.AndroidSupportInjection;
+
+import javax.inject.Inject;
 
 /**
  * Display all the articles in a list.
  */
-public class ArticlesListFragment extends BaseFragment {
+public class ArticlesListFragment extends BaseFragment2 {
     private static final String ARG_FEED_ID = "feed_id";
 
     private long feedId;
@@ -57,8 +61,9 @@ public class ArticlesListFragment extends BaseFragment {
     private ActivityViewModel activityViewModel;
     private Snackbar setUnreadSnackbar = null;
 
-    public ArticlesListFragment() {
-        // Required public constructor
+    @Inject
+    public ArticlesListFragment(@NonNull DaggerDelegateViewModelsFactory viewModelsFactory, DaggerDelegateFragmentFactory fragmentFactory) {
+        super(viewModelsFactory, fragmentFactory);
     }
 
     /**
@@ -69,18 +74,13 @@ public class ArticlesListFragment extends BaseFragment {
      *
      * @return A new instance of fragment ArticlesListFragment.
      */
-    public static ArticlesListFragment newInstance(long feedId) {
-        ArticlesListFragment fragment = new ArticlesListFragment();
+    public static ArticlesListFragment newInstance(FragmentFactory fragmentFactory, long feedId) {
+        ArticlesListFragment fragment = (ArticlesListFragment) fragmentFactory.instantiate(ArticlesListFragment.class.getClassLoader(),
+                ArticlesListFragment.class.getName());
         Bundle args = new Bundle();
         args.putLong(ARG_FEED_ID, feedId);
         fragment.setArguments(args);
         return fragment;
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        AndroidSupportInjection.inject(this);
-        super.onAttach(context);
     }
 
     @Override

@@ -259,7 +259,7 @@ class ArticleListActivity : SessionActivity() {
         title = feed.title
         binding.toolbar.toolbar.title = title
         supportFragmentManager.commit {
-            val hf = ArticlesListFragment.newInstance(feed.id)
+            val hf = ArticlesListFragment.newInstance(supportFragmentManager.fragmentFactory, feed.id)
             replace(R.id.middle_pane_layout, hf, FRAGMENT_ARTICLES_LIST)
         }
         if (twoPane) {

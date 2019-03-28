@@ -74,8 +74,10 @@ abstract class ActivitiesInjectorModule {
 @Module(includes = [ViewModelModule::class])
 abstract class FragmentsInjectorModule {
 
-    @ContributesAndroidInjector
-    internal abstract fun contributesArticleListFragmentInjector(): ArticlesListFragment
+    @Binds
+    @IntoMap
+    @FragmentKey(ArticlesListFragment::class)
+    abstract fun bindArticlesListFragment(articlesListFragment: ArticlesListFragment): Fragment
 
     @Binds
     @IntoMap
@@ -99,7 +101,7 @@ abstract class ViewModelModule {
 }
 
 @Module
-private abstract class ActivityViewModelModule{
+private abstract class ActivityViewModelModule {
     @Binds
     @IntoMap
     @ViewModelKey(ActivityViewModel::class)
