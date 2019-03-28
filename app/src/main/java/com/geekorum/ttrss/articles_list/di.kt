@@ -23,7 +23,9 @@
 package com.geekorum.ttrss.articles_list
 
 import android.accounts.Account
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
+import com.geekorum.geekdroid.dagger.FragmentKey
 import com.geekorum.geekdroid.dagger.ViewModelKey
 import com.geekorum.ttrss.accounts.NetworkLoginModule
 import com.geekorum.ttrss.accounts.PerAccount
@@ -69,20 +71,21 @@ abstract class ActivitiesInjectorModule {
 /**
  * Provides the Fragments injectors subcomponents.
  */
-@Module
+@Module(includes = [ViewModelModule::class])
 abstract class FragmentsInjectorModule {
 
-    @ContributesAndroidInjector(modules = [ViewModelModule::class])
+    @ContributesAndroidInjector
     internal abstract fun contributesArticleListFragmentInjector(): ArticlesListFragment
 
-    @ContributesAndroidInjector(modules = [ViewModelModule::class])
-    internal abstract fun contributesFeedListFragmentInjector(): FeedListFragment
-
+    @Binds
+    @IntoMap
+    @FragmentKey(FeedListFragment::class)
+    abstract fun bindFeedListFragment(feedListFragment: FeedListFragment): Fragment
 }
 
 
 @Module
-private abstract class ViewModelModule {
+abstract class ViewModelModule {
     @Binds
     @IntoMap
     @ViewModelKey(FragmentViewModel::class)

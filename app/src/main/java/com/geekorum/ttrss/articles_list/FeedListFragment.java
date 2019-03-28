@@ -35,9 +35,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.ActivityOptionsCompat;
+import androidx.fragment.app.FragmentFactory;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProviders;
-import com.geekorum.ttrss.BaseFragment;
+import com.geekorum.geekdroid.dagger.DaggerDelegateFragmentFactory;
+import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory;
+import com.geekorum.ttrss.BaseFragment2;
 import com.geekorum.ttrss.R;
 import com.geekorum.ttrss.settings.SettingsActivity;
 import com.geekorum.ttrss.data.Category;
@@ -48,10 +51,12 @@ import com.google.android.material.navigation.NavigationView;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 /**
  * Display the list of feeds.
  */
-public class FeedListFragment extends BaseFragment implements NavigationView.OnNavigationItemSelectedListener {
+public class FeedListFragment extends BaseFragment2 implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final int MENU_GROUP_ID_SPECIAL = 1;
 
@@ -63,6 +68,11 @@ public class FeedListFragment extends BaseFragment implements NavigationView.OnN
     private ActivityViewModel activityViewModel;
     private LiveData<List<Feed>> feedsForCategory;
     private TtrssAccountViewModel accountViewModel;
+
+    @Inject
+    public FeedListFragment(@NonNull DaggerDelegateViewModelsFactory viewModelsFactory, DaggerDelegateFragmentFactory fragmentFactory) {
+        super(viewModelsFactory, fragmentFactory);
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -264,5 +274,11 @@ public class FeedListFragment extends BaseFragment implements NavigationView.OnN
             }
         }
         return false;
+    }
+
+    public static FeedListFragment newInstance(FragmentFactory factory) {
+        FeedListFragment fragment = (FeedListFragment) factory.instantiate(FeedListFragment.class.getClassLoader(),
+                FeedListFragment.class.getName());
+        return fragment;
     }
 }

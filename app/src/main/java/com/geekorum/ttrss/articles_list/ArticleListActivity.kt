@@ -138,7 +138,7 @@ class ArticleListActivity : SessionActivity() {
         }
 
         if (savedInstanceState == null) {
-            val feedListFragment = FeedListFragment()
+            val feedListFragment = FeedListFragment.newInstance(supportFragmentManager.fragmentFactory)
             supportFragmentManager.commit {
                 replace(R.id.start_pane_layout, feedListFragment, FRAGMENT_FEEDS_LIST)
             }

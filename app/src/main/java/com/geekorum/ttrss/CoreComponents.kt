@@ -30,6 +30,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.geekorum.geekdroid.dagger.DaggerDelegateFragmentFactory
 import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory
+import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import dagger.android.support.DaggerAppCompatActivity
 import dagger.android.support.DaggerFragment
@@ -85,8 +86,13 @@ open class BaseActivity : BatteryFriendlyActivity() {
     lateinit var daggerDelegateFragmentFactory: DaggerDelegateFragmentFactory
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+        // need to be set after injection and before super.onCreate() because it recreates fragments
+        // because of this we need to inject ourselves
+        // not ideal because we inject 2 times, and create dependencies 2 times.
+        // TODO get rid of DaggerAppCompatActivity
+        AndroidInjection.inject(this)
         supportFragmentManager.fragmentFactory = daggerDelegateFragmentFactory
+        super.onCreate(savedInstanceState)
     }
 }
 
