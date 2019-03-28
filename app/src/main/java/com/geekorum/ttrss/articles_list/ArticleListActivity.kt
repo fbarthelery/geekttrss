@@ -271,7 +271,7 @@ class ArticleListActivity : SessionActivity() {
 
     private fun navigateToSearch() {
         supportFragmentManager.commit {
-            val hf = ArticlesSearchFragment()
+            val hf = ArticlesSearchFragment.newInstance(supportFragmentManager.fragmentFactory)
             replace(R.id.middle_pane_layout, hf, FRAGMENT_ARTICLES_LIST)
             addToBackStack(FRAGMENT_BACKSTACK_SEARCH)
         }

@@ -20,16 +20,17 @@
  */
 package com.geekorum.ttrss.articles_list.search
 
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
+import com.geekorum.geekdroid.dagger.FragmentKey
 import com.geekorum.geekdroid.dagger.ViewModelKey
 import com.geekorum.ttrss.network.TinyrssApiModule
 import dagger.Binds
 import dagger.Module
-import dagger.android.ContributesAndroidInjector
 import dagger.multibindings.IntoMap
 
 @Module
-private abstract class ViewModelsModule {
+internal abstract class ViewModelsModule {
     @Binds
     @IntoMap
     @ViewModelKey(SearchViewModel::class)
@@ -39,12 +40,14 @@ private abstract class ViewModelsModule {
 /**
  * Provides the Fragments injectors subcomponents.
  */
-@Module
+@Module(includes = [
+    ViewModelsModule::class,
+    TinyrssApiModule::class])
 abstract class FragmentsInjectorModule {
 
-    @ContributesAndroidInjector(modules = [
-        ViewModelsModule::class,
-        TinyrssApiModule::class])
-    internal abstract fun contributesArticleSearchFragmentInjector(): ArticlesSearchFragment
+    @Binds
+    @IntoMap
+    @FragmentKey(ArticlesSearchFragment::class)
+    abstract fun bindArticlesSearchFragment(articlesSearchFragment: ArticlesSearchFragment): Fragment
 
 }

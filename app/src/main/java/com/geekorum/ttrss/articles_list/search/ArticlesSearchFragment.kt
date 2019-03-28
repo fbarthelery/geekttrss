@@ -24,7 +24,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.FragmentFactory
 import androidx.lifecycle.Observer
+import com.geekorum.geekdroid.dagger.DaggerDelegateFragmentFactory
+import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory
 import com.geekorum.ttrss.BaseFragment
 import com.geekorum.ttrss.activityViewModels
 import com.geekorum.ttrss.articles_list.ActivityViewModel
@@ -34,11 +37,15 @@ import com.geekorum.ttrss.articles_list.setupCardSpacing
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.databinding.FragmentArticlesSearchBinding
 import com.geekorum.ttrss.viewModels
+import javax.inject.Inject
 
 /**
  * Display search results
  */
-class ArticlesSearchFragment : BaseFragment() {
+class ArticlesSearchFragment @Inject constructor(
+    viewModelsFactory: DaggerDelegateViewModelsFactory,
+    fragmentFactory: DaggerDelegateFragmentFactory
+) : BaseFragment(viewModelsFactory, fragmentFactory) {
 
     lateinit var binding: FragmentArticlesSearchBinding
     private val activityViewModel: ActivityViewModel by activityViewModels()
@@ -91,6 +98,14 @@ class ArticlesSearchFragment : BaseFragment() {
 
         override fun onMenuToggleReadSelected(article: Article) {
             searchViewModel.setArticleUnread(article.id, !article.isTransientUnread)
+        }
+    }
+
+    companion object {
+        @JvmStatic
+        fun newInstance(fragmentFactory: FragmentFactory): ArticlesSearchFragment {
+            return fragmentFactory.instantiate(ArticlesSearchFragment::class.java.classLoader,
+                ArticlesSearchFragment::class.java.name) as ArticlesSearchFragment
         }
     }
 
