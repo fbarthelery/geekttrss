@@ -37,7 +37,7 @@ import com.geekorum.geekdroid.dagger.DaggerDelegateFragmentFactory;
 import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory;
 import com.geekorum.geekdroid.views.recyclerview.ItemSwiper;
 import com.geekorum.geekdroid.views.recyclerview.ScrollFromBottomAppearanceItemAnimator;
-import com.geekorum.ttrss.BaseFragment2;
+import com.geekorum.ttrss.BaseFragment;
 import com.geekorum.ttrss.R;
 import com.geekorum.ttrss.data.Article;
 import com.geekorum.ttrss.databinding.FragmentArticleListBinding;
@@ -49,7 +49,7 @@ import javax.inject.Inject;
 /**
  * Display all the articles in a list.
  */
-public class ArticlesListFragment extends BaseFragment2 {
+public class ArticlesListFragment extends BaseFragment {
     private static final String ARG_FEED_ID = "feed_id";
 
     private long feedId;

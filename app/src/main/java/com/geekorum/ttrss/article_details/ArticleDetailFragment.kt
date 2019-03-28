@@ -45,10 +45,11 @@ import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.FragmentFactory
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.observe
 import com.geekorum.geekdroid.dagger.DaggerDelegateFragmentFactory
 import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory
 import com.geekorum.geekdroid.network.OkHttpWebViewClient
-import com.geekorum.ttrss.BaseFragment2
+import com.geekorum.ttrss.BaseFragment
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.activityViewModels
 import com.geekorum.ttrss.articles_list.ArticleListActivity
@@ -70,7 +71,7 @@ class ArticleDetailFragment @Inject constructor(
     viewModelsFactory: DaggerDelegateViewModelsFactory,
     fragmentFactory: DaggerDelegateFragmentFactory,
     private val okHttpClient: OkHttpClient
-) : BaseFragment2(viewModelsFactory) {
+) : BaseFragment(viewModelsFactory, fragmentFactory) {
 
     private lateinit var binding: FragmentArticleDetailBinding
     private val articleDetailsViewModel: ArticleDetailsViewModel by activityViewModels()

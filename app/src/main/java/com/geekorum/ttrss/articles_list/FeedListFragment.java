@@ -40,7 +40,8 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProviders;
 import com.geekorum.geekdroid.dagger.DaggerDelegateFragmentFactory;
 import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory;
-import com.geekorum.ttrss.BaseFragment2;
+import com.geekorum.geekdroid.dagger.DaggerDelegateFragmentFactory;
+import com.geekorum.ttrss.BaseFragment;
 import com.geekorum.ttrss.R;
 import com.geekorum.ttrss.settings.SettingsActivity;
 import com.geekorum.ttrss.data.Category;
@@ -56,7 +57,7 @@ import javax.inject.Inject;
 /**
  * Display the list of feeds.
  */
-public class FeedListFragment extends BaseFragment2 implements NavigationView.OnNavigationItemSelectedListener {
+public class FeedListFragment extends BaseFragment implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final int MENU_GROUP_ID_SPECIAL = 1;
 

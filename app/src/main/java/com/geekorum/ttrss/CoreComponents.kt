@@ -21,6 +21,7 @@
 package com.geekorum.ttrss
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
@@ -33,7 +34,6 @@ import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import dagger.android.support.DaggerAppCompatActivity
-import dagger.android.support.DaggerFragment
 import javax.inject.Inject
 
 /**
@@ -49,32 +49,13 @@ inline fun <reified VM : ViewModel> ViewModelProviderActivity.viewModels(): Lazy
     return viewModels { viewModelsFactory }
 }
 
-
-open class ViewModelProviderFragment : DaggerFragment() {
-    @Inject
-    lateinit var viewModelsFactory: DaggerDelegateViewModelsFactory
-}
-
-inline fun <reified VM : ViewModel> ViewModelProviderFragment.viewModels(): Lazy<VM> {
+inline fun <reified VM : ViewModel> BaseFragment.viewModels(): Lazy<VM> {
     return viewModels { viewModelsFactory }
 }
 
-inline fun <reified VM : ViewModel> ViewModelProviderFragment.activityViewModels(): Lazy<VM> {
+inline fun <reified VM : ViewModel> BaseFragment.activityViewModels(): Lazy<VM> {
     return activityViewModels { viewModelsFactory }
 }
-
-open class ViewModelProviderFragment2(
-    val viewModelsFactory: DaggerDelegateViewModelsFactory
-) : Fragment()
-
-inline fun <reified VM : ViewModel> ViewModelProviderFragment2.viewModels(): Lazy<VM> {
-    return viewModels { viewModelsFactory }
-}
-
-inline fun <reified VM : ViewModel> ViewModelProviderFragment2.activityViewModels(): Lazy<VM> {
-    return activityViewModels { viewModelsFactory }
-}
-
 
 /**
  * Common base Activity for the application.
@@ -98,9 +79,14 @@ open class BaseActivity : BatteryFriendlyActivity() {
 
 /**
  * Common base Fragment for the application.
- * As it supports Dagger injection, the Fragment must have a corresponding [AndroidInjector]
  */
-@Deprecated("Use a constructor injectable Fragment or BaseFragment2")
-open class BaseFragment : ViewModelProviderFragment()
+open class BaseFragment (
+    val viewModelsFactory: ViewModelsFactory,
+    val fragmentFactory: DaggerDelegateFragmentFactory
+) : Fragment() {
 
-open class BaseFragment2(viewModelsFactory: ViewModelsFactory) : ViewModelProviderFragment2(viewModelsFactory)
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        childFragmentManager.fragmentFactory = fragmentFactory
+    }
+}
