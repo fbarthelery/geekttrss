@@ -85,9 +85,9 @@ class ActivityViewModel @Inject constructor(
     fun refresh() {
         val feed = selectedFeed.value
         if (feed != null) {
-            backgroundJobManager.refreshFeed(account.value, feed.id)
+            backgroundJobManager.refreshFeed(account.value!!, feed.id)
         } else {
-            backgroundJobManager.refresh(account.value)
+            backgroundJobManager.refresh(account.value!!)
         }
     }
 

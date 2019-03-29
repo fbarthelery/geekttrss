@@ -32,6 +32,7 @@ import javax.inject.Inject;
 /**
  * JobService to purge old Articles
  */
+//TODO use WorkManager instead
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class PurgeArticlesJobService extends ThreadedJobService {
 
