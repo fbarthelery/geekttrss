@@ -142,7 +142,7 @@ dependencies {
         add("googleImplementation", it)
     }
 
-    implementation("com.google.android.material:material:1.0.0")
+    implementation("com.google.android.material:material:1.1.0-alpha05")
     implementation("net.opacapp:multiline-collapsingtoolbar:1.3.0")
     implementation("com.squareup.retrofit2:retrofit:2.5.0")
     implementation("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")

@@ -31,12 +31,18 @@
     <color name="material_blue_grey_900" tools:override="true">#263238</color>
     <color name="material_green_a700">#00C853</color>
 
+    <!-- Theme colors -->
+    <color name="primary">@color/material_blue_grey_500</color>
+    <color name="primary_dark">@color/material_blue_grey_700</color>
+    <color name="primary_light">#8eacbb</color>
+    <color name="secondary">@color/material_green_a700</color>
+    <color name="secondary_dark">#009624</color>
+    <color name="secondary_light">#5efc82</color>
+
     <color name="unreadCounterColor">#909090</color>
     <color name="headlineExcerptTextColor">#323232</color>
     <color name="headlineSecondaryTextColor">#909090</color>
     <color name="articleHeaderSeparator">#cccccc</color>
-    <color name="primary">@color/material_blue_grey_500</color>
-    <color name="primary_dark">@color/material_blue_grey_700</color>
     <color name="accent">@color/material_green_a700</color>
     <color name="image_scrim">#ccffffff</color>
     <color name="article_text_color">#8a000000</color>
