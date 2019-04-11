@@ -37,6 +37,7 @@ import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.databinding.ActivityLoginAccountBinding
 import com.geekorum.ttrss.di.ViewModelsFactory
+import com.google.android.material.textfield.TextInputLayout
 import dagger.android.AndroidInjection
 import javax.inject.Inject
 
@@ -92,10 +93,10 @@ class LoginActivity : AccountAuthenticatorAppCompatActivity() {
 
         loginViewModel.fieldErrors.observe(this, Observer { errorStatus ->
             val error = checkNotNull(errorStatus)
-            setFieldError(binding.form.url, error.invalidUrlMsgId)
+            setFieldError(binding.form.urlField, error.invalidUrlMsgId)
             if (error.hasAttemptLogin) {
-                setFieldError(binding.form.username, error.invalidNameMsgId)
-                setFieldError(binding.form.password, error.invalidPasswordMsgId)
+                setFieldError(binding.form.usernameField, error.invalidNameMsgId)
+                setFieldError(binding.form.passwordField, error.invalidPasswordMsgId)
             }
         })
     }
@@ -127,7 +128,7 @@ class LoginActivity : AccountAuthenticatorAppCompatActivity() {
         finish()
     }
 
-    private fun setFieldError(view: EditText, errorId: Int?) {
+    private fun setFieldError(view: TextInputLayout, errorId: Int?) {
         val errorMsg = if (errorId != null) getString(errorId) else null
         view.error = errorMsg
     }

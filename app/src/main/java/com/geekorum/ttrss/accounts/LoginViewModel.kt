@@ -46,6 +46,8 @@ internal class LoginViewModel @Inject constructor(
 
     var username = ""
     var password = ""
+    var http_auth_username = ""
+    var http_auth_password = ""
     var httpUrl: HttpUrl? = null
     private lateinit var action: String
     private var account: Account? = null

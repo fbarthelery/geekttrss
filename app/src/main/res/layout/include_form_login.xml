@@ -38,7 +38,8 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:theme="@style/ThemeOverlay.AppTheme.LoginForm">
 
             <androidx.constraintlayout.widget.Group
                     android:id="@+id/login_form"
@@ -53,13 +54,14 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintWidth_max="320dp">
+                    app:layout_constraintWidth_max="320dp"
+                    android:hint="@string/prompt_url"
+                    app:startIconDrawable="@drawable/ic_web_24dp">
 
                 <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/url"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/prompt_url"
                         android:inputType="textUri"
                         android:maxLines="1"
                         android:text="@={LoginViewModel.convertHttpUrlToString(viewModel.httpUrl)}"
@@ -77,13 +79,15 @@
                     app:layout_constraintStart_toStartOf="@+id/url_field"
                     app:layout_constraintEnd_toEndOf="@+id/url_field"
                     app:layout_constraintTop_toBottomOf="@+id/url_field"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
+                    android:hint="@string/prompt_username"
+                    app:startIconDrawable="@drawable/ic_person_24dp"
                     >
 
                 <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/username"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/prompt_username"
                         android:inputType="textPersonName"
                         android:maxLines="1"
                         android:text="@={viewModel.username}"
@@ -101,13 +105,15 @@
                     app:layout_constraintStart_toStartOf="@+id/url_field"
                     app:layout_constraintEnd_toEndOf="@+id/url_field"
                     app:layout_constraintTop_toBottomOf="@+id/username_field"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
+                    android:hint="@string/prompt_password"
+                    app:startIconDrawable="@drawable/ic_vpn_key_24dp"
                     >
 
                 <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/password"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:hint="@string/prompt_password"
                         android:imeActionId="@integer/ime_action_done"
                         android:imeActionLabel="@string/action_sign_in_short"
                         android:imeOptions="actionUnspecified"
@@ -121,17 +127,86 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <Button
-                    android:id="@+id/email_sign_in_button"
-                    style="?android:textAppearanceSmall"
+            <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_advanced_option"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    app:layout_constraintStart_toStartOf="@+id/url_field"
+                    app:layout_constraintEnd_toEndOf="@+id/url_field"
+                    app:layout_constraintTop_toBottomOf="@+id/password_field"
+                    android:text="Advanced options"
+                    android:textAllCaps="false"
+                    android:gravity="bottom|start"
+                    app:icon="@drawable/view_account_menu_line_handle_closed"
+                    app:iconGravity="start"
+                    android:textColor="?colorControlNormal"
+                    app:iconTint="?colorControlNormal"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"/>
+
+
+
+            <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/http_username_field"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     app:layout_constraintStart_toStartOf="@+id/url_field"
                     app:layout_constraintEnd_toEndOf="@+id/url_field"
-                    app:layout_constraintTop_toBottomOf="@+id/password_field"
+                    app:layout_constraintTop_toBottomOf="@+id/btn_advanced_option"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
+                    android:hint="@string/prompt_username"
+                    app:startIconDrawable="@drawable/ic_person_24dp"
+                    >
+
+                <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/http_username"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/prompt_username"
+                        android:inputType="textPersonName"
+                        android:maxLines="1"
+                        android:text="@={viewModel.http_auth_username}"
+                        android:autofillHints="username"
+                        tools:ignore="UnusedAttribute" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/http_password_field"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="@+id/url_field"
+                    app:layout_constraintEnd_toEndOf="@+id/url_field"
+                    app:layout_constraintTop_toBottomOf="@+id/http_username_field"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
+                    android:hint="@string/prompt_password"
+                    app:startIconDrawable="@drawable/ic_vpn_key_24dp"
+                    app:errorEnabled="true"
+                    >
+
+                <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/http_password"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPassword"
+                        android:maxLines="1"
+                        android:text="@={viewModel.http_auth_password}"
+                        android:autofillHints="password"
+                        tools:ignore="UnusedAttribute" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+
+            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                    android:id="@+id/email_sign_in_button"
+                    style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="@+id/url_field"
+                    app:layout_constraintEnd_toEndOf="@+id/url_field"
+                    app:layout_constraintTop_toBottomOf="@+id/http_password_field"
                     android:layout_marginTop="16dp"
                     android:text="@string/action_sign_in"
-                    android:textStyle="bold"
                     android:enabled="@{safeUnbox(viewModel.areFieldsCorrect)}"
                     android:onClickListener="@{() -> viewModel.confirmLogin()}"
                     />

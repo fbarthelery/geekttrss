@@ -70,4 +70,12 @@
         <item name="colorButtonNormal">@android:color/transparent</item>
     </style>
 
+    <style name="LoginForm.TextInputStyle" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+        <item name="errorEnabled">true</item>
+    </style>
+
+    <style name="ThemeOverlay.AppTheme.LoginForm" parent="ThemeOverlay.AppTheme.DayNight">
+        <item name="textInputStyle">@style/LoginForm.TextInputStyle</item>
+    </style>
+
 </resources>
