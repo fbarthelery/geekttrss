@@ -28,6 +28,7 @@
 
     <data>
         <import type="com.geekorum.ttrss.accounts.LoginViewModel" />
+        <import type="android.view.View"/>
         <variable name="viewModel" type="com.geekorum.ttrss.accounts.LoginViewModel" />
     </data>
 
@@ -127,32 +128,24 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btn_advanced_option"
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/use_http_auth"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    app:layout_constraintStart_toStartOf="@+id/url_field"
-                    app:layout_constraintEnd_toEndOf="@+id/url_field"
+                    app:layout_constraintStart_toStartOf="@id/url_field"
+                    app:layout_constraintEnd_toEndOf="@id/url_field"
                     app:layout_constraintTop_toBottomOf="@+id/password_field"
-                    android:text="Advanced options"
-                    android:textAllCaps="false"
-                    android:gravity="bottom|start"
-                    app:icon="@drawable/view_account_menu_line_handle_closed"
-                    app:iconGravity="start"
-                    android:textColor="?colorControlNormal"
-                    app:iconTint="?colorControlNormal"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"/>
-
-
+                    android:text="@string/lbl_use_http_authentication"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                    />
 
             <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/http_username_field"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="@+id/url_field"
-                    app:layout_constraintEnd_toEndOf="@+id/url_field"
-                    app:layout_constraintTop_toBottomOf="@+id/btn_advanced_option"
+                    app:layout_constraintStart_toStartOf="@id/url_field"
+                    app:layout_constraintEnd_toEndOf="@id/url_field"
+                    app:layout_constraintTop_toBottomOf="@+id/use_http_auth"
                     android:layout_marginTop="@dimen/activity_vertical_margin"
                     android:hint="@string/prompt_username"
                     app:startIconDrawable="@drawable/ic_person_24dp"
@@ -175,8 +168,8 @@
                     android:id="@+id/http_password_field"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="@+id/url_field"
-                    app:layout_constraintEnd_toEndOf="@+id/url_field"
+                    app:layout_constraintStart_toStartOf="@id/url_field"
+                    app:layout_constraintEnd_toEndOf="@id/url_field"
                     app:layout_constraintTop_toBottomOf="@+id/http_username_field"
                     android:layout_marginTop="@dimen/activity_vertical_margin"
                     android:hint="@string/prompt_password"
@@ -205,7 +198,7 @@
                     app:layout_constraintStart_toStartOf="@+id/url_field"
                     app:layout_constraintEnd_toEndOf="@+id/url_field"
                     app:layout_constraintTop_toBottomOf="@+id/http_password_field"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="@dimen/activity_vertical_margin"
                     android:text="@string/action_sign_in"
                     android:enabled="@{safeUnbox(viewModel.areFieldsCorrect)}"
                     android:onClickListener="@{() -> viewModel.confirmLogin()}"
@@ -224,6 +217,14 @@
                     app:layout_constraintVertical_bias="0.1"
                     android:visibility="gone" />
 
+            <androidx.constraintlayout.widget.Group
+                    android:id="@+id/use_http_auth_group"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:constraint_referenced_ids="http_username_field,http_password_field"
+                    android:visibility="@{useHttpAuth.checked ? View.VISIBLE : View.GONE}"
+                    tools:visibility="gone"
+                    />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 </layout>
