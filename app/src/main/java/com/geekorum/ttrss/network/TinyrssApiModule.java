@@ -1,4 +1,4 @@
-/**
+/*
  * Geekttrss is a RSS feed reader application on the Android Platform.
  *
  * Copyright (C) 2017-2018 by Frederic-Charles Barthelery.
@@ -30,6 +30,7 @@ import dagger.BindsOptionalOf;
 import dagger.Module;
 import dagger.Provides;
 import kotlinx.serialization.json.JSON;
+import okhttp3.Authenticator;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
@@ -61,6 +62,12 @@ public abstract class TinyrssApiModule {
                 .baseUrl(tinyrssApiUrl);
 
         loggedRequestInterceptorFactory.ifPresent(retrofitBuilder::addConverterFactory);
+
+        if (serverInformation.getBasicHttpAuthPassword() != null
+                || serverInformation.getBasicHttpAuthUsername() != null) {
+            Authenticator serverAuthenticator = new BasicAuthAuthenticator(serverInformation);
+            okHttpClient = okHttpClient.newBuilder().authenticator(serverAuthenticator).build();
+        }
 
         JSON.Companion json = JSON.Companion;
         retrofitBuilder.addConverterFactory(KotlinSerializationConverterFactory.stringBased(
