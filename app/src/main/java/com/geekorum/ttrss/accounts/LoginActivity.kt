@@ -80,6 +80,9 @@ class LoginActivity : AccountAuthenticatorAppCompatActivity() {
             showProgress(inProgress!!)
         })
         loginViewModel.loginFailedEvent.observe(this, EventObserver { event ->
+            if (event.errorMsgId in listOf(R.string.error_http_forbidden, R.string.error_http_unauthorized)) {
+                binding.form.useHttpAuth.isChecked = true
+            }
             Snackbar.make(binding.root, event.errorMsgId, Snackbar.LENGTH_SHORT).show()
         })
 

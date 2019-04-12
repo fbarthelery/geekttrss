@@ -34,6 +34,7 @@ import com.geekorum.ttrss.network.ApiCallException
 import com.geekorum.ttrss.network.impl.LoginRequestPayload
 import kotlinx.coroutines.launch
 import okhttp3.HttpUrl
+import retrofit2.HttpException
 import javax.inject.Inject
 
 /**
@@ -124,7 +125,7 @@ internal class LoginViewModel @Inject constructor(
 
     @VisibleForTesting
     internal suspend fun doLogin() {
-        val serverInformation = DataServerInformation(httpUrl!!.toString())
+        val serverInformation = DataServerInformation(httpUrl!!.toString(), http_auth_username, http_auth_password)
         val urlModule = TinyRssServerInformationModule(serverInformation)
         val networkComponent = networkComponentBuilder
             .tinyRssServerInformationModule(urlModule)
@@ -146,6 +147,13 @@ internal class LoginViewModel @Inject constructor(
                 response.error == ApiCallException.ApiError.API_DISABLED ->
                     loginFailedEvent.value = LoginFailedEvent(R.string.error_api_disabled)
 
+                else -> loginFailedEvent.value = LoginFailedEvent(R.string.error_unknown)
+            }
+        } catch (e: HttpException) {
+            when (e.code()) {
+                401 -> loginFailedEvent.value = LoginFailedEvent(R.string.error_http_unauthorized)
+                403 -> loginFailedEvent.value = LoginFailedEvent(R.string.error_http_forbidden)
+                404 -> loginFailedEvent.value = LoginFailedEvent(R.string.error_http_not_found)
                 else -> loginFailedEvent.value = LoginFailedEvent(R.string.error_unknown)
             }
         } catch (e: Exception) {

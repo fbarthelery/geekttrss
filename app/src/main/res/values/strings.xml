@@ -89,10 +89,10 @@
 
     <!-- Api error messages -->
     <string name="error_unknown">Error: Unknown error (see log)</string>
-    <string name="error_http_unauthorized">Error: 401 unauthorized</string>
-    <string name="error_http_forbidden">Error: 403 forbidden</string>
-    <string name="error_http_not_found">Error: 404 not found</string>
-    <string name="error_http_server_error">Error: 500 server error</string>
+    <string name="error_http_unauthorized">Http error: 401 unauthorized</string>
+    <string name="error_http_forbidden">Http error: 403 forbidden</string>
+    <string name="error_http_not_found">Http error: 404 not found</string>
+    <string name="error_http_server_error">Http error: 500 server error</string>
     <string name="error_http_other_error">Error: other HTTP error (see log)</string>
     <string name="error_ssl_rejected">Error: SSL certificate rejected</string>
     <string name="error_parse_error">Error: JSON parse failed</string>
