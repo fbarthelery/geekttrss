@@ -121,7 +121,7 @@ class TinyrssApiModuleTest {
 
         val tinyRssApi = TinyrssApiModule.providesTinyRssApi(okHttpClient, authServerInformation, Optional.empty())
 
-        val loginResponsePayload = runBlocking {
+        runBlocking {
             val requestPayload = LoginRequestPayload("user", "password")
             tinyRssApi.login(requestPayload).await()
         }

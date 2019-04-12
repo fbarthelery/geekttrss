@@ -475,6 +475,7 @@ class JsonSerializationTest {
     private inline fun <reified T> getSerializer(): KSerializer<T> {
         val typeToken = typeTokenOf<T>()
         // we use type token because that's what RetrofitConverter use to get the serializer
+        @Suppress("UNCHECKED_CAST")
         return serializerByTypeToken(typeToken) as KSerializer<T>
 
     }

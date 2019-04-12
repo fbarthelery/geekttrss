@@ -45,8 +45,8 @@
                       android:gravity="center"
                       android:textAppearance="?textAppearanceHeadline4"
                       android:padding="@dimen/activity_horizontal_margin"
-                      android:text="@{activityViewModel.refreshing ? @string/fragment_articles_list_no_articles_and_sync_lbl : @string/fragment_articles_list_no_articles_lbl}"
-                      android:visibility="@{fragmentViewModel.haveZeroArticles ? View.VISIBLE : View.GONE}"
+                      android:text="@{safeUnbox(activityViewModel.refreshing) ? @string/fragment_articles_list_no_articles_and_sync_lbl : @string/fragment_articles_list_no_articles_lbl}"
+                      android:visibility="@{safeUnbox(fragmentViewModel.haveZeroArticles) ? View.VISIBLE : View.GONE}"
                     />
 
             <androidx.recyclerview.widget.RecyclerView

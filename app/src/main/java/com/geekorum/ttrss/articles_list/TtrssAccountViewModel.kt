@@ -24,20 +24,20 @@ import android.accounts.Account
 import android.accounts.AccountManager
 import android.accounts.AccountManagerCallback
 import android.app.Activity
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import com.geekorum.geekdroid.accounts.AccountSelector
 import com.geekorum.geekdroid.accounts.AccountsListViewModel
 import com.geekorum.geekdroid.app.lifecycle.EmptyEvent
 import com.geekorum.ttrss.accounts.AccountAuthenticator
 import com.geekorum.ttrss.providers.ArticlesContract
+import timber.log.Timber
 import javax.inject.Inject
 import com.geekorum.geekdroid.app.lifecycle.EmptyEvent.Companion.makeEmptyEvent as NoAccountSelectedEvent
 
@@ -48,10 +48,6 @@ class TtrssAccountViewModel @Inject constructor(
     accountManager: AccountManager,
     accountSelector: AccountSelector
 ): AccountsListViewModel(accountManager, accountSelector, AccountAuthenticator.TTRSS_ACCOUNT_TYPE) {
-
-    companion object {
-        private val TAG = TtrssAccountViewModel::class.java.simpleName
-    }
 
     val selectedAccountHost = Transformations.map(selectedAccount) { account ->
         val url = accountManager.getUserData(account, AccountAuthenticator.USERDATA_URL)
@@ -68,7 +64,7 @@ class TtrssAccountViewModel @Inject constructor(
                 val accountType = result.getString(AccountManager.KEY_ACCOUNT_TYPE)
                 selectAccount(Account(accountName, accountType))
             } catch (e: Exception) {
-                Log.w(TAG, "Unable to get auth token", e)
+                Timber.w(e, "Unable to get auth token")
                 noAccountSelectedEventSource.value = NoAccountSelectedEvent()
             }
         }
