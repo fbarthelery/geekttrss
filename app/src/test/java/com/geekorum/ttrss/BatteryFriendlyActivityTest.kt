@@ -24,6 +24,10 @@ import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.os.PowerManager
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_UNSPECIFIED
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.core.content.getSystemService
 import androidx.lifecycle.MutableLiveData
@@ -44,29 +48,28 @@ import kotlin.test.Test
 
 @RunWith(AndroidJUnit4::class)
 class BatteryFriendlyActivityTest {
-    val application = ApplicationProvider.getApplicationContext<Application>()
+    val application: Application = ApplicationProvider.getApplicationContext()
 
     @BeforeTest
     fun setUp() {
         // declare BatteryFriendlyActivity to handle UI mode configuration change
+        // this allows the test to not care about the activity being destroyed/recreated
         val packageManager = Shadows.shadowOf(application.packageManager)
         val packageInfo = packageManager.getInternalMutablePackageInfo(application.packageName)
         val batteryFriendly = ActivityInfo().apply {
             configChanges = ActivityInfo.CONFIG_UI_MODE
-            name = BatteryFriendlyActivity::class.qualifiedName
+            name = BatteryFriendlyActivityRecordNightModeChanged::class.qualifiedName
             applicationInfo = packageInfo.applicationInfo
             packageName = packageInfo.packageName
         }
-        val nbActivities = packageInfo.activities.size
-        packageInfo.activities = packageInfo.activities.copyOf(nbActivities + 1)
-        packageInfo.activities[nbActivities] = batteryFriendly
+        packageInfo.activities += batteryFriendly
     }
 
     @Test
     fun testThatWhenPowerSaveIsOnNightModeConfigurationIsUsed() {
-        val scenario = ActivityScenario.launch(BatteryFriendlyActivity::class.java)
+        val scenario = ActivityScenario.launch(BatteryFriendlyActivityRecordNightModeChanged::class.java)
         scenario.onActivity {
-            assertConfigurationNightModeEquals(it.resources.configuration, Configuration.UI_MODE_NIGHT_NO)
+            assertThat(it.nightMode).isEqualTo(MODE_NIGHT_FOLLOW_SYSTEM)
         }
 
         val powerManager = Shadows.shadowOf(application.getSystemService<PowerManager>())
@@ -74,29 +77,25 @@ class BatteryFriendlyActivityTest {
         application.sendBroadcast(Intent(PowerManager.ACTION_POWER_SAVE_MODE_CHANGED))
 
         scenario.onActivity {
-            assertConfigurationNightModeEquals(it.resources.configuration, Configuration.UI_MODE_NIGHT_YES)
+            assertThat(it.nightMode).isEqualTo(MODE_NIGHT_YES)
         }
     }
 
     @Test
     fun testThatWhenBatteryIsLowNightModeConfigurationIsUsed() {
-        val scenario = ActivityScenario.launch(BatteryFriendlyActivity::class.java)
+        val scenario = ActivityScenario.launch(BatteryFriendlyActivityRecordNightModeChanged::class.java)
         scenario.onActivity {
-            assertConfigurationNightModeEquals(it.resources.configuration, Configuration.UI_MODE_NIGHT_NO)
+            assertThat(it.nightMode).isEqualTo(MODE_NIGHT_FOLLOW_SYSTEM)
         }
 
         val application = ApplicationProvider.getApplicationContext<Application>()
         application.sendBroadcast(Intent(Intent.ACTION_BATTERY_LOW))
 
         scenario.onActivity {
-            assertConfigurationNightModeEquals(it.resources.configuration, Configuration.UI_MODE_NIGHT_YES)
+            assertThat(it.nightMode).isEqualTo(MODE_NIGHT_YES)
         }
     }
 
-
-    private fun assertConfigurationNightModeEquals(configuration: Configuration, nightMode: Int) {
-        assertThat(configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK).isEqualTo(nightMode)
-    }
 }
 
 class ForceNightModeViewModelTest {
@@ -160,11 +159,19 @@ class ForceNightModeViewModelTest {
     }
 }
 
+class BatteryFriendlyActivityRecordNightModeChanged : BatteryFriendlyActivity() {
+    var nightMode: Int  = MODE_NIGHT_UNSPECIFIED
+
+    override fun onNightModeChanged(mode: Int) {
+        nightMode = mode
+    }
+}
+
 
 @Module
 abstract class BatteryFriendlyActivityTestModule {
 
     @ContributesAndroidInjector
-    internal abstract fun contributesBatteryFriendlyActivityInjector(): BatteryFriendlyActivity
+    internal abstract fun contributesBatteryFriendlyActivityInjector(): BatteryFriendlyActivityRecordNightModeChanged
 
 }

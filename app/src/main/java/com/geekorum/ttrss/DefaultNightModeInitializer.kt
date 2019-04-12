@@ -23,7 +23,7 @@ package com.geekorum.ttrss
 import android.app.Application
 import android.preference.PreferenceManager
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_AUTO
+import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_UNSPECIFIED
 import com.geekorum.geekdroid.dagger.AppInitializer
 import com.geekorum.geekdroid.dagger.AppInitializersModule
 import dagger.Module
@@ -34,8 +34,8 @@ import dagger.multibindings.IntoSet
 class DefaultNightModeInitializer : AppInitializer {
     override fun initialize(app: Application) {
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(app)
-        val nighModeStr = sharedPreferences.getString(SettingsActivity.KEY_THEME, Integer.toString(MODE_NIGHT_AUTO))
-        val nighMode = Integer.valueOf(nighModeStr!!)
+        val nighMode =
+            sharedPreferences.getString(SettingsActivity.KEY_THEME, MODE_NIGHT_UNSPECIFIED.toString())!!.toInt()
         AppCompatDelegate.setDefaultNightMode(nighMode)
     }
 }
