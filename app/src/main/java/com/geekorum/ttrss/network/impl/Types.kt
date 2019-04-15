@@ -25,9 +25,9 @@ import androidx.annotation.RequiresApi
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
-import kotlinx.serialization.Optional
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonObject
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
@@ -41,38 +41,29 @@ data class Feed(
     val title: String = "",
 
     @SerialName("display_title")
-    @Optional
     val displayTitle: String = "",
 
-    @Optional
     @SerialName("feed_url")
     val url: String = "",
 
-    @Optional
     @SerialName("unread")
     val nbUnreadArticles: Int = 0,
 
-    @Optional
     @SerialName("has_icon")
     val hasIcon: Boolean = false,
 
-    @Optional
     @SerialName("cat_id")
     val categoryId: Long = 0,
 
-    @Optional
     @SerialName("last_updated")
     val lastUpdatedTimestamp: Long = 0,
 
-    @Optional
     @SerialName("order_id")
     val orderId: Int = 0,
 
-    @Optional
     @SerialName("is_cat")
     val isCategory: Boolean = false,
 
-    @Optional
     @SerialName("always_display_as_feed")
     val alwaysDisplayAsFeed: Boolean = false
 ) {
@@ -102,11 +93,9 @@ data class FeedCategory(
     val title: String = "",
 
     @SerialName("unread")
-    @Optional
     val nbUnreadArticles: Int = 0,
 
     @SerialName("order_id")
-    @Optional
     val orderId: Int = 0
 ) {
 
@@ -122,13 +111,10 @@ data class FeedCategory(
 @Serializable
 data class Headline(
     val id: Long = 0,
-    @Optional
     val guid: String = "",
     val title: String = "",
     val link: String = "",
-    @Optional
     val content: String = "",
-    @Optional
     val excerpt: String = "",
     val author: String = "",
     val note: String? = "",
@@ -138,7 +124,6 @@ data class Headline(
     val score: Int = 0,
     @SerialName("is_updated")
     val isUpdated: Boolean = false,
-    @Optional
     val selected: Boolean = false,
     val tags: List<String> = emptyList(),
 
@@ -161,15 +146,13 @@ data class Headline(
     val alwaysDisplayAttachment: Boolean = false,
 
     // unuseful
-    @Optional
-    val attachments: List<Any> = emptyList(),
+    val attachments: List<JsonObject> = emptyList(),
     val labels: List<String> = emptyList(),
     val lang: String? = ""
 
 ) {
 
     @delegate:Transient
-    @kotlinx.serialization.Transient
     val lastUpdatedDate: LocalDateTime by lazy @RequiresApi(O) {
         LocalDateTime.ofEpochSecond(lastUpdatedTimestamp, 0, ZoneOffset.UTC)
     }

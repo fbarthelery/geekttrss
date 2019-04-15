@@ -29,7 +29,7 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.KotlinSerializa
 import dagger.BindsOptionalOf;
 import dagger.Module;
 import dagger.Provides;
-import kotlinx.serialization.json.JSON;
+import kotlinx.serialization.json.Json;
 import okhttp3.Authenticator;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -69,11 +69,10 @@ public abstract class TinyrssApiModule {
             okHttpClient = okHttpClient.newBuilder().authenticator(serverAuthenticator).build();
         }
 
-        JSON.Companion json = JSON.Companion;
-        retrofitBuilder.addConverterFactory(KotlinSerializationConverterFactory.stringBased(
-                Objects.requireNonNull(MediaType.parse("application/json")),
-                json::parse,
-                json::stringify
+        Json.Companion json = Json.Companion;
+        retrofitBuilder.addConverterFactory(KotlinSerializationConverterFactory.create(
+                json,
+                Objects.requireNonNull(MediaType.parse("application/json"))
         ))
                 .addCallAdapterFactory(CoroutineCallAdapterFactory.create())
                 .client(okHttpClient);

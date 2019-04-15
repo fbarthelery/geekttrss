@@ -25,7 +25,6 @@ import kotlinx.serialization.CompositeDecoder
 import kotlinx.serialization.Decoder
 import kotlinx.serialization.Encoder
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Optional
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Serializer
@@ -126,11 +125,8 @@ data class UpdateArticleResponsePayload(
 
     @Serializable
     data class Content(
-        @Optional
         val status: String? = null,
-        @Optional
         val updated: Int? = null,
-        @Optional
         override var error: String? = null
     ): BaseContent()
 

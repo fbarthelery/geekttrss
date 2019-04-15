@@ -132,8 +132,8 @@ dependencies {
     // androidx others
     implementation("androidx.browser:browser:1.0.0")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.9.0")
-    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.1.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.11.0")
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.4.0")
 
     val GEEKDROID_PROJECT_DIR: String? by project
     val geekdroidExt = GEEKDROID_PROJECT_DIR?.let { "" } ?: "aar"

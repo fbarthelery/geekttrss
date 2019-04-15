@@ -23,7 +23,7 @@ package com.geekorum.ttrss.network.impl
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.google.common.truth.Truth.assertThat
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.json.JSON
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializerByTypeToken
 import kotlinx.serialization.typeTokenOf
 import kotlin.test.Test
@@ -35,7 +35,7 @@ class JsonSerializationTest {
     fun testThatLoginRequestPayloadDoCorrectJson() {
         val payload = LoginRequestPayload("myuser", "mypassword")
         val serializer = getSerializer<LoginRequestPayload>()
-        val result = JSON.stringify(serializer, payload)
+        val result = Json.stringify(serializer, payload)
         assertThat(result).isEqualTo("""
             {"user":"myuser","password":"mypassword","op":"login"}
         """.trimIndent())
@@ -51,7 +51,7 @@ class JsonSerializationTest {
             }
         """.trimIndent()
         val serializer = getSerializer<LoginResponsePayload>()
-        val result = JSON.parse(serializer, jsonString)
+        val result = Json.parse(serializer, jsonString)
         val expected = LoginResponsePayload(
             status = 0,
             content = LoginResponsePayload.Content("XXX", 3)
@@ -71,7 +71,7 @@ class JsonSerializationTest {
             }
         """.trimIndent()
         val serializer = getSerializer<LoginResponsePayload>()
-        val result = JSON.parse(serializer, jsonString)
+        val result = Json.parse(serializer, jsonString)
         val expected = LoginResponsePayload(
             status = 1,
             content = LoginResponsePayload.Content(error = "NOT_LOGGED_IN")
@@ -92,7 +92,7 @@ class JsonSerializationTest {
             sessionId = "SESSION_ID"
         }
         val serializer = getSerializer<UpdateArticleRequestPayload>()
-        val result = JSON.stringify(serializer, payload)
+        val result = Json.stringify(serializer, payload)
         assertThat(result).isEqualTo("""
             {"sid":"SESSION_ID","article_ids":"23","mode":1,"field":2,"data":null,"op":"updateArticle"}
         """.trimIndent())
@@ -108,7 +108,7 @@ class JsonSerializationTest {
             }
         """.trimIndent()
         val serializer = getSerializer<UpdateArticleResponsePayload>()
-        val result = JSON.parse(serializer, jsonString)
+        val result = Json.parse(serializer, jsonString)
         val expected = UpdateArticleResponsePayload(
             sequence = 0,
             status = 0,
@@ -129,7 +129,7 @@ class JsonSerializationTest {
             }
         """.trimIndent()
         val serializer = getSerializer<UpdateArticleResponsePayload>()
-        val result = JSON.parse(serializer, jsonString)
+        val result = Json.parse(serializer, jsonString)
         val expected = UpdateArticleResponsePayload(
             sequence = 0,
             status = 1,
@@ -148,7 +148,7 @@ class JsonSerializationTest {
             sessionId = "SESSION_ID"
         }
         val serializer = getSerializer<GetFeedsRequestPayload>()
-        val result = JSON.stringify(serializer, payload)
+        val result = Json.stringify(serializer, payload)
         assertThat(result).isEqualTo("""
             {"sid":"SESSION_ID","include_nested":true,"unread_only":false,"cat_id":-3,"op":"getFeeds"}
         """.trimIndent())
@@ -195,7 +195,7 @@ class JsonSerializationTest {
             }
         """.trimIndent()
         val serializer = getSerializer<ListResponsePayload<Feed>>()
-        val result = JSON.parse(serializer, jsonString)
+        val result = Json.parse(serializer, jsonString)
         val expected = ListResponsePayload(
             sequence = 2,
             status = 1,
@@ -241,7 +241,7 @@ class JsonSerializationTest {
             }
         """.trimIndent()
         val serializer = getSerializer<ListResponsePayload<Feed>>()
-        val result = JSON.parse(serializer, jsonString)
+        val result = Json.parse(serializer, jsonString)
         val expected = ListResponsePayload<Feed>(
             sequence = 2,
             status = 1,
@@ -259,7 +259,7 @@ class JsonSerializationTest {
             sessionId = "SESSION_ID"
         }
         val serializer = getSerializer<GetCategoriesRequestPayload>()
-        val result = JSON.stringify(serializer, payload)
+        val result = Json.stringify(serializer, payload)
         assertThat(result).isEqualTo("""
             {"sid":"SESSION_ID","include_nested":true,"unread_only":false,"op":"getCategories"}
         """.trimIndent())
@@ -288,7 +288,7 @@ class JsonSerializationTest {
             }
         """.trimIndent()
         val serializer = getSerializer<ListResponsePayload<FeedCategory>>()
-        val result = JSON.parse(serializer, jsonString)
+        val result = Json.parse(serializer, jsonString)
         val expected = ListResponsePayload<FeedCategory>(
             sequence = 2,
             status = 1,
@@ -312,7 +312,7 @@ class JsonSerializationTest {
             }
         """.trimIndent()
         val serializer = getSerializer<ListResponsePayload<FeedCategory>>()
-        val result = JSON.parse(serializer, jsonString)
+        val result = Json.parse(serializer, jsonString)
         val expected = ListResponsePayload<FeedCategory>(
             sequence = 2,
             status = 1,
@@ -339,7 +339,7 @@ class JsonSerializationTest {
             sessionId = "SESSION_ID"
         }
         val serializer = getSerializer<GetArticlesRequestPayload>()
-        val result = JSON.stringify(serializer, payload)
+        val result = Json.stringify(serializer, payload)
         assertThat(result).isEqualTo("""
             {"sid":"SESSION_ID","feed_id":256,"view_mode":"ALL_ARTICLES","show_content":true,"show_excerpt":false,"skip":10,"since_id":200,"limit":10,"order_by":"TITLE","op":"getHeadlines"}
         """.trimIndent())
@@ -412,7 +412,7 @@ class JsonSerializationTest {
         }
 """.trimIndent()
         val serializer = getSerializer<ListResponsePayload<Headline>>()
-        val result = JSON.parse(serializer, jsonString)
+        val result = Json.parse(serializer, jsonString)
         val expected = ListResponsePayload<Headline>(
             sequence = 2,
             status = 1,
@@ -461,7 +461,7 @@ class JsonSerializationTest {
             }
         """.trimIndent()
         val serializer = getSerializer<ListResponsePayload<Headline>>()
-        val result = JSON.parse(serializer, jsonString)
+        val result = Json.parse(serializer, jsonString)
         val expected = ListResponsePayload<Headline>(
             sequence = 2,
             status = 1,
