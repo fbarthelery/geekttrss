@@ -37,14 +37,14 @@ repositories {
     google()
     maven {
         // Workaround for genymotion plugin not working on gradle 5.0
-        // we publish 1.4.1 version with fixes
+        // we publish 1.4.2 version with fixes
         url = URI("https://raw.githubusercontent.com/fbarthelery/genymotion-gradle-plugin/master/repo/")
     }
 }
 
 dependencies {
-    implementation("com.android.tools.build:gradle:3.3.2")
-    implementation("com.genymotion:plugin:1.4.1")
+    implementation("com.android.tools.build:gradle:3.4.0")
+    implementation("com.genymotion:plugin:1.4.2")
     implementation("gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.14.0")
     implementation("com.github.triplet.gradle:play-publisher:2.1.0")
 }

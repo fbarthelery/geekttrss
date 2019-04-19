@@ -22,7 +22,7 @@ import com.geekorum.build.setupGoogleContent
 import java.net.URI
 
 plugins {
-    id("com.google.android.gms.oss-licenses-plugin") version "0.9.3.1" apply false
+    id("com.google.android.gms.oss-licenses-plugin") version "0.9.3.2" apply false
     id("com.google.gms.google-services") version "3.2.0" apply false
     id("io.fabric") version "1.25.4" apply false
     kotlin("android") version "1.3.30" apply false
