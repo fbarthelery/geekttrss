@@ -77,7 +77,7 @@ android {
     }
 
     buildTypes {
-        getByName("release") {
+        named("release") {
             postprocessing {
                 isRemoveUnusedCode = true
                 isRemoveUnusedResources = true
@@ -85,6 +85,11 @@ android {
                 isOptimizeCode = true
                 proguardFile("proguard-rules.pro")
             }
+        }
+        named("debug") {
+            // prevent fabric for generating build id which hurts gradle task caching
+            // see https://docs.fabric.io/android/crashlytics/build-tools.html#optimize-builds-when-you-re-not-proguarding-or-using-beta-by-crashlytics
+            (this as ExtensionAware).extra["alwaysUpdateBuildId"] = false
         }
     }
 
