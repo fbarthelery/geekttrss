@@ -285,6 +285,7 @@ class ArticleListActivity : SessionActivity() {
 
     private fun navigateUpToList() {
         supportFragmentManager.popBackStack(FRAGMENT_BACKSTACK_SEARCH, POP_BACK_STACK_INCLUSIVE)
+        binding.appBar?.setExpanded(true)
     }
 
     override fun onBackPressed() {
