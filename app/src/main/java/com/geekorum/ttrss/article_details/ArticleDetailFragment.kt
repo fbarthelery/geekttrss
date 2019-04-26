@@ -21,6 +21,9 @@
 package com.geekorum.ttrss.article_details
 
 import android.content.ContentUris
+import android.content.Intent
+import android.content.IntentFilter
+import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.Color
 import android.net.Uri
@@ -286,7 +289,18 @@ class ArticleDetailFragment : BaseFragment() {
     private inner class MyWebViewClient internal constructor() : OkHttpWebViewClient(okHttpClient) {
 
         override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-            articleDetailsViewModel.openUrlInBrowser(view.context, request.url)
+            val intent = Intent(Intent.ACTION_VIEW, request.url)
+            val context = view.context
+            val activities =
+                context.packageManager.queryIntentActivities(intent, PackageManager.GET_RESOLVED_FILTER)
+                    .filterNot {
+                        it.filter.isWebBrowserApp()
+                    }
+            if (activities.isNotEmpty()) {
+                context.startActivity(intent)
+            } else {
+                articleDetailsViewModel.openUrlInBrowser(context, request.url)
+            }
             return true
         }
 
@@ -337,5 +351,32 @@ class ArticleDetailFragment : BaseFragment() {
                 arguments = bundleOf(ARG_ARTICLE_URI to articleUri)
             }
         }
+    }
+
+    private fun IntentFilter.isWebBrowserApp(): Boolean {
+        // from hidden method IntentFilter.handleAllWebDataURI()
+        return hasCategory(Intent.CATEGORY_APP_BROWSER) || handlesWebUris() && countDataAuthorities() == 0
+    }
+
+    private fun IntentFilter.handlesWebUris(): Boolean {
+        // adapted from hidden method IntentFilter.handleWebUris()
+        val nbDataSchemes = countDataSchemes()
+        // Require ACTION_VIEW, CATEGORY_BROWSEABLE, and at least one scheme
+        if (!hasAction(Intent.ACTION_VIEW)
+            || !hasCategory(Intent.CATEGORY_BROWSABLE)
+            || nbDataSchemes == 0
+        ) {
+            return false
+        }
+
+        // Now allow only the schemes "http" and "https"
+        for (i in 0 until nbDataSchemes) {
+            val scheme = getDataScheme(i)
+            val isWebScheme = "http" == scheme || "https" == scheme
+            if (isWebScheme) {
+                return true
+            }
+        }
+        return false
     }
 }
