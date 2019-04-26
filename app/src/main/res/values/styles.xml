@@ -35,6 +35,7 @@
         <!-- must be a color, not a drawable -->
         <item name="articleTextColor">@color/article_text_color</item>
         <item name="linkColor">?android:textColorLink</item>
+        <item name="bottomAppBarStyle">@style/BottomAppBarStyle</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -75,6 +76,11 @@
 
     <style name="ThemeOverlay.AppTheme.LoginForm" parent="ThemeOverlay.AppTheme.DayNight">
         <item name="textInputStyle">@style/LoginForm.TextInputStyle</item>
+    </style>
+
+    <style name="BottomAppBarStyle" parent="Widget.MaterialComponents.BottomAppBar">
+        <item name="fabCradleMargin">8dp</item>
+        <item name="fabCradleRoundedCornerRadius">32dp</item>
     </style>
 
     <style name="HeadlineCardFooterButton">

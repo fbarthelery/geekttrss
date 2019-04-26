@@ -22,9 +22,6 @@
 -->
 <layout>
     <data>
-        <import type="android.text.Html" />
-
-        <import type="android.view.View" />
         <variable
             name="viewModel"
             type="com.geekorum.ttrss.article_details.ArticleDetailsViewModel" />
