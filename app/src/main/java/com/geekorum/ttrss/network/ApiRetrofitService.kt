@@ -36,6 +36,7 @@ import com.geekorum.ttrss.network.impl.TinyRssApi
 import com.geekorum.ttrss.network.impl.UpdateArticleRequestPayload
 import com.geekorum.ttrss.providers.ArticlesContract
 import kotlinx.coroutines.Deferred
+import retrofit2.HttpException
 import java.io.IOException
 
 /**
@@ -149,6 +150,8 @@ class ApiRetrofitService(
             }
             return body
         } catch (e: IOException) {
+            throw ApiCallException(failingMessage, e)
+        } catch (e: HttpException) {
             throw ApiCallException(failingMessage, e)
         }
     }
