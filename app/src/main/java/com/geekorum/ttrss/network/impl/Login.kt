@@ -1,4 +1,4 @@
-/**
+/*
  * Geekttrss is a RSS feed reader application on the Android Platform.
  *
  * Copyright (C) 2017-2018 by Frederic-Charles Barthelery.
@@ -25,7 +25,6 @@ import kotlinx.serialization.CompositeDecoder
 import kotlinx.serialization.Decoder
 import kotlinx.serialization.Encoder
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Optional
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Serializer
@@ -71,14 +70,11 @@ data class LoginResponsePayload(
     @Serializable
     data class Content(
         @SerialName("session_id")
-        @Optional
         val sessionId: String? = null,
 
         @SerialName("api_level")
-        @Optional
         val apiLevel: Int? = null,
 
-        @Optional
         override var error: String? = null
 
     ) : BaseContent()
@@ -92,12 +88,12 @@ data class LoginResponsePayload(
 
     @Serializer(LoginResponsePayload::class)
     class LoginResponsePayloadSerializer : KSerializer<LoginResponsePayload> {
-        override fun serialize(output: Encoder, obj: LoginResponsePayload) {
+        override fun serialize(encoder: Encoder, obj: LoginResponsePayload) {
             TODO("not implemented")
         }
 
-        override fun deserialize(input: Decoder): LoginResponsePayload {
-            val contentDecoder = input.beginStructure(descriptor)
+        override fun deserialize(decoder: Decoder): LoginResponsePayload {
+            val contentDecoder = decoder.beginStructure(descriptor)
             lateinit var content: LoginResponsePayload.Content
             var seq: Int? = null
             var status = 0
