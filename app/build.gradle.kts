@@ -123,11 +123,11 @@ repositories {
 dependencies {
 
     implementation("androidx.core:core-ktx:1.0.1")
-    implementation("androidx.fragment:fragment-ktx:1.1.0-alpha04")
-    implementation("androidx.activity:activity-ktx:1.0.0-alpha04")
+    implementation("androidx.fragment:fragment-ktx:1.1.0-alpha07")
+    implementation("androidx.activity:activity-ktx:1.0.0-alpha07")
 
     // androidx ui
-    implementation("androidx.appcompat:appcompat:1.1.0-alpha03")
+    implementation("androidx.appcompat:appcompat:1.1.0-alpha04")
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")
     implementation("androidx.cardview:cardview:1.0.0")
     implementation("androidx.recyclerview:recyclerview:1.0.0")
@@ -166,7 +166,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
     kapt("androidx.lifecycle:lifecycle-compiler:$lifecycleVersion")
-    dualTestImplementation("androidx.arch.core:core-testing:2.0.0")
+    dualTestImplementation("androidx.arch.core:core-testing:2.0.1")
     implementation("androidx.paging:paging-runtime:2.1.0")
 
     // dagger
