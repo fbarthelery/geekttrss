@@ -34,10 +34,10 @@ plugins {
 // some extra properties
 extra["compileSdkVersion"] = "android-28"
 extra["daggerVersion"] = "2.21"
-extra["lifecycleVersion"] = "2.1.0-alpha01"
+extra["lifecycleVersion"] = "2.1.0-alpha04"
 extra["roomVersion"] = "2.1.0-alpha04"
 extra["kotlinVersion"] = "1.3.30"
-extra["coroutinesVersion"] = "1.1.0"
+extra["coroutinesVersion"] = "1.2.1"
 
 
 allprojects {

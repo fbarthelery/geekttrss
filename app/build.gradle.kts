@@ -180,8 +180,8 @@ dependencies {
     kapt("com.google.dagger:dagger-android-processor:$daggerVersion")
     kaptTest("com.google.dagger:dagger-compiler:$daggerVersion")
     kaptTest("com.google.dagger:dagger-android-processor:$daggerVersion")
-    implementation("com.squareup.inject:assisted-inject-annotations-dagger2:0.3.2")
-    kapt("com.squareup.inject:assisted-inject-processor-dagger2:0.3.2")
+    implementation("com.squareup.inject:assisted-inject-annotations-dagger2:0.4.0")
+    kapt("com.squareup.inject:assisted-inject-processor-dagger2:0.4.0")
 
     val roomVersion: String by rootProject.extra
     implementation("androidx.room:room-runtime:$roomVersion")
