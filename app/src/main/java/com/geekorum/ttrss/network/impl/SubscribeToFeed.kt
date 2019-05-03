@@ -21,13 +21,22 @@
 package com.geekorum.ttrss.network.impl
 
 import androidx.annotation.Keep
+import kotlinx.serialization.CompositeDecoder
+import kotlinx.serialization.Decoder
+import kotlinx.serialization.Encoder
+import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.Serializer
+import kotlinx.serialization.internal.IntSerializer
+import kotlinx.serialization.internal.makeNullable
 
 /**
  * Request Payload to subscribe to a new feed
  */
 @Keep
-internal class SubscribeToFeedRequestPayload(
+@Serializable
+internal data class SubscribeToFeedRequestPayload(
     @SerialName("feed_url")
     private val feedUrl: String,
 
@@ -66,20 +75,70 @@ internal enum class SubscribeResultCode(val code: Int) {
  */
 @Keep
 internal data class SubscribeToFeedResponsePayload(
+    @SerialName("seq")
     override val sequence: Int? = null,
     override val status: Int = 0,
     override val content: SubscribeToFeedResponseContent
 ) : ResponsePayload<SubscribeToFeedResponseContent>() {
 
     private val resultCode
-        get() = SubscribeResultCode.valueOf(content.resultCode)
+        get() = content.status?.let { SubscribeResultCode.valueOf(it.resultCode) }
 
     val success: Boolean
         get() = (resultCode == SubscribeResultCode.FEED_ALREADY_EXIST || resultCode == SubscribeResultCode.FEED_ADDED)
 
+    companion object {
+        fun serializer(): KSerializer<SubscribeToFeedResponsePayload> {
+            return SubscribeToFeedResponsePayloadSerializer()
+        }
+    }
+
+    @Serializer(SubscribeToFeedResponsePayload::class)
+    class SubscribeToFeedResponsePayloadSerializer : KSerializer<SubscribeToFeedResponsePayload> {
+        override fun serialize(encoder: Encoder, obj: SubscribeToFeedResponsePayload) {
+            TODO("not implemented")
+        }
+
+        override fun deserialize(decoder: Decoder): SubscribeToFeedResponsePayload {
+            val contentDecoder = decoder.beginStructure(descriptor)
+            lateinit var content: SubscribeToFeedResponseContent
+            var seq: Int? = null
+            var status = 0
+            loop@ while (true) {
+                when (val i = contentDecoder.decodeElementIndex(descriptor)) {
+                    CompositeDecoder.READ_DONE -> break@loop
+                    0 -> seq = contentDecoder.decodeNullableSerializableElement(descriptor, i, makeNullable(
+                        IntSerializer))
+                    1 -> status = contentDecoder.decodeIntElement(descriptor, i)
+                    2 -> {
+                        val contentSerializer = SubscribeToFeedResponseContent.serializer()
+                        content = contentDecoder.decodeSerializableElement(contentSerializer.descriptor, i,
+                            contentSerializer)
+                    }
+                }
+            }
+            contentDecoder.endStructure(descriptor)
+            return SubscribeToFeedResponsePayload(
+                content = content,
+                sequence = seq,
+                status = status
+            )
+        }
+    }
+
+
 }
 
+@Serializable
 internal data class SubscribeToFeedResponseContent(
+
+    val status: Status? = null,
+
+    override var error: String? = null
+) : BaseContent()
+
+@Serializable
+internal data class Status(
     @SerialName("code")
     val resultCode: Int = 0,
 
@@ -87,9 +146,8 @@ internal data class SubscribeToFeedResponseContent(
     val message: String = "",
 
     @SerialName("feed_id")
-    val feedId: Long = 0,
-    override var error: String? = null
-) : BaseContent()
+    val feedId: Long = 0
+)
 
 
 /*    public void unsubscribeFeed(final Feed feed) {

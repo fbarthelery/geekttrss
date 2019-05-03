@@ -303,6 +303,72 @@ class JsonSerializationTest {
     }
 
     @Test
+    fun testThatSubscribeToFeedRequestPayloadDoCorrectJson() {
+        val payload = SubscribeToFeedRequestPayload(
+            "http://my.feed.url/feed", 2,
+            "user", "password"
+        ).apply {
+            sessionId = "SESSION_ID"
+        }
+
+        val serializer = getSerializer<SubscribeToFeedRequestPayload>()
+        val result = Json.stringify(serializer, payload)
+        assertThat(result).isEqualTo("""
+            {"sid":"SESSION_ID","feed_url":"http://my.feed.url/feed","category_id":2,"login":"user","password":"password","op":"subscribeToFeed"}
+        """.trimIndent())
+    }
+
+
+    @Test
+    fun testThatSubscribeToFeedResponsePayloadDoLoadCorrectly() {
+        val jsonString = """
+            {
+              "seq": 2,
+              "status": 1,
+              "content": {
+                "status": {
+                  "code": 1,
+                  "message": "Feed successfully added",
+                  "feed_id": 42
+                }
+              }
+            }
+        """.trimIndent()
+        val serializer = getSerializer<SubscribeToFeedResponsePayload>()
+        val result = Json.parse(serializer, jsonString)
+        val expected = SubscribeToFeedResponsePayload(
+            sequence = 2,
+            status = 1,
+            content = SubscribeToFeedResponseContent(Status(1, "Feed successfully added", 42))
+        )
+        assertThat(result.sequence).isEqualTo(expected.sequence)
+        assertThat(result.status).isEqualTo(expected.status)
+        assertThat(result.content).isEqualTo(expected.content)
+    }
+
+    @Test
+    fun testThatSubscribeToFeedResponsePayloadWithErrorDoLoadCorrectly() {
+        val jsonString = """
+            {
+              "seq": 0,
+              "status": 1,
+              "content": {"error":"NOT_LOGGED_IN"}
+            }
+        """.trimIndent()
+        val serializer = getSerializer<UpdateArticleResponsePayload>()
+        val result = Json.parse(serializer, jsonString)
+        val expected = UpdateArticleResponsePayload(
+            sequence = 0,
+            status = 1,
+            content = UpdateArticleResponsePayload.Content(error = "NOT_LOGGED_IN")
+        )
+        assertThat(result.sequence).isEqualTo(expected.sequence)
+        assertThat(result.status).isEqualTo(expected.status)
+        assertThat(result.content).isEqualTo(expected.content)
+    }
+
+
+    @Test
     fun testThatGetCategoriesResponsePayloadWithErrorDoLoadCorrectly() {
         val jsonString = """
             {
