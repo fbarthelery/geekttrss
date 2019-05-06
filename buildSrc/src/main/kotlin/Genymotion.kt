@@ -41,16 +41,16 @@ internal fun Project.configureGenymotionDevices(useLocalDevices: Boolean = false
     configure<GenymotionPluginExtension> {
         if (useLocalDevices) {
             devices(closureOf<NamedDomainObjectContainer<VDLaunchDsl>> {
-                register("nexus9-v24") {
-                    template = "Google Nexus 9 - 7.0.0 - API 24 - 1536x2048"
+                register("pixelc-v24") {
+                    template = "Google Pixel C - 7.0.0 - API 24 - 2560x1800"
                 }
             })
         }
 
         if (useCloudDevices) {
             cloudDevices(closureOf<NamedDomainObjectContainer<CloudVDLaunchDsl>> {
-                register("nexus9-v24") {
-                    template = "Google Nexus 9 - 7.0.0 - API 24 - 1536x2048"
+                register("pixelc-v24") {
+                    template = "Google Pixel C - 7.0.0 - API 24 - 2560x1800"
                 }
                 register("pixel2-v26") {
                     template = "Google Pixel 2 - 8.0 - API 26 - 1080x1920"
