@@ -24,6 +24,7 @@ import android.app.Application
 import android.content.ContentResolver
 import android.os.Build
 import android.os.StrictMode
+import android.util.Log
 import com.geekorum.geekdroid.dagger.AppInitializer
 import com.geekorum.geekdroid.dagger.AppInitializersModule
 import com.geekorum.ttrss.BuildConfig
@@ -31,7 +32,11 @@ import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.Dispatchers
+import timber.log.Timber
+import java.util.concurrent.Executors
 import javax.inject.Inject
+
+private const val TAG = "StrictMode"
 
 /**
  * Configure StrictMode policies
@@ -40,6 +45,7 @@ class StrictModeInitializer @Inject constructor(
     private val contentResolver: ContentResolver
 ) : AppInitializer {
     override fun initialize(app: Application) {
+        val shouldBeFatal = shouldBeFatal()
         StrictMode.setVmPolicy(StrictMode.VmPolicy.Builder()
 //            .detectAll() don't use detect all because crashlytics don't tag its socket
             .detectActivityLeaks()
@@ -48,28 +54,41 @@ class StrictModeInitializer @Inject constructor(
             .detectLeakedClosableObjects()
             .detectLeakedRegistrationObjects()
             .detectLeakedSqlLiteObjects()
-            .penaltyLog()
             .apply {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     detectContentUriWithoutPermission()
                     detectUntaggedSockets()
                 }
-                if (shouldBeFatal()) {
-                    penaltyDeath()
-                } else {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                        // appcompat use nonsdk
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    // appcompat use nonsdk
 //                        detectNonSdkApiUsage()
-                    }
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    penaltyListener(Executors.newSingleThreadExecutor(), StrictMode.OnVmViolationListener {
+                        val priority = if (shouldBeFatal) Log.ERROR else Log.WARN
+                        Timber.tag(TAG).log(priority, it, "StrictMode violation")
+                    })
+                } else {
+                    penaltyLog()
+                }
+                if (shouldBeFatal) {
+                    penaltyDeath()
                 }
             }
             .build())
 
         StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder()
             .detectAll()
-            .penaltyLog()
             .apply {
-                if (shouldBeFatal()) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    penaltyListener(Executors.newSingleThreadExecutor(), StrictMode.OnThreadViolationListener {
+                        val priority = if (shouldBeFatal) Log.ERROR else Log.WARN
+                        Timber.tag(TAG).log(priority, it, "StrictMode violation")
+                    })
+                } else {
+                    penaltyLog()
+                }
+                if (shouldBeFatal) {
                     penaltyDeath()
                 }
             }
