@@ -53,7 +53,7 @@
                   app:layout_constraintStart_toStartOf="parent"
                   app:layout_constraintEnd_toEndOf="parent"
                   tools:layout="@android:layout/list_content"
-                  android:name="com.geekorum.ttrss.SettingsActivity$SettingsFragment" />
+                  android:name="com.geekorum.ttrss.settings.SettingsActivity$SettingsFragment" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -39,7 +39,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProviders;
 import com.geekorum.ttrss.BaseFragment;
 import com.geekorum.ttrss.R;
-import com.geekorum.ttrss.SettingsActivity;
+import com.geekorum.ttrss.settings.SettingsActivity;
 import com.geekorum.ttrss.data.Category;
 import com.geekorum.ttrss.data.Feed;
 import com.geekorum.ttrss.databinding.FragmentFeedsBinding;

@@ -1,4 +1,4 @@
-/**
+/*
  * Geekttrss is a RSS feed reader application on the Android Platform.
  *
  * Copyright (C) 2017-2018 by Frederic-Charles Barthelery.
@@ -18,42 +18,53 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.geekorum.ttrss
+package com.geekorum.ttrss.settings
 
+import android.content.Context
 import androidx.recyclerview.widget.RecyclerView
-import androidx.test.core.app.ActivityScenario
-import androidx.test.espresso.Espresso.onData
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions.actionOnItem
+import androidx.test.espresso.intent.Intents
+import androidx.test.espresso.intent.rule.IntentsTestRule
 import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import org.hamcrest.`object`.HasToString.hasToString
+import androidx.test.ext.truth.content.IntentSubject
+import com.geekorum.ttrss.R
+import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
+import com.google.common.truth.Truth.assertThat
+import org.junit.Rule
 import org.junit.runner.RunWith
+import kotlin.reflect.jvm.jvmName
 import kotlin.test.Test
 
+/*
+ * For some reasons, when it's a Robolectric test the activity doesn't launch (or synchronization is bad) so we only check
+ * if the correct intent is fired. See androidTest/com.geekorum.test.SettingsActivityTest for a more complete test.
+ */
 @RunWith(AndroidJUnit4::class)
 class SettingsActivityTest {
+
+    @get:Rule
+    val activityRule = IntentsTestRule(SettingsActivity::class.java)
 
 
     @Test
     fun testThatWeCanShowDependenciesOpenSourcesLicenses() {
-        ActivityScenario.launch(SettingsActivity::class.java)
-
         // click on OSS licenses
         onView(withId(R.id.recycler_view))
             .perform(actionOnItem<RecyclerView.ViewHolder>(hasDescendant(withText(R.string.oss_license_title)),
                 click()))
 
-        // click on androidx
-        onData(
-            hasToString("org.jetbrains.kotlin:kotlin-stdlib")
-        ).perform(click())
+        val intents = Intents.getIntents()
+        assertThat(intents).hasSize(1)
+        val intent = intents.first()
 
-        onView(withId(R.id.license_activity_textview))
-            .check(matches(withText("http://www.apache.org/licenses/LICENSE-2.0.txt")))
+        val applicationContext = ApplicationProvider.getApplicationContext<Context>()
+        IntentSubject.assertThat(intent).hasComponent(applicationContext.packageName, OssLicensesMenuActivity::class.jvmName)
+
     }
 }

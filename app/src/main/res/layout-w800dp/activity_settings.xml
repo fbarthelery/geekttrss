@@ -56,7 +56,7 @@
 
             <fragment android:id="@+id/preferences"
                       android:layout_width="match_parent" android:layout_height="match_parent"
-                      android:name="com.geekorum.ttrss.SettingsActivity$SettingsFragment"
+                      android:name="com.geekorum.ttrss.settings.SettingsActivity$SettingsFragment"
                       tools:layout="@android:layout/list_content" />
 
         </com.google.android.material.card.MaterialCardView>

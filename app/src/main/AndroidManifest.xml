@@ -84,7 +84,7 @@
                   android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
-                android:name="com.geekorum.ttrss.SettingsActivity"
+                android:name="com.geekorum.ttrss.settings.SettingsActivity"
                 android:label="@string/activity_settings_title"
                 android:theme="@style/AppTheme.NoActionBar"
                 android:parentActivityName="com.geekorum.ttrss.articles_list.ArticleListActivity">

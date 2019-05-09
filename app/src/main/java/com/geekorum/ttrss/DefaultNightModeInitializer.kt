@@ -27,6 +27,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_UNSPECIFIED
 import com.geekorum.geekdroid.dagger.AppInitializer
 import com.geekorum.geekdroid.dagger.AppInitializersModule
+import com.geekorum.ttrss.settings.SettingsActivity
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
