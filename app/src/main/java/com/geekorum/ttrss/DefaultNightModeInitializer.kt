@@ -21,6 +21,7 @@
 package com.geekorum.ttrss
 
 import android.app.Application
+import android.os.StrictMode
 import android.preference.PreferenceManager
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_UNSPECIFIED
@@ -33,10 +34,12 @@ import dagger.multibindings.IntoSet
 
 class DefaultNightModeInitializer : AppInitializer {
     override fun initialize(app: Application) {
+        val threadPolicy = StrictMode.allowThreadDiskReads()
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(app)
         val nighMode =
             sharedPreferences.getString(SettingsActivity.KEY_THEME, MODE_NIGHT_UNSPECIFIED.toString())!!.toInt()
         AppCompatDelegate.setDefaultNightMode(nighMode)
+        StrictMode.setThreadPolicy(threadPolicy)
     }
 }
 

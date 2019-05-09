@@ -22,6 +22,7 @@ package com.geekorum.ttrss
 
 import com.geekorum.geekdroid.dagger.AppInitializer
 import com.geekorum.geekdroid.dagger.initialize
+import com.geekorum.ttrss.debugtools.StrictModeInitializer
 import com.geekorum.ttrss.di.ApplicationComponent
 import com.geekorum.ttrss.di.DaggerApplicationComponent
 import dagger.android.support.DaggerApplication
@@ -38,7 +39,10 @@ open class Application : DaggerApplication() {
 
     override fun onCreate() {
         super.onCreate()
-        appInitializers.initialize(this)
+        // initializer StrictMode first
+        val strictModeFirst = appInitializers.partition { it is StrictModeInitializer }
+        strictModeFirst.first.forEach { it.initialize(this) }
+        strictModeFirst.second.forEach { it.initialize(this) }
     }
 
     override fun applicationInjector(): ApplicationComponent {

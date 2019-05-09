@@ -93,7 +93,6 @@ class ArticleListActivity : SessionActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        PreferenceManager.setDefaultValues(this, R.xml.pref_general, false)
 
         activityViewModel.selectedFeed.observe(this, Observer { onFeedSelected(it) })
 
