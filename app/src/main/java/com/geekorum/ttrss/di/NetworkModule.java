@@ -26,6 +26,7 @@ import androidx.annotation.Nullable;
 import com.geekorum.geekdroid.dagger.AppInitializer;
 import com.geekorum.geekdroid.dagger.AppInitializersModule;
 import com.geekorum.geekdroid.network.PicassoOkHttp3Downloader;
+import com.geekorum.geekdroid.network.TaggedSocketFactory;
 import com.geekorum.ttrss.logging.RetrofitInvocationLogger;
 import com.squareup.picasso.Picasso;
 import dagger.Module;
@@ -39,11 +40,14 @@ import java.io.File;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.net.SocketFactory;
 
 @Module(includes = {AppInitializersModule.class})
 public class NetworkModule {
     private static final boolean DEBUG_REQUEST = false;
     private static final boolean DEBUG_RETROFIT_CALL = true;
+    private static final int TAG_OKHTTP = 1;
+    private static final int TAG_PICASSO = 2;
 
 
     @Provides
@@ -51,7 +55,9 @@ public class NetworkModule {
     static OkHttpClient providesOkHttpclient(Cache cache,
                                              @Nullable HttpLoggingInterceptor requestLogger,
                                              @Nullable RetrofitInvocationLogger retrofitInvocationLogger) {
-        OkHttpClient.Builder okHttpBuilder = new OkHttpClient.Builder();
+        SocketFactory socketFactory = new TaggedSocketFactory(SocketFactory.getDefault(), TAG_OKHTTP);
+        OkHttpClient.Builder okHttpBuilder = new OkHttpClient.Builder()
+                .socketFactory(socketFactory);
         if (retrofitInvocationLogger != null) {
             okHttpBuilder.addInterceptor(retrofitInvocationLogger);
         }
@@ -93,8 +99,12 @@ public class NetworkModule {
     @Provides
     @Singleton
     static Picasso providesPicasso(Application application, OkHttpClient okHttpClient) {
+        SocketFactory socketFactory = new TaggedSocketFactory(okHttpClient.socketFactory(), TAG_PICASSO);
+        OkHttpClient.Builder okHttpBuilder = okHttpClient.newBuilder()
+                .socketFactory(socketFactory);
+
         Picasso picasso = new Picasso.Builder(application)
-                .downloader(new PicassoOkHttp3Downloader(okHttpClient))
+                .downloader(new PicassoOkHttp3Downloader(okHttpBuilder.build()))
                 .indicatorsEnabled(DEBUG_REQUEST)
                 .build();
         return picasso;
