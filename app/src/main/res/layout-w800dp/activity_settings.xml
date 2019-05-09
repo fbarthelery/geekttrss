@@ -45,19 +45,21 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <androidx.cardview.widget.CardView android:layout_width="560dp" android:layout_height="match_parent"
-                                           app:layout_constraintStart_toStartOf="parent"
-                                           app:layout_constraintEnd_toEndOf="parent"
-                                           app:layout_constraintTop_toTopOf="parent"
-                                           android:layout_marginTop="?actionBarSize"
-                                           app:cardElevation="8dp">
+        <com.google.android.material.card.MaterialCardView
+                android:layout_width="560dp"
+                android:layout_height="match_parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginTop="?actionBarSize"
+                app:cardElevation="8dp">
 
             <fragment android:id="@+id/preferences"
                       android:layout_width="match_parent" android:layout_height="match_parent"
                       android:name="com.geekorum.ttrss.SettingsActivity$SettingsFragment"
                       tools:layout="@android:layout/list_content" />
 
-        </androidx.cardview.widget.CardView>
+        </com.google.android.material.card.MaterialCardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
