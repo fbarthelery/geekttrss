@@ -35,7 +35,7 @@ import dagger.multibindings.IntoSet
 
 class DefaultNightModeInitializer : AppInitializer {
     override fun initialize(app: Application) {
-        val threadPolicy = StrictMode.allowThreadDiskReads()
+        val threadPolicy = StrictMode.allowThreadDiskWrites()
         val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(app)
         val nighMode =
             sharedPreferences.getString(SettingsActivity.KEY_THEME, MODE_NIGHT_UNSPECIFIED.toString())!!.toInt()
