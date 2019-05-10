@@ -1,7 +1,7 @@
-/**
+/*
  * Geekttrss is a RSS feed reader application on the Android Platform.
  *
- * Copyright (C) 2017-2018 by Frederic-Charles Barthelery.
+ * Copyright (C) 2017-2019 by Frederic-Charles Barthelery.
  *
  * This file is part of Geekttrss.
  *
@@ -42,7 +42,8 @@ class FeedExtractor @Inject constructor() : HtmlExtractor<FeedInformation>() {
                                     title = it.attr("title"))
                 }
         }
-        return emptyList()    }
+        return emptyList()
+    }
 
     private fun isValidLinkFeed(elem: Element): Boolean {
         val type = elem.attr("type")
