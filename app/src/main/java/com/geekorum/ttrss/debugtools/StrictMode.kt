@@ -24,6 +24,7 @@ import android.app.Application
 import android.content.ContentResolver
 import android.os.Build
 import android.os.StrictMode
+import android.os.StrictMode.allowThreadDiskReads
 import android.util.Log
 import com.geekorum.geekdroid.dagger.AppInitializer
 import com.geekorum.geekdroid.dagger.AppInitializersModule
@@ -112,9 +113,9 @@ abstract class StrictModeModule {
 class CoroutinesAsyncInitializer @Inject constructor() : AppInitializer {
     override fun initialize(app: Application) {
         // load Dispatchers.Main at application start
-        val threadPolicy = StrictMode.allowThreadDiskReads()
-        Dispatchers.Main
-        StrictMode.setThreadPolicy(threadPolicy)
+        withStrictMode(allowThreadDiskReads()) {
+            Dispatchers.Main
+        }
     }
 }
 
@@ -124,4 +125,19 @@ abstract class CoroutinesInitializerModule {
     @IntoSet
     abstract fun bindCoroutinesAsyncInitializer(oroutinesAsyncInitializer: CoroutinesAsyncInitializer): AppInitializer
 
+}
+
+/**
+ * Run [block] then restore [originalThreadPolicy]
+ * Allows to write code like
+ * ```
+ *  withStrictMode(allowThreadDiskReads()) {
+ *      //read disk data
+ *  }
+ *
+ * ```
+ */
+inline fun withStrictMode(originalThreadPolicy: StrictMode.ThreadPolicy, block: () -> Unit) {
+    block()
+    StrictMode.setThreadPolicy(originalThreadPolicy)
 }

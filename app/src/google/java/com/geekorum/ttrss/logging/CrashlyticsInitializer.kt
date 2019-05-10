@@ -21,10 +21,12 @@
 package com.geekorum.ttrss.logging
 
 import android.app.Application
+import android.os.StrictMode.allowThreadDiskReads
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.core.CrashlyticsCore
 import com.geekorum.geekdroid.dagger.AppInitializer
 import com.geekorum.ttrss.BuildConfig
+import com.geekorum.ttrss.debugtools.withStrictMode
 import io.fabric.sdk.android.Fabric
 
 /**
@@ -32,10 +34,11 @@ import io.fabric.sdk.android.Fabric
  */
 class CrashlyticsInitializer : AppInitializer {
     override fun initialize(app: Application) {
-        val crashlytics = Crashlytics.Builder()
-            .core(CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build())
-            .build()
-        Fabric.with(app, crashlytics)
+        withStrictMode(allowThreadDiskReads()) {
+            val crashlytics = Crashlytics.Builder()
+                .core(CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build())
+                .build()
+            Fabric.with(app, crashlytics)
+        }
     }
-
 }

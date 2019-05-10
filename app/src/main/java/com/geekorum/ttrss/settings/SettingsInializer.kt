@@ -22,9 +22,11 @@ package com.geekorum.ttrss.settings
 
 import android.app.Application
 import android.os.StrictMode
+import android.os.StrictMode.allowThreadDiskReads
 import android.preference.PreferenceManager
 import com.geekorum.geekdroid.dagger.AppInitializer
 import com.geekorum.ttrss.R
+import com.geekorum.ttrss.debugtools.withStrictMode
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoSet
@@ -32,9 +34,9 @@ import javax.inject.Inject
 
 class SettingsInializer @Inject constructor() : AppInitializer {
     override fun initialize(app: Application) {
-        val threadPolicy = StrictMode.allowThreadDiskReads()
-        PreferenceManager.setDefaultValues(app, R.xml.pref_general, false)
-        StrictMode.setThreadPolicy(threadPolicy)
+        withStrictMode(allowThreadDiskReads()) {
+            PreferenceManager.setDefaultValues(app, R.xml.pref_general, false)
+        }
     }
 
 }
