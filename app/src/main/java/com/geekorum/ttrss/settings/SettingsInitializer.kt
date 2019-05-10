@@ -21,8 +21,7 @@
 package com.geekorum.ttrss.settings
 
 import android.app.Application
-import android.os.StrictMode
-import android.os.StrictMode.allowThreadDiskReads
+import android.os.StrictMode.allowThreadDiskWrites
 import android.preference.PreferenceManager
 import com.geekorum.geekdroid.dagger.AppInitializer
 import com.geekorum.ttrss.R
@@ -32,9 +31,9 @@ import dagger.Module
 import dagger.multibindings.IntoSet
 import javax.inject.Inject
 
-class SettingsInializer @Inject constructor() : AppInitializer {
+class SettingsInitializer @Inject constructor() : AppInitializer {
     override fun initialize(app: Application) {
-        withStrictMode(allowThreadDiskReads()) {
+        withStrictMode(allowThreadDiskWrites()) {
             PreferenceManager.setDefaultValues(app, R.xml.pref_general, false)
         }
     }
@@ -45,6 +44,6 @@ class SettingsInializer @Inject constructor() : AppInitializer {
 abstract class SettingsInitializerModule {
     @Binds
     @IntoSet
-    abstract fun bindSettingsInitializer(settingsInitializer: SettingsInializer): AppInitializer
+    abstract fun bindSettingsInitializer(settingsInitializer: SettingsInitializer): AppInitializer
 
 }

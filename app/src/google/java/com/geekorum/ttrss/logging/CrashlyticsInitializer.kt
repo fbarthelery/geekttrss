@@ -21,7 +21,7 @@
 package com.geekorum.ttrss.logging
 
 import android.app.Application
-import android.os.StrictMode.allowThreadDiskReads
+import android.os.StrictMode.allowThreadDiskWrites
 import com.crashlytics.android.Crashlytics
 import com.crashlytics.android.core.CrashlyticsCore
 import com.geekorum.geekdroid.dagger.AppInitializer
@@ -34,7 +34,7 @@ import io.fabric.sdk.android.Fabric
  */
 class CrashlyticsInitializer : AppInitializer {
     override fun initialize(app: Application) {
-        withStrictMode(allowThreadDiskReads()) {
+        withStrictMode(allowThreadDiskWrites()) {
             val crashlytics = Crashlytics.Builder()
                 .core(CrashlyticsCore.Builder().disabled(BuildConfig.DEBUG).build())
                 .build()
