@@ -45,7 +45,7 @@ import org.gradle.kotlin.dsl.the
 internal fun Project.configureAndroidPlayStorePublisher(): Unit {
     apply<PlayPublisherPlugin>()
     configure<PlayPublisherExtension> {
-        defaultToAppBundles = false
+        defaultToAppBundles = true
         track = properties.getOrDefault("PLAY_STORE_TRACK", "internal") as String
         fromTrack = properties.getOrDefault("PLAY_STORE_FROM_TRACK", "internal") as String
     }
