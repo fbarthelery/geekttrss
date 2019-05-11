@@ -52,8 +52,8 @@ internal fun Project.configureGenymotionDevices(useLocalDevices: Boolean = false
                 register("pixelc-v24") {
                     template = "Google Pixel C - 7.0.0 - API 24 - 2560x1800"
                 }
-                register("pixel2-v26") {
-                    template = "Google Pixel 2 - 8.0 - API 26 - 1080x1920"
+                register("pixel3-v28") {
+                    template = "Google Pixel 3 - 9.0 - API 28 - 1080x2160"
                 }
             })
         }
