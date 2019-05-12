@@ -29,9 +29,6 @@ import com.geekorum.ttrss.data.Transaction
  * Database access interface for the synchronization process.
  */
 interface DatabaseService {
-    fun beginTransaction()
-    fun endTransaction()
-    fun setTransactionSuccessful()
     suspend fun <R> runInTransaction(block: suspend () -> R)
 
     suspend fun insertFeeds(feeds: List<Feed>)

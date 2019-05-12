@@ -73,18 +73,6 @@ class SynchronizationFacade @Inject constructor(
         database.withTransaction(block)
     }
 
-    override fun beginTransaction() {
-        database.beginTransaction()
-    }
-
-    override fun endTransaction() {
-        database.endTransaction()
-    }
-
-    override fun setTransactionSuccessful() {
-        database.setTransactionSuccessful()
-    }
-
     override suspend fun insertFeeds(feeds: List<Feed>) {
         synchronizationDao.insertFeeds(feeds)
     }

@@ -155,22 +155,15 @@ class ArticleSynchronizer @AssistedInject constructor(
         var offset = 0
         var articles = getArticles(ApiService.ALL_ARTICLES_FEED_ID, latestId, offset)
 
-        // we need to make every operations from the transaction in the same thread
-        runBlocking {
-            try {
-                databaseService.beginTransaction()
-                while (articles.isNotEmpty()) {
-                    insertArticles(articles, feedsIds)
-                    cacheArticlesImages(articles)
-                    val latestIdInserted = articles.maxBy { it.id }?.id ?: -1
-                    updateLatestArticleSyncedId(latestIdInserted)
+        databaseService.runInTransaction {
+            while (articles.isNotEmpty()) {
+                insertArticles(articles, feedsIds)
+                cacheArticlesImages(articles)
+                val latestIdInserted = articles.maxBy { it.id }?.id ?: -1
+                updateLatestArticleSyncedId(latestIdInserted)
 
-                    offset += articles.size
-                    articles = getArticles(ApiService.ALL_ARTICLES_FEED_ID, latestId, offset)
-                }
-                databaseService.setTransactionSuccessful()
-            } finally {
-                databaseService.endTransaction()
+                offset += articles.size
+                articles = getArticles(ApiService.ALL_ARTICLES_FEED_ID, latestId, offset)
             }
         }
     }
