@@ -32,7 +32,9 @@ import com.geekorum.geekdroid.app.lifecycle.Event
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.network.ApiCallException
 import com.geekorum.ttrss.network.impl.LoginRequestPayload
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
 import retrofit2.HttpException
 import javax.inject.Inject
@@ -176,7 +178,7 @@ internal class LoginViewModel @Inject constructor(
         actionCompleteEvent.value = ActionCompleteSuccessEvent(account!!)
     }
 
-    private fun onAddAccountSuccess() {
+    private fun onAddAccountSuccess() = viewModelScope.launch {
         val result = addAccount()
         actionCompleteEvent.value = if (result != null) {
             ActionCompleteSuccessEvent(result)
@@ -185,14 +187,16 @@ internal class LoginViewModel @Inject constructor(
         }
     }
 
-    private fun addAccount(): Account? {
-        val account = Account(username, httpUrl!!.toString())
-        val success = accountManager.addAccount(account, password)
-        if (success) {
-            accountManager.initializeAccountSync(account)
-            return account
+    private suspend fun addAccount(): Account? {
+        return withContext(Dispatchers.IO) {
+            val account = Account(username, httpUrl!!.toString())
+            val success = accountManager.addAccount(account, password)
+            if (success) {
+                accountManager.initializeAccountSync(account)
+                return@withContext account
+            }
+            return@withContext null
         }
-        return null
     }
 
     private data class DataServerInformation(
