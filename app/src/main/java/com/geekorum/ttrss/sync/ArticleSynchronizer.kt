@@ -36,7 +36,9 @@ import com.geekorum.ttrss.sync.SyncContract.EXTRA_FEED_ID
 import com.geekorum.ttrss.sync.SyncContract.EXTRA_NUMBER_OF_LATEST_ARTICLES_TO_REFRESH
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.yield
@@ -181,7 +183,7 @@ class ArticleSynchronizer @AssistedInject constructor(
      * As the web api doesn't allow to sort by id, we sort by reverse date which is the closest approximation
      */
     @Throws(ApiCallException::class, RemoteException::class, OperationApplicationException::class)
-    private suspend fun collectNewArticlesGradually() {
+    private suspend fun collectNewArticlesGradually() = coroutineScope {
         Timber.i("Collecting new articles gradually")
         var latestId = getLatestArticleId()
         if (latestId < 0) {
@@ -214,13 +216,13 @@ class ArticleSynchronizer @AssistedInject constructor(
         accountPreferences.edit().putLong(PREF_LATEST_ARTICLE_SYNCED_ID, latestId).apply()
     }
 
-    private fun cacheArticlesImages(articles: List<Article>) {
+    private fun CoroutineScope.cacheArticlesImages(articles: List<Article>) {
         articles.filter {
             it.isUnread
         }.forEach { cacheArticleImages(it) }
     }
 
-    private fun cacheArticleImages(article: Article) = launch(Dispatchers.IO) {
+    private fun CoroutineScope.cacheArticleImages(article: Article) = launch(Dispatchers.IO) {
         if (!backgroundDataUsageManager.canDownloadArticleImages()) {
             return@launch
         }
