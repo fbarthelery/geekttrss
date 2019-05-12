@@ -48,17 +48,20 @@ class StrictModeInitializer @Inject constructor(
     override fun initialize(app: Application) {
         val shouldBeFatal = shouldBeFatal()
         StrictMode.setVmPolicy(StrictMode.VmPolicy.Builder()
-//            .detectAll() don't use detect all because crashlytics don't tag its socket
             .detectActivityLeaks()
             .detectCleartextNetwork()
             .detectFileUriExposure()
             .detectLeakedClosableObjects()
             .detectLeakedRegistrationObjects()
             .detectLeakedSqlLiteObjects()
+            .penaltyLog()
             .apply {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     detectContentUriWithoutPermission()
-                    detectUntaggedSockets()
+                    // because crashlytics don't tag its socket
+                    if (BuildConfig.FLAVOR != "google" || !shouldBeFatal) {
+                        detectUntaggedSockets()
+                    }
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                     // appcompat use nonsdk
@@ -69,8 +72,6 @@ class StrictModeInitializer @Inject constructor(
                         val priority = if (shouldBeFatal) Log.ERROR else Log.WARN
                         Timber.tag(TAG).log(priority, it, "StrictMode violation")
                     })
-                } else {
-                    penaltyLog()
                 }
                 if (shouldBeFatal) {
                     penaltyDeath()
@@ -80,14 +81,13 @@ class StrictModeInitializer @Inject constructor(
 
         StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder()
             .detectAll()
+            .penaltyLog()
             .apply {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                     penaltyListener(Executors.newSingleThreadExecutor(), StrictMode.OnThreadViolationListener {
                         val priority = if (shouldBeFatal) Log.ERROR else Log.WARN
                         Timber.tag(TAG).log(priority, it, "StrictMode violation")
                     })
-                } else {
-                    penaltyLog()
                 }
                 if (shouldBeFatal) {
                     penaltyDeath()
