@@ -27,7 +27,6 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import kotlinx.coroutines.runBlocking
 
 /**
  * Dao to access Feeds and Categories
@@ -41,8 +40,8 @@ abstract class FeedsDao {
     @get:Query("SELECT * FROM feeds ORDER BY title")
     abstract val allFeeds: LiveData<List<Feed>>
 
-    @get:Query("SELECT * FROM feeds")
-    internal abstract val allFeedsList: List<Feed>
+    @Query("SELECT * FROM feeds")
+    internal abstract suspend fun getAllFeedsList(): List<Feed>
 
     @get:Query("SELECT * FROM categories ORDER BY title")
     abstract val allCategories: LiveData<List<Category>>
@@ -60,11 +59,10 @@ abstract class FeedsDao {
     internal abstract suspend fun deleteFeeds(feeds: Collection<Feed>)
 
     @Query("DELETE FROM ARTICLES where feed_id=:feedId")
-    // not suspend because of room compiler bug
-    internal abstract fun deleteArticleFromFeed(feedId: Long)
+    internal abstract suspend fun deleteArticleFromFeed(feedId: Long)
 
     @Transaction
-    open fun deleteFeedsAndArticles(toBeDelete: List<Feed>) = runBlocking {
+    open suspend fun deleteFeedsAndArticles(toBeDelete: List<Feed>) {
         for ((id) in toBeDelete) {
             deleteArticleFromFeed(id)
         }
@@ -88,14 +86,14 @@ abstract class FeedsDao {
     abstract fun getFeedsForCategory(catId: Long): LiveData<List<Feed>>
 
     @Transaction
-    open fun setFeedsAndCategories(feeds: Collection<Feed>, categories: Collection<Category>) = runBlocking {
+    open suspend fun setFeedsAndCategories(feeds: Collection<Feed>, categories: Collection<Category>) {
         setCategories(categories)
         setFeeds(feeds)
     }
 
     private suspend fun setFeeds(feeds: Collection<Feed>) {
         val feedsIds: List<Long> = feeds.map { it.id }
-        val toDelete = allFeedsList.filter { it.id !in feedsIds }
+        val toDelete = getAllFeedsList().filter { it.id !in feedsIds }
 
         deleteFeedsAndArticles(toDelete)
         insertFeeds(feeds)
