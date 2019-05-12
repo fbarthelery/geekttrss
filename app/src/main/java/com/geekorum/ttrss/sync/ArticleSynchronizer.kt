@@ -69,10 +69,10 @@ class ArticleSynchronizer @AssistedInject constructor(
     private val numberOfLatestArticlesToRefresh = params.getInt(EXTRA_NUMBER_OF_LATEST_ARTICLES_TO_REFRESH, 500)
     private val feedId = params.getLong(EXTRA_FEED_ID, ApiService.ALL_ARTICLES_FEED_ID)
 
-    private fun getLatestArticleId(): Long {
+    private suspend fun getLatestArticleId(): Long {
         var result = accountPreferences.getLong(PREF_LATEST_ARTICLE_SYNCED_ID, 0)
         if (result == 0L) {
-            result = databaseService.getLatestArticleId()
+            result = databaseService.getLatestArticleId() ?: 0
         }
         return result
     }
@@ -205,7 +205,7 @@ class ArticleSynchronizer @AssistedInject constructor(
         }
     }
 
-    private fun insertArticles(articles: List<Article>, feedsIds: List<Long>) {
+    private suspend fun insertArticles(articles: List<Article>, feedsIds: List<Long>) {
         // it is possible to receive articles not associated to a feed (feedId==0)
         val toInsert = articles.filter { it.feedId in feedsIds }
         databaseService.insertArticles(toInsert)
@@ -253,7 +253,7 @@ class ArticleSynchronizer @AssistedInject constructor(
         return true
     }
 
-    private fun updateArticleMetadata(articles: List<Article>) {
+    private suspend fun updateArticleMetadata(articles: List<Article>) {
         databaseService.runInTransaction {
             articles.forEach {
                 databaseService.updateArticleMetadata(it.id, it.isUnread, it.isUnread, it.isStarred,
@@ -323,7 +323,7 @@ class ArticleSynchronizer @AssistedInject constructor(
     }
 
     @Throws(RemoteException::class, OperationApplicationException::class)
-    private fun deleteOldFeeds(feeds: List<com.geekorum.ttrss.data.Feed>) {
+    private suspend fun deleteOldFeeds(feeds: List<com.geekorum.ttrss.data.Feed>) {
         val feedsIds: List<Long> = feeds.map { it.id }
         val toBeDelete = databaseService.getFeeds().filter { it.id !in feedsIds }
 
@@ -331,7 +331,7 @@ class ArticleSynchronizer @AssistedInject constructor(
     }
 
     @Throws(RemoteException::class, OperationApplicationException::class)
-    private fun deleteOldCategories(categories: List<Category>) {
+    private suspend fun deleteOldCategories(categories: List<Category>) {
         val feedCategoriesId: List<Long> = categories.map { category -> category.id }
         val toDelete = databaseService.getCategories().filter { it.id !in feedCategoriesId }
 
@@ -339,12 +339,12 @@ class ArticleSynchronizer @AssistedInject constructor(
     }
 
     @Throws(RemoteException::class, OperationApplicationException::class)
-    private fun insertFeeds(feeds: List<com.geekorum.ttrss.data.Feed>) {
+    private suspend fun insertFeeds(feeds: List<com.geekorum.ttrss.data.Feed>) {
         databaseService.insertFeeds(feeds)
     }
 
     @Throws(RemoteException::class, OperationApplicationException::class)
-    private fun insertCategories(categories: List<Category>) {
+    private suspend fun insertCategories(categories: List<Category>) {
         // remove virtual categories
         val realCategories = categories.filter { it.id >= 0 }
         databaseService.insertCategories(realCategories)

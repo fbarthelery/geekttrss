@@ -20,6 +20,7 @@
  */
 package com.geekorum.ttrss.data.plugins
 
+import androidx.room.withTransaction
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticlesDatabase
 import com.geekorum.ttrss.data.Category
@@ -37,39 +38,39 @@ class SynchronizationFacade @Inject constructor(
     private val synchronizationDao: SynchronizationDao
 ) : DatabaseService {
 
-    override fun updateArticleMetadata(
+    override suspend fun updateArticleMetadata(
         id: Long, unread: Boolean, transientUnread: Boolean, starred: Boolean, published: Boolean,
         lastTimeUpdated: Long, isUpdated: Boolean
     ) {
       synchronizationDao.updateArticleMetadata(id, unread, transientUnread, starred, published, lastTimeUpdated, isUpdated)
     }
 
-    override fun getTransactions(): List<Transaction> = synchronizationDao.allTransactions
+    override suspend fun getTransactions(): List<Transaction> = synchronizationDao.getAllTransactions()
 
-    override fun deleteTransaction(transaction: Transaction) = synchronizationDao.deleteTransaction(transaction)
+    override suspend fun deleteTransaction(transaction: Transaction) = synchronizationDao.deleteTransaction(transaction)
 
-    override fun updateArticle(article: Article) = synchronizationDao.updateArticle(article)
+    override suspend fun updateArticle(article: Article) = synchronizationDao.updateArticle(article)
 
-    override fun getLatestArticleId(): Long = synchronizationDao.latestArticleId
+    override suspend fun getLatestArticleId(): Long? = synchronizationDao.getLatestArticleId()
 
-    override fun getArticle(id: Long): Article? = synchronizationDao.getArticleById(id)
+    override suspend fun getArticle(id: Long): Article? = synchronizationDao.getArticleById(id)
 
-    override fun insertArticles(articles: List<Article>) = synchronizationDao.insertArticles(articles)
+    override suspend fun insertArticles(articles: List<Article>) = synchronizationDao.insertArticles(articles)
 
-    override fun getCategories(): List<Category> = synchronizationDao.allCategories
+    override suspend fun getCategories(): List<Category> = synchronizationDao.getAllCategories()
 
-    override fun getFeeds(): List<Feed> = synchronizationDao.allFeeds
+    override suspend fun getFeeds(): List<Feed> = synchronizationDao.getAllFeeds()
 
-    override fun deleteCategories(categories: List<Category>) {
+    override suspend fun deleteCategories(categories: List<Category>) {
         synchronizationDao.deleteCategories(categories)
     }
 
-    override fun insertCategories(categories: List<Category>) {
+    override suspend fun insertCategories(categories: List<Category>) {
         synchronizationDao.insertCategories(categories)
     }
 
-    override fun runInTransaction(block: () -> Any) {
-        database.runInTransaction(block)
+    override suspend fun <R> runInTransaction(block: suspend () -> R) {
+        database.withTransaction(block)
     }
 
     override fun beginTransaction() {
@@ -84,11 +85,11 @@ class SynchronizationFacade @Inject constructor(
         database.setTransactionSuccessful()
     }
 
-    override fun insertFeeds(feeds: List<Feed>) {
+    override suspend fun insertFeeds(feeds: List<Feed>) {
         synchronizationDao.insertFeeds(feeds)
     }
 
-    override fun deleteFeedsAndArticles(feeds: List<Feed>) {
+    override suspend fun deleteFeedsAndArticles(feeds: List<Feed>) {
         synchronizationDao.deleteFeedsAndArticles(feeds)
     }
 

@@ -32,25 +32,25 @@ interface DatabaseService {
     fun beginTransaction()
     fun endTransaction()
     fun setTransactionSuccessful()
-    fun runInTransaction(block: () -> Any)
+    suspend fun <R> runInTransaction(block: suspend () -> R)
 
-    fun insertFeeds(feeds: List<Feed>)
-    fun deleteFeedsAndArticles(feeds: List<Feed>)
-    fun getFeeds(): List<Feed>
+    suspend fun insertFeeds(feeds: List<Feed>)
+    suspend fun deleteFeedsAndArticles(feeds: List<Feed>)
+    suspend fun getFeeds(): List<Feed>
 
-    fun insertCategories(categories: List<Category>)
-    fun deleteCategories(categories: List<Category>)
-    fun getCategories(): List<Category>
+    suspend fun insertCategories(categories: List<Category>)
+    suspend fun deleteCategories(categories: List<Category>)
+    suspend fun getCategories(): List<Category>
 
-    fun getTransactions(): List<Transaction>
-    fun deleteTransaction(transaction: Transaction)
+    suspend fun getTransactions(): List<Transaction>
+    suspend fun deleteTransaction(transaction: Transaction)
 
-    fun getArticle(id: Long): Article?
-    fun insertArticles(articles: List<Article>)
-    fun updateArticle(article: Article)
-    fun getLatestArticleId(): Long
+    suspend fun getArticle(id: Long): Article?
+    suspend fun insertArticles(articles: List<Article>)
+    suspend fun updateArticle(article: Article)
+    suspend fun getLatestArticleId(): Long?
 
-    fun updateArticleMetadata(
+    suspend fun updateArticleMetadata(
         id: Long, unread: Boolean, transientUnread: Boolean, starred: Boolean,
         published: Boolean, lastTimeUpdated: Long, isUpdated: Boolean)
 }
