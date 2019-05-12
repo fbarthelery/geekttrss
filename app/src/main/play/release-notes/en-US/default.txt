@@ -1,5 +1,7 @@
-Fix bug preventing users with long password to log in
-Mark article as read when you reach the end of the page
-Add a button to view an article in browser from the article card
-Switch to dark theme when the device is on low battery
-Various bug fixes
+Support new Android Q gestures navigation model
+Support servers behind an Http Basic Authentication
+Open links in their Android application if available
+Fix crash when subscribing to a new feed
+Don't crash when the TinyTinyRss server replies an Http error
+Fix crash when loading big images
+More bug fixes
