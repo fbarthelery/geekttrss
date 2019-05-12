@@ -184,7 +184,7 @@ dependencies {
 
     val roomVersion: String by rootProject.extra
     implementation("androidx.room:room-runtime:$roomVersion")
-    implementation("androidx.room:room-coroutines:$roomVersion")
+    implementation("androidx.room:room-ktx:$roomVersion")
     kapt("androidx.room:room-compiler:$roomVersion")
     androidTestImplementation("androidx.room:room-testing:$roomVersion")
     dualTestImplementation("androidx.test.ext:truth:1.1.0")
