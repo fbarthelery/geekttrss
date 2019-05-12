@@ -22,6 +22,8 @@ package com.geekorum.ttrss.accounts
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.geekorum.geekdroid.app.lifecycle.Event
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.network.ApiCallException
@@ -36,17 +38,28 @@ import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
 import io.mockk.verifySequence
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
 import okhttp3.HttpUrl
+import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.util.concurrent.Executors
 
 
 class LoginViewModelTest {
 
     @get:Rule
     val archRule = InstantTaskExecutorRule()
+
+    private val mainThreadSurrogate =  Executors.newSingleThreadExecutor {
+        Thread(it, "UI Thread")
+    }.asCoroutineDispatcher()
 
     lateinit var accountManager: TinyrssAccountManager
 
@@ -58,12 +71,20 @@ class LoginViewModelTest {
 
     @Before
     fun setup() {
+        Dispatchers.setMain(mainThreadSurrogate)
         tinyRssApi = mockk()
         accountManager = mockk()
         networkBuilder = DaggerTestAuthenticatorNetworkComponent.builder()
             .fakeTinyrssApiModule(FakeTinyrssApiModule(tinyRssApi))
 
         viewModel = LoginViewModel(accountManager, networkBuilder)
+    }
+
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+        mainThreadSurrogate.close()
     }
 
     @Test
@@ -117,6 +138,7 @@ class LoginViewModelTest {
 
         runBlocking {
             viewModel.doLogin()
+            viewModel.waitForChildrenCoroutines()
         }
         verify {
             observer.onChanged(match {
@@ -151,6 +173,10 @@ class LoginViewModelTest {
         every { observer.onChanged(any()) } just Runs
         return observer
     }
+}
+
+private suspend fun ViewModel.waitForChildrenCoroutines() {
+    viewModelScope.coroutineContext[Job]!!.children.forEach { it.join() }
 }
 
 
