@@ -128,6 +128,7 @@ dependencies {
 
     // androidx ui
     implementation("androidx.appcompat:appcompat:1.1.0-alpha04")
+    implementation("androidx.drawerlayout:drawerlayout:1.1.0-alpha01")
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")
     implementation("androidx.recyclerview:recyclerview:1.0.0")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.0.0")
@@ -146,8 +147,7 @@ dependencies {
         add("googleImplementation", it)
     }
 
-    implementation("com.google.android.material:material:1.1.0-alpha05")
-    implementation("net.opacapp:multiline-collapsingtoolbar:1.3.0")
+    implementation("com.google.android.material:material:1.1.0-alpha06")
     implementation("com.squareup.retrofit2:retrofit:2.5.0")
     implementation("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")
     implementation("com.squareup.okhttp3:okhttp:3.12.0")
