@@ -33,8 +33,11 @@ class RetrofitInvocationLogger : Interceptor {
         val request = chain.request()
         request.tag(Invocation::class.java)?.let {
             val method = it.method()
+            val args = it.arguments().takeUnless {
+                method.name == "login"
+            } ?: listOf("Anonymized arguments")
             Timber.tag("Retrofit")
-                .d("calling ${method.declaringClass.simpleName}.${method.name} ${it.arguments()}")
+                .d("calling ${method.declaringClass.simpleName}.${method.name} $args")
         }
         return chain.proceed(request)
     }
