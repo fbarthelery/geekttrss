@@ -36,6 +36,7 @@ import kotlinx.coroutines.Dispatchers
 import timber.log.Timber
 import java.util.concurrent.Executors
 import javax.inject.Inject
+import kotlin.jvm.internal.Reflection
 
 private const val TAG = "StrictMode"
 
@@ -102,7 +103,7 @@ class StrictModeInitializer @Inject constructor(
 }
 
 
-@Module(includes = [AppInitializersModule::class, CoroutinesInitializerModule::class])
+@Module(includes = [AppInitializersModule::class, KotlinInitializerModule::class])
 abstract class StrictModeModule {
     @Binds
     @IntoSet
@@ -110,20 +111,25 @@ abstract class StrictModeModule {
 }
 
 
-class CoroutinesAsyncInitializer @Inject constructor() : AppInitializer {
+/**
+ * Initialize some kotlin functionality eagerly to avoid a DiskReadViolation out of our control
+ */
+class KotlinInitializer @Inject constructor() : AppInitializer {
     override fun initialize(app: Application) {
         // load Dispatchers.Main at application start
         withStrictMode(allowThreadDiskReads()) {
             Dispatchers.Main
+            val k = Reflection.getOrCreateKotlinClass(Object::class.java)
+            Timber.d("initialize kotlin Klass with class $k")
         }
     }
 }
 
 @Module
-abstract class CoroutinesInitializerModule {
+abstract class KotlinInitializerModule {
     @Binds
     @IntoSet
-    abstract fun bindCoroutinesAsyncInitializer(oroutinesAsyncInitializer: CoroutinesAsyncInitializer): AppInitializer
+    abstract fun bindCoroutinesAsyncInitializer(oroutinesAsyncInitializer: KotlinInitializer): AppInitializer
 
 }
 
