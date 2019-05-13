@@ -25,7 +25,8 @@ import android.content.ContentResolver
 import android.os.Build
 import android.os.StrictMode
 import android.os.StrictMode.allowThreadDiskReads
-import android.util.Log
+import android.os.strictmode.Violation
+import androidx.annotation.RequiresApi
 import com.geekorum.geekdroid.dagger.AppInitializer
 import com.geekorum.geekdroid.dagger.AppInitializersModule
 import com.geekorum.ttrss.BuildConfig
@@ -44,10 +45,15 @@ private const val TAG = "StrictMode"
  * Configure StrictMode policies
  */
 class StrictModeInitializer @Inject constructor(
-    private val contentResolver: ContentResolver
+    contentResolver: ContentResolver
 ) : AppInitializer {
+    private val listenerExecutor by lazy { Executors.newSingleThreadExecutor() }
+    private val shouldBeFatal: Boolean = (BuildConfig.DEBUG)
+
+    @delegate:RequiresApi(Build.VERSION_CODES.P)
+    private val violationListener: ViolationListener by lazy { ViolationListener() }
+
     override fun initialize(app: Application) {
-        val shouldBeFatal = shouldBeFatal()
         StrictMode.setVmPolicy(StrictMode.VmPolicy.Builder()
             .detectActivityLeaks()
             .detectCleartextNetwork()
@@ -69,10 +75,7 @@ class StrictModeInitializer @Inject constructor(
 //                        detectNonSdkApiUsage()
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                    penaltyListener(Executors.newSingleThreadExecutor(), StrictMode.OnVmViolationListener {
-                        val priority = if (shouldBeFatal) Log.ERROR else Log.WARN
-                        Timber.tag(TAG).log(priority, it, "StrictMode violation")
-                    })
+                    penaltyListener(listenerExecutor, violationListener)
                 }
                 if (shouldBeFatal) {
                     penaltyDeath()
@@ -85,10 +88,7 @@ class StrictModeInitializer @Inject constructor(
             .penaltyLog()
             .apply {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                    penaltyListener(Executors.newSingleThreadExecutor(), StrictMode.OnThreadViolationListener {
-                        val priority = if (shouldBeFatal) Log.ERROR else Log.WARN
-                        Timber.tag(TAG).log(priority, it, "StrictMode violation")
-                    })
+                    penaltyListener(listenerExecutor, violationListener)
                 }
                 if (shouldBeFatal) {
                     penaltyDeath()
@@ -97,9 +97,17 @@ class StrictModeInitializer @Inject constructor(
             .build())
     }
 
-    private fun shouldBeFatal(): Boolean {
-        return isFirebaseTestDevice(contentResolver) || BuildConfig.DEBUG
+    @RequiresApi(Build.VERSION_CODES.P)
+    private inner class ViolationListener : StrictMode.OnThreadViolationListener, StrictMode.OnVmViolationListener {
+        override fun onThreadViolation(v: Violation) = onViolation(v)
+
+        override fun onVmViolation(v: Violation) = onViolation(v)
+
+        private fun onViolation(v: Violation) {
+            Timber.tag(TAG).e(v, "StrictMode violation")
+        }
     }
+
 }
 
 
