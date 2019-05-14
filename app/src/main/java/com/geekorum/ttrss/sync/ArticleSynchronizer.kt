@@ -36,6 +36,7 @@ import com.geekorum.ttrss.sync.SyncContract.EXTRA_FEED_ID
 import com.geekorum.ttrss.sync.SyncContract.EXTRA_NUMBER_OF_LATEST_ARTICLES_TO_REFRESH
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -84,11 +85,15 @@ class ArticleSynchronizer @AssistedInject constructor(
             collectNewArticles()
             updateArticlesStatus()
         } catch (e: ApiCallException) {
-            Timber.e(e, "unable to synchronize articles")
+            Timber.w(e, "unable to synchronize articles")
         } catch (e: RemoteException) {
             Timber.e(e, "unable to synchronize articles")
         } catch (e: OperationApplicationException) {
             Timber.e(e, "unable to synchronize articles")
+        } catch (e: CancellationException) {
+            // normal cancellation
+            Timber.i(e, "Synchronization was cancelled")
+            throw e
         } catch (e: RuntimeException) {
             Timber.e(e, "unable to synchronize articles")
         }
@@ -158,7 +163,9 @@ class ArticleSynchronizer @AssistedInject constructor(
         databaseService.runInTransaction {
             while (articles.isNotEmpty()) {
                 insertArticles(articles, feedsIds)
-                cacheArticlesImages(articles)
+                coroutineScope {
+                    cacheArticlesImages(articles)
+                }
                 val latestIdInserted = articles.maxBy { it.id }?.id ?: -1
                 updateLatestArticleSyncedId(latestIdInserted)
 
