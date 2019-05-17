@@ -93,7 +93,6 @@ class ArticleSynchronizer @AssistedInject constructor(
         } catch (e: CancellationException) {
             // normal cancellation
             Timber.i(e, "Synchronization was cancelled")
-            throw e
         } catch (e: RuntimeException) {
             Timber.e(e, "unable to synchronize articles")
         }
