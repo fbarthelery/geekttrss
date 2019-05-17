@@ -90,12 +90,14 @@ class ArticleSynchronizer @AssistedInject constructor(
             Timber.e(e, "unable to synchronize articles")
         } catch (e: OperationApplicationException) {
             Timber.e(e, "unable to synchronize articles")
-        } catch (e: CancellationException) {
-            // normal cancellation
-            Timber.i(e, "Synchronization was cancelled")
         } catch (e: RuntimeException) {
             Timber.e(e, "unable to synchronize articles")
         }
+    }
+
+    override fun onSyncCancelled() {
+        super.onSyncCancelled()
+        Timber.i("Synchronization was cancelled")
     }
 
     @Throws(ApiCallException::class, RemoteException::class, OperationApplicationException::class)
