@@ -50,7 +50,7 @@ android {
         minSdkVersion(24)
         targetSdkVersion(28)
         val major = 1
-        val minor = 2
+        val minor = 3
         val patch = 0
         versionCode = computeChangesetVersionCode(major, minor, patch)
         versionName = "$major.$minor.$patch"
