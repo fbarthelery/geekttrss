@@ -20,14 +20,11 @@
  */
 package com.geekorum.ttrss.articles_list
 
-import android.accounts.AccountManager
 import android.content.ContentUris
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.view.MenuItem
-import android.view.View
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.GravityCompat
@@ -37,12 +34,9 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import androidx.fragment.app.commit
 import androidx.lifecycle.Observer
-import androidx.lifecycle.observe
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
-import com.geekorum.ttrss.BackgroundJobManager
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.article_details.ArticleDetailActivity
-import com.geekorum.ttrss.article_details.ArticleDetailFragment
 import com.geekorum.ttrss.articles_list.search.ArticlesSearchFragment
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.Feed
@@ -50,7 +44,6 @@ import com.geekorum.ttrss.databinding.ActivityArticleListBinding
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.session.SessionActivity
 import com.geekorum.ttrss.viewModels
-import javax.inject.Inject
 
 /**
  * An activity representing a list of Articles. This activity
@@ -68,25 +61,12 @@ class ArticleListActivity : SessionActivity() {
         private const val STATE_FEED_ID = "feed_id"
     }
 
-    /**
-     * Whether or not the activity is in two-pane mode, i.e. running on a tablet
-     * device.
-     */
-    private val twoPane:Boolean by lazy {
-        binding.articleDetailContainer != null
-    }
-
     private var actionBarDrawerToggle: ActionBarDrawerToggle? = null
 
     private lateinit var binding: ActivityArticleListBinding
-    private val drawerLayout: DrawerLayout?
+    private val drawerLayout: DrawerLayout
         get() = binding.headlinesDrawer
 
-    @Inject
-    lateinit var backgroundJobManager: BackgroundJobManager
-
-    @Inject
-    lateinit var accountManager: AccountManager
 
     private val activityViewModel: ActivityViewModel by viewModels()
     private val accountViewModel: TtrssAccountViewModel by viewModels()
@@ -122,7 +102,7 @@ class ArticleListActivity : SessionActivity() {
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_article_list)
 
-        binding.setLifecycleOwner(this)
+        binding.lifecycleOwner = this
         binding.activityViewModel = activityViewModel
         if (binding.headlinesDrawer != null) {
             with(binding.startPaneLayout) {
@@ -152,17 +132,9 @@ class ArticleListActivity : SessionActivity() {
         val toolbar = binding.toolbar.toolbar
         setupSearch()
 
-        if (!twoPane) {
-            actionBarDrawerToggle = ActionBarDrawerToggle(this, binding.headlinesDrawer, toolbar,
-                R.string.drawer_open, R.string.drawer_close).also {
-                binding.headlinesDrawer?.addDrawerListener(it)
-            }
-        } else {
-            toolbar.setNavigationIcon(R.drawable.ic_menu_24dp)
-            toolbar.setNavigationOnClickListener {
-                binding.middlePaneLayout.visibility = View.GONE
-                binding.startPaneLayout.visibility = View.VISIBLE
-            }
+        actionBarDrawerToggle = ActionBarDrawerToggle(this, binding.headlinesDrawer, toolbar,
+            R.string.drawer_open, R.string.drawer_close).also {
+            binding.headlinesDrawer.addDrawerListener(it)
         }
     }
 
@@ -211,10 +183,6 @@ class ArticleListActivity : SessionActivity() {
         }
     }
 
-    private fun setupPeriodicJobs() {
-        backgroundJobManager.setupPeriodicJobs()
-    }
-
     public override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
         actionBarDrawerToggle?.syncState()
@@ -232,20 +200,11 @@ class ArticleListActivity : SessionActivity() {
 
     private fun onArticleSelected(position: Int, item: Article) {
         val articleUri = ContentUris.withAppendedId(ArticlesContract.Article.CONTENT_URI, item.id)
-        if (twoPane) {
-            val articleDetailFragment = ArticleDetailFragment.newInstance(articleUri)
-            supportFragmentManager.commit {
-                replace(R.id.article_detail_container, articleDetailFragment)
-            }
-            binding.startPaneLayout.visibility = View.GONE
-            // TODO: add some good animation
-        } else {
-            val intent = Intent(this, ArticleDetailActivity::class.java).apply {
-                action = Intent.ACTION_VIEW
-                data = articleUri
-            }
-            startActivity(intent)
+        val intent = Intent(this, ArticleDetailActivity::class.java).apply {
+            action = Intent.ACTION_VIEW
+            data = articleUri
         }
+        startActivity(intent)
     }
 
     /*
@@ -262,11 +221,7 @@ class ArticleListActivity : SessionActivity() {
             val hf = ArticlesListFragment.newInstance(supportFragmentManager.fragmentFactory, feed.id)
             replace(R.id.middle_pane_layout, hf, FRAGMENT_ARTICLES_LIST)
         }
-        if (twoPane) {
-            binding.middlePaneLayout.visibility = View.VISIBLE
-            binding.startPaneLayout.visibility = View.GONE
-        }
-        drawerLayout?.closeDrawers()
+        drawerLayout.closeDrawers()
     }
 
     private fun navigateToSearch() {
@@ -275,20 +230,16 @@ class ArticleListActivity : SessionActivity() {
             replace(R.id.middle_pane_layout, hf, FRAGMENT_ARTICLES_LIST)
             addToBackStack(FRAGMENT_BACKSTACK_SEARCH)
         }
-        if (twoPane) {
-            binding.middlePaneLayout.visibility = View.VISIBLE
-            binding.startPaneLayout.visibility = View.GONE
-        }
-        drawerLayout?.closeDrawers()
+        drawerLayout.closeDrawers()
     }
 
     private fun navigateUpToList() {
         supportFragmentManager.popBackStack(FRAGMENT_BACKSTACK_SEARCH, POP_BACK_STACK_INCLUSIVE)
-        binding.appBar?.setExpanded(true)
+        binding.appBar.setExpanded(true)
     }
 
     override fun onBackPressed() {
-        if (drawerLayout?.isDrawerOpen(GravityCompat.START) == true) {
+        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
             drawerLayout?.closeDrawers()
         } else {
             super.onBackPressed()
