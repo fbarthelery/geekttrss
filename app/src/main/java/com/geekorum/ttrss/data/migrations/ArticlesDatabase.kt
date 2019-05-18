@@ -365,3 +365,39 @@ object MigrationFrom6To7 : Migration(6, 7) {
     }
 
 }
+
+/**
+ * This migration changes Feed table to add subscribed column
+ */
+object MigrationFrom7To8 : Migration(7, 8) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        migrateFeedsTable(database)
+    }
+
+    private fun migrateFeedsTable(database: SupportSQLiteDatabase) {
+        with(database) {
+            execSQL(
+                """CREATE TABLE IF NOT EXISTS `feeds_new` (
+                    |`_id` INTEGER NOT NULL,
+                    |`url` TEXT NOT NULL,
+                    |`title` TEXT NOT NULL,
+                    |`cat_id` INTEGER NOT NULL,
+                    |`display_title` TEXT NOT NULL,
+                    |`last_time_update` INTEGER NOT NULL,
+                    |`unread_count` INTEGER NOT NULL,
+                    |`is_subscribed` INTEGER NOT NULL,
+                    |PRIMARY KEY(`_id`),
+                    |FOREIGN KEY(`cat_id`) REFERENCES `categories`(`_id`)
+                    |ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED
+                    |)""".trimMargin())
+
+            execSQL("DROP INDEX IF EXISTS `index_feeds_cat_id`;")
+            execSQL("CREATE  INDEX `index_feeds_cat_id` ON `feeds_new` (`cat_id`);")
+
+            execSQL("INSERT INTO feeds_new SELECT *, 1 FROM feeds;")
+            execSQL("DROP TABLE feeds;")
+            execSQL("ALTER TABLE feeds_new RENAME TO feeds;")
+        }
+    }
+
+}

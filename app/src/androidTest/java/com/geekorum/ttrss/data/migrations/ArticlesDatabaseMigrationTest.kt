@@ -20,6 +20,7 @@
  */
 package com.geekorum.ttrss.data.migrations
 
+import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import androidx.core.content.contentValuesOf
 import androidx.room.testing.MigrationTestHelper
@@ -33,6 +34,8 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.runner.RunWith
 import kotlin.test.Test
+
+private const val TEST_DB = "migration-test"
 
 /**
  * Testsuite for [ArticlesDatabase] migrations.
@@ -219,7 +222,48 @@ class ArticlesDatabaseMigrationTest {
         }
     }
 
-    companion object {
-        private val TEST_DB = "migration-test"
+    @Test
+    fun migrate7To8() {
+        helper.createDatabase(TEST_DB, 7).use {
+            // db has schema version 7. insert some contentData using SQL queries.
+            // You cannot use DAO classes because they expect the latest schema.
+            // as our schema for this migration doesn't change much from the previous
+            // we can reuse the same function
+            createSomeArticles(it)
+        }
+
+        helper.runMigrationsAndValidate(TEST_DB, 8, true,
+            MigrationFrom1To2, MigrationFrom2To3, MigrationFrom3To4, MigrationFrom4To5,
+            MigrationFrom5To6, MigrationFrom6To7, MigrationFrom7To8).use {
+            // MigrationTestHelper automatically verifies the schema changes,
+            // but you need to validate that the contentData was migrated properly.
+            assertMigration7To8DataIntegrity(it)
+        }
     }
+
+    private fun assertMigration7To8DataIntegrity(db: SupportSQLiteDatabase) {
+        assertMigration1To2DataIntegrity(db)
+        db.query("SELECT * FROM " + DbHelper.TABLE_FEEDS).use {
+            assertThat(it.count).isEqualTo(1)
+            it.moveToFirst()
+            assertThat(it.getValue<Boolean>("is_subscribed")).isTrue()
+        }
+    }
+
+    private inline fun <reified T> Cursor.getValue(columnName: String) : T {
+        val index = getColumnIndexOrThrow(columnName)
+        @Suppress("IMPLICIT_CAST_TO_ANY")
+        return when (T::class) {
+            String::class -> getString(index)
+            Int::class -> getInt(index)
+            ByteArray::class -> getBlob(index)
+            Double::class -> getDouble(index)
+            Float::class -> getFloat(index)
+            Long::class -> getLong(index)
+            Short::class -> getShort(index)
+            Boolean::class -> getInt(index) != 0
+            else -> throw IllegalArgumentException()
+        } as T
+    }
+
 }

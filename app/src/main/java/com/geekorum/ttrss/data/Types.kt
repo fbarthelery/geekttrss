@@ -265,8 +265,12 @@ data class Feed(
     var lastTimeUpdate: Long = 0,
 
     @ColumnInfo(name = "unread_count")
-    var unreadCount: Int = 0
-) {
+    var unreadCount: Int = 0,
+
+    @ColumnInfo(name = "is_subscribed")
+    var isSubscribed: Boolean = true
+
+    ) {
 
     val isFreshFeed
         get() = id == FEED_ID_FRESH

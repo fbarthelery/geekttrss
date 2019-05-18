@@ -23,6 +23,7 @@ package com.geekorum.ttrss.network.impl
 import android.os.Build.VERSION_CODES.O
 import androidx.annotation.RequiresApi
 import com.geekorum.ttrss.data.Article
+import com.geekorum.ttrss.data.ArticleContentIndexed
 import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
 import kotlinx.serialization.SerialName
@@ -75,15 +76,16 @@ data class Feed(
     }
 
     fun toDataType(): Feed {
-        return Feed().apply {
-            this.id = this@Feed.id
-            this.title = this@Feed.title
-            this.displayTitle = this@Feed.displayTitle
-            this.url = this@Feed.url
-            this.unreadCount = nbUnreadArticles
-            this.catId = categoryId
-            this.lastTimeUpdate = lastUpdatedTimestamp
-        }
+        return Feed(
+            id = id,
+            title = title,
+            displayTitle = displayTitle,
+            url = url,
+            unreadCount = nbUnreadArticles,
+            catId = categoryId,
+            lastTimeUpdate = lastUpdatedTimestamp,
+            isSubscribed = true
+        )
     }
 }
 
@@ -159,23 +161,24 @@ data class Headline(
 
 
     fun toDataType(): Article {
-        return Article().apply {
-            this.id = this@Headline.id
-            this.title = this@Headline.title
-            this.content = this@Headline.content
-            this.isUnread = this@Headline.unread
-            this.isTransientUnread = this.isUnread
-            this.isStarred = this@Headline.marked
-            this.isPublished = this@Headline.published
-            this.score = this@Headline.score
-            this.lastTimeUpdate = this@Headline.lastUpdatedTimestamp
-            this.isUpdated = this@Headline.isUpdated
-            this.link = this@Headline.link
-            this.feedId = this@Headline.feedId ?: 0
-            this.tags = this@Headline.tags.joinToString(", ")
-            this.author = this@Headline.author
-            this.contentExcerpt = this@Headline.excerpt
-        }
+        return Article(
+            id = id,
+            contentData = ArticleContentIndexed(
+                title = title,
+                content = content,
+                author = author,
+                tags = tags.joinToString(", ")),
+            isUnread = unread,
+            isTransientUnread = unread,
+            isStarred = marked,
+            isPublished = published,
+            score = score,
+            lastTimeUpdate = lastUpdatedTimestamp,
+            isUpdated = isUpdated,
+            link = link,
+            feedId = feedId ?: 0,
+            contentExcerpt = excerpt
+        )
     }
 }
 
