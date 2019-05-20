@@ -113,12 +113,6 @@ android {
     }
 }
 
-//TODO remove once geekdroid is published
-repositories {
-    flatDir {
-        dirs("libs")
-    }
-}
 
 dependencies {
 

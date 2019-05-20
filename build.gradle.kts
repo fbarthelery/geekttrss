@@ -18,6 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
+import com.geekorum.build.createComponentsPlatforms
 import com.geekorum.build.setupGoogleContent
 import java.net.URI
 
@@ -46,6 +47,13 @@ allprojects {
         jcenter()
         // for kotlinx
         maven { url = URI("https://kotlin.bintray.com/kotlinx") }
+        // for geekdroid
+        flatDir {
+            dirs(rootProject.files("libs"))
+        }
+    }
+    dependencies {
+        createComponentsPlatforms()
     }
 }
 

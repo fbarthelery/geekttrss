@@ -18,6 +18,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
+@file:Suppress("UnstableApiUsage")
+
 package com.geekorum.build
 
 import org.gradle.api.artifacts.ComponentMetadataContext
@@ -25,6 +27,25 @@ import org.gradle.api.artifacts.ComponentMetadataRule
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.dsl.ComponentMetadataHandler
 import org.gradle.api.artifacts.dsl.DependencyHandler
+
+private val componentsPlatform = mutableMapOf<ComponentMetadataHandler, MutableSet<String>>()
+
+fun DependencyHandler.createComponentsPlatforms() {
+    components.apply {
+        getOrCreatePlatform(CoroutinesPlatform)
+        getOrCreatePlatform(DaggerPlatform)
+        getOrCreatePlatform(AndroidX.RoomPlatform)
+        getOrCreatePlatform(AndroidX.LifecyclePlatform)
+    }
+}
+
+private fun ComponentMetadataHandler.getOrCreatePlatform(platformFactory: PlatformFactory): String {
+    val componentsSet = componentsPlatform.getOrPut(this) { mutableSetOf() }
+    if (!componentsSet.contains(platformFactory.platformName)) {
+        componentsSet.add(platformFactory.createPlatform(this))
+    }
+    return platformFactory.platformName
+}
 
 internal class CoroutinesPlatform {
 
@@ -44,7 +65,7 @@ internal class CoroutinesPlatform {
 }
 
 fun DependencyHandler.enforcedCoroutinesPlatform(version: String): Dependency {
-    return enforcedPlatform("${CoroutinesPlatform.createPlatform(components)}:$version")
+    return enforcedPlatform("${components.getOrCreatePlatform(CoroutinesPlatform)}:$version")
 }
 
 
@@ -56,7 +77,7 @@ internal class DaggerPlatform {
 }
 
 fun DependencyHandler.enforcedDaggerPlatform(version: String): Dependency {
-    return enforcedPlatform("${DaggerPlatform.createPlatform(components)}:$version")
+    return enforcedPlatform("${components.getOrCreatePlatform(DaggerPlatform)}:$version")
 }
 
 
@@ -79,11 +100,11 @@ internal class AndroidX {
 
 
 fun DependencyHandler.enforcedAndroidxRoomPlatform(version: String): Dependency {
-    return enforcedPlatform("${AndroidX.RoomPlatform.createPlatform(components)}:$version")
+    return enforcedPlatform("${components.getOrCreatePlatform(AndroidX.RoomPlatform)}:$version")
 }
 
 fun DependencyHandler.enforcedAndroidxLifecyclePlatform(version: String): Dependency {
-    return enforcedPlatform("${AndroidX.LifecyclePlatform.createPlatform(components)}:$version")
+    return enforcedPlatform("${components.getOrCreatePlatform(AndroidX.LifecyclePlatform)}:$version")
 }
 
 open class PlatformFactory(
