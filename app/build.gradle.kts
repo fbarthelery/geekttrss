@@ -121,7 +121,7 @@ dependencies {
     implementation("androidx.activity:activity-ktx:1.0.0-alpha07")
 
     // androidx ui
-    implementation("androidx.appcompat:appcompat:1.1.0-alpha04")
+    implementation("androidx.appcompat:appcompat:1.1.0-alpha05")
     implementation("androidx.drawerlayout:drawerlayout:1.1.0-alpha01")
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")
     implementation("androidx.recyclerview:recyclerview:1.0.0")
