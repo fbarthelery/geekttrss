@@ -43,6 +43,7 @@ import androidx.core.os.bundleOf
 import androidx.core.view.doOnNextLayout
 import androidx.core.widget.NestedScrollView
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.geekorum.geekdroid.network.OkHttpWebViewClient
 import com.geekorum.ttrss.BaseFragment
 import com.geekorum.ttrss.R
@@ -236,7 +237,6 @@ class ArticleDetailFragment : BaseFragment() {
     override fun onStop() {
         super.onStop()
         chromeClient.onHideCustomView()
-        markReadJob?.cancel()
     }
 
     private inner class FSVideoChromeClient : WebChromeClient() {
@@ -315,7 +315,7 @@ class ArticleDetailFragment : BaseFragment() {
             }
             root.doOnNextLayout {
                 if (root.isAtEndOfArticle) {
-                    markReadJob = GlobalScope.launch {
+                    markReadJob = viewLifecycleOwner.lifecycleScope.launchWhenResumed {
                         delay(2000)
                         articleDetailsViewModel.setArticleUnread(false)
                     }
