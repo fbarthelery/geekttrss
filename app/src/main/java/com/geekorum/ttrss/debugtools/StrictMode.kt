@@ -44,9 +44,7 @@ private const val TAG = "StrictMode"
 /**
  * Configure StrictMode policies
  */
-class StrictModeInitializer @Inject constructor(
-    contentResolver: ContentResolver
-) : AppInitializer {
+class StrictModeInitializer @Inject constructor() : AppInitializer {
     private val listenerExecutor by lazy { Executors.newSingleThreadExecutor() }
     private val shouldBeFatal: Boolean = (BuildConfig.DEBUG)
 
@@ -137,7 +135,7 @@ class KotlinInitializer @Inject constructor() : AppInitializer {
 abstract class KotlinInitializerModule {
     @Binds
     @IntoSet
-    abstract fun bindCoroutinesAsyncInitializer(oroutinesAsyncInitializer: KotlinInitializer): AppInitializer
+    abstract fun bindKotlinInitializer(kotlinInitializer: KotlinInitializer): AppInitializer
 
 }
 
@@ -151,7 +149,10 @@ abstract class KotlinInitializerModule {
  *
  * ```
  */
-inline fun withStrictMode(originalThreadPolicy: StrictMode.ThreadPolicy, block: () -> Unit) {
-    block()
-    StrictMode.setThreadPolicy(originalThreadPolicy)
+inline fun <R> withStrictMode(originalThreadPolicy: StrictMode.ThreadPolicy, block: () -> R): R {
+    try {
+        return block()
+    } finally {
+        StrictMode.setThreadPolicy(originalThreadPolicy)
+    }
 }

@@ -23,9 +23,11 @@ package com.geekorum.ttrss.accounts
 import android.accounts.AccountManager
 import android.content.ContentResolver
 import android.os.Bundle
+import android.os.StrictMode
 import android.util.Base64
 import com.geekorum.geekdroid.security.SecretCipher
 import com.geekorum.ttrss.BackgroundJobManager
+import com.geekorum.ttrss.debugtools.withStrictMode
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.sync.SyncContract
 import timber.log.Timber
@@ -106,7 +108,7 @@ class AndroidTinyrssAccountManager @Inject constructor(
     }
 
     @Throws(GeneralSecurityException::class, IllegalArgumentException::class)
-    fun getPassword(account: Account) : String? {
+    fun getPassword(account: Account): String? {
         val encryptedPassword: String? = android.accounts.Account(account.username, ACCOUNT_TYPE).let {
             accountManager.getPassword(it)
         }
@@ -114,9 +116,11 @@ class AndroidTinyrssAccountManager @Inject constructor(
     }
 
     fun fromAndroidAccount(androidAccount: android.accounts.Account): Account {
-        check(ACCOUNT_TYPE == androidAccount.type) {"Invalid account type ${androidAccount.type}"}
-        val url = accountManager.getUserData(androidAccount, AccountAuthenticator.USERDATA_URL)
-        return Account(androidAccount.name, url)
+        return withStrictMode(StrictMode.allowThreadDiskReads()) {
+            check(ACCOUNT_TYPE == androidAccount.type) { "Invalid account type ${androidAccount.type}" }
+            val url = accountManager.getUserData(androidAccount, AccountAuthenticator.USERDATA_URL)
+            Account(androidAccount.name, url)
+        }
     }
 
     fun updateServerInformation(account: Account, serverInformation: ServerInformation) {
@@ -124,19 +128,21 @@ class AndroidTinyrssAccountManager @Inject constructor(
         val encryptedPassword = serverInformation.basicHttpAuthPassword?.let { encrypt(it) }
         accountManager.run {
             setUserData(androidAccount, AccountAuthenticator.USERDATA_URL, serverInformation.apiUrl)
-            setUserData(androidAccount, AccountAuthenticator.USERDATA_BASIC_HTTP_AUTH_USERNAME, serverInformation.basicHttpAuthUsername)
+            setUserData(androidAccount, AccountAuthenticator.USERDATA_BASIC_HTTP_AUTH_USERNAME,
+                serverInformation.basicHttpAuthUsername)
             setUserData(androidAccount, AccountAuthenticator.USERDATA_BASIC_HTTP_AUTH_PASSWORD, encryptedPassword)
         }
     }
 
-    fun getServerInformation(account: Account) : ServerInformation {
+    fun getServerInformation(account: Account): ServerInformation {
         val androidAccount = android.accounts.Account(account.username, ACCOUNT_TYPE)
         return object : ServerInformation() {
             override val apiUrl: String
-                get() =  accountManager.getUserData(androidAccount, AccountAuthenticator.USERDATA_URL)
+                get() = accountManager.getUserData(androidAccount, AccountAuthenticator.USERDATA_URL)
 
             override val basicHttpAuthUsername: String?
-                get() =  accountManager.getUserData(androidAccount, AccountAuthenticator.USERDATA_BASIC_HTTP_AUTH_USERNAME)
+                get() =  accountManager.getUserData(androidAccount,
+                    AccountAuthenticator.USERDATA_BASIC_HTTP_AUTH_USERNAME)
 
             override val basicHttpAuthPassword: String?
                 get() {
@@ -170,7 +176,7 @@ class AndroidTinyrssAccountManager @Inject constructor(
         val base64EncryptedPassword = Base64.encodeToString(output, Base64.NO_WRAP)
         val gcmParameterSpec = secretCipher.parametersSpec
         val base64IV = Base64.encodeToString(gcmParameterSpec.iv, Base64.NO_WRAP)
-        return "${base64EncryptedPassword}\n$${base64IV}\n${gcmParameterSpec.tLen}\n"
+        return "$base64EncryptedPassword\n$$base64IV\n${gcmParameterSpec.tLen}\n"
     }
 }
 
