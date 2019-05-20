@@ -33,9 +33,9 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.geekorum.geekdroid.app.BottomSheetDialogActivity
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
+import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.databinding.ActivityAddFeedBinding
-import com.geekorum.ttrss.di.ViewModelsFactory
 import com.geekorum.ttrss.html.FeedInformation
 import dagger.android.AndroidInjection
 import kotlinx.coroutines.CoroutineScope
@@ -61,7 +61,7 @@ class AddFeedActivity : BottomSheetDialogActivity(), CoroutineScope {
         get() = Dispatchers.Main + job
 
     @Inject
-    internal lateinit var viewModelFactory: ViewModelsFactory
+    internal lateinit var viewModelFactory: DaggerDelegateViewModelsFactory
 
     private lateinit var feedAdapter: FeedAdapter
     private lateinit var accountsAdapter: AccountsAdapter

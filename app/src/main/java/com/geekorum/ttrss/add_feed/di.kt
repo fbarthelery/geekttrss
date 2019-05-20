@@ -22,6 +22,7 @@ package com.geekorum.ttrss.add_feed
 
 import android.accounts.Account
 import androidx.lifecycle.ViewModel
+import com.geekorum.geekdroid.dagger.ViewModelKey
 import com.geekorum.ttrss.accounts.NetworkLoginModule
 import com.geekorum.ttrss.accounts.PerAccount
 import com.geekorum.ttrss.di.AssistedFactoriesModule
@@ -31,7 +32,6 @@ import dagger.BindsInstance
 import dagger.Module
 import dagger.Subcomponent
 import dagger.android.ContributesAndroidInjector
-import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 
@@ -80,7 +80,7 @@ internal interface AddFeedComponent {
 private abstract class ViewModelsModule {
     @Binds
     @IntoMap
-    @ClassKey(AddFeedViewModel::class)
+    @ViewModelKey(AddFeedViewModel::class)
     abstract fun getAddFeedViewModel(addFeedViewModel: AddFeedViewModel): ViewModel
 
 }

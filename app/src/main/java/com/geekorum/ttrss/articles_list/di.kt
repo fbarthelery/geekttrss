@@ -24,6 +24,7 @@ package com.geekorum.ttrss.articles_list
 
 import android.accounts.Account
 import androidx.lifecycle.ViewModel
+import com.geekorum.geekdroid.dagger.ViewModelKey
 import com.geekorum.ttrss.accounts.NetworkLoginModule
 import com.geekorum.ttrss.accounts.PerAccount
 import com.geekorum.ttrss.di.AssistedFactoriesModule
@@ -32,7 +33,6 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.android.ContributesAndroidInjector
-import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 
@@ -85,12 +85,12 @@ abstract class FragmentsInjectorModule {
 private abstract class ViewModelModule {
     @Binds
     @IntoMap
-    @ClassKey(FragmentViewModel::class)
+    @ViewModelKey(FragmentViewModel::class)
     abstract fun getArticlesFragmentViewModel(fragmentViewModel: FragmentViewModel): ViewModel
 
     @Binds
     @IntoMap
-    @ClassKey(FeedsViewModel::class)
+    @ViewModelKey(FeedsViewModel::class)
     abstract fun getFeedsViewModel(feedsViewModel: FeedsViewModel): ViewModel
 
 }
@@ -99,7 +99,7 @@ private abstract class ViewModelModule {
 private abstract class ActivityViewModelModule{
     @Binds
     @IntoMap
-    @ClassKey(ActivityViewModel::class)
+    @ViewModelKey(ActivityViewModel::class)
     abstract fun getActivityViewModel(activityViewModel: ActivityViewModel): ViewModel
 
 }

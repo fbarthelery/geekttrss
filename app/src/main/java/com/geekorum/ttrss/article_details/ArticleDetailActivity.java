@@ -33,7 +33,6 @@ import com.geekorum.ttrss.R;
 import com.geekorum.ttrss.articles_list.ArticleListActivity;
 import com.geekorum.ttrss.databinding.ActivityArticleDetailBinding;
 import com.geekorum.ttrss.databinding.ToolbarArticleDetailsBinding;
-import com.geekorum.ttrss.di.ViewModelsFactory;
 import com.geekorum.ttrss.session.SessionActivity;
 import com.google.android.material.bottomappbar.BottomAppBar;
 

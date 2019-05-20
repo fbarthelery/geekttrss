@@ -26,6 +26,7 @@ import android.app.Activity
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.geekorum.geekdroid.accounts.AccountTokenRetriever
+import com.geekorum.geekdroid.dagger.ViewModelKey
 import com.geekorum.geekdroid.network.TokenRetriever
 import com.geekorum.geekdroid.security.SecretEncryption
 import com.geekorum.ttrss.network.TinyrssApiModule
@@ -36,7 +37,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.Subcomponent
 import dagger.android.ContributesAndroidInjector
-import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 import javax.inject.Scope
 import kotlin.annotation.AnnotationRetention.RUNTIME
@@ -160,7 +160,7 @@ internal class TinyRssServerInformationModule(val serverInformation: ServerInfor
 private abstract class ViewModelsModule {
     @Binds
     @IntoMap
-    @ClassKey(LoginViewModel::class)
+    @ViewModelKey(LoginViewModel::class)
     abstract fun getLoginViewModel(loginViewModel: LoginViewModel): ViewModel
 
 }

@@ -21,18 +21,18 @@
 package com.geekorum.ttrss.articles_list.search
 
 import androidx.lifecycle.ViewModel
+import com.geekorum.geekdroid.dagger.ViewModelKey
 import com.geekorum.ttrss.network.TinyrssApiModule
 import dagger.Binds
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
-import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 @Module
 private abstract class ViewModelsModule {
     @Binds
     @IntoMap
-    @ClassKey(SearchViewModel::class)
+    @ViewModelKey(SearchViewModel::class)
     abstract fun providesSearchViewModel(searchViewModel: SearchViewModel): ViewModel
 }
 

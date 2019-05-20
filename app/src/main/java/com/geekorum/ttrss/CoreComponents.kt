@@ -26,7 +26,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.geekorum.ttrss.di.ViewModelsFactory
+import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory
 import dagger.android.AndroidInjector
 import dagger.android.support.DaggerAppCompatActivity
 import dagger.android.support.DaggerFragment
@@ -38,7 +38,7 @@ import javax.inject.Inject
 @SuppressLint("Registered")
 open class ViewModelProviderActivity : DaggerAppCompatActivity() {
     @Inject
-    lateinit var viewModelsFactory: ViewModelsFactory
+    lateinit var viewModelsFactory: DaggerDelegateViewModelsFactory
 }
 
 inline fun <reified VM : ViewModel> ViewModelProviderActivity.viewModels(): Lazy<VM> {
@@ -48,7 +48,7 @@ inline fun <reified VM : ViewModel> ViewModelProviderActivity.viewModels(): Lazy
 
 open class ViewModelProviderFragment : DaggerFragment() {
     @Inject
-    lateinit var viewModelsFactory: ViewModelsFactory
+    lateinit var viewModelsFactory: DaggerDelegateViewModelsFactory
 }
 
 inline fun <reified VM : ViewModel> ViewModelProviderFragment.viewModels(): Lazy<VM> {

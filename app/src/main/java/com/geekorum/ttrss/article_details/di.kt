@@ -24,6 +24,7 @@ package com.geekorum.ttrss.article_details
 
 import android.accounts.Account
 import androidx.lifecycle.ViewModel
+import com.geekorum.geekdroid.dagger.ViewModelKey
 import com.geekorum.ttrss.accounts.NetworkLoginModule
 import com.geekorum.ttrss.accounts.PerAccount
 import com.geekorum.ttrss.di.AssistedFactoriesModule
@@ -32,7 +33,6 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.android.ContributesAndroidInjector
-import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 
@@ -47,7 +47,7 @@ import dagger.multibindings.IntoMap
 abstract class ViewModelsModule {
     @Binds
     @IntoMap
-    @ClassKey(ArticleDetailsViewModel::class)
+    @ViewModelKey(ArticleDetailsViewModel::class)
     abstract fun getArticleDetailsViewModel(articleDetailsViewModel: ArticleDetailsViewModel): ViewModel
 
 }

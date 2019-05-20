@@ -23,20 +23,19 @@ package com.geekorum.ttrss.accounts
 import android.accounts.Account
 import android.accounts.AccountManager
 import android.app.Activity
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
-import androidx.databinding.DataBindingUtil
 import android.os.Bundle
-import com.google.android.material.snackbar.Snackbar
 import android.transition.TransitionManager
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
+import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import com.geekorum.geekdroid.accounts.AccountAuthenticatorAppCompatActivity
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
+import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.databinding.ActivityLoginAccountBinding
-import com.geekorum.ttrss.di.ViewModelsFactory
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 import dagger.android.AndroidInjection
 import javax.inject.Inject
@@ -57,7 +56,7 @@ class LoginActivity : AccountAuthenticatorAppCompatActivity() {
     lateinit var accountManager: AndroidTinyrssAccountManager
 
     @Inject
-    internal lateinit var viewModelFactory: ViewModelsFactory
+    internal lateinit var viewModelFactory: DaggerDelegateViewModelsFactory
 
     private lateinit var binding: ActivityLoginAccountBinding
 

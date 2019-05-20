@@ -21,11 +21,11 @@
 package com.geekorum.ttrss.di;
 
 import androidx.lifecycle.ViewModel;
+import com.geekorum.geekdroid.dagger.ViewModelKey;
 import com.geekorum.ttrss.ForceNightModeViewModel;
 import com.geekorum.ttrss.articles_list.TtrssAccountViewModel;
 import dagger.Binds;
 import dagger.Module;
-import dagger.multibindings.ClassKey;
 import dagger.multibindings.IntoMap;
 
 /**
@@ -36,12 +36,12 @@ public abstract class ViewModelsModule {
 
     @Binds
     @IntoMap
-    @ClassKey(TtrssAccountViewModel.class)
+    @ViewModelKey(TtrssAccountViewModel.class)
     public abstract ViewModel getTtrssAccountViewModel(TtrssAccountViewModel ttrssAccountViewModel);
 
     @Binds
     @IntoMap
-    @ClassKey(ForceNightModeViewModel.class)
+    @ViewModelKey(ForceNightModeViewModel.class)
     public abstract ViewModel getForceNightViewModel(ForceNightModeViewModel ttrssAccountViewModel);
 
 
