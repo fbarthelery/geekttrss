@@ -81,7 +81,7 @@ open class BaseActivity : BatteryFriendlyActivity() {
  * Common base Fragment for the application.
  */
 open class BaseFragment (
-    val viewModelsFactory: ViewModelsFactory,
+    val viewModelsFactory: DaggerDelegateViewModelsFactory,
     val fragmentFactory: DaggerDelegateFragmentFactory
 ) : Fragment() {
 
