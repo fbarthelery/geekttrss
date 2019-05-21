@@ -24,6 +24,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -33,14 +34,13 @@ import com.geekorum.geekdroid.dagger.DaggerDelegateFragmentFactory
 import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
-import dagger.android.support.DaggerAppCompatActivity
 import javax.inject.Inject
 
 /**
  * An activity who get a dagger injected [ViewModelProvider.Factory]
  */
 @SuppressLint("Registered")
-open class ViewModelProviderActivity : DaggerAppCompatActivity() {
+open class ViewModelProviderActivity : AppCompatActivity() {
     @Inject
     lateinit var viewModelsFactory: DaggerDelegateViewModelsFactory
 }
@@ -67,14 +67,16 @@ open class BaseActivity : BatteryFriendlyActivity() {
     lateinit var daggerDelegateFragmentFactory: DaggerDelegateFragmentFactory
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // need to be set after injection and before super.onCreate() because it recreates fragments
-        // because of this we need to inject ourselves
-        // not ideal because we inject 2 times, and create dependencies 2 times.
-        // TODO get rid of DaggerAppCompatActivity
-        AndroidInjection.inject(this)
+        inject()
         supportFragmentManager.fragmentFactory = daggerDelegateFragmentFactory
         super.onCreate(savedInstanceState)
     }
+
+    /**
+     * Inject required field into the activity.
+     * Default method use Dagger [AndroidInjection]
+     */
+    protected open fun inject() = AndroidInjection.inject(this)
 }
 
 /**
