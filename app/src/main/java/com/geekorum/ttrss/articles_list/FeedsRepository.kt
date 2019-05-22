@@ -23,6 +23,7 @@ package com.geekorum.ttrss.articles_list
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
+import androidx.lifecycle.map
 import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.data.FeedsDao
@@ -38,36 +39,18 @@ import javax.inject.Inject
 
 /**
  * A Facade to access Feeds and Categories.
- * TODO: add a better mechanism to refresh less often
  */
 class FeedsRepository
 @Inject constructor(
-        private val feedsDao: FeedsDao,
-        private val apiService: ApiService
+    private val feedsDao: FeedsDao
 ) {
-    val allUnreadFeeds: LiveData<List<Feed>>
-        get() {
-            refresh()
-            return Transformations.map(feedsDao.allUnreadFeeds, this::addSpecialFeeds)
-        }
+    val allUnreadFeeds: LiveData<List<Feed>> = feedsDao.allUnreadFeeds.map(this::addSpecialFeeds)
 
-    val allFeeds: LiveData<List<Feed>>
-        get() {
-            refresh()
-            return Transformations.map(feedsDao.allFeeds, this::addSpecialFeeds)
-        }
+    val allFeeds: LiveData<List<Feed>> = feedsDao.allFeeds.map(this::addSpecialFeeds)
 
-    val allCategories: LiveData<List<Category>>
-        get() {
-            refresh()
-            return feedsDao.allCategories
-        }
+    val allCategories: LiveData<List<Category>> = feedsDao.allCategories
 
-    val allUnreadCategories: LiveData<List<Category>>
-        get() {
-            refresh()
-            return feedsDao.allUnreadCategories
-        }
+    val allUnreadCategories: LiveData<List<Category>> = feedsDao.allUnreadCategories
 
     fun getFeedById(feedId: Long): LiveData<Feed?> {
         return when {
@@ -99,15 +82,8 @@ class FeedsRepository
         return feedsDao.getFeedsForCategory(catId)
     }
 
-    private fun refresh() = GlobalScope.launch(Dispatchers.IO) {
-        try {
-            coroutineScope {
-                val feeds = async { apiService.getFeeds() }
-                val categories = async { apiService.getCategories() }
-                feedsDao.setFeedsAndCategories(feeds.await(), categories.await())
-            }
-        } catch (e: ApiCallException) {
-            Timber.w(e, "Unable to refresh feeds and categories")
-        }
+    suspend fun setFeedsAndCategories(feeds: Collection<Feed>, categories: Collection<Category>) {
+        feedsDao.setFeedsAndCategories(feeds, categories)
     }
+
 }

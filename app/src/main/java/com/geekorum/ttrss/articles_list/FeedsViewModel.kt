@@ -23,23 +23,32 @@ package com.geekorum.ttrss.articles_list
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.liveData
 import androidx.lifecycle.switchMap
+import androidx.lifecycle.viewModelScope
 import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
+import com.geekorum.ttrss.network.ApiCallException
+import com.geekorum.ttrss.network.ApiService
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 /**
  * [ViewModel] for [FeedListFragment]
  */
 class FeedsViewModel @Inject constructor(
-    private val feedsRepository: FeedsRepository
+    private val feedsRepository: FeedsRepository,
+    private val apiService: ApiService
 ) : ViewModel() {
 
     private val onlyUnread = MutableLiveData<Boolean>().apply { value = true }
 
     private val feedLiveData = onlyUnread.switchMap { onlyUnread ->
         if (onlyUnread) feedsRepository.allUnreadFeeds else feedsRepository.allFeeds
-    }
+    }.refreshed()
 
     private val selectedCategory = MutableLiveData<Long>()
 
@@ -59,7 +68,7 @@ class FeedsViewModel @Inject constructor(
             feedsRepository.allUnreadCategories
         else
             feedsRepository.allCategories
-    }
+    }.refreshed()
 
     fun setOnlyUnread(onlyUnread: Boolean) {
         this.onlyUnread.value = onlyUnread
@@ -67,6 +76,24 @@ class FeedsViewModel @Inject constructor(
 
     fun setSelectedCategory(selectedCategoryId: Long) {
         selectedCategory.value = selectedCategoryId
+    }
+
+    private fun refreshFeeds() = viewModelScope.launch(Dispatchers.IO) {
+        try {
+            val feeds = async { apiService.getFeeds() }
+            val categories = async { apiService.getCategories() }
+            feedsRepository.setFeedsAndCategories(feeds.await(), categories.await())
+        } catch (e: ApiCallException) {
+            Timber.w(e, "Unable to refresh feeds and categories")
+        }
+    }
+
+    /**
+     * Refresh feeds and categories when observing this livedata for the first time
+     */
+    private fun <T> LiveData<T>.refreshed(): LiveData<T> = liveData {
+        emitSource(this@refreshed)
+        refreshFeeds()
     }
 
 }
