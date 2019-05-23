@@ -23,6 +23,7 @@ package com.geekorum.ttrss
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
+import android.os.Bundle
 import android.os.PowerManager
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
@@ -37,6 +38,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
 import dagger.Module
+import dagger.android.AndroidInjection
 import dagger.android.ContributesAndroidInjector
 import io.mockk.mockk
 import io.mockk.verifySequence
@@ -161,6 +163,11 @@ class ForceNightModeViewModelTest {
 
 class BatteryFriendlyActivityRecordNightModeChanged : BatteryFriendlyActivity() {
     var nightMode: Int  = MODE_NIGHT_UNSPECIFIED
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        AndroidInjection.inject(this)
+        super.onCreate(savedInstanceState)
+    }
 
     override fun onNightModeChanged(mode: Int) {
         nightMode = mode

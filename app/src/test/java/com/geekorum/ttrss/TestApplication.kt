@@ -22,6 +22,7 @@ package com.geekorum.ttrss
 
 import com.geekorum.geekdroid.dagger.AndroidFrameworkModule
 import com.geekorum.geekdroid.dagger.AppInitializersModule
+import com.geekorum.geekdroid.dagger.FragmentFactoriesModule
 import com.geekorum.ttrss.di.AndroidBindingsModule
 import com.geekorum.ttrss.di.ApplicationComponent
 import com.geekorum.ttrss.di.ViewModelsModule
@@ -46,6 +47,7 @@ class TestGoogleFlavorApplication : TestApplication()
 @Component(modules = [AppInitializersModule::class,
     AndroidFrameworkModule::class,
     AndroidBindingsModule::class,
+    FragmentFactoriesModule::class,
     ViewModelsModule::class,
     BatteryFriendlyActivityTestModule::class])
 interface TestApplicationComponent : ApplicationComponent {

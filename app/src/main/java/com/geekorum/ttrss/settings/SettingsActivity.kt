@@ -33,13 +33,13 @@ import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.geekorum.geekdroid.preferences.PreferenceSummaryBinder
-import com.geekorum.ttrss.BatteryFriendlyActivity
+import com.geekorum.ttrss.BaseActivity
 import com.geekorum.ttrss.BuildConfig
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.databinding.ActivitySettingsBinding
 
 
-class SettingsActivity : BatteryFriendlyActivity() {
+class SettingsActivity : BaseActivity() {
     lateinit var binding: ActivitySettingsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
