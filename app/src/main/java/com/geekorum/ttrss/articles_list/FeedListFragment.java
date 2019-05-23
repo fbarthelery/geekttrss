@@ -40,14 +40,13 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.ViewModelProviders;
 import com.geekorum.geekdroid.dagger.DaggerDelegateFragmentFactory;
 import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory;
-import com.geekorum.geekdroid.dagger.DaggerDelegateFragmentFactory;
 import com.geekorum.ttrss.BaseFragment;
 import com.geekorum.ttrss.R;
-import com.geekorum.ttrss.settings.SettingsActivity;
 import com.geekorum.ttrss.data.Category;
 import com.geekorum.ttrss.data.Feed;
 import com.geekorum.ttrss.databinding.FragmentFeedsBinding;
 import com.geekorum.ttrss.databinding.MenuFeedActionViewBinding;
+import com.geekorum.ttrss.settings.SettingsActivity;
 import com.google.android.material.navigation.NavigationView;
 
 import java.util.List;
@@ -108,11 +107,13 @@ public class FeedListFragment extends BaseFragment implements NavigationView.OnN
         if (categoriesDisplayed) {
             feedsViewModel.getCategories().observe(this, categories -> {
                 transformCategoriesInMenuEntry(binding.navigationView.getMenu(), categories);
+                binding.navigationView.inflateMenu(R.menu.fragment_feed_list);
             });
         } else {
             feedsViewModel.getAllFeeds().observe(this, feeds -> {
                 currentFeeds = feeds;
                 transformFeedsInMenuEntry(binding.navigationView.getMenu(), feeds);
+                binding.navigationView.inflateMenu(R.menu.fragment_feed_list);
             });
         }
         activityViewModel = ViewModelProviders.of(requireActivity(), getViewModelsFactory()).get(ActivityViewModel.class);
@@ -222,7 +223,9 @@ public class FeedListFragment extends BaseFragment implements NavigationView.OnN
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        if (categoriesDisplayed) {
+        if (item.getItemId() == R.id.manage_feeds) {
+            return true;
+        } else if (categoriesDisplayed) {
             return onCategoriesSelected(item);
         } else {
             return onFeedSelected(item);
@@ -267,7 +270,7 @@ public class FeedListFragment extends BaseFragment implements NavigationView.OnN
                     feed.setId(category.getId());
                     feed.setTitle(category.getTitle());
                     // TODO is cat = true);
-//                    activityViewModel.setSelectedFeed(feed);
+                    // activityViewModel.setSelectedFeed(feed);
                 } else {
                     displayFeedCategory(category);
                 }
