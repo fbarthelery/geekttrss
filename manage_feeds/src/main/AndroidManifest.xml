@@ -1,0 +1,18 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:dist="http://schemas.android.com/apk/distribution"
+          package="com.geekorum.ttrss.manage_feeds">
+
+    <dist:module
+            dist:instant="false"
+            dist:title="@string/title_manage_feeds">
+        <dist:delivery>
+            <dist:on-demand />
+        </dist:delivery>
+        <dist:fusing dist:include="true" />
+    </dist:module>
+
+    <application>
+        <activity android:name=".TestActivity" />
+    </application>
+</manifest>
+

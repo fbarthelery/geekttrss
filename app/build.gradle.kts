@@ -80,7 +80,7 @@ android {
         named("release") {
             postprocessing {
                 isRemoveUnusedCode = true
-                isRemoveUnusedResources = true
+//                isRemoveUnusedResources = true
                 isObfuscate = false
                 isOptimizeCode = true
                 proguardFile("proguard-rules.pro")
@@ -111,6 +111,8 @@ android {
             versionNameSuffix = "-google"
         }
     }
+
+    dynamicFeatures = mutableSetOf(":manage_feeds")
 }
 
 
