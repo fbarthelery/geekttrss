@@ -34,6 +34,12 @@ import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus
 import com.google.android.play.core.tasks.Task
 import dagger.Module
 import dagger.Provides
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.channels.produce
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class PlayStoreModuleManager constructor(
     private val splitInstallManager: SplitInstallManager
@@ -71,6 +77,20 @@ private class SplitInstallSession(
     private val splitInstallManager: SplitInstallManager,
     id: Int
 ) : InstallSession(id) {
+    override fun CoroutineScope.getSessionStates(): ReceiveChannel<State> = produce {
+        val listener = SplitInstallStateUpdatedListener {
+            val installState = it.toInstallSessionState()
+            launch {
+                //TODO close when state is a terminal state?
+                send(installState)
+            }
+        }
+        splitInstallManager.registerListener(listener)
+        invokeOnClose {
+            splitInstallManager.unregisterListener(listener)
+        }
+    }
+
     private val splitListener: SplitInstallStateUpdatedListener = SplitInstallStateUpdatedListener { state ->
         if (state.sessionId() != id) {
             return@SplitInstallStateUpdatedListener

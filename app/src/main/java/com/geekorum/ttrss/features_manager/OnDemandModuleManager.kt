@@ -23,6 +23,9 @@ package com.geekorum.ttrss.features_manager
 import androidx.annotation.MainThread
 import dagger.Module
 import dagger.Provides
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
@@ -65,6 +68,8 @@ abstract class InstallSession(
     abstract fun registerListener(listener: Listener)
     abstract fun unregisterListener(listener: Listener)
 
+    abstract fun CoroutineScope.getSessionStates(): ReceiveChannel<State>
+
     abstract suspend fun getSessionState(): State
 
     interface Listener {
@@ -91,8 +96,15 @@ abstract class InstallSession(
 
 suspend fun InstallSession.awaitCompletion(): InstallSession.State {
     fun isComplete(state: InstallSession.State) = when (state.status) {
-        InstallSession.State.Status.INSTALLED, InstallSession.State.Status.FAILED -> true
-        else -> TODO("deal with additional states")
+        InstallSession.State.Status.INSTALLED,
+        InstallSession.State.Status.FAILED,
+        InstallSession.State.Status.CANCELED -> true
+
+        InstallSession.State.Status.PENDING,
+        InstallSession.State.Status.REQUIRES_USER_CONFIRMATION,
+        InstallSession.State.Status.DOWNLOADING,
+        InstallSession.State.Status.INSTALLING,
+        InstallSession.State.Status.CANCELING -> false
     }
 
     val state = getSessionState()

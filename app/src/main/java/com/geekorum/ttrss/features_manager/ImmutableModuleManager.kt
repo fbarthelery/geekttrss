@@ -20,6 +20,10 @@
  */
 package com.geekorum.ttrss.features_manager
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.channels.produce
+
 /**
  * An Immutable module installations.
  */
@@ -60,6 +64,11 @@ private class CompleteSession(id: Int) : InstallSession(id) {
 
     override suspend fun getSessionState(): State = state
 
+    override fun CoroutineScope.getSessionStates(): ReceiveChannel<State> = produce {
+        send(state)
+        close()
+    }
+
     override fun cancel() {
         // no op
     }
@@ -82,6 +91,11 @@ private class FailedSession(id: Int) : InstallSession(id) {
     private val state = State(State.Status.FAILED)
 
     override suspend fun getSessionState(): State = state
+
+    override fun CoroutineScope.getSessionStates(): ReceiveChannel<State> = produce {
+        send(state)
+        close()
+    }
 
     override fun cancel() {
         // no op
