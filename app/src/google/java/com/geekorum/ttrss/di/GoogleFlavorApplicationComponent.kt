@@ -20,6 +20,7 @@
  */
 package com.geekorum.ttrss.di
 
+import com.geekorum.ttrss.PlayStoreInstallModule
 import com.geekorum.ttrss.logging.CrashlyticsLoggingModule
 import dagger.Component
 import javax.inject.Singleton
@@ -30,7 +31,8 @@ import javax.inject.Singleton
  */
 @Component(modules = [
     FlavorLessModule::class,
-    CrashlyticsLoggingModule::class
+    CrashlyticsLoggingModule::class,
+    PlayStoreInstallModule::class
 ])
 @Singleton
 interface GoogleFlavorApplicationComponent : ApplicationComponent {

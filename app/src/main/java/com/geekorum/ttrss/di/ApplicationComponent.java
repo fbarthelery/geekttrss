@@ -21,6 +21,7 @@
 package com.geekorum.ttrss.di;
 
 import com.geekorum.ttrss.Application;
+import com.geekorum.ttrss.features_manager.AllFeaturesInstalledModule;
 import dagger.BindsInstance;
 import dagger.Component;
 import dagger.android.AndroidInjector;
@@ -31,7 +32,8 @@ import javax.inject.Singleton;
  * Main component for the application
  */
 @Component(modules = {
-        FlavorLessModule.class
+        FlavorLessModule.class,
+        AllFeaturesInstalledModule.class
 })
 @Singleton
 public interface ApplicationComponent extends AndroidInjector<Application> {

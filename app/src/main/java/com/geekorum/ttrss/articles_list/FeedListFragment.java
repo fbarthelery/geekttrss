@@ -20,6 +20,7 @@
  */
 package com.geekorum.ttrss.articles_list;
 
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -41,6 +42,9 @@ import androidx.lifecycle.ViewModelProviders;
 import com.geekorum.geekdroid.dagger.DaggerDelegateFragmentFactory;
 import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory;
 import com.geekorum.ttrss.BaseFragment;
+import com.geekorum.ttrss.features_manager.Features;
+import com.geekorum.ttrss.features_manager.InstallModuleViewModel;
+import com.geekorum.ttrss.features_manager.InstallSession;
 import com.geekorum.ttrss.R;
 import com.geekorum.ttrss.data.Category;
 import com.geekorum.ttrss.data.Feed;
@@ -48,6 +52,7 @@ import com.geekorum.ttrss.databinding.FragmentFeedsBinding;
 import com.geekorum.ttrss.databinding.MenuFeedActionViewBinding;
 import com.geekorum.ttrss.settings.SettingsActivity;
 import com.google.android.material.navigation.NavigationView;
+import timber.log.Timber;
 
 import java.util.List;
 
@@ -68,6 +73,7 @@ public class FeedListFragment extends BaseFragment implements NavigationView.OnN
     private ActivityViewModel activityViewModel;
     private LiveData<List<Feed>> feedsForCategory;
     private TtrssAccountViewModel accountViewModel;
+    private InstallModuleViewModel installModuleViewModel;
 
     @Inject
     public FeedListFragment(@NonNull DaggerDelegateViewModelsFactory viewModelsFactory, DaggerDelegateFragmentFactory fragmentFactory) {
@@ -139,6 +145,8 @@ public class FeedListFragment extends BaseFragment implements NavigationView.OnN
             TextView server = headerView.findViewById(R.id.drawer_header_server);
             server.setText(host);
         });
+
+        installModuleViewModel = ViewModelProviders.of(this, getViewModelsFactory()).get(InstallModuleViewModel.class);
     }
 
     private void setupHeader() {
@@ -224,6 +232,20 @@ public class FeedListFragment extends BaseFragment implements NavigationView.OnN
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.manage_feeds) {
+            if (installModuleViewModel.isModuleInstalled(Features.MANAGE_FEEDS)) {
+                Intent intent = new Intent();
+                intent.setComponent(ComponentName.createRelative(requireActivity(), "com.geekorum.ttrss.manage_feeds.TestActivity"));
+                startActivity(intent);
+            } else {
+                installModuleViewModel.installModule(Features.MANAGE_FEEDS).observe(this, state -> {
+                    Timber.d("install session state %s", state);
+                    if (state.getStatus() == InstallSession.State.Status.INSTALLED) {
+                        Intent intent = new Intent();
+                        intent.setComponent(ComponentName.createRelative(requireActivity(), "com.geekorum.ttrss.manage_feeds.TestActivity"));
+                        startActivity(intent);
+                    }
+                });
+            }
             return true;
         } else if (categoriesDisplayed) {
             return onCategoriesSelected(item);

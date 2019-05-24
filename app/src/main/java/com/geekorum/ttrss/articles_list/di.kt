@@ -27,6 +27,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import com.geekorum.geekdroid.dagger.FragmentKey
 import com.geekorum.geekdroid.dagger.ViewModelKey
+import com.geekorum.ttrss.features_manager.InstallModuleViewModel
 import com.geekorum.ttrss.accounts.NetworkLoginModule
 import com.geekorum.ttrss.accounts.PerAccount
 import com.geekorum.ttrss.di.AssistedFactoriesModule
@@ -97,6 +98,11 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(FeedsViewModel::class)
     abstract fun getFeedsViewModel(feedsViewModel: FeedsViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(InstallModuleViewModel::class)
+    abstract fun getInstallModuleViewModel(vm: InstallModuleViewModel): ViewModel
 
 }
 
