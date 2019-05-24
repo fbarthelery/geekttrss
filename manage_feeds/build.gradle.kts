@@ -18,13 +18,23 @@ android {
         minSdkVersion(24)
         targetSdkVersion(28)
 
-        missingDimensionStrategy("distribution", "free", "google")
     }
 
     configureJavaVersion()
 
     dataBinding {
         isEnabled = true
+    }
+
+    flavorDimensions("distribution")
+    productFlavors {
+        register("free") {
+            dimension = "distribution"
+        }
+
+        register("google") {
+            dimension = "distribution"
+        }
     }
 }
 
