@@ -58,11 +58,13 @@ class InstallModuleViewModel @Inject constructor(
                 }
             }
             try {
+                Timber.d("RegisterListener for livedata")
                 session.registerListener(listener)
 
                 // wait for completion
                 session.awaitCompletion()
             } finally {
+                Timber.d("UnregisterListener for livedata")
                 session.unregisterListener(listener)
             }
         }

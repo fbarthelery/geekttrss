@@ -40,6 +40,7 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import timber.log.Timber
 
 class PlayStoreModuleManager constructor(
     private val splitInstallManager: SplitInstallManager
@@ -130,6 +131,7 @@ private class SplitInstallSession(
 }
 
 private fun SplitInstallSessionState.toInstallSessionState(): InstallSession.State {
+    Timber.d("convert split install state status ${status()}")
     val status = when (val status = status()) {
         SplitInstallSessionStatus.INSTALLED -> InstallSession.State.Status.INSTALLED
         SplitInstallSessionStatus.FAILED -> InstallSession.State.Status.FAILED

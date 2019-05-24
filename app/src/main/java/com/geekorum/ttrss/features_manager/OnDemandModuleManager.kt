@@ -27,6 +27,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.suspendCancellableCoroutine
+import timber.log.Timber
 import kotlin.coroutines.resume
 
 /**
@@ -115,13 +116,16 @@ suspend fun InstallSession.awaitCompletion(): InstallSession.State {
     return suspendCancellableCoroutine {
         val listener = object : InstallSession.Listener {
             override fun onStateUpdate(session: InstallSession, state: InstallSession.State) {
+                Timber.d("Unregister listener for awaitCompletion")
                 unregisterListener(this)
                 it.resume(state)
             }
         }
         it.invokeOnCancellation {
+            Timber.d("Unregister listener for awaitCompletion")
             unregisterListener(listener)
         }
+        Timber.d("Register listener for awaitCompletion")
         registerListener(listener)
     }
 }
