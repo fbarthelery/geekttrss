@@ -202,6 +202,9 @@ dependencies {
     add("googleImplementation", "com.crashlytics.sdk.android:crashlytics:2.9.6")
     // ensure that the free flavor don't get any firebase dependencies
     configurations["freeImplementation"].exclude(group = "com.google.firebase")
+
+    add("googleImplementation", "com.google.android.play:core:1.5.0")
+
 }
 
 apply {
