@@ -76,8 +76,14 @@ abstract class InstallSession(
         val status: Status
     ) {
         enum class Status {
+            PENDING,
+            REQUIRES_USER_CONFIRMATION,
+            DOWNLOADING,
+            INSTALLING,
             INSTALLED,
-            FAILED
+            FAILED,
+            CANCELING,
+            CANCELED
         }
     }
 }

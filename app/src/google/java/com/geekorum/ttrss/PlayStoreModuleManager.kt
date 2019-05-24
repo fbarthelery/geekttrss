@@ -110,10 +110,16 @@ private class SplitInstallSession(
 }
 
 private fun SplitInstallSessionState.toInstallSessionState(): InstallSession.State {
-    val status = when (status()) {
+    val status = when (val status = status()) {
         SplitInstallSessionStatus.INSTALLED -> InstallSession.State.Status.INSTALLED
         SplitInstallSessionStatus.FAILED -> InstallSession.State.Status.FAILED
-        else -> TODO("unhandled status")
+        SplitInstallSessionStatus.PENDING -> InstallSession.State.Status.PENDING
+        SplitInstallSessionStatus.REQUIRES_USER_CONFIRMATION -> InstallSession.State.Status.REQUIRES_USER_CONFIRMATION
+        SplitInstallSessionStatus.DOWNLOADING -> InstallSession.State.Status.DOWNLOADING
+        SplitInstallSessionStatus.DOWNLOADED, SplitInstallSessionStatus.INSTALLING -> InstallSession.State.Status.INSTALLING
+        SplitInstallSessionStatus.CANCELING -> InstallSession.State.Status.CANCELING
+        SplitInstallSessionStatus.CANCELED -> InstallSession.State.Status.CANCELED
+        else -> TODO("unhandled status $status")
     }
     return InstallSession.State(status)
 }
