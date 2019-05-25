@@ -25,4 +25,7 @@
     <!-- Must be kept in sync with packageId and other flavor dependent variable -->
     <string name="package_name">com.geekorum.ttrss</string>
     <string name="sync_adapter_content_authority">com.geekorum.ttrss.providers.articles</string>
+
+    <!-- TODO: turn off on release -->
+    <bool name="dev_show_manage_features">true</bool>
 </resources>

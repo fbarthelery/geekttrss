@@ -20,7 +20,8 @@
     along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
 
 -->
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+                  xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <PreferenceCategory
             android:title="@string/pref_category_user_interface">
@@ -33,6 +34,16 @@
                 android:entryValues="@array/pref_theme_values"
                 android:negativeButtonText="@null"
                 />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+            android:title="@string/pref_category_development"
+            app:isPreferenceVisible="@bool/dev_show_manage_features">
+
+        <Preference
+                android:key="manage_features"
+                android:title="@string/pref_title_manage_features">
+        </Preference>
     </PreferenceCategory>
 
     <PreferenceCategory
