@@ -21,12 +21,8 @@
     along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
 
 -->
-<sync-adapter
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:contentAuthority="com.geekorum.ttrss.free.providers.articles"
-        android:accountType="com.geekorum.ttrss.free"
-        android:userVisible="true"
-        android:supportsUploading="true"
-        android:allowParallelSyncs="false"
-        android:isAlwaysSyncable="true"/>
-
+<resources>
+    <!-- Must be kept in sync with packageId and other flavor dependent variable -->
+    <string name="package_name">com.geekorum.ttrss</string>
+    <string name="sync_adapter_content_authority">com.geekorum.ttrss.providers.articles</string>
+</resources>

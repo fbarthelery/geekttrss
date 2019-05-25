@@ -43,7 +43,7 @@
                 android:title="@string/oss_license_title"
                 >
             <intent android:targetClass="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
-                    android:targetPackage="com.geekorum.ttrss"
+                    android:targetPackage="@string/package_name"
                     />
         </Preference>
         <Preference

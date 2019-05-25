@@ -22,7 +22,7 @@
 
 -->
 <account-authenticator xmlns:android="http://schemas.android.com/apk/res/android"
-                       android:accountType="com.geekorum.ttrss"
+                       android:accountType="@string/package_name"
                        android:icon="@mipmap/ic_launcher"
                        android:smallIcon="@mipmap/ic_launcher"
                        android:label="@string/ttrss_account"

@@ -21,9 +21,9 @@
     along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
 
 -->
-<account-authenticator xmlns:android="http://schemas.android.com/apk/res/android"
-                       android:accountType="com.geekorum.ttrss.free"
-                       android:icon="@mipmap/ic_launcher"
-                       android:smallIcon="@mipmap/ic_launcher"
-                       android:label="@string/ttrss_account"
-/>
+<resources>
+    <!-- Must be kept in sync with packageId in build.gradle.kts -->
+    <string name="package_name">com.geekorum.ttrss.free</string>
+    <string name="sync_adapter_content_authority">com.geekorum.ttrss.free.providers.articles</string>
+
+</resources>
