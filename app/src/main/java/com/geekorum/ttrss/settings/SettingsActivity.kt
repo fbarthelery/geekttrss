@@ -27,6 +27,7 @@ import android.os.Bundle
 import android.os.StrictMode
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.preference.ListPreference
@@ -39,7 +40,7 @@ import com.geekorum.ttrss.R
 import com.geekorum.ttrss.databinding.ActivitySettingsBinding
 
 
-class SettingsActivity : BaseActivity() {
+class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
     lateinit var binding: ActivitySettingsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,6 +49,11 @@ class SettingsActivity : BaseActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_settings)
         setSupportActionBar(binding.toolbar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        if (savedInstanceState == null) {
+            supportFragmentManager.commit {
+                replace(R.id.preferences_container, SettingsFragment())
+            }
+        }
     }
 
     private fun allowDiskReads() {
@@ -57,6 +63,16 @@ class SettingsActivity : BaseActivity() {
                 StrictMode.setThreadPolicy(threadPolicy)
             }
         })
+    }
+
+    override fun onPreferenceStartFragment(caller: PreferenceFragmentCompat, pref: Preference): Boolean {
+        val fragmentClass = pref.fragment
+        supportFragmentManager.commit {
+            val fragment = daggerDelegateFragmentFactory.instantiate(classLoader, fragmentClass)
+            addToBackStack("preferences_screen")
+            replace(R.id.preferences_container, fragment)
+        }
+        return true
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)

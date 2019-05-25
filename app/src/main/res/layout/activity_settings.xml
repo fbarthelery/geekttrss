@@ -46,14 +46,12 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <fragment android:id="@+id/preferences"
-                  android:layout_width="0dp" android:layout_height="0dp"
-                  app:layout_constraintTop_toBottomOf="@+id/app_bar"
-                  app:layout_constraintBottom_toBottomOf="parent"
-                  app:layout_constraintStart_toStartOf="parent"
-                  app:layout_constraintEnd_toEndOf="parent"
-                  tools:layout="@android:layout/list_content"
-                  android:name="com.geekorum.ttrss.settings.SettingsActivity$SettingsFragment" />
+        <FrameLayout android:id="@+id/preferences_container"
+                android:layout_width="0dp" android:layout_height="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/app_bar" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

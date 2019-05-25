@@ -54,10 +54,10 @@
                 android:layout_marginTop="?actionBarSize"
                 app:cardElevation="8dp">
 
-            <fragment android:id="@+id/preferences"
-                      android:layout_width="match_parent" android:layout_height="match_parent"
-                      android:name="com.geekorum.ttrss.settings.SettingsActivity$SettingsFragment"
-                      tools:layout="@android:layout/list_content" />
+            <FrameLayout android:id="@+id/preferences_container"
+                         android:layout_width="match_parent"
+                         android:layout_height="match_parent"
+                    />
 
         </com.google.android.material.card.MaterialCardView>
 
