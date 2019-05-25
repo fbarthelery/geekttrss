@@ -29,6 +29,7 @@ import com.geekorum.ttrss.data.ArticlesDatabaseModule
 import com.geekorum.ttrss.debugtools.StrictModeModule
 import com.geekorum.ttrss.logging.LogcatLoggingModule
 import com.geekorum.ttrss.settings.SettingsInitializerModule
+import com.geekorum.ttrss.settings.SettingsModule
 import dagger.Module
 
 /**
@@ -43,7 +44,7 @@ import dagger.Module
     BackgroundJobsModule::class,
     NetworkModule::class,
     ArticlesDatabaseModule::class,
-    SettingsInitializerModule::class,
+    SettingsModule::class,
     LogcatLoggingModule::class,
     AndroidTinyrssAccountManagerModule::class,
     StrictModeModule::class,

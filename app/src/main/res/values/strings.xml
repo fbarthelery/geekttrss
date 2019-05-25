@@ -63,6 +63,9 @@
     <string name="pref_category_development">Development</string>
     <string name="pref_title_manage_features">Manage features</string>
 
+    <!-- Manage features fragment -->
+    <string name="btn_install_feature">Install</string>
+    <string name="btn_uninstall_feature">Uninstall</string>
 
     <!-- article list items -->
     <string name="mark_as_read">Mark as read</string>
