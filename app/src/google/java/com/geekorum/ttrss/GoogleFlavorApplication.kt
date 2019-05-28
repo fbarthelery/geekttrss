@@ -20,12 +20,25 @@
  */
 package com.geekorum.ttrss
 
+import com.geekorum.geekdroid.dagger.AppInitializer
+import com.geekorum.ttrss.debugtools.StrictModeInitializer
 import com.geekorum.ttrss.di.ApplicationComponent
 import com.geekorum.ttrss.di.DaggerGoogleFlavorApplicationComponent
+import com.geekorum.ttrss.logging.CrashlyticsInitializer
 
 class GoogleFlavorApplication : Application() {
 
     override fun applicationInjector(): ApplicationComponent {
         return DaggerGoogleFlavorApplicationComponent.builder().bindApplication(this).build()
+    }
+
+    override fun sortAppInitializers(initializers: Set<AppInitializer>): List<AppInitializer> {
+        val result = mutableListOf<AppInitializer>()
+        val strictModeInitializer = initializers.find { it is StrictModeInitializer }
+        strictModeInitializer?.let { result.add(it) }
+        val crashlyticsInitializer = initializers.find { it is CrashlyticsInitializer }
+        crashlyticsInitializer?.let { result.add(it) }
+        result.addAll(initializers)
+        return result.distinct()
     }
 }

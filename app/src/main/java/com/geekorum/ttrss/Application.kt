@@ -39,10 +39,16 @@ open class Application : DaggerApplication() {
 
     override fun onCreate() {
         super.onCreate()
-        // initializer StrictMode first
-        val strictModeFirst = appInitializers.partition { it is StrictModeInitializer }
-        strictModeFirst.first.forEach { it.initialize(this) }
-        strictModeFirst.second.forEach { it.initialize(this) }
+        // a few initializers need to be set up before others
+        sortAppInitializers(appInitializers).initialize(this)
+    }
+
+    protected open fun sortAppInitializers(initializers: Set<AppInitializer>): List<AppInitializer> {
+        val result = mutableListOf<AppInitializer>()
+        val strictModeInitializer = initializers.find { it is StrictModeInitializer }
+        strictModeInitializer?.let { result.add(it) }
+        result.addAll(initializers)
+        return result.distinct()
     }
 
     override fun applicationInjector(): ApplicationComponent {
