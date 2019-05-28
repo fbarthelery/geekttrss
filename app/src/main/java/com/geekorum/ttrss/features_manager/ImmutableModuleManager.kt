@@ -59,7 +59,7 @@ class ImmutableModuleManager(
 /**
  * An InstallSession for an pre installed module
  */
-private class CompleteSession(id: Int) : InstallSession(id) {
+internal class CompleteSession(id: Int) : InstallSession(id) {
     private val state = State(State.Status.INSTALLED)
 
     override suspend fun getSessionState(): State = state

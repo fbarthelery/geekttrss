@@ -21,6 +21,7 @@
 package com.geekorum.ttrss
 
 import com.geekorum.geekdroid.gms.await
+import com.geekorum.ttrss.features_manager.CompleteSession
 import com.geekorum.ttrss.features_manager.InstallSession
 import com.geekorum.ttrss.features_manager.OnDemandModuleException
 import com.geekorum.ttrss.features_manager.OnDemandModuleManager
@@ -35,11 +36,9 @@ import com.google.android.play.core.tasks.Task
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
 class PlayStoreModuleManager constructor(
@@ -53,7 +52,11 @@ class PlayStoreModuleManager constructor(
         }.build()
         val installTask: Task<Int> = splitInstallManager.startInstall(installRequest)
         try {
-            val id = installTask.await() // fail error code -2 MODULE_UNAVAILABLE
+            val id = installTask.await()
+            if (id == 0) {
+                // already installed so not a real session
+                return CompleteSession(id)
+            }
             return SplitInstallSession(splitInstallManager, id)
         } catch (e: SplitInstallException) {
             throw OnDemandModuleException("unable to install modules", e)
