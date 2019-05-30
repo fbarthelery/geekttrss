@@ -34,8 +34,6 @@ fun DependencyHandler.createComponentsPlatforms() {
     components.apply {
         getOrCreatePlatform(CoroutinesPlatform)
         getOrCreatePlatform(DaggerPlatform)
-        getOrCreatePlatform(AndroidX.RoomPlatform)
-        getOrCreatePlatform(AndroidX.LifecyclePlatform)
     }
 }
 
@@ -78,33 +76,6 @@ internal class DaggerPlatform {
 
 fun DependencyHandler.enforcedDaggerPlatform(version: String): Dependency {
     return enforcedPlatform("${components.getOrCreatePlatform(DaggerPlatform)}:$version")
-}
-
-
-internal class AndroidX {
-    class RoomPlatform {
-
-        companion object : PlatformFactory("androidx.room:room-platform", AlignmentRule::class.java)
-
-        open class AlignmentRule : SameGroupAlignmentRule(platformName, "androidx.room")
-    }
-
-    class LifecyclePlatform {
-
-        companion object : PlatformFactory("androidx.lifecycle:lifecycle-platform", AlignmentRule::class.java)
-
-        open class AlignmentRule : SameGroupAlignmentRule(platformName, "androidx.lifecycle")
-
-    }
-}
-
-
-fun DependencyHandler.enforcedAndroidxRoomPlatform(version: String): Dependency {
-    return enforcedPlatform("${components.getOrCreatePlatform(AndroidX.RoomPlatform)}:$version")
-}
-
-fun DependencyHandler.enforcedAndroidxLifecyclePlatform(version: String): Dependency {
-    return enforcedPlatform("${components.getOrCreatePlatform(AndroidX.LifecyclePlatform)}:$version")
 }
 
 open class PlatformFactory(
