@@ -21,11 +21,9 @@
 package com.geekorum.ttrss.features_manager
 
 import androidx.annotation.MainThread
-import dagger.Module
-import dagger.Provides
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.channels.SendChannel
+import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.suspendCancellableCoroutine
 import timber.log.Timber
 import kotlin.coroutines.resume
@@ -69,7 +67,7 @@ abstract class InstallSession(
     abstract fun registerListener(listener: Listener)
     abstract fun unregisterListener(listener: Listener)
 
-    abstract fun CoroutineScope.getSessionStates(): ReceiveChannel<State>
+    abstract suspend fun sendStatesTo(channel: SendChannel<State>)
 
     abstract suspend fun getSessionState(): State
 
@@ -96,6 +94,9 @@ abstract class InstallSession(
     }
 }
 
+fun CoroutineScope.produceInstallSessionStates(session: InstallSession) = produce <InstallSession.State> {
+    session.sendStatesTo(channel)
+}
 
 suspend fun InstallSession.awaitCompletion(): InstallSession.State {
     fun isComplete(state: InstallSession.State) = when (state.status) {

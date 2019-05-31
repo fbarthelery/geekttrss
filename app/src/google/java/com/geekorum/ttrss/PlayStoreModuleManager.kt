@@ -35,10 +35,8 @@ import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus
 import com.google.android.play.core.tasks.Task
 import dagger.Module
 import dagger.Provides
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.ReceiveChannel
-import kotlinx.coroutines.channels.produce
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.channels.SendChannel
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
 class PlayStoreModuleManager constructor(
@@ -81,16 +79,19 @@ private class SplitInstallSession(
     private val splitInstallManager: SplitInstallManager,
     id: Int
 ) : InstallSession(id) {
-    override fun CoroutineScope.getSessionStates(): ReceiveChannel<State> = produce {
+    override suspend fun sendStatesTo(channel: SendChannel<State>) {
         val listener = SplitInstallStateUpdatedListener {
-            val installState = it.toInstallSessionState()
-            launch {
-                //TODO close when state is a terminal state?
-                send(installState)
+            runBlocking {
+                val installState = it.toInstallSessionState()
+                channel.send(installState)
+                if (it.isTerminal) {
+                    channel.close()
+                }
             }
         }
         splitInstallManager.registerListener(listener)
-        invokeOnClose {
+
+        channel.invokeOnClose {
             splitInstallManager.unregisterListener(listener)
         }
     }
@@ -149,6 +150,16 @@ private fun SplitInstallSessionState.toInstallSessionState(): InstallSession.Sta
     return InstallSession.State(status, bytesDownloaded(), totalBytesToDownload())
 }
 
+/**
+ * Is this the last state that we will receive?
+ */
+private val SplitInstallSessionState.isTerminal: Boolean
+    get() = when (status()) {
+        SplitInstallSessionStatus.INSTALLED,
+        SplitInstallSessionStatus.FAILED,
+        SplitInstallSessionStatus.CANCELED -> true
+        else -> false
+    }
 
 @Module
 class PlayStoreInstallModule {
