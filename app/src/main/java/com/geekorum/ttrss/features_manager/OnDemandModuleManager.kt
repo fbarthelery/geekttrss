@@ -94,6 +94,9 @@ abstract class InstallSession(
     }
 }
 
+
+/* Extensions functions for easy usage */
+
 fun CoroutineScope.produceInstallSessionStates(session: InstallSession) = produce <InstallSession.State> {
     session.sendStatesTo(channel)
 }

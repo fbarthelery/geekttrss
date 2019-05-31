@@ -27,7 +27,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
+import com.geekorum.ttrss.R
 import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -35,12 +38,59 @@ class InstallModuleViewModel @Inject constructor(
     private val moduleManager: OnDemandModuleManager
 ) : ViewModel() {
 
+    data class InstallProgression(
+        @StringRes
+        val message: Int,
+        val progress: Int,
+        val max: Int
+    )
+
+    private val _sessionState = MutableLiveData<InstallSession.State>().apply {
+        value = InstallSession.State(InstallSession.State.Status.PENDING, 0, 0)
+    }
+
+    val progress = _sessionState.map {
+        Timber.d("install session state is ${it}")
+        val message = when (it.status) {
+            InstallSession.State.Status.DOWNLOADING -> R.string.lbl_download_in_progress
+            InstallSession.State.Status.INSTALLING -> R.string.lbl_install_in_progress
+            InstallSession.State.Status.INSTALLED -> R.string.lbl_install_complete
+            InstallSession.State.Status.FAILED -> R.string.lbl_failed_to_install
+            else -> R.string.lbl_other
+        }
+        val max = 100
+        val percent = when (it.totalBytesDownloaded) {
+            0L -> 0
+            else -> Math.round((it.bytesDownloaded.toFloat() / it.totalBytesDownloaded) * max)
+        }
+        InstallProgression(message, percent, max)
+    }
+
+    private var session: InstallSession? = null
+
     fun isModuleInstalled(module: String): Boolean {
         return module in moduleManager.installedModules
     }
 
     fun deferedInstallModule(vararg modules: String) {
         moduleManager.deferredInstall(*modules)
+    }
+
+    fun startInstallModules(vararg modules: String) = viewModelScope.launch {
+        if (session != null) {
+            return@launch
+        }
+
+        val session = moduleManager.startInstallModule(*modules)
+
+        val sessionStates = produceInstallSessionStates(session)
+
+        this@InstallModuleViewModel.session = session
+
+        sessionStates.consumeEach {
+            _sessionState.value = it
+        }
+
     }
 
     fun installModule(vararg modules: String): LiveData<InstallSession.State> {
