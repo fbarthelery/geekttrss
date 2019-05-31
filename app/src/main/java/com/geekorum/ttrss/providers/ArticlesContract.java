@@ -78,6 +78,7 @@ public class ArticlesContract {
         public static final String LAST_TIME_UPDATE  = "last_time_update";
         public static final String DISPLAY_TITLE = "display_title";
         public static final String UNREAD_COUNT = "unread_count";
+        public static final String IS_SUBSCRIBED = "is_subscribed";
 
 
         private Feed() {
