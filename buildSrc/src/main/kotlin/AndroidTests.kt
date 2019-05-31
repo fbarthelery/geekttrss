@@ -24,14 +24,14 @@ import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.internal.dsl.TestOptions
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
+import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.kotlin.dsl.closureOf
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.kotlin
-import org.gradle.kotlin.dsl.provideDelegate
 
-const val espressoVersion = "3.1.1"
+const val espressoVersion = "3.2.0"
 const val androidxTestRunnerVersion = "1.1.1"
 const val androidxTestCoreVersion = "1.1.0"
 const val androidxTestExtVersion = "1.1.0"
@@ -76,8 +76,13 @@ internal fun Project.configureTests() {
         dualTestImplementation("androidx.test.espresso:espresso-intents:$espressoVersion")
 
         // assertions
-        dualTestImplementation("com.google.truth:truth:0.42")
+        dualTestImplementation("com.google.truth:truth:0.44")
         dualTestImplementation("androidx.test.ext:truth:$androidxTestExtVersion")
+
+        // fix for guava listenablefuture conflict with application runtime version
+        dualTestImplementation("com.google.guava:listenablefuture:1.0") {
+            isForce = true
+        }
 
         // mock
         testImplementation("io.mockk:mockk:1.9")
@@ -89,6 +94,12 @@ internal fun Project.configureTests() {
 fun DependencyHandler.dualTestImplementation(dependencyNotation: Any) {
     add("androidTestImplementation", dependencyNotation)
     add("testImplementation", dependencyNotation)
+}
+
+fun DependencyHandler.dualTestImplementation(dependencyNotation: Any, action: ExternalModuleDependency.() -> Unit) {
+    val closure = closureOf(action)
+    add("androidTestImplementation", dependencyNotation, closure)
+    add("testImplementation", dependencyNotation, closure)
 }
 
 internal fun DependencyHandler.`androidTestImplementation`(dependencyNotation: Any): Dependency? =
