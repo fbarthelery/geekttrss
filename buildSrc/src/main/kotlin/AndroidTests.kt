@@ -30,6 +30,7 @@ import org.gradle.kotlin.dsl.closureOf
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.kotlin
+import org.gradle.kotlin.dsl.provideDelegate
 
 const val espressoVersion = "3.2.0"
 const val androidxTestRunnerVersion = "1.1.1"
