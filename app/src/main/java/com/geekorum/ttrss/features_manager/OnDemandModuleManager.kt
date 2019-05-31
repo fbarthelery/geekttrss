@@ -79,7 +79,9 @@ abstract class InstallSession(
     }
 
     data class State(
-        val status: Status
+        val status: Status,
+        val bytesDownloaded: Long,
+        val totalBytesDownloaded: Long
     ) {
         enum class Status {
             PENDING,

@@ -146,7 +146,7 @@ private fun SplitInstallSessionState.toInstallSessionState(): InstallSession.Sta
         SplitInstallSessionStatus.CANCELED -> InstallSession.State.Status.CANCELED
         else -> TODO("unhandled status $status")
     }
-    return InstallSession.State(status)
+    return InstallSession.State(status, bytesDownloaded(), totalBytesToDownload())
 }
 
 
