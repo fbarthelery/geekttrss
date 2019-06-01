@@ -67,6 +67,13 @@
     <string name="btn_install_feature">Install</string>
     <string name="btn_uninstall_feature">Uninstall</string>
 
+    <!-- Install feature -->
+    <string name="lbl_download_in_progress">Downloading</string>
+    <string name="lbl_install_in_progress">Installing</string>
+    <string name="lbl_failed_to_install">Installation failed</string>
+    <string name="lbl_install_complete">Installation complete</string>
+    <string name="lbl_other">Other state</string>
+
     <!-- article list items -->
     <string name="mark_as_read">Mark as read</string>
     <string name="mark_as_unread">Mark as unread</string>

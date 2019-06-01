@@ -20,30 +20,35 @@
  */
 package com.geekorum.ttrss.settings.manage_modules
 
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModel
-import com.geekorum.geekdroid.dagger.FragmentKey
-import com.geekorum.geekdroid.dagger.ViewModelKey
+import android.os.Bundle
+import androidx.databinding.DataBindingUtil
+import com.geekorum.ttrss.BaseActivity
+import com.geekorum.ttrss.R
+import com.geekorum.ttrss.databinding.ActivityInstallFeatureBinding
 import com.geekorum.ttrss.features_manager.InstallModuleViewModel
-import dagger.Binds
-import dagger.Module
-import dagger.multibindings.IntoMap
+import com.geekorum.ttrss.viewModels
 
-@Module
-abstract class ManageFeaturesModule {
+/**
+ * Quick and dirty InstallFeatureActivity
+ */
+class InstallFeatureActivity : BaseActivity() {
 
-    @Binds
-    @IntoMap
-    @FragmentKey(ManageFeaturesFragment::class)
-    abstract fun getManageFeaturesFragment(manageFeaturesFragment: ManageFeaturesFragment): Fragment
+    companion object {
+        const val EXTRA_FEATURES_LIST = "features"
+    }
 
-    @Binds
-    @IntoMap
-    @ViewModelKey(ManageFeaturesViewModel::class)
-    abstract fun getManageFeaturesViewModel(manageFeaturesViewModel: ManageFeaturesViewModel): ViewModel
+    lateinit var binding: ActivityInstallFeatureBinding
 
-    @Binds
-    @IntoMap
-    @ViewModelKey(InstallModuleViewModel::class)
-    abstract fun getInstallModuleViewModel(vm: InstallModuleViewModel): ViewModel
+    val viewModel: InstallModuleViewModel by viewModels()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_install_feature)
+        binding.lifecycleOwner = this
+        binding.viewModel = viewModel
+        val features = intent.getStringArrayExtra(EXTRA_FEATURES_LIST)
+        viewModel.startInstallModules(*features)
+    }
 }
+
+
