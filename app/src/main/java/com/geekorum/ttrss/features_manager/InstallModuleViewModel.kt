@@ -88,8 +88,10 @@ class InstallModuleViewModel @Inject constructor(
         this@InstallModuleViewModel.session = session
 
         sessionStates.consumeEach {
+            Timber.d("received new state $it")
             _sessionState.value = it
         }
+        Timber.d("end of consumeeach, state channel is closed for receive? ${sessionStates.isClosedForReceive}")
 
     }
 

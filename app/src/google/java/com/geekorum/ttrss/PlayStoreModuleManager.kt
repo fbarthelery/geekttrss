@@ -38,6 +38,8 @@ import dagger.Provides
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class PlayStoreModuleManager constructor(
     private val splitInstallManager: SplitInstallManager
@@ -82,6 +84,7 @@ private class SplitInstallSession(
     override suspend fun sendStatesTo(channel: SendChannel<State>) {
         val listener = SplitInstallStateUpdatedListener {
             runBlocking {
+                Timber.d("receive split install state $it")
                 val installState = it.toInstallSessionState()
                 channel.send(installState)
                 if (it.isTerminal) {
@@ -93,9 +96,13 @@ private class SplitInstallSession(
         Timber.d("register listener for send states")
         splitInstallManager.registerListener(listener)
 
-        channel.invokeOnClose {
-            Timber.d("unregister listener for send states")
-            splitInstallManager.unregisterListener(listener)
+        Timber.d("suspend sendStatesTo coroutines")
+        suspendCoroutine<Unit> {cont ->
+            channel.invokeOnClose {
+                Timber.d("unregister listener for send states")
+                splitInstallManager.unregisterListener(listener)
+                cont.resume(Unit)
+            }
         }
     }
 
