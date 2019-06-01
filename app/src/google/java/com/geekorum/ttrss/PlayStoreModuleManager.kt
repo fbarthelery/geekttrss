@@ -85,13 +85,16 @@ private class SplitInstallSession(
                 val installState = it.toInstallSessionState()
                 channel.send(installState)
                 if (it.isTerminal) {
+                    Timber.d("state $it converted to $installState is terminal. closing channel")
                     channel.close()
                 }
             }
         }
+        Timber.d("register listener for send states")
         splitInstallManager.registerListener(listener)
 
         channel.invokeOnClose {
+            Timber.d("unregister listener for send states")
             splitInstallManager.unregisterListener(listener)
         }
     }
