@@ -23,6 +23,7 @@ package com.geekorum.ttrss.settings.manage_modules
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.geekorum.geekdroid.app.lifecycle.Event
 import com.geekorum.ttrss.features_manager.Features
 import com.geekorum.ttrss.features_manager.ImmutableModuleManager
 import com.geekorum.ttrss.features_manager.OnDemandModuleManager
@@ -33,9 +34,7 @@ class ManageFeaturesViewModel @Inject constructor(
 ) : ViewModel() {
     private val moduleStatus = MutableLiveData<List<FeatureStatus>>().apply {
         value = Features.allFeatures.map {
-            FeatureStatus(it,
-                it in moduleManager.installedModules
-            )
+            FeatureStatus(it,it in moduleManager.installedModules)
         }
     }
 
@@ -43,10 +42,13 @@ class ManageFeaturesViewModel @Inject constructor(
         value = moduleManager !is ImmutableModuleManager
     }
 
+    private val _startInstallModuleEvent = MutableLiveData<Event<String>>()
+    val startInstallModuleEvent: LiveData<Event<String>> = _startInstallModuleEvent
+
     val features: LiveData<List<FeatureStatus>> = moduleStatus
 
     fun installModule(module: String) {
-
+        _startInstallModuleEvent.value = Event(module)
     }
 
     fun uninstallModule(module: String) {
@@ -60,7 +62,6 @@ class ManageFeaturesViewModel @Inject constructor(
                 it in moduleManager.installedModules
             )
         }
-
     }
 }
 

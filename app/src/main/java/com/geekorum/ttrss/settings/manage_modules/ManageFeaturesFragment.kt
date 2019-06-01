@@ -20,6 +20,7 @@
  */
 package com.geekorum.ttrss.settings.manage_modules
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -27,6 +28,7 @@ import android.view.ViewGroup
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
+import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.geekdroid.dagger.DaggerDelegateFragmentFactory
 import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory
 import com.geekorum.ttrss.BaseFragment
@@ -51,6 +53,13 @@ class ManageFeaturesFragment @Inject constructor(
         viewModel.features.observe(viewLifecycleOwner) {
             adapter.items = it
         }
+        viewModel.startInstallModuleEvent.observe(this, EventObserver {
+            val intent = Intent(requireContext(), InstallFeatureActivity::class.java).apply {
+                putExtra(InstallFeatureActivity.EXTRA_FEATURES_LIST, arrayOf(it))
+            }
+            startActivity(intent)
+        })
+
         return binding.root
     }
 
