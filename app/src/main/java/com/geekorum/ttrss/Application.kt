@@ -26,7 +26,6 @@ import com.geekorum.ttrss.debugtools.StrictModeInitializer
 import com.geekorum.ttrss.di.ApplicationComponent
 import com.geekorum.ttrss.di.DaggerApplicationComponent
 import dagger.android.support.DaggerApplication
-
 import javax.inject.Inject
 
 /**

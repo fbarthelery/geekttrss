@@ -74,7 +74,6 @@ class PlayStoreModuleManager constructor(
     override val installedModules: Set<String>
         get() = splitInstallManager.installedModules
 
-
 }
 
 private class SplitInstallSession(
@@ -87,7 +86,6 @@ private class SplitInstallSession(
                 if (it.sessionId() != id) {
                     return@runBlocking
                 }
-                Timber.d("receive split install state $it")
                 val installState = it.toInstallSessionState()
                 channel.send(installState)
                 if (it.isTerminal) {
@@ -96,13 +94,10 @@ private class SplitInstallSession(
                 }
             }
         }
-        Timber.d("register listener for send states")
         splitInstallManager.registerListener(listener)
 
-        Timber.d("suspend sendStatesTo coroutines")
         suspendCoroutine<Unit> {cont ->
             channel.invokeOnClose {
-                Timber.d("unregister listener for send states")
                 splitInstallManager.unregisterListener(listener)
                 cont.resume(Unit)
             }
@@ -144,11 +139,9 @@ private class SplitInstallSession(
             splitInstallManager.unregisterListener(splitListener)
         }
     }
-
 }
 
 private fun SplitInstallSessionState.toInstallSessionState(): InstallSession.State {
-    Timber.d("convert split install state status ${status()}")
     val status = when (val status = status()) {
         SplitInstallSessionStatus.PENDING -> InstallSession.State.Status.PENDING
         SplitInstallSessionStatus.DOWNLOADING -> InstallSession.State.Status.DOWNLOADING

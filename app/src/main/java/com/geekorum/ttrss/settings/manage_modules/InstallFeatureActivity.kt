@@ -22,10 +22,14 @@ package com.geekorum.ttrss.settings.manage_modules
 
 import android.os.Bundle
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.observe
 import com.geekorum.ttrss.BaseActivity
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.databinding.ActivityInstallFeatureBinding
 import com.geekorum.ttrss.features_manager.InstallModuleViewModel
+import com.geekorum.ttrss.features_manager.InstallSession.State.Status.CANCELED
+import com.geekorum.ttrss.features_manager.InstallSession.State.Status.FAILED
+import com.geekorum.ttrss.features_manager.InstallSession.State.Status.INSTALLED
 import com.geekorum.ttrss.viewModels
 
 /**
@@ -41,13 +45,50 @@ class InstallFeatureActivity : BaseActivity() {
 
     val viewModel: InstallModuleViewModel by viewModels()
 
+    private var animationIsRunning = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_install_feature)
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
+
+        viewModel.sessionState.observe(this) {
+            when (it.status) {
+                INSTALLED,
+                FAILED,
+                CANCELED -> stopAnimation()
+                else -> startAnimation()
+            }
+        }
         val features = intent.getStringArrayExtra(EXTRA_FEATURES_LIST)
         viewModel.startInstallModules(*features)
+    }
+
+    private fun startAnimation() {
+        if (animationIsRunning) {
+            return
+        }
+        binding.moduleLogo.animate()
+            .rotationBy(360f)
+            .withEndAction {
+                animationIsRunning = false
+                startAnimation()
+            }
+            .setInterpolator(null)
+            .setDuration(2000L)
+            .start()
+        animationIsRunning = true
+    }
+
+    private fun stopAnimation() {
+        binding.moduleLogo.animate().cancel()
+        animationIsRunning = false
+    }
+
+    override fun onPause() {
+        super.onPause()
+        stopAnimation()
     }
 }
 

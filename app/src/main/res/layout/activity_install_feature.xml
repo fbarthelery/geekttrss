@@ -70,9 +70,9 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/install_status"
                 app:layout_constraintWidth_percent="0.6"
+                android:indeterminate="@{viewModel.progress.progressIndeterminate}"
                 android:progress="@{viewModel.progress.progress}"
                 android:max="@{viewModel.progress.max}"
-                android:indeterminate="@{viewModel.progress.progressIndeterminate}"
                 tools:progress="33"
                 />
     </androidx.constraintlayout.widget.ConstraintLayout>

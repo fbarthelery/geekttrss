@@ -58,28 +58,8 @@ class InstallModuleViewModel @Inject constructor(
         value = InstallSession.State(PENDING, 0, 0)
     }
 
-    val progress = _sessionState.map {
-        Timber.d("install session state is ${it}")
-        val message = when (it.status) {
-            DOWNLOADING -> R.string.lbl_download_in_progress
-            INSTALLING -> R.string.lbl_install_in_progress
-            INSTALLED -> R.string.lbl_install_complete
-            FAILED -> R.string.lbl_failed_to_install
-            else -> R.string.lbl_other
-        }
-        val max = 100
-        val percent = when (it.status) {
-            DOWNLOADING -> Math.round((it.bytesDownloaded.toFloat() / it.totalBytesDownloaded) * max)
-            INSTALLED -> 100
-            else -> 0
-        }
-        val progressIndeterminate = when (it.status) {
-            PENDING, INSTALLING, REQUIRES_USER_CONFIRMATION, CANCELING -> true
-            DOWNLOADING, INSTALLED, FAILED, CANCELED -> false
-        }
-
-        InstallProgression(message, percent, max, progressIndeterminate)
-    }
+    val sessionState: LiveData<InstallSession.State> = _sessionState
+    val progress = sessionState.map(this::mapStateToProgression)
 
     private var session: InstallSession? = null
 
@@ -103,12 +83,32 @@ class InstallModuleViewModel @Inject constructor(
         this@InstallModuleViewModel.session = session
 
         sessionStates.consumeEach {
-            Timber.d("received new state $it")
             _sessionState.value = it
         }
-        Timber.d("end of consumeeach, state channel is closed for receive? ${sessionStates.isClosedForReceive}")
-
     }
+
+    private fun mapStateToProgression(state: InstallSession.State): InstallProgression {
+        Timber.d("install session state is $state")
+        val message = when (state.status) {
+            PENDING, DOWNLOADING -> R.string.lbl_download_in_progress
+            INSTALLING -> R.string.lbl_install_in_progress
+            INSTALLED -> R.string.lbl_install_complete
+            FAILED -> R.string.lbl_failed_to_install
+            else -> R.string.lbl_other
+        }
+        val max = 100
+        val percent = when (state.status) {
+            DOWNLOADING -> Math.round((state.bytesDownloaded.toFloat() / state.totalBytesDownloaded) * max)
+            INSTALLED -> 100
+            else -> 0
+        }
+        val progressIndeterminate = when (state.status) {
+            PENDING, INSTALLING, REQUIRES_USER_CONFIRMATION, CANCELING -> true
+            DOWNLOADING, INSTALLED, FAILED, CANCELED -> false
+        }
+        return InstallProgression(message, percent, max, progressIndeterminate)
+    }
+
 
     fun installModule(vararg modules: String): LiveData<InstallSession.State> {
         val sessionDeferred = viewModelScope.async { moduleManager.startInstallModule(*modules) }
