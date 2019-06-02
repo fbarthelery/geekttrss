@@ -20,13 +20,23 @@
  */
 package com.geekorum.ttrss
 
+import android.content.Context
 import com.geekorum.geekdroid.dagger.AppInitializer
 import com.geekorum.ttrss.debugtools.StrictModeInitializer
 import com.geekorum.ttrss.di.ApplicationComponent
 import com.geekorum.ttrss.di.DaggerGoogleFlavorApplicationComponent
 import com.geekorum.ttrss.logging.CrashlyticsInitializer
+import com.google.android.play.core.splitcompat.SplitCompat
 
 class GoogleFlavorApplication : Application() {
+
+    /**
+     * Allow to load code/resources from on demand modules
+     */
+    override fun attachBaseContext(base: Context?) {
+        super.attachBaseContext(base)
+        SplitCompat.install(this)
+    }
 
     override fun applicationInjector(): ApplicationComponent {
         return DaggerGoogleFlavorApplicationComponent.builder().bindApplication(this).build()

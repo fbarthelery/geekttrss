@@ -84,6 +84,9 @@ private class SplitInstallSession(
     override suspend fun sendStatesTo(channel: SendChannel<State>) {
         val listener = SplitInstallStateUpdatedListener {
             runBlocking {
+                if (it.sessionId() != id) {
+                    return@runBlocking
+                }
                 Timber.d("receive split install state $it")
                 val installState = it.toInstallSessionState()
                 channel.send(installState)
