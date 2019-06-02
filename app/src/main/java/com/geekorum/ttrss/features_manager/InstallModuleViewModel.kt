@@ -28,6 +28,14 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.geekorum.ttrss.R
+import com.geekorum.ttrss.features_manager.InstallSession.State.Status.CANCELED
+import com.geekorum.ttrss.features_manager.InstallSession.State.Status.CANCELING
+import com.geekorum.ttrss.features_manager.InstallSession.State.Status.DOWNLOADING
+import com.geekorum.ttrss.features_manager.InstallSession.State.Status.FAILED
+import com.geekorum.ttrss.features_manager.InstallSession.State.Status.INSTALLED
+import com.geekorum.ttrss.features_manager.InstallSession.State.Status.INSTALLING
+import com.geekorum.ttrss.features_manager.InstallSession.State.Status.PENDING
+import com.geekorum.ttrss.features_manager.InstallSession.State.Status.REQUIRES_USER_CONFIRMATION
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
@@ -42,28 +50,35 @@ class InstallModuleViewModel @Inject constructor(
         @StringRes
         val message: Int,
         val progress: Int,
-        val max: Int
+        val max: Int,
+        val progressIndeterminate: Boolean
     )
 
     private val _sessionState = MutableLiveData<InstallSession.State>().apply {
-        value = InstallSession.State(InstallSession.State.Status.PENDING, 0, 0)
+        value = InstallSession.State(PENDING, 0, 0)
     }
 
     val progress = _sessionState.map {
         Timber.d("install session state is ${it}")
         val message = when (it.status) {
-            InstallSession.State.Status.DOWNLOADING -> R.string.lbl_download_in_progress
-            InstallSession.State.Status.INSTALLING -> R.string.lbl_install_in_progress
-            InstallSession.State.Status.INSTALLED -> R.string.lbl_install_complete
-            InstallSession.State.Status.FAILED -> R.string.lbl_failed_to_install
+            DOWNLOADING -> R.string.lbl_download_in_progress
+            INSTALLING -> R.string.lbl_install_in_progress
+            INSTALLED -> R.string.lbl_install_complete
+            FAILED -> R.string.lbl_failed_to_install
             else -> R.string.lbl_other
         }
         val max = 100
-        val percent = when (it.totalBytesDownloaded) {
-            0L -> 0
-            else -> Math.round((it.bytesDownloaded.toFloat() / it.totalBytesDownloaded) * max)
+        val percent = when (it.status) {
+            DOWNLOADING -> Math.round((it.bytesDownloaded.toFloat() / it.totalBytesDownloaded) * max)
+            INSTALLED -> 100
+            else -> 0
         }
-        InstallProgression(message, percent, max)
+        val progressIndeterminate = when (it.status) {
+            PENDING, INSTALLING, REQUIRES_USER_CONFIRMATION, CANCELING -> true
+            DOWNLOADING, INSTALLED, FAILED, CANCELED -> false
+        }
+
+        InstallProgression(message, percent, max, progressIndeterminate)
     }
 
     private var session: InstallSession? = null

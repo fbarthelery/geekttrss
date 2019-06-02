@@ -147,12 +147,12 @@ private class SplitInstallSession(
 private fun SplitInstallSessionState.toInstallSessionState(): InstallSession.State {
     Timber.d("convert split install state status ${status()}")
     val status = when (val status = status()) {
-        SplitInstallSessionStatus.INSTALLED -> InstallSession.State.Status.INSTALLED
-        SplitInstallSessionStatus.FAILED -> InstallSession.State.Status.FAILED
         SplitInstallSessionStatus.PENDING -> InstallSession.State.Status.PENDING
-        SplitInstallSessionStatus.REQUIRES_USER_CONFIRMATION -> InstallSession.State.Status.REQUIRES_USER_CONFIRMATION
         SplitInstallSessionStatus.DOWNLOADING -> InstallSession.State.Status.DOWNLOADING
         SplitInstallSessionStatus.DOWNLOADED, SplitInstallSessionStatus.INSTALLING -> InstallSession.State.Status.INSTALLING
+        SplitInstallSessionStatus.INSTALLED -> InstallSession.State.Status.INSTALLED
+        SplitInstallSessionStatus.FAILED, SplitInstallSessionStatus.UNKNOWN -> InstallSession.State.Status.FAILED
+        SplitInstallSessionStatus.REQUIRES_USER_CONFIRMATION -> InstallSession.State.Status.REQUIRES_USER_CONFIRMATION
         SplitInstallSessionStatus.CANCELING -> InstallSession.State.Status.CANCELING
         SplitInstallSessionStatus.CANCELED -> InstallSession.State.Status.CANCELED
         else -> TODO("unhandled status $status")
