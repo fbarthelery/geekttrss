@@ -53,7 +53,7 @@ import com.geekorum.ttrss.databinding.MenuFeedActionViewBinding;
 import com.geekorum.ttrss.features_manager.Features;
 import com.geekorum.ttrss.features_manager.InstallModuleViewModel;
 import com.geekorum.ttrss.settings.SettingsActivity;
-import com.geekorum.ttrss.settings.manage_modules.InstallFeatureActivity;
+import com.geekorum.ttrss.settings.manage_features.InstallFeatureActivity;
 import com.google.android.material.navigation.NavigationView;
 import timber.log.Timber;
 

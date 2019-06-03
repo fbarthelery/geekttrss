@@ -22,7 +22,7 @@ package com.geekorum.ttrss.di;
 
 import com.geekorum.ttrss.MainActivity;
 import com.geekorum.ttrss.settings.SettingsActivity;
-import com.geekorum.ttrss.settings.manage_modules.InstallFeatureActivity;
+import com.geekorum.ttrss.settings.manage_features.InstallFeatureActivity;
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;
 import dagger.android.support.AndroidSupportInjectionModule;

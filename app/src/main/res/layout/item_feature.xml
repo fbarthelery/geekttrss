@@ -26,8 +26,8 @@
 
     <data>
         <import type="android.view.View" />
-        <variable name="feature" type="com.geekorum.ttrss.settings.manage_modules.FeatureStatus" />
-        <variable name="viewModel" type="com.geekorum.ttrss.settings.manage_modules.ManageFeaturesViewModel" />
+        <variable name="feature" type="com.geekorum.ttrss.settings.manage_features.FeatureStatus" />
+        <variable name="viewModel" type="com.geekorum.ttrss.settings.manage_features.ManageFeaturesViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

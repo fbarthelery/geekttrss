@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.geekorum.ttrss.settings.manage_modules
+package com.geekorum.ttrss.settings.manage_features
 
 import android.content.Intent
 import android.os.Bundle

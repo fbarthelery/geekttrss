@@ -43,7 +43,7 @@
         <Preference
                 android:key="manage_features"
                 android:title="@string/pref_title_manage_features"
-                android:fragment="com.geekorum.ttrss.settings.manage_modules.ManageFeaturesFragment">
+                android:fragment="com.geekorum.ttrss.settings.manage_features.ManageFeaturesFragment">
         </Preference>
     </PreferenceCategory>
 

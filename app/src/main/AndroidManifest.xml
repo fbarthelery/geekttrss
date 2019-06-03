@@ -101,7 +101,7 @@
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
-        <activity android:name=".settings.manage_modules.InstallFeatureActivity" />
+        <activity android:name=".settings.manage_features.InstallFeatureActivity" />
 
         <service android:name="com.geekorum.ttrss.providers.PurgeArticlesJobService"
                  android:permission="android.permission.BIND_JOB_SERVICE" />
