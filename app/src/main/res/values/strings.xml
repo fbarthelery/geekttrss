@@ -36,6 +36,7 @@
     <string name="action_sign_in_short">Login</string>
     <string name="error_field_required">This field is required</string>
     <string name="error_invalid_http_url">Invalid http(s) url</string>
+    <string name="error_http_url_must_end_wish_slash">Url must end with /</string>
     <string name="error_incorrect_password">Incorrect password</string>
 
     <string name="title_article_list">Articles</string>

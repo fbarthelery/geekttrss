@@ -85,6 +85,7 @@ internal class LoginViewModel @Inject constructor(
         val invalidUrlMsgId = when {
             text.isEmpty() -> R.string.error_field_required
             httpUrl == null -> R.string.error_invalid_http_url
+            httpUrl?.pathSegments()?.last()?.isNotEmpty() == true -> R.string.error_http_url_must_end_wish_slash
             else -> null
         }
         fieldErrors.value = current.copy(invalidUrlMsgId = invalidUrlMsgId, hasEditUrl = true)
@@ -235,7 +236,10 @@ internal class LoginViewModel @Inject constructor(
         @JvmStatic
         @InverseMethod("convertHttpUrlToString")
         fun convertStringToHttpUrl(url: String): HttpUrl? {
-            return HttpUrl.parse(url)
+            return HttpUrl.parse(url)?.newBuilder() // remove fragment and query
+                ?.query(null)
+                ?.encodedFragment(null)
+                ?.build()
         }
 
         @JvmStatic
