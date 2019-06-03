@@ -26,6 +26,7 @@ import com.geekorum.geekdroid.dagger.FragmentFactoriesModule
 import com.geekorum.ttrss.di.AndroidBindingsModule
 import com.geekorum.ttrss.di.ApplicationComponent
 import com.geekorum.ttrss.di.ViewModelsModule
+import com.geekorum.ttrss.settings.SettingsModule
 import dagger.Component
 import javax.inject.Singleton
 
@@ -49,6 +50,8 @@ class TestGoogleFlavorApplication : TestApplication()
     AndroidBindingsModule::class,
     FragmentFactoriesModule::class,
     ViewModelsModule::class,
+    SettingsModule::class,
+    AllFeaturesInstalledModule::class,
     BatteryFriendlyActivityTestModule::class])
 interface TestApplicationComponent : ApplicationComponent {
     @Component.Builder
