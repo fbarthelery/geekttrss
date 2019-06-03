@@ -43,7 +43,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.android.tools.build:gradle:3.4.0")
+    implementation("com.android.tools.build:gradle:3.4.1")
     implementation("com.genymotion:plugin:1.4.2")
     implementation("gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.14.0")
     implementation("com.github.triplet.gradle:play-publisher:2.1.0")

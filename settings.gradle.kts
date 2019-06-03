@@ -29,7 +29,7 @@ pluginManagement {
         jcenter()
         maven {
             // Workaround for bug https://github.com/gradle/kotlin-dsl/issues/1186
-            // we publish oss-licenses-plugin 0.9.3.2
+            // we publish oss-licenses-plugin 0.9.5.1
             url = URI("https://raw.githubusercontent.com/fbarthelery/play-services-plugins/master/repo/")
         }
         google()
