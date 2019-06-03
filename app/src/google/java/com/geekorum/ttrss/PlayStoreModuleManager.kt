@@ -89,7 +89,6 @@ private class SplitInstallSession(
                 val installState = it.toInstallSessionState()
                 channel.send(installState)
                 if (it.isTerminal) {
-                    Timber.d("state $it converted to $installState is terminal. closing channel")
                     channel.close()
                 }
             }
@@ -104,18 +103,6 @@ private class SplitInstallSession(
         }
     }
 
-    private val splitListener: SplitInstallStateUpdatedListener = SplitInstallStateUpdatedListener { state ->
-        if (state.sessionId() != id) {
-            return@SplitInstallStateUpdatedListener
-        }
-        val installState = state.toInstallSessionState()
-        listeners.forEach {
-            it.onStateUpdate(this, installState)
-        }
-    }
-
-    private val listeners = mutableSetOf<Listener>()
-
     override suspend fun getSessionState(): State {
         val splitInstallSessionState = splitInstallManager.getSessionState(id).await()
         return splitInstallSessionState.toInstallSessionState()
@@ -123,21 +110,6 @@ private class SplitInstallSession(
 
     override fun cancel() {
         splitInstallManager.cancelInstall(id)
-    }
-
-    override fun registerListener(listener: Listener) {
-        if (listeners.isEmpty()) {
-            splitInstallManager.registerListener(splitListener)
-        }
-        listeners.add(listener)
-    }
-
-    override fun unregisterListener(listener: Listener) {
-        // remove
-        listeners.remove(listener)
-        if (listeners.isEmpty()) {
-            splitInstallManager.unregisterListener(splitListener)
-        }
     }
 }
 
@@ -151,7 +123,7 @@ private fun SplitInstallSessionState.toInstallSessionState(): InstallSession.Sta
         SplitInstallSessionStatus.REQUIRES_USER_CONFIRMATION -> InstallSession.State.Status.REQUIRES_USER_CONFIRMATION
         SplitInstallSessionStatus.CANCELING -> InstallSession.State.Status.CANCELING
         SplitInstallSessionStatus.CANCELED -> InstallSession.State.Status.CANCELED
-        else -> TODO("unhandled status $status")
+        else -> throw IllegalArgumentException("unhandled status $status")
     }
     return InstallSession.State(status, bytesDownloaded(), totalBytesToDownload())
 }

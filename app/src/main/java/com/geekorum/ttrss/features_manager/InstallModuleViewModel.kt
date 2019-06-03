@@ -24,7 +24,6 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.geekorum.ttrss.R
@@ -36,7 +35,6 @@ import com.geekorum.ttrss.features_manager.InstallSession.State.Status.INSTALLED
 import com.geekorum.ttrss.features_manager.InstallSession.State.Status.INSTALLING
 import com.geekorum.ttrss.features_manager.InstallSession.State.Status.PENDING
 import com.geekorum.ttrss.features_manager.InstallSession.State.Status.REQUIRES_USER_CONFIRMATION
-import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -65,10 +63,6 @@ class InstallModuleViewModel @Inject constructor(
 
     fun isModuleInstalled(module: String): Boolean {
         return module in moduleManager.installedModules
-    }
-
-    fun deferedInstallModule(vararg modules: String) {
-        moduleManager.deferredInstall(*modules)
     }
 
     fun startInstallModules(vararg modules: String) = viewModelScope.launch {
@@ -107,36 +101,6 @@ class InstallModuleViewModel @Inject constructor(
             DOWNLOADING, INSTALLED, FAILED, CANCELED -> false
         }
         return InstallProgression(message, percent, max, progressIndeterminate)
-    }
-
-
-    fun installModule(vararg modules: String): LiveData<InstallSession.State> {
-        val sessionDeferred = viewModelScope.async { moduleManager.startInstallModule(*modules) }
-        return liveData {
-            val session = try {
-                sessionDeferred.await()
-            } catch (e: OnDemandModuleException) {
-                Timber.w(e, "Unable to install modules ${modules.joinToString()}")
-                return@liveData
-            }
-            val stateLiveData = MutableLiveData<InstallSession.State>()
-            emitSource(stateLiveData)
-            val listener = object : InstallSession.Listener {
-                override fun onStateUpdate(session: InstallSession, state: InstallSession.State) {
-                    stateLiveData.value = state
-                }
-            }
-            try {
-                Timber.d("RegisterListener for livedata")
-                session.registerListener(listener)
-
-                // wait for completion
-                session.awaitCompletion()
-            } finally {
-                Timber.d("UnregisterListener for livedata")
-                session.unregisterListener(listener)
-            }
-        }
     }
 
 }

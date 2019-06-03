@@ -24,7 +24,7 @@ import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.delay
 
 /**
- * An Immutable module installations.
+ * An Immutable modules installation
  */
 class ImmutableModuleManager(
     override val installedModules: Set<String>
@@ -56,7 +56,7 @@ class ImmutableModuleManager(
 }
 
 /**
- * An InstallSession for an pre installed module
+ * An InstallSession for a pre installed module
  */
 internal class CompleteSession(id: Int) : InstallSession(id) {
     private val state = State(State.Status.INSTALLED, 0, 0)
@@ -69,15 +69,6 @@ internal class CompleteSession(id: Int) : InstallSession(id) {
     }
 
     override fun cancel() {
-        // no op
-    }
-
-    override fun registerListener(listener: Listener) {
-        // send complete
-        listener.onStateUpdate(this, state)
-    }
-
-    override fun unregisterListener(listener: Listener) {
         // no op
     }
 }
@@ -98,15 +89,6 @@ private class FailedSession(id: Int) : InstallSession(id) {
     }
 
     override fun cancel() {
-        // no op
-    }
-
-    override fun registerListener(listener: Listener) {
-        // send fail
-        listener.onStateUpdate(this, state)
-    }
-
-    override fun unregisterListener(listener: Listener) {
         // no op
     }
 

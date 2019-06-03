@@ -20,13 +20,9 @@
  */
 package com.geekorum.ttrss.features_manager
 
-import androidx.annotation.MainThread
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.channels.produce
-import kotlinx.coroutines.suspendCancellableCoroutine
-import timber.log.Timber
-import kotlin.coroutines.resume
 
 /**
  * Allows to manage On Demand modules
@@ -64,17 +60,10 @@ abstract class InstallSession(
     val id: Int
 ) {
     abstract fun cancel()
-    abstract fun registerListener(listener: Listener)
-    abstract fun unregisterListener(listener: Listener)
 
     abstract suspend fun sendStatesTo(channel: SendChannel<State>)
 
     abstract suspend fun getSessionState(): State
-
-    interface Listener {
-        @MainThread
-        fun onStateUpdate(session: InstallSession, state: State)
-    }
 
     data class State(
         val status: Status,
@@ -100,41 +89,5 @@ abstract class InstallSession(
 fun CoroutineScope.produceInstallSessionStates(session: InstallSession) = produce <InstallSession.State> {
     session.sendStatesTo(channel)
 }
-
-suspend fun InstallSession.awaitCompletion(): InstallSession.State {
-    fun isComplete(state: InstallSession.State) = when (state.status) {
-        InstallSession.State.Status.INSTALLED,
-        InstallSession.State.Status.FAILED,
-        InstallSession.State.Status.CANCELED -> true
-
-        InstallSession.State.Status.PENDING,
-        InstallSession.State.Status.REQUIRES_USER_CONFIRMATION,
-        InstallSession.State.Status.DOWNLOADING,
-        InstallSession.State.Status.INSTALLING,
-        InstallSession.State.Status.CANCELING -> false
-    }
-
-    val state = getSessionState()
-    if (isComplete(state)) {
-        return state
-    }
-
-    return suspendCancellableCoroutine {
-        val listener = object : InstallSession.Listener {
-            override fun onStateUpdate(session: InstallSession, state: InstallSession.State) {
-                Timber.d("Unregister listener for awaitCompletion")
-                unregisterListener(this)
-                it.resume(state)
-            }
-        }
-        it.invokeOnCancellation {
-            Timber.d("Unregister listener for awaitCompletion")
-            unregisterListener(listener)
-        }
-        Timber.d("Register listener for awaitCompletion")
-        registerListener(listener)
-    }
-}
-
 
 
