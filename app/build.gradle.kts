@@ -50,7 +50,7 @@ android {
         targetSdkVersion(28)
         val major = 1
         val minor = 3
-        val patch = 0
+        val patch = 1
         versionCode = computeChangesetVersionCode(major, minor, patch)
         versionName = "$major.$minor.$patch"
         buildConfigField("String", "REPOSITORY_CHANGESET", "\"${getChangeSet()}\"")

@@ -1,7 +1,2 @@
-Support new Android Q gestures navigation model
-Support servers behind an Http Basic Authentication
-Open links in their Android application if available
-Fix crash when subscribing to a new feed
-Don't crash when the TinyTinyRss server replies an Http error
-Fix crash when loading big images
-More bug fixes
+Fix crash when trying to login on large screen devices (tablet)
+Fix crash when using some incorrect server url

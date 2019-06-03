@@ -1,7 +1,2 @@
-Support du nouveau modèle de navigation par gestes introduit dans Android Q
-Support des serveurs utilisant Http Basic Authentication
-Ouvre les liens dans les applications Android si disponible
-Correction d'un crash lors de l'abonnement à un nouveau flux
-Correction d'un crash lorsque le serveur TinyTinyRss répond avec une erreur
-Correction d'un crash lors du chargement de très grosses images
-Encore plus de corrections
+Correction de crash lors d'une connection sur un appareil possédant un grand écran (tablette)
+Correction de crash lors de l'utilisation d'une URL de serveur incorrecte
