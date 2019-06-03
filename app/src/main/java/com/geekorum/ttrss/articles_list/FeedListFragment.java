@@ -45,13 +45,13 @@ import androidx.lifecycle.ViewModelProviders;
 import com.geekorum.geekdroid.dagger.DaggerDelegateFragmentFactory;
 import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory;
 import com.geekorum.ttrss.BaseFragment;
+import com.geekorum.ttrss.Features;
 import com.geekorum.ttrss.R;
 import com.geekorum.ttrss.data.Category;
 import com.geekorum.ttrss.data.Feed;
 import com.geekorum.ttrss.databinding.FragmentFeedsBinding;
 import com.geekorum.ttrss.databinding.MenuFeedActionViewBinding;
-import com.geekorum.ttrss.features_manager.Features;
-import com.geekorum.ttrss.features_manager.InstallModuleViewModel;
+import com.geekorum.ttrss.on_demand_modules.OnDemandModuleManager;
 import com.geekorum.ttrss.settings.SettingsActivity;
 import com.geekorum.ttrss.settings.manage_features.InstallFeatureActivity;
 import com.google.android.material.navigation.NavigationView;
@@ -77,11 +77,12 @@ public class FeedListFragment extends BaseFragment implements NavigationView.OnN
     private ActivityViewModel activityViewModel;
     private LiveData<List<Feed>> feedsForCategory;
     private TtrssAccountViewModel accountViewModel;
-    private InstallModuleViewModel installModuleViewModel;
+    private final OnDemandModuleManager moduleManager;
 
     @Inject
-    public FeedListFragment(@NonNull DaggerDelegateViewModelsFactory viewModelsFactory, DaggerDelegateFragmentFactory fragmentFactory) {
+    public FeedListFragment(@NonNull DaggerDelegateViewModelsFactory viewModelsFactory, DaggerDelegateFragmentFactory fragmentFactory, OnDemandModuleManager moduleManager) {
         super(viewModelsFactory, fragmentFactory);
+        this.moduleManager = moduleManager;
     }
 
     @Override
@@ -149,8 +150,6 @@ public class FeedListFragment extends BaseFragment implements NavigationView.OnN
             TextView server = headerView.findViewById(R.id.drawer_header_server);
             server.setText(host);
         });
-
-        installModuleViewModel = ViewModelProviders.of(this, getViewModelsFactory()).get(InstallModuleViewModel.class);
     }
 
     private void setupHeader() {
@@ -295,7 +294,7 @@ public class FeedListFragment extends BaseFragment implements NavigationView.OnN
 
     private void installOrStartManageFeed() {
         Context context = requireContext();
-        if (installModuleViewModel.isModuleInstalled(Features.MANAGE_FEEDS)) {
+        if (isManageFeedInstalled()) {
             try {
                 Context freshContext = context.createPackageContext(context.getPackageName(), 0);
                 Intent intent = new Intent();
@@ -309,6 +308,10 @@ public class FeedListFragment extends BaseFragment implements NavigationView.OnN
             intent.putExtra(InstallFeatureActivity.EXTRA_FEATURES_LIST, new String[]{Features.MANAGE_FEEDS});
             startActivityForResult(intent, CODE_INSTALL_MANAGE_FEED);
         }
+    }
+
+    private boolean isManageFeedInstalled() {
+        return moduleManager.getInstalledModules().contains(Features.MANAGE_FEEDS);
     }
 
     @Override

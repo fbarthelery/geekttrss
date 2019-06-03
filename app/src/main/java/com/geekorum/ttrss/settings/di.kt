@@ -20,8 +20,17 @@
  */
 package com.geekorum.ttrss.settings
 
+import com.geekorum.ttrss.settings.manage_features.InstallFeatureActivity
 import com.geekorum.ttrss.settings.manage_features.ManageFeaturesModule
 import dagger.Module
+import dagger.android.ContributesAndroidInjector
 
 @Module(includes = [SettingsInitializerModule::class, ManageFeaturesModule::class])
-class SettingsModule
+abstract class SettingsModule {
+
+    @ContributesAndroidInjector
+    abstract fun contributesSettingsActivityInjector(): SettingsActivity
+
+    @ContributesAndroidInjector
+    abstract fun contributesInstallFeatureActivityInjector(): InstallFeatureActivity
+}

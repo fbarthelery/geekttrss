@@ -18,13 +18,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.geekorum.ttrss
+package com.geekorum.ttrss.on_demand_modules
 
 import com.geekorum.geekdroid.gms.await
-import com.geekorum.ttrss.features_manager.CompleteSession
-import com.geekorum.ttrss.features_manager.InstallSession
-import com.geekorum.ttrss.features_manager.OnDemandModuleException
-import com.geekorum.ttrss.features_manager.OnDemandModuleManager
 import com.google.android.play.core.splitinstall.SplitInstallException
 import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
@@ -37,7 +33,6 @@ import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.runBlocking
-import timber.log.Timber
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 

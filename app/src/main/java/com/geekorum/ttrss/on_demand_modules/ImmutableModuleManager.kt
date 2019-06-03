@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.geekorum.ttrss.features_manager
+package com.geekorum.ttrss.on_demand_modules
 
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.delay
@@ -36,7 +36,9 @@ class ImmutableModuleManager(
         return if (toInstall.isEmpty())
             CompleteSession(nextSessionId++)
         else
-            FailedSession(nextSessionId++)
+//            FailedSession(nextSessionId++)
+        MockedSession(nextSessionId++)
+
     }
 
     override fun deferredInstall(vararg modules: String) {
@@ -90,6 +92,44 @@ private class FailedSession(id: Int) : InstallSession(id) {
 
     override fun cancel() {
         // no op
+    }
+
+}
+
+class MockedSession(id: Int) : InstallSession(id) {
+    override suspend fun sendStatesTo(channel: SendChannel<State>) {
+        var state = State(State.Status.PENDING, 0, 0)
+        channel.send(state)
+        delay(500)
+
+        state = State(State.Status.DOWNLOADING, 0, 1000)
+        channel.send(state)
+        delay(500)
+        state = State(State.Status.DOWNLOADING, 200, 1000)
+        channel.send(state)
+        delay(500)
+        state = State(State.Status.DOWNLOADING, 700, 1000)
+        channel.send(state)
+        delay(500)
+        state = State(State.Status.DOWNLOADING, 1000, 1000)
+        channel.send(state)
+        delay(500)
+
+        state = State(State.Status.INSTALLING, 1000, 1000)
+        channel.send(state)
+        delay(500)
+
+        state = State(State.Status.INSTALLED, 1000, 1000)
+        channel.send(state)
+        channel.close()
+    }
+
+    override fun cancel() {
+        TODO("not implemented")
+    }
+
+    override suspend fun getSessionState(): State {
+        TODO("not implemented")
     }
 
 }

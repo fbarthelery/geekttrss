@@ -25,7 +25,7 @@
         xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <variable name="viewModel" type="com.geekorum.ttrss.features_manager.InstallModuleViewModel" />
+        <variable name="viewModel" type="com.geekorum.ttrss.on_demand_modules.InstallModuleViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

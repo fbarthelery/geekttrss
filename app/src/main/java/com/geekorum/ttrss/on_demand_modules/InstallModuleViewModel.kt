@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.geekorum.ttrss.features_manager
+package com.geekorum.ttrss.on_demand_modules
 
 import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
@@ -27,14 +27,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.geekorum.ttrss.R
-import com.geekorum.ttrss.features_manager.InstallSession.State.Status.CANCELED
-import com.geekorum.ttrss.features_manager.InstallSession.State.Status.CANCELING
-import com.geekorum.ttrss.features_manager.InstallSession.State.Status.DOWNLOADING
-import com.geekorum.ttrss.features_manager.InstallSession.State.Status.FAILED
-import com.geekorum.ttrss.features_manager.InstallSession.State.Status.INSTALLED
-import com.geekorum.ttrss.features_manager.InstallSession.State.Status.INSTALLING
-import com.geekorum.ttrss.features_manager.InstallSession.State.Status.PENDING
-import com.geekorum.ttrss.features_manager.InstallSession.State.Status.REQUIRES_USER_CONFIRMATION
+import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.CANCELED
+import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.CANCELING
+import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.DOWNLOADING
+import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.FAILED
+import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.INSTALLED
+import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.INSTALLING
+import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.PENDING
+import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.REQUIRES_USER_CONFIRMATION
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
 import timber.log.Timber

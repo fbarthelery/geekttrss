@@ -20,8 +20,8 @@
  */
 package com.geekorum.ttrss.di
 
-import com.geekorum.ttrss.PlayStoreInstallModule
 import com.geekorum.ttrss.logging.CrashlyticsLoggingModule
+import com.geekorum.ttrss.on_demand_modules.PlayStoreInstallModule
 import dagger.Component
 import javax.inject.Singleton
 

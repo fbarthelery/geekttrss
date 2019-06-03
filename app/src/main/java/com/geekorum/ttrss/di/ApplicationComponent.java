@@ -21,7 +21,7 @@
 package com.geekorum.ttrss.di;
 
 import com.geekorum.ttrss.Application;
-import com.geekorum.ttrss.features_manager.AllFeaturesInstalledModule;
+import com.geekorum.ttrss.AllFeaturesInstalledModule;
 import dagger.BindsInstance;
 import dagger.Component;
 import dagger.android.AndroidInjector;

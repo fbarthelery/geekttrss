@@ -28,10 +28,10 @@ import androidx.lifecycle.observe
 import com.geekorum.ttrss.BaseActivity
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.databinding.ActivityInstallFeatureBinding
-import com.geekorum.ttrss.features_manager.InstallModuleViewModel
-import com.geekorum.ttrss.features_manager.InstallSession.State.Status.CANCELED
-import com.geekorum.ttrss.features_manager.InstallSession.State.Status.FAILED
-import com.geekorum.ttrss.features_manager.InstallSession.State.Status.INSTALLED
+import com.geekorum.ttrss.on_demand_modules.InstallModuleViewModel
+import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.CANCELED
+import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.FAILED
+import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.INSTALLED
 import com.geekorum.ttrss.viewModels
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

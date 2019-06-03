@@ -18,8 +18,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.geekorum.ttrss.features_manager
+package com.geekorum.ttrss
 
+import com.geekorum.ttrss.on_demand_modules.ImmutableModuleManager
+import com.geekorum.ttrss.on_demand_modules.OnDemandModuleManager
 import dagger.Module
 import dagger.Provides
 

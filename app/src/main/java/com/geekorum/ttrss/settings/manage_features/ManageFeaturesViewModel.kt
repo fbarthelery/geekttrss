@@ -24,9 +24,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.geekorum.geekdroid.app.lifecycle.Event
-import com.geekorum.ttrss.features_manager.Features
-import com.geekorum.ttrss.features_manager.ImmutableModuleManager
-import com.geekorum.ttrss.features_manager.OnDemandModuleManager
+import com.geekorum.ttrss.Features
+import com.geekorum.ttrss.on_demand_modules.ImmutableModuleManager
+import com.geekorum.ttrss.on_demand_modules.OnDemandModuleManager
 import javax.inject.Inject
 
 class ManageFeaturesViewModel @Inject constructor(

@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.geekorum.ttrss.features_manager
+package com.geekorum.ttrss.on_demand_modules
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.SendChannel

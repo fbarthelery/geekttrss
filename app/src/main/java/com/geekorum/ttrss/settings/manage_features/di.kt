@@ -24,7 +24,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import com.geekorum.geekdroid.dagger.FragmentKey
 import com.geekorum.geekdroid.dagger.ViewModelKey
-import com.geekorum.ttrss.features_manager.InstallModuleViewModel
+import com.geekorum.ttrss.on_demand_modules.InstallModuleViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
