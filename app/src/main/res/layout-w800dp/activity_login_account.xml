@@ -53,7 +53,8 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <!-- not a MaterialCardView because they can't have databinding included view (Bug) -->
+        <!-- not a MaterialCardView because they can't have databinding included view
+            Bug: https://issuetracker.google.com/issues/134379499 -->
         <androidx.cardview.widget.CardView
                 android:layout_width="560dp"
                 android:layout_height="match_parent"
