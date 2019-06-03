@@ -117,9 +117,9 @@ android {
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.0.1")
-    implementation("androidx.fragment:fragment-ktx:1.1.0-alpha07")
-    implementation("androidx.activity:activity-ktx:1.0.0-alpha07")
+    implementation("androidx.core:core-ktx:1.0.2")
+    implementation("androidx.fragment:fragment-ktx:1.1.0-alpha09")
+    implementation("androidx.activity:activity-ktx:1.0.0-alpha08")
 
     // androidx ui
     implementation("androidx.appcompat:appcompat:1.1.0-alpha05")
@@ -142,12 +142,12 @@ dependencies {
         add("googleImplementation", it)
     }
 
-    implementation("com.google.android.material:material:1.1.0-alpha06")
+    implementation("com.google.android.material:material:1.1.0-alpha07")
     implementation("com.squareup.retrofit2:retrofit:2.5.0")
     implementation("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")
     implementation("com.squareup.okhttp3:okhttp:3.12.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:3.10.0")
-    testImplementation("com.squareup.okhttp3:mockwebserver:3.10.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:3.12.0")
+    testImplementation("com.squareup.okhttp3:mockwebserver:3.12.0")
     implementation("com.squareup.picasso:picasso:2.5.2")
     implementation("com.google.android.gms:play-services-oss-licenses:16.0.2")
 
