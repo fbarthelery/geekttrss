@@ -53,7 +53,8 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <com.google.android.material.card.MaterialCardView
+        <!-- not a MaterialCardView because they can't have databinding included view (Bug) -->
+        <androidx.cardview.widget.CardView
                 android:layout_width="560dp"
                 android:layout_height="match_parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -65,7 +66,7 @@
 
             <include android:id="@+id/form" layout="@layout/include_form_login"
                      app:viewModel="@{viewModel}"/>
-        </com.google.android.material.card.MaterialCardView>
+        </androidx.cardview.widget.CardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
