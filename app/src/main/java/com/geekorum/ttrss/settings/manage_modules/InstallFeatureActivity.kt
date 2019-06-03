@@ -20,8 +20,10 @@
  */
 package com.geekorum.ttrss.settings.manage_modules
 
+import android.app.Activity
 import android.os.Bundle
 import androidx.databinding.DataBindingUtil
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import com.geekorum.ttrss.BaseActivity
 import com.geekorum.ttrss.R
@@ -31,6 +33,8 @@ import com.geekorum.ttrss.features_manager.InstallSession.State.Status.CANCELED
 import com.geekorum.ttrss.features_manager.InstallSession.State.Status.FAILED
 import com.geekorum.ttrss.features_manager.InstallSession.State.Status.INSTALLED
 import com.geekorum.ttrss.viewModels
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * Quick and dirty InstallFeatureActivity
@@ -55,7 +59,13 @@ class InstallFeatureActivity : BaseActivity() {
 
         viewModel.sessionState.observe(this) {
             when (it.status) {
-                INSTALLED,
+                INSTALLED -> {
+                    setResult(Activity.RESULT_OK)
+                    lifecycleScope.launch {
+                        delay(1000)
+                        finish()
+                    }
+                }
                 FAILED,
                 CANCELED -> stopAnimation()
                 else -> startAnimation()
