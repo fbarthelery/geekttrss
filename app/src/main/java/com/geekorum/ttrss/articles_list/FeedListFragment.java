@@ -20,9 +20,12 @@
  */
 package com.geekorum.ttrss.articles_list;
 
+import android.app.Activity;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
@@ -42,15 +45,15 @@ import androidx.lifecycle.ViewModelProviders;
 import com.geekorum.geekdroid.dagger.DaggerDelegateFragmentFactory;
 import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory;
 import com.geekorum.ttrss.BaseFragment;
-import com.geekorum.ttrss.features_manager.Features;
-import com.geekorum.ttrss.features_manager.InstallModuleViewModel;
-import com.geekorum.ttrss.features_manager.InstallSession;
 import com.geekorum.ttrss.R;
 import com.geekorum.ttrss.data.Category;
 import com.geekorum.ttrss.data.Feed;
 import com.geekorum.ttrss.databinding.FragmentFeedsBinding;
 import com.geekorum.ttrss.databinding.MenuFeedActionViewBinding;
+import com.geekorum.ttrss.features_manager.Features;
+import com.geekorum.ttrss.features_manager.InstallModuleViewModel;
 import com.geekorum.ttrss.settings.SettingsActivity;
+import com.geekorum.ttrss.settings.manage_modules.InstallFeatureActivity;
 import com.google.android.material.navigation.NavigationView;
 import timber.log.Timber;
 
@@ -64,6 +67,7 @@ import javax.inject.Inject;
 public class FeedListFragment extends BaseFragment implements NavigationView.OnNavigationItemSelectedListener {
 
     private static final int MENU_GROUP_ID_SPECIAL = 1;
+    private static final int CODE_INSTALL_MANAGE_FEED = 1;
 
     private FragmentFeedsBinding binding;
     private SharedPreferences preferences;
@@ -232,20 +236,7 @@ public class FeedListFragment extends BaseFragment implements NavigationView.OnN
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.manage_feeds) {
-            if (installModuleViewModel.isModuleInstalled(Features.MANAGE_FEEDS)) {
-                Intent intent = new Intent();
-                intent.setComponent(ComponentName.createRelative(requireActivity(), "com.geekorum.ttrss.manage_feeds.TestActivity"));
-                startActivity(intent);
-            } else {
-                installModuleViewModel.installModule(Features.MANAGE_FEEDS).observe(this, state -> {
-                    Timber.d("install session state %s", state);
-                    if (state.getStatus() == InstallSession.State.Status.INSTALLED) {
-                        Intent intent = new Intent();
-                        intent.setComponent(ComponentName.createRelative(requireActivity(), "com.geekorum.ttrss.manage_feeds.TestActivity"));
-                        startActivity(intent);
-                    }
-                });
-            }
+            installOrStartManageFeed();
             return true;
         } else if (categoriesDisplayed) {
             return onCategoriesSelected(item);
@@ -300,6 +291,33 @@ public class FeedListFragment extends BaseFragment implements NavigationView.OnN
             }
         }
         return false;
+    }
+
+    private void installOrStartManageFeed() {
+        Context context = requireContext();
+        if (installModuleViewModel.isModuleInstalled(Features.MANAGE_FEEDS)) {
+            try {
+                Context freshContext = context.createPackageContext(context.getPackageName(), 0);
+                Intent intent = new Intent();
+                intent.setComponent(ComponentName.createRelative(freshContext, "com.geekorum.ttrss.manage_feeds.TestActivity"));
+                startActivity(intent);
+            } catch (PackageManager.NameNotFoundException e) {
+                Timber.wtf(e, "Unable to create our package context");
+            }
+        } else {
+            Intent intent = new Intent(context, InstallFeatureActivity.class);
+            intent.putExtra(InstallFeatureActivity.EXTRA_FEATURES_LIST, new String[]{Features.MANAGE_FEEDS});
+            startActivityForResult(intent, CODE_INSTALL_MANAGE_FEED);
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == CODE_INSTALL_MANAGE_FEED) {
+            if (resultCode == Activity.RESULT_OK) {
+                installOrStartManageFeed();
+            }
+        }
     }
 
     public static FeedListFragment newInstance(FragmentFactory factory) {
