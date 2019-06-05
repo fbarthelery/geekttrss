@@ -20,6 +20,7 @@
  */
 package com.geekorum.ttrss
 
+import android.app.Activity
 import com.geekorum.geekdroid.dagger.AppInitializer
 import com.geekorum.geekdroid.dagger.initialize
 import com.geekorum.ttrss.debugtools.StrictModeInitializer
@@ -36,6 +37,10 @@ open class Application : DaggerApplication() {
     @Inject
     lateinit var appInitializers: MutableSet<AppInitializer>
 
+    open val applicationComponent by lazy {
+        DaggerApplicationComponent.builder().bindApplication(this).build()
+    }
+
     override fun onCreate() {
         super.onCreate()
         // a few initializers need to be set up before others
@@ -51,6 +56,9 @@ open class Application : DaggerApplication() {
     }
 
     override fun applicationInjector(): ApplicationComponent {
-        return DaggerApplicationComponent.builder().bindApplication(this).build()
+        return applicationComponent
     }
 }
+
+val Activity.applicationComponent
+        get() = (applicationContext as Application).applicationComponent

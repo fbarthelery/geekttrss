@@ -20,15 +20,26 @@
  */
 package com.geekorum.ttrss
 
+import androidx.room.Room
 import com.geekorum.geekdroid.dagger.AndroidFrameworkModule
 import com.geekorum.geekdroid.dagger.AppInitializersModule
 import com.geekorum.geekdroid.dagger.FragmentFactoriesModule
 import com.geekorum.ttrss.accounts.LoginActivityTestModule
+import com.geekorum.ttrss.data.ArticlesDatabase
+import com.geekorum.ttrss.data.migrations.MigrationFrom1To2
+import com.geekorum.ttrss.data.migrations.MigrationFrom2To3
+import com.geekorum.ttrss.data.migrations.MigrationFrom3To4
+import com.geekorum.ttrss.data.migrations.MigrationFrom4To5
+import com.geekorum.ttrss.data.migrations.MigrationFrom5To6
+import com.geekorum.ttrss.data.migrations.MigrationFrom6To7
+import com.geekorum.ttrss.data.migrations.MigrationFrom7To8
 import com.geekorum.ttrss.di.AndroidBindingsModule
 import com.geekorum.ttrss.di.ApplicationComponent
 import com.geekorum.ttrss.di.ViewModelsModule
 import com.geekorum.ttrss.settings.SettingsModule
 import dagger.Component
+import dagger.Module
+import dagger.Provides
 import javax.inject.Singleton
 
 /**
@@ -54,9 +65,28 @@ class TestGoogleFlavorApplication : TestApplication()
     SettingsModule::class,
     AllFeaturesInstalledModule::class,
     BatteryFriendlyActivityTestModule::class,
-    LoginActivityTestModule::class
+    LoginActivityTestModule::class,
+    MockDatabaseModule::class
 ])
 interface TestApplicationComponent : ApplicationComponent {
     @Component.Builder
     interface Builder : ApplicationComponent.Builder
+}
+
+
+@Module
+private class MockDatabaseModule {
+    @Provides
+    @Singleton
+    internal fun providesAppDatabase(application: android.app.Application): ArticlesDatabase {
+        return Room.inMemoryDatabaseBuilder(application, ArticlesDatabase::class.java)
+            .addMigrations(MigrationFrom1To2,
+                MigrationFrom2To3,
+                MigrationFrom3To4,
+                MigrationFrom4To5,
+                MigrationFrom5To6,
+                MigrationFrom6To7,
+                MigrationFrom7To8)
+            .build()
+    }
 }

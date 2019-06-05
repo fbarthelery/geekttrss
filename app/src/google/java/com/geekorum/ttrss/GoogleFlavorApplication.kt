@@ -23,7 +23,6 @@ package com.geekorum.ttrss
 import android.content.Context
 import com.geekorum.geekdroid.dagger.AppInitializer
 import com.geekorum.ttrss.debugtools.StrictModeInitializer
-import com.geekorum.ttrss.di.ApplicationComponent
 import com.geekorum.ttrss.di.DaggerGoogleFlavorApplicationComponent
 import com.geekorum.ttrss.logging.CrashlyticsInitializer
 import com.google.android.play.core.splitcompat.SplitCompat
@@ -38,8 +37,8 @@ class GoogleFlavorApplication : Application() {
         SplitCompat.install(this)
     }
 
-    override fun applicationInjector(): ApplicationComponent {
-        return DaggerGoogleFlavorApplicationComponent.builder().bindApplication(this).build()
+    override val applicationComponent by lazy {
+        DaggerGoogleFlavorApplicationComponent.builder().bindApplication(this).build()
     }
 
     override fun sortAppInitializers(initializers: Set<AppInitializer>): List<AppInitializer> {

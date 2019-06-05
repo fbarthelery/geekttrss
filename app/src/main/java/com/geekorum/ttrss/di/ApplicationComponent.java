@@ -20,6 +20,8 @@
  */
 package com.geekorum.ttrss.di;
 
+import android.accounts.AccountManager;
+import android.os.PowerManager;
 import com.geekorum.ttrss.Application;
 import com.geekorum.ttrss.AllFeaturesInstalledModule;
 import dagger.BindsInstance;
@@ -47,5 +49,11 @@ public interface ApplicationComponent extends AndroidInjector<Application> {
     }
 
     void inject(Application application);
+
+    android.app.Application getApplication();
+
+    AccountManager getAccountManager();
+
+    PowerManager getPowerManager();
 
 }
