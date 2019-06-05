@@ -346,7 +346,7 @@ class ArticleDetailFragment @Inject constructor(
 
         @JvmStatic
         fun newInstance(fragmentFactory: FragmentFactory, articleUri: Uri): ArticleDetailFragment {
-            return fragmentFactory.instantiate(ArticleDetailFragment::class.java.classLoader,
+            return fragmentFactory.instantiate(ArticleDetailFragment::class.java.classLoader!!,
                 ArticleDetailFragment::class.java.name).apply {
                 arguments = bundleOf(ARG_ARTICLE_URI to articleUri)
             } as ArticleDetailFragment

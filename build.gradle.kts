@@ -33,7 +33,7 @@ plugins {
 
 
 // some extra properties
-extra["compileSdkVersion"] = "android-28"
+extra["compileSdkVersion"] = "android-29"
 extra["daggerVersion"] = "2.21"
 extra["lifecycleVersion"] = "2.2.0-alpha01"
 extra["roomVersion"] = "2.1.0-beta01"
