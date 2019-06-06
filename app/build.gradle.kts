@@ -123,7 +123,7 @@ dependencies {
     implementation("androidx.activity:activity-ktx:1.0.0-alpha08")
 
     // androidx ui
-    implementation("androidx.appcompat:appcompat:1.1.0-alpha05")
+    api("androidx.appcompat:appcompat:1.1.0-alpha05")
     implementation("androidx.drawerlayout:drawerlayout:1.1.0-alpha01")
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")
     implementation("androidx.recyclerview:recyclerview:1.0.0")
@@ -179,8 +179,8 @@ dependencies {
     kapt("com.squareup.inject:assisted-inject-processor-dagger2:0.4.0")
 
     val roomVersion: String by rootProject.extra
-    implementation("androidx.room:room-runtime:$roomVersion")
-    implementation("androidx.room:room-ktx:$roomVersion")
+    api("androidx.room:room-runtime:$roomVersion")
+    api("androidx.room:room-ktx:$roomVersion")
     kapt("androidx.room:room-compiler:$roomVersion")
     androidTestImplementation("androidx.room:room-testing:$roomVersion")
     dualTestImplementation("androidx.test.ext:truth:1.1.0")

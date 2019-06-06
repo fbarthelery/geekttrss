@@ -18,35 +18,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.geekorum.ttrss.di;
+package com.geekorum.ttrss.di
 
-import com.geekorum.ttrss.AllFeaturesInstalledModule;
-import com.geekorum.ttrss.Application;
-import com.geekorum.ttrss.features_api.ManageFeedsDependencies;
-import dagger.BindsInstance;
-import dagger.Component;
-import dagger.android.AndroidInjector;
+import javax.inject.Scope
 
-import javax.inject.Singleton;
-
-/**
- * Main component for the application
- */
-@Component(modules = {
-        FlavorLessModule.class,
-        AllFeaturesInstalledModule.class
-})
-@Singleton
-public interface ApplicationComponent extends AndroidInjector<Application>, ManageFeedsDependencies {
-
-    @Component.Builder
-    interface Builder {
-        ApplicationComponent build();
-
-        @BindsInstance
-        Builder bindApplication(android.app.Application application);
-    }
-
-    void inject(Application application);
-
-}
+@MustBeDocumented
+@Scope
+annotation class FeatureScope
