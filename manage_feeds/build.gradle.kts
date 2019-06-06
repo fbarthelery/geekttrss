@@ -40,9 +40,34 @@ android {
 
 
 dependencies {
+    implementation(project(":app"))
+
     val kotlinVersion: String by rootProject.extra
     implementation(enforcedPlatform(kotlin("bom", kotlinVersion)))
     implementation(kotlin("stdlib-jdk8"))
-    implementation(project(":app"))
+
+    val daggerVersion: String by rootProject.extra
+    implementation(enforcedDaggerPlatform(daggerVersion))
+    kapt(enforcedDaggerPlatform(daggerVersion))
+    implementation("com.google.dagger:dagger:$daggerVersion")
+    implementation("com.google.dagger:dagger-android:$daggerVersion")
+    implementation("com.google.dagger:dagger-android-support:$daggerVersion")
+    kapt("com.google.dagger:dagger-compiler:$daggerVersion")
+    kapt("com.google.dagger:dagger-android-processor:$daggerVersion")
+    kaptTest("com.google.dagger:dagger-compiler:$daggerVersion")
+    kaptTest("com.google.dagger:dagger-android-processor:$daggerVersion")
+
+    val GEEKDROID_PROJECT_DIR: String? by project
+    val geekdroidExt = GEEKDROID_PROJECT_DIR?.let { "" } ?: "aar"
+    implementation(group = "com.geekorum", name = "geekdroid", version = "0.0.1", ext = geekdroidExt)
+
+    // androidx UI
+    implementation("androidx.constraintlayout:constraintlayout:1.1.3")
+    implementation("androidx.recyclerview:recyclerview:1.0.0")
+    implementation("androidx.coordinatorlayout:coordinatorlayout:1.0.0")
+    implementation("com.google.android.material:material:1.1.0-alpha07")
+
+    val lifecycleVersion: String by rootProject.extra
+    implementation("androidx.lifecycle:lifecycle-livedata-core-ktx:$lifecycleVersion")
 
 }

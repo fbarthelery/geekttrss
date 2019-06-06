@@ -18,25 +18,28 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.geekorum.ttrss.features_api
+package com.geekorum.ttrss.manage_feeds
 
-import android.accounts.AccountManager
-import android.os.PowerManager
-import com.geekorum.ttrss.data.ArticlesDatabase
+import android.os.Bundle
+import com.geekorum.ttrss.applicationComponent
+import com.geekorum.ttrss.session.SessionActivity
 
-/**
- * Provides dependencies for the ManageFeeds feature.
- * All classes returned by this interface must be part of the public api of the application.
- * If from an external lib, the lib must be in the api gradle configuration
- */
-interface ManageFeedsDependencies {
+class ManageFeedsActivity : SessionActivity() {
 
-    fun getApplication(): android.app.Application
+    private val moduleComponent by lazy {
+        DaggerManageFeedComponent.builder()
+            .manageFeedsDependencies(applicationComponent)
+            .build()
+    }
 
-    fun getAccountManager(): AccountManager
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+//        binding = DataBindingUtil.setContentView(this, R.layout.activity_manage_feeds)
+    }
 
-    fun getPowerManager(): PowerManager
+    override fun inject() {
+        moduleComponent.inject(this)
+    }
 
-    fun getArticlesDatabase(): ArticlesDatabase
 
 }

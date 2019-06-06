@@ -34,6 +34,8 @@
     </dist:module>
 
     <application>
+        <activity android:name="com.geekorum.ttrss.manage_feeds.ManageFeedsActivity"
+                   />
         <activity android:name=".TestActivity" />
     </application>
 </manifest>
