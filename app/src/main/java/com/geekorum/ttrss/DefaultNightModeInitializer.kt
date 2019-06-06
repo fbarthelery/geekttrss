@@ -22,9 +22,9 @@ package com.geekorum.ttrss
 
 import android.app.Application
 import android.os.StrictMode
-import android.preference.PreferenceManager
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_UNSPECIFIED
+import androidx.preference.PreferenceManager
 import com.geekorum.geekdroid.dagger.AppInitializer
 import com.geekorum.geekdroid.dagger.AppInitializersModule
 import com.geekorum.ttrss.settings.SettingsActivity

@@ -22,7 +22,7 @@ package com.geekorum.ttrss.settings
 
 import android.app.Application
 import android.os.StrictMode.allowThreadDiskWrites
-import android.preference.PreferenceManager
+import androidx.preference.PreferenceManager
 import com.geekorum.geekdroid.dagger.AppInitializer
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.debugtools.withStrictMode
