@@ -23,8 +23,11 @@
 package com.geekorum.ttrss.articles_list
 
 import android.accounts.Account
+import android.app.Application
+import android.content.SharedPreferences
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
+import androidx.preference.PreferenceManager
 import com.geekorum.geekdroid.dagger.FragmentKey
 import com.geekorum.geekdroid.dagger.ViewModelKey
 import com.geekorum.ttrss.accounts.NetworkLoginModule
@@ -56,23 +59,21 @@ abstract class ActivitiesInjectorModule {
 
     @ContributesAndroidInjector(modules = [
         AssistedFactoriesModule::class,
-        com.geekorum.ttrss.articles_list.FragmentsInjectorModule::class,
+        ArticlesListModule::class,
         com.geekorum.ttrss.article_details.FragmentsInjectorModule::class,
         com.geekorum.ttrss.articles_list.search.FragmentsInjectorModule::class,
-        ActivityViewModelModule::class,
         TinyrssApiModule::class,
-        NetworkLoginModule::class,
-        SelectedAccountModule::class])
+        NetworkLoginModule::class])
     @PerAccount
     internal abstract fun contributesArticleListActivityInjector(): ArticleListActivity
 
 }
 
 /**
- * Provides the Fragments injectors subcomponents.
+ * Provides the dependencies for article lists
  */
-@Module(includes = [ViewModelModule::class])
-abstract class FragmentsInjectorModule {
+@Module
+private abstract class ArticlesListModule {
 
     @Binds
     @IntoMap
@@ -83,11 +84,7 @@ abstract class FragmentsInjectorModule {
     @IntoMap
     @FragmentKey(FeedListFragment::class)
     abstract fun bindFeedListFragment(feedListFragment: FeedListFragment): Fragment
-}
 
-
-@Module
-abstract class ViewModelModule {
     @Binds
     @IntoMap
     @ViewModelKey(FragmentViewModel::class)
@@ -98,21 +95,23 @@ abstract class ViewModelModule {
     @ViewModelKey(FeedsViewModel::class)
     abstract fun getFeedsViewModel(feedsViewModel: FeedsViewModel): ViewModel
 
-
-}
-
-@Module
-private abstract class ActivityViewModelModule {
     @Binds
     @IntoMap
     @ViewModelKey(ActivityViewModel::class)
     abstract fun getActivityViewModel(activityViewModel: ActivityViewModel): ViewModel
 
-}
+    @Module
+    companion object {
 
-@Module
-internal class SelectedAccountModule {
+        @JvmStatic
+        @Provides
+        fun providesAccount(articleListActivity: ArticleListActivity): Account = articleListActivity.account!!
 
-    @Provides
-    fun providesAccount(articleListActivity: ArticleListActivity): Account = articleListActivity.account!!
+        @JvmStatic
+        @Provides
+        fun providesApplicationPreferences(application: Application): SharedPreferences =
+            PreferenceManager.getDefaultSharedPreferences(application)
+
+    }
+
 }

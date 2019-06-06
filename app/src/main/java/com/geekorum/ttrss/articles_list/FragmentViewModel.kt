@@ -21,9 +21,7 @@
 package com.geekorum.ttrss.articles_list
 
 import android.accounts.Account
-import android.app.Application
 import android.content.SharedPreferences
-import android.preference.PreferenceManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -45,11 +43,11 @@ private const val PREF_VIEW_MODE = "view_mode"
  * [ViewModel] for the [ArticlesListFragment].
  */
 class FragmentViewModel @Inject constructor(
-    application: Application,
     private val articlesRepository: ArticlesRepository,
     private val feedsRepository: FeedsRepository,
     private val backgroundJobManager: BackgroundJobManager,
-    private val account: Account
+    private val account: Account,
+    private val prefs: SharedPreferences
 ) : ViewModel() {
 
     private val onSharedPreferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
@@ -58,8 +56,10 @@ class FragmentViewModel @Inject constructor(
         }
     }
 
-    private val prefs = PreferenceManager.getDefaultSharedPreferences(application.applicationContext).apply {
-        registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener)
+    init {
+        prefs.apply {
+            registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener)
+        }
     }
 
     private val feedId = MutableLiveData<Long>()

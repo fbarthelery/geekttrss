@@ -27,7 +27,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -70,7 +69,7 @@ public class FeedListFragment extends BaseFragment implements NavigationView.OnN
     private static final int CODE_INSTALL_MANAGE_FEED = 1;
 
     private FragmentFeedsBinding binding;
-    private SharedPreferences preferences;
+    private final SharedPreferences preferences;
     private List<Feed> currentFeeds;
     private boolean categoriesDisplayed;
     private FeedsViewModel feedsViewModel;
@@ -80,15 +79,10 @@ public class FeedListFragment extends BaseFragment implements NavigationView.OnN
     private final OnDemandModuleManager moduleManager;
 
     @Inject
-    public FeedListFragment(@NonNull DaggerDelegateViewModelsFactory viewModelsFactory, DaggerDelegateFragmentFactory fragmentFactory, OnDemandModuleManager moduleManager) {
+    public FeedListFragment(@NonNull DaggerDelegateViewModelsFactory viewModelsFactory, DaggerDelegateFragmentFactory fragmentFactory, OnDemandModuleManager moduleManager, SharedPreferences preferences) {
         super(viewModelsFactory, fragmentFactory);
         this.moduleManager = moduleManager;
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        preferences = PreferenceManager.getDefaultSharedPreferences(requireContext().getApplicationContext());
+        this.preferences = preferences;
     }
 
     @Nullable
