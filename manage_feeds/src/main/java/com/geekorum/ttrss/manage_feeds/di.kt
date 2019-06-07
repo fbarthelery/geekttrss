@@ -21,11 +21,9 @@
 package com.geekorum.ttrss.manage_feeds
 
 import androidx.lifecycle.ViewModel
-import com.geekorum.geekdroid.dagger.AndroidFrameworkModule
 import com.geekorum.geekdroid.dagger.FragmentFactoriesModule
 import com.geekorum.geekdroid.dagger.ViewModelKey
 import com.geekorum.ttrss.data.ArticlesDatabase
-import com.geekorum.ttrss.di.ApplicationComponent
 import com.geekorum.ttrss.di.FeatureScope
 import com.geekorum.ttrss.di.ViewModelsModule
 import com.geekorum.ttrss.features_api.ManageFeedsDependencies
@@ -33,7 +31,6 @@ import dagger.Binds
 import dagger.Component
 import dagger.Module
 import dagger.Provides
-import dagger.android.support.AndroidSupportInjectionModule
 import dagger.multibindings.IntoMap
 
 @Component(dependencies = [ManageFeedsDependencies::class],
@@ -48,5 +45,17 @@ interface ManageFeedComponent {
 
 @Module
 private abstract class ManageFeedModule {
+    @Binds
+    @IntoMap
+    @ViewModelKey(ManageFeedViewModel::class)
+    abstract fun bindManageFeedViewModel(vm: ManageFeedViewModel): ViewModel
+
+    @Module
+    companion object {
+
+        @Provides
+        @JvmStatic
+        fun providesFeedsDao(articlesDatabase: ArticlesDatabase) = articlesDatabase.manageFeedsDao()
+    }
 }
 

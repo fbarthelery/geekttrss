@@ -24,6 +24,7 @@ import android.os.Bundle
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
+import androidx.lifecycle.observe
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -32,8 +33,10 @@ import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.manage_feeds.databinding.ActivityManageFeedsBinding
 import com.geekorum.ttrss.manage_feeds.databinding.ItemFeedBinding
 import com.geekorum.ttrss.session.SessionActivity
+import com.geekorum.ttrss.viewModels
 
 class ManageFeedsActivity : SessionActivity() {
+    private val viewModel: ManageFeedViewModel by viewModels()
     private lateinit var binding: ActivityManageFeedsBinding
     private val adapter = FeedsAdapter()
 
@@ -47,6 +50,9 @@ class ManageFeedsActivity : SessionActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_manage_feeds)
         binding.recyclerView.adapter = adapter
+        viewModel.feeds.observe(this) {
+            adapter.submitList(it)
+        }
     }
 
     override fun inject() {
