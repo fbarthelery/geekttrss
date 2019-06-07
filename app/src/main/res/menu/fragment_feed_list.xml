@@ -24,7 +24,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <group android:id="@+id/feed_settings" android:visible="false">
+    <group android:id="@+id/feed_settings" android:visible="true">
         <item android:id="@+id/manage_feeds"
               android:title="@string/title_manage_feeds"
               android:icon="@drawable/ic_tune_black_24dp" />

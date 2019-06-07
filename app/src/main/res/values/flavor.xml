@@ -27,5 +27,5 @@
     <string name="sync_adapter_content_authority">com.geekorum.ttrss.providers.articles</string>
 
     <!-- TODO: turn off on release -->
-    <bool name="dev_show_manage_features">false</bool>
+    <bool name="dev_show_manage_features">true</bool>
 </resources>

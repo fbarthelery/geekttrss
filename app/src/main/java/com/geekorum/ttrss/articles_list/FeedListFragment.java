@@ -292,7 +292,7 @@ public class FeedListFragment extends BaseFragment implements NavigationView.OnN
             try {
                 Context freshContext = context.createPackageContext(context.getPackageName(), 0);
                 Intent intent = new Intent();
-                intent.setComponent(ComponentName.createRelative(freshContext, "com.geekorum.ttrss.manage_feeds.TestActivity"));
+                intent.setComponent(ComponentName.createRelative(freshContext, "com.geekorum.ttrss.manage_feeds.ManageFeedsActivity"));
                 startActivity(intent);
             } catch (PackageManager.NameNotFoundException e) {
                 Timber.wtf(e, "Unable to create our package context");
