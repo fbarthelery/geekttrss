@@ -91,4 +91,7 @@
         <item name="android:padding">12dp</item>
     </style>
 
+    <!-- defined in feature modules -->
+    <style name="AppTheme.ManageFeedsActivity" />
+
 </resources>

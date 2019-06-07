@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <!--
 
     Geekttrss is a RSS feed reader application on the Android Platform.
@@ -20,23 +21,9 @@
     along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
 
 -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:dist="http://schemas.android.com/apk/distribution"
-          package="com.geekorum.ttrss.manage_feeds">
-
-    <dist:module
-            dist:instant="false"
-            dist:title="@string/title_manage_feeds">
-        <dist:delivery>
-            <dist:on-demand />
-        </dist:delivery>
-        <dist:fusing dist:include="true" />
-    </dist:module>
-
-    <application>
-        <activity android:name="com.geekorum.ttrss.manage_feeds.ManageFeedsActivity"
-                  android:theme="@style/AppTheme.ManageFeedsActivity" />
-        <activity android:name=".TestActivity" />
-    </application>
-</manifest>
-
+<resources>
+    <style name="AppTheme.ManageFeedsActivity" parent="AppTheme.NoActionBar">
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:navigationBarColor">?android:windowBackground</item>
+    </style>
+</resources>
