@@ -162,7 +162,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
     kapt("androidx.lifecycle:lifecycle-compiler:$lifecycleVersion")
     dualTestImplementation("androidx.arch.core:core-testing:2.0.1")
-    implementation("androidx.paging:paging-runtime:2.1.0")
+    api("androidx.paging:paging-runtime:2.1.0")
 
     // dagger
     val daggerVersion: String by rootProject.extra

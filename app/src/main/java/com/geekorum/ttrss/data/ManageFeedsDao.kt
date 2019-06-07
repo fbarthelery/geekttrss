@@ -18,28 +18,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.geekorum.ttrss.data;
+package com.geekorum.ttrss.data
 
-import androidx.room.Database;
-import androidx.room.RoomDatabase;
-import com.geekorum.ttrss.providers.ArticlesProvidersDao;
+import androidx.paging.DataSource
+import androidx.room.Dao
+import androidx.room.Query
 
-@Database(entities = {Article.class, ArticleFTS.class,
-        Category.class, Feed.class, Transaction.class},
-        version = 8)
-public abstract class ArticlesDatabase extends RoomDatabase {
+@Dao
+interface ManageFeedsDao {
 
-    public static final String DATABASE_NAME = "room_articles.db";
-
-    public abstract ArticleDao articleDao();
-
-    public abstract TransactionsDao transactionsDao();
-
-    public abstract SynchronizationDao synchronizationDao();
-
-    public abstract ArticlesProvidersDao articlesProvidersDao();
-
-    public abstract FeedsDao feedsDao();
-
-    public abstract ManageFeedsDao manageFeedsDao();
+    @get:Query("SELECT * FROM feeds ORDER BY title")
+    val allFeeds: DataSource.Factory<Integer, Feed>
 }
