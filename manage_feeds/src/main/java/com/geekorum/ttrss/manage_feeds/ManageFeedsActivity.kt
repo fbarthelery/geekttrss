@@ -21,10 +21,21 @@
 package com.geekorum.ttrss.manage_feeds
 
 import android.os.Bundle
+import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
+import androidx.databinding.ViewDataBinding
+import androidx.paging.PagedListAdapter
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.RecyclerView
 import com.geekorum.ttrss.applicationComponent
+import com.geekorum.ttrss.data.Feed
+import com.geekorum.ttrss.manage_feeds.databinding.ActivityManageFeedsBinding
+import com.geekorum.ttrss.manage_feeds.databinding.ItemFeedBinding
 import com.geekorum.ttrss.session.SessionActivity
 
 class ManageFeedsActivity : SessionActivity() {
+    private lateinit var binding: ActivityManageFeedsBinding
+    private val adapter = FeedsAdapter()
 
     private val moduleComponent by lazy {
         DaggerManageFeedComponent.builder()
@@ -34,12 +45,43 @@ class ManageFeedsActivity : SessionActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        binding = DataBindingUtil.setContentView(this, R.layout.activity_manage_feeds)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_manage_feeds)
+        binding.recyclerView.adapter = adapter
     }
 
     override fun inject() {
         moduleComponent.inject(this)
     }
 
+    private inner class FeedsAdapter : PagedListAdapter<Feed, FeedViewHolder>(DiffFeed) {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedViewHolder {
+            val itemFeedBinding = ItemFeedBinding.inflate(layoutInflater, parent, false)
+            return FeedViewHolder(itemFeedBinding)
+        }
+
+        override fun onBindViewHolder(holder: FeedViewHolder, position: Int) {
+            val feed = getItem(position)
+            checkNotNull(feed)
+            holder.setFeed(feed)
+            holder.binding.executePendingBindings()
+        }
+    }
+
+    class FeedViewHolder(val binding: ViewDataBinding): RecyclerView.ViewHolder(binding.root) {
+        fun setFeed(feed: Feed?) {
+            val title = feed?.displayTitle?.takeIf { it.isNotEmpty() } ?: feed?.title
+            binding.setVariable(BR.name, title)
+        }
+    }
+
+    private object DiffFeed : DiffUtil.ItemCallback<Feed>() {
+        override fun areItemsTheSame(oldItem: Feed, newItem: Feed): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: Feed, newItem: Feed): Boolean {
+            return oldItem == newItem
+        }
+    }
 
 }
