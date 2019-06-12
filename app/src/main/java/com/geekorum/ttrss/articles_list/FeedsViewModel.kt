@@ -25,14 +25,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.switchMap
-import androidx.lifecycle.viewModelScope
 import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.network.ApiCallException
 import com.geekorum.ttrss.network.ApiService
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.coroutineScope
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -78,14 +76,11 @@ class FeedsViewModel @Inject constructor(
         selectedCategory.value = selectedCategoryId
     }
 
-    private fun refreshFeeds() = viewModelScope.launch(Dispatchers.IO) {
-        try {
-            val feeds = async { apiService.getFeeds() }
-            val categories = async { apiService.getCategories() }
-            feedsRepository.setFeedsAndCategories(feeds.await(), categories.await())
-        } catch (e: ApiCallException) {
-            Timber.w(e, "Unable to refresh feeds and categories")
-        }
+    @Throws(ApiCallException::class)
+    private suspend fun refreshFeeds() = coroutineScope {
+        val feeds = async { apiService.getFeeds() }
+        val categories = async { apiService.getCategories() }
+        feedsRepository.setFeedsAndCategories(feeds.await(), categories.await())
     }
 
     /**
@@ -93,7 +88,11 @@ class FeedsViewModel @Inject constructor(
      */
     private fun <T> LiveData<T>.refreshed(): LiveData<T> = liveData {
         emitSource(this@refreshed)
-        refreshFeeds()
+        try {
+            refreshFeeds()
+        } catch (e: ApiCallException) {
+            Timber.w(e, "Unable to refresh feeds and categories")
+        }
     }
 
 }
