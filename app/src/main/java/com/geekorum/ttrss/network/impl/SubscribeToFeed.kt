@@ -78,8 +78,8 @@ internal data class SubscribeToFeedResponsePayload(
     @SerialName("seq")
     override val sequence: Int? = null,
     override val status: Int = 0,
-    override val content: SubscribeToFeedResponseContent
-) : ResponsePayload<SubscribeToFeedResponseContent>() {
+    override val content: Content
+) : ResponsePayload<SubscribeToFeedResponsePayload.Content>() {
 
     private val resultCode
         get() = content.status?.let { SubscribeResultCode.valueOf(it.resultCode) }
@@ -101,7 +101,7 @@ internal data class SubscribeToFeedResponsePayload(
 
         override fun deserialize(decoder: Decoder): SubscribeToFeedResponsePayload {
             val contentDecoder = decoder.beginStructure(descriptor)
-            lateinit var content: SubscribeToFeedResponseContent
+            lateinit var content: Content
             var seq: Int? = null
             var status = 0
             loop@ while (true) {
@@ -111,7 +111,7 @@ internal data class SubscribeToFeedResponsePayload(
                         IntSerializer))
                     1 -> status = contentDecoder.decodeIntElement(descriptor, i)
                     2 -> {
-                        val contentSerializer = SubscribeToFeedResponseContent.serializer()
+                        val contentSerializer = Content.serializer()
                         content = contentDecoder.decodeSerializableElement(contentSerializer.descriptor, i,
                             contentSerializer)
                     }
@@ -127,27 +127,25 @@ internal data class SubscribeToFeedResponsePayload(
     }
 
 
-}
-
-@Serializable
-internal data class SubscribeToFeedResponseContent(
-
-    val status: Status? = null,
-
-    override var error: Error? = null
-) : BaseContent() {
-
     @Serializable
-    internal data class Status(
-        @SerialName("code")
-        val resultCode: Int = 0,
+    internal data class Content(
+        val status: Status? = null,
+        override var error: Error? = null
+    ) : BaseContent() {
 
-        @SerialName("message")
-        val message: String = "",
+        @Serializable
+        internal data class Status(
+            @SerialName("code")
+            val resultCode: Int = 0,
 
-        @SerialName("feed_id")
-        val feedId: Long = 0
-    )
+            @SerialName("message")
+            val message: String = "",
+
+            @SerialName("feed_id")
+            val feedId: Long = 0
+        )
+    }
+
 }
 
 
@@ -175,8 +173,8 @@ internal data class UnsubscribeFeedResponsePayload(
     @SerialName("seq")
     override val sequence: Int? = null,
     override val status: Int = 0,
-    override val content: UnsubscribeFeedResponseContent
-) : ResponsePayload<UnsubscribeFeedResponsePayload.UnsubscribeFeedResponseContent>() {
+    override val content: Content
+) : ResponsePayload<UnsubscribeFeedResponsePayload.Content>() {
 
     companion object {
         fun serializer(): KSerializer<UnsubscribeFeedResponsePayload> {
@@ -192,7 +190,7 @@ internal data class UnsubscribeFeedResponsePayload(
 
         override fun deserialize(decoder: Decoder): UnsubscribeFeedResponsePayload {
             val contentDecoder = decoder.beginStructure(descriptor)
-            lateinit var content: UnsubscribeFeedResponseContent
+            lateinit var content: Content
             var seq: Int? = null
             var status = 0
             loop@ while (true) {
@@ -202,7 +200,7 @@ internal data class UnsubscribeFeedResponsePayload(
                         IntSerializer))
                     1 -> status = contentDecoder.decodeIntElement(descriptor, i)
                     2 -> {
-                        val contentSerializer = UnsubscribeFeedResponseContent.serializer()
+                        val contentSerializer = Content.serializer()
                         content = contentDecoder.decodeSerializableElement(contentSerializer.descriptor, i,
                             contentSerializer)
                     }
@@ -217,16 +215,11 @@ internal data class UnsubscribeFeedResponsePayload(
         }
     }
 
-
-
     @Serializable
-    internal data class UnsubscribeFeedResponseContent(
-
+    internal data class Content(
         val status: Status? = null,
-
         override var error: Error? = null
     ) : BaseContent() {
-
         internal enum class Status {
             OK,
             KO

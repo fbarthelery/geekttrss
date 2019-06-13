@@ -20,7 +20,7 @@
  */
 package com.geekorum.ttrss.network.impl
 
-import com.geekorum.ttrss.network.impl.UnsubscribeFeedResponsePayload.UnsubscribeFeedResponseContent
+import com.geekorum.ttrss.network.impl.UnsubscribeFeedResponsePayload.Content
 import com.google.common.truth.Truth
 import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
@@ -65,8 +65,8 @@ class SubscribeToFeedJsonSerializationTest {
         val expected = SubscribeToFeedResponsePayload(
             sequence = 2,
             status = 1,
-            content = SubscribeToFeedResponseContent(
-                SubscribeToFeedResponseContent.Status(1, "Feed successfully added", 42))
+            content = SubscribeToFeedResponsePayload.Content(
+                SubscribeToFeedResponsePayload.Content.Status(1, "Feed successfully added", 42))
         )
         Truth.assertThat(result.sequence).isEqualTo(expected.sequence)
         Truth.assertThat(result.status).isEqualTo(expected.status)
@@ -87,7 +87,7 @@ class SubscribeToFeedJsonSerializationTest {
         val expected = SubscribeToFeedResponsePayload(
             sequence = 0,
             status = 1,
-            content = SubscribeToFeedResponseContent(error = Error.NOT_LOGGED_IN)
+            content = SubscribeToFeedResponsePayload.Content(error = Error.NOT_LOGGED_IN)
         )
         Truth.assertThat(result.sequence).isEqualTo(expected.sequence)
         Truth.assertThat(result.status).isEqualTo(expected.status)
@@ -130,7 +130,7 @@ class UnsubscribeFromFeedJsonSerializationTest {
         val expected = UnsubscribeFeedResponsePayload(
             sequence = 2,
             status = 1,
-            content = UnsubscribeFeedResponseContent(UnsubscribeFeedResponseContent.Status.OK)
+            content = Content(Content.Status.OK)
         )
         Truth.assertThat(result.sequence).isEqualTo(expected.sequence)
         Truth.assertThat(result.status).isEqualTo(expected.status)
@@ -151,7 +151,7 @@ class UnsubscribeFromFeedJsonSerializationTest {
         val expected = UnsubscribeFeedResponsePayload(
             sequence = 0,
             status = 1,
-            content = UnsubscribeFeedResponseContent(error = Error.FEED_NOT_FOUND)
+            content = Content(error = Error.FEED_NOT_FOUND)
         )
         Truth.assertThat(result.sequence).isEqualTo(expected.sequence)
         Truth.assertThat(result.status).isEqualTo(expected.status)
