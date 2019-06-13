@@ -127,7 +127,7 @@ data class UpdateArticleResponsePayload(
     data class Content(
         val status: String? = null,
         val updated: Int? = null,
-        override var error: String? = null
+        override var error: Error? = null
     ): BaseContent()
 
   companion object {

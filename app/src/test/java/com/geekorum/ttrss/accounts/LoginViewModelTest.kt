@@ -27,6 +27,7 @@ import androidx.lifecycle.viewModelScope
 import com.geekorum.geekdroid.app.lifecycle.Event
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.network.ApiCallException
+import com.geekorum.ttrss.network.error
 import com.geekorum.ttrss.network.impl.TinyRssApi
 import dagger.Component
 import dagger.Module

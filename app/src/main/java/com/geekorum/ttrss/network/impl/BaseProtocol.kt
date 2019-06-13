@@ -21,7 +21,6 @@
 package com.geekorum.ttrss.network.impl
 
 import androidx.annotation.Keep
-import com.geekorum.ttrss.network.ApiCallException
 import kotlinx.serialization.CompositeDecoder
 import kotlinx.serialization.Decoder
 import kotlinx.serialization.Encoder
@@ -31,12 +30,12 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Serializer
 import kotlinx.serialization.Transient
+import kotlinx.serialization.internal.EnumSerializer
 import kotlinx.serialization.internal.IntSerializer
 import kotlinx.serialization.internal.SerialClassDescImpl
 import kotlinx.serialization.internal.makeNullable
 import kotlinx.serialization.json.JsonParsingException
 import kotlinx.serialization.list
-import kotlinx.serialization.serializer
 
 /* Requests */
 
@@ -84,15 +83,30 @@ abstract class ResponsePayload<T : BaseContent> {
     val isStatusOk: Boolean
         get() = status == API_STATUS_OK
 
-    val error: ApiCallException.ApiError?
-        get() = content.getErrorAsApiError()
-
     companion object {
 
         private val API_STATUS_OK = 0
         private val API_STATUS_ERR = 1
     }
 
+}
+
+enum class Error {
+    NO_ERROR,
+    API_DISABLED,
+    API_UNKNOWN,
+    LOGIN_ERROR,
+    INCORRECT_USAGE,
+    NOT_LOGGED_IN,
+    FEED_NOT_FOUND,
+    UNKNOWN_METHOD;
+
+    // to keep same syntax
+    companion object {
+        fun serializer(): KSerializer<Error> {
+            return EnumSerializer(Error::class)
+        }
+    }
 }
 
 
@@ -106,19 +120,7 @@ abstract class ResponsePayload<T : BaseContent> {
  */
 abstract class BaseContent {
 
-    abstract var error: String?
-
-    fun getErrorAsApiError(): ApiCallException.ApiError {
-        return when (error) {
-            "LOGIN_ERROR" -> ApiCallException.ApiError.LOGIN_FAILED
-            "API_DISABLED" -> ApiCallException.ApiError.API_DISABLED
-            "NOT_LOGGED_IN" -> ApiCallException.ApiError.NOT_LOGGED_IN
-            "INCORRECT_USAGE" -> ApiCallException.ApiError.API_INCORRECT_USAGE
-            "FEED_NOT_FOUND" -> ApiCallException.ApiError.API_FEED_NOT_FOUND
-            "UNKNOWN_METHOD" -> ApiCallException.ApiError.API_UNKNOWN_METHOD
-            else -> ApiCallException.ApiError.API_UNKNOWN
-        }
-    }
+    abstract var error: Error?
 }
 
 
@@ -131,7 +133,7 @@ abstract class BaseContent {
 data class ListContent<T>(
     @Transient
     val list: List<T> = emptyList(),
-    override var error: String? = null
+    override var error: Error? = null
 ) : BaseContent() {
 
     companion object {
@@ -163,12 +165,12 @@ data class ListContent<T>(
 
         private fun deserializeBaseContent(input: Decoder): ListContent<E> {
             val contentDecoder = input.beginStructure(descriptor)
-            var error: String? = null
+            var error: Error? = null
             loop@ while (true) {
                 when (val i = contentDecoder.decodeElementIndex(descriptor)) {
                     CompositeDecoder.READ_DONE -> break@loop
                     0 -> error = contentDecoder.decodeNullableSerializableElement(descriptor, i,
-                        makeNullable(String.serializer()))
+                        makeNullable(Error.serializer()))
                 }
             }
             contentDecoder.endStructure(descriptor)

@@ -134,7 +134,7 @@ internal data class SubscribeToFeedResponseContent(
 
     val status: Status? = null,
 
-    override var error: String? = null
+    override var error: Error? = null
 ) : BaseContent() {
 
     @Serializable
@@ -224,7 +224,7 @@ internal data class UnsubscribeFeedResponsePayload(
 
         val status: Status? = null,
 
-        override var error: String? = null
+        override var error: Error? = null
     ) : BaseContent() {
 
         internal enum class Status {

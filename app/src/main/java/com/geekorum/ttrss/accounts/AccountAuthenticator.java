@@ -32,6 +32,7 @@ import androidx.annotation.NonNull;
 import com.geekorum.ttrss.BuildConfig;
 import com.geekorum.ttrss.R;
 import com.geekorum.ttrss.network.ApiCallException;
+import com.geekorum.ttrss.network.ApiCallExceptionKt;
 import com.geekorum.ttrss.network.impl.LoginRequestPayload;
 import com.geekorum.ttrss.network.impl.LoginResponsePayload;
 import com.geekorum.ttrss.network.impl.TinyRssApi;
@@ -118,7 +119,7 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
                 result.putString(AccountManager.KEY_AUTHTOKEN, sessionId);
                 return result;
             }
-            ApiCallException.ApiError error = responsePayload.getError();
+            ApiCallException.ApiError error = ApiCallExceptionKt.getErrorFromPayload(responsePayload);
             if (error == ApiCallException.ApiError.LOGIN_FAILED) {
                 Timber.w("Login failed: Invalid credentials");
                 return getRevalidateCredentialResponse(account);

@@ -22,9 +22,11 @@ package com.geekorum.ttrss.network.impl
 
 import com.geekorum.ttrss.network.impl.UnsubscribeFeedResponsePayload.UnsubscribeFeedResponseContent
 import com.google.common.truth.Truth
+import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import org.junit.Test
 
+@UnstableDefault
 class SubscribeToFeedJsonSerializationTest {
     @Test
     fun testThatSubscribeToFeedRequestPayloadDoCorrectJson() {
@@ -85,7 +87,7 @@ class SubscribeToFeedJsonSerializationTest {
         val expected = SubscribeToFeedResponsePayload(
             sequence = 0,
             status = 1,
-            content = SubscribeToFeedResponseContent(error = "NOT_LOGGED_IN")
+            content = SubscribeToFeedResponseContent(error = Error.NOT_LOGGED_IN)
         )
         Truth.assertThat(result.sequence).isEqualTo(expected.sequence)
         Truth.assertThat(result.status).isEqualTo(expected.status)
@@ -94,7 +96,7 @@ class SubscribeToFeedJsonSerializationTest {
 }
 
 
-
+@UnstableDefault
 class UnsubscribeFromFeedJsonSerializationTest {
     @Test
     fun testThatUnsubscribeFeedRequestPayloadDoCorrectJson() {
@@ -149,7 +151,7 @@ class UnsubscribeFromFeedJsonSerializationTest {
         val expected = UnsubscribeFeedResponsePayload(
             sequence = 0,
             status = 1,
-            content = UnsubscribeFeedResponseContent(error = "FEED_NOT_FOUND")
+            content = UnsubscribeFeedResponseContent(error = Error.FEED_NOT_FOUND)
         )
         Truth.assertThat(result.sequence).isEqualTo(expected.sequence)
         Truth.assertThat(result.status).isEqualTo(expected.status)

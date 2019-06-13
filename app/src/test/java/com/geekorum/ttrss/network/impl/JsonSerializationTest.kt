@@ -20,15 +20,16 @@
  */
 package com.geekorum.ttrss.network.impl
 
-import com.geekorum.ttrss.providers.ArticlesContract
+import com.geekorum.ttrss.network.impl.Error.NOT_LOGGED_IN
 import com.google.common.truth.Truth.assertThat
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializerByTypeToken
 import kotlinx.serialization.typeTokenOf
 import kotlin.test.Test
 
-
+@UnstableDefault
 class JsonSerializationTest {
 
     @Test
@@ -74,7 +75,7 @@ class JsonSerializationTest {
         val result = Json.parse(serializer, jsonString)
         val expected = LoginResponsePayload(
             status = 1,
-            content = LoginResponsePayload.Content(error = "NOT_LOGGED_IN")
+            content = LoginResponsePayload.Content(error = NOT_LOGGED_IN)
         )
         assertThat(result.sequence).isEqualTo(expected.sequence)
         assertThat(result.status).isEqualTo(expected.status)
@@ -133,7 +134,7 @@ class JsonSerializationTest {
         val expected = UpdateArticleResponsePayload(
             sequence = 0,
             status = 1,
-            content = UpdateArticleResponsePayload.Content(error = "NOT_LOGGED_IN")
+            content = UpdateArticleResponsePayload.Content(error = NOT_LOGGED_IN)
         )
         assertThat(result.sequence).isEqualTo(expected.sequence)
         assertThat(result.status).isEqualTo(expected.status)
@@ -245,7 +246,7 @@ class JsonSerializationTest {
         val expected = ListResponsePayload<Feed>(
             sequence = 2,
             status = 1,
-            content = ListContent(error = "NOT_LOGGED_IN")
+            content = ListContent(error = NOT_LOGGED_IN)
         )
         assertThat(result.sequence).isEqualTo(expected.sequence)
         assertThat(result.status).isEqualTo(expected.status)
@@ -255,7 +256,10 @@ class JsonSerializationTest {
 
     @Test
     fun testThatGetCategoriesRequestPayloadDoCorrectJson() {
-        val payload = GetCategoriesRequestPayload(true, false).apply {
+        val payload = GetCategoriesRequestPayload(
+            includeNested = true,
+            unreadOnly = false
+        ).apply {
             sessionId = "SESSION_ID"
         }
         val serializer = getSerializer<GetCategoriesRequestPayload>()
@@ -289,7 +293,7 @@ class JsonSerializationTest {
         """.trimIndent()
         val serializer = getSerializer<ListResponsePayload<FeedCategory>>()
         val result = Json.parse(serializer, jsonString)
-        val expected = ListResponsePayload<FeedCategory>(
+        val expected = ListResponsePayload(
             sequence = 2,
             status = 1,
             content = ListContent(listOf(
@@ -317,7 +321,7 @@ class JsonSerializationTest {
         val expected = ListResponsePayload<FeedCategory>(
             sequence = 2,
             status = 1,
-            content = ListContent(error = "NOT_LOGGED_IN")
+            content = ListContent(error = NOT_LOGGED_IN)
         )
         assertThat(result.sequence).isEqualTo(expected.sequence)
         assertThat(result.status).isEqualTo(expected.status)
@@ -466,7 +470,7 @@ class JsonSerializationTest {
         val expected = ListResponsePayload<Headline>(
             sequence = 2,
             status = 1,
-            content = ListContent(error = "NOT_LOGGED_IN")
+            content = ListContent(error = NOT_LOGGED_IN)
         )
         assertThat(result.sequence).isEqualTo(expected.sequence)
         assertThat(result.status).isEqualTo(expected.status)
