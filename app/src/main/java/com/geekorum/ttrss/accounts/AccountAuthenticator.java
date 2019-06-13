@@ -112,15 +112,14 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
 
         try {
             LoginResponsePayload responsePayload = login(ttRssAccount.getUsername(), password, serverInformation);
-            if (responsePayload.isStatusOk()) {
-                String sessionId = responsePayload.getSessionId();
-                result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
-                result.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
-                result.putString(AccountManager.KEY_AUTHTOKEN, sessionId);
-                return result;
-            }
-            ApiCallException.ApiError error = ApiCallExceptionKt.getErrorFromPayload(responsePayload);
-            if (error == ApiCallException.ApiError.LOGIN_FAILED) {
+            ApiCallExceptionKt.checkStatus(responsePayload);
+            String sessionId = responsePayload.getSessionId();
+            result.putString(AccountManager.KEY_ACCOUNT_NAME, account.name);
+            result.putString(AccountManager.KEY_ACCOUNT_TYPE, account.type);
+            result.putString(AccountManager.KEY_AUTHTOKEN, sessionId);
+            return result;
+        } catch (ApiCallException e) {
+            if (e.getErrorCode() == ApiCallException.ApiError.LOGIN_FAILED) {
                 Timber.w("Login failed: Invalid credentials");
                 return getRevalidateCredentialResponse(account);
             }

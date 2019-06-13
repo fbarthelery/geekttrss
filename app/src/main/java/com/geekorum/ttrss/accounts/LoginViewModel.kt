@@ -32,7 +32,7 @@ import androidx.lifecycle.viewModelScope
 import com.geekorum.geekdroid.app.lifecycle.Event
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.network.ApiCallException
-import com.geekorum.ttrss.network.error
+import com.geekorum.ttrss.network.checkStatus
 import com.geekorum.ttrss.network.impl.LoginRequestPayload
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -143,33 +143,32 @@ internal class LoginViewModel @Inject constructor(
         try {
             loginInProgress.value = true
             val response = tinyRssApi.login(loginPayload).await()
-
-            when {
-                response.isStatusOk -> onUserLoggedIn()
-
-                response.error == ApiCallException.ApiError.LOGIN_FAILED
-                        || response.error == ApiCallException.ApiError.NOT_LOGGED_IN ->
-                    loginFailedEvent.value = LoginFailedEvent(R.string.error_login_failed)
-
-                response.error == ApiCallException.ApiError.API_DISABLED ->
-                    loginFailedEvent.value = LoginFailedEvent(R.string.error_api_disabled)
-
-                else -> loginFailedEvent.value = LoginFailedEvent(R.string.error_unknown)
+            response.checkStatus { "Login failed" }
+            onUserLoggedIn()
+        } catch (e: ApiCallException) {
+            val errorMsgId = when (e.errorCode) {
+                ApiCallException.ApiError.LOGIN_FAILED,
+                ApiCallException.ApiError.NOT_LOGGED_IN -> R.string.error_login_failed
+                ApiCallException.ApiError.API_DISABLED -> R.string.error_api_disabled
+                else -> R.string.error_unknown
             }
+            loginFailedEvent.value = LoginFailedEvent(errorMsgId)
         } catch (e: HttpException) {
-            when (e.code()) {
-                401 -> loginFailedEvent.value = LoginFailedEvent(R.string.error_http_unauthorized)
-                403 -> loginFailedEvent.value = LoginFailedEvent(R.string.error_http_forbidden)
-                404 -> loginFailedEvent.value = LoginFailedEvent(R.string.error_http_not_found)
-                else -> loginFailedEvent.value = LoginFailedEvent(R.string.error_unknown)
+            val errorMsgId = when (e.code()) {
+                401 -> R.string.error_http_unauthorized
+                403 -> R.string.error_http_forbidden
+                404 -> R.string.error_http_not_found
+                else -> R.string.error_unknown
             }
+            loginFailedEvent.value = LoginFailedEvent(errorMsgId)
         } catch (e: IOException) {
             val isCleartextTrafficPermitted = NetworkSecurityPolicy.getInstance().isCleartextTrafficPermitted
-            if (!serverUrl.isHttps && !isCleartextTrafficPermitted) {
-                loginFailedEvent.value = LoginFailedEvent(R.string.error_cleartext_traffic_not_allowed)
+            val errorMsgId = if (!serverUrl.isHttps && !isCleartextTrafficPermitted) {
+                R.string.error_cleartext_traffic_not_allowed
             } else {
-                loginFailedEvent.value = LoginFailedEvent(R.string.error_unknown)
+                R.string.error_unknown
             }
+            loginFailedEvent.value = LoginFailedEvent(errorMsgId)
         } catch (e: Exception) {
             loginFailedEvent.value = LoginFailedEvent(R.string.error_unknown)
         } finally {

@@ -124,15 +124,13 @@ class ApiRetrofitService(
         return subscribeResult.success
     }
 
-    private fun convertError(error: ApiCallException.ApiError, message: String): ApiCallException {
-        return ApiCallException(error, message)
-    }
-
     @Throws(IOException::class)
     private suspend fun <T : ResponsePayload<*>> retryIfInvalidToken(block: () -> Deferred<T>): T {
         val body = block().await()
-        if (!body.isStatusOk) {
-            val error = body.error
+        try {
+            body.checkStatus()
+        } catch (e: ApiCallException) {
+            val error = e.errorCode
             if (error == ApiCallException.ApiError.LOGIN_FAILED || error == ApiCallException.ApiError.NOT_LOGGED_IN) {
                 tokenRetriever.invalidateToken()
                 return block().await()
@@ -145,9 +143,7 @@ class ApiRetrofitService(
     private suspend fun <T : ResponsePayload<*>> executeOrFail(failingMessage: String, block: () -> Deferred<T>): T {
         try {
             val body = retryIfInvalidToken(block)
-            if (!body.isStatusOk) {
-                throw convertError(body.error ?: ApiCallException.ApiError.API_UNKNOWN, failingMessage)
-            }
+            body.checkStatus { failingMessage }
             return body
         } catch (e: IOException) {
             throw ApiCallException(failingMessage, e)

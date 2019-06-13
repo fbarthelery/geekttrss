@@ -80,13 +80,9 @@ abstract class ResponsePayload<T : BaseContent> {
 
     abstract val content: T
 
-    val isStatusOk: Boolean
-        get() = status == API_STATUS_OK
-
     companion object {
-
-        private val API_STATUS_OK = 0
-        private val API_STATUS_ERR = 1
+        val API_STATUS_OK = 0
+        val API_STATUS_ERR = 1
     }
 
 }

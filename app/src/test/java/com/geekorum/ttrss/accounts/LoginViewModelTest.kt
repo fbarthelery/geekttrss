@@ -26,8 +26,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.geekorum.geekdroid.app.lifecycle.Event
 import com.geekorum.ttrss.R
-import com.geekorum.ttrss.network.ApiCallException
-import com.geekorum.ttrss.network.error
+import com.geekorum.ttrss.network.impl.Error
+import com.geekorum.ttrss.network.impl.LoginResponsePayload
+import com.geekorum.ttrss.network.impl.ResponsePayload
 import com.geekorum.ttrss.network.impl.TinyRssApi
 import dagger.Component
 import dagger.Module
@@ -51,6 +52,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.util.concurrent.Executors
+import kotlin.Any
+import kotlin.Boolean
+import kotlin.toString
 
 
 class LoginViewModelTest {
@@ -69,6 +73,15 @@ class LoginViewModelTest {
     private lateinit var viewModel: LoginViewModel
 
     private lateinit var networkBuilder: AuthenticatorNetworkComponent.Builder
+
+    private val successLoginResponse = LoginResponsePayload(
+        status = ResponsePayload.API_STATUS_OK,
+        content = LoginResponsePayload.Content("session_id"))
+
+    private val failedLoginResponse = LoginResponsePayload(
+        status = ResponsePayload.API_STATUS_ERR,
+        content = LoginResponsePayload.Content(error = Error.LOGIN_ERROR))
+
 
     @Before
     fun setup() {
@@ -107,7 +120,7 @@ class LoginViewModelTest {
     @Test
     fun checkDoLoginSendProgressEvent() {
         val observer: Observer<Boolean> = mockObserver()
-        coEvery { tinyRssApi.login(any()).await().isStatusOk } returns true
+        coEvery { tinyRssApi.login(any()).await() } returns successLoginResponse
         every { accountManager.addAccount(any(), any()) } returns false
 
         viewModel.initialize(LoginActivity.ACTION_ADD_ACCOUNT)
@@ -129,7 +142,7 @@ class LoginViewModelTest {
         val observer: Observer<Event<LoginViewModel.ActionCompleteEvent>> = mockObserver()
         every { accountManager.addAccount(any(), any()) } returns true
         every { accountManager.initializeAccountSync(any()) } just Runs
-        coEvery { tinyRssApi.login(any()).await().isStatusOk } returns true
+        coEvery { tinyRssApi.login(any()).await() } returns successLoginResponse
 
         viewModel.initialize(LoginActivity.ACTION_ADD_ACCOUNT)
         viewModel.actionCompleteEvent.observeForever(observer)
@@ -152,9 +165,7 @@ class LoginViewModelTest {
     @Test
     fun checkDoLoginWithFailSendLoginFailedEvent() {
         val observer: Observer<Event<LoginViewModel.LoginFailedError>> = mockObserver()
-        coEvery { tinyRssApi.login(any()).await().error } returns ApiCallException.ApiError.LOGIN_FAILED
-        coEvery { tinyRssApi.login(any()).await().isStatusOk } returns false
-
+        coEvery { tinyRssApi.login(any()).await() } returns failedLoginResponse
 
         viewModel.initialize(LoginActivity.ACTION_ADD_ACCOUNT)
         viewModel.loginFailedEvent.observeForever(observer)

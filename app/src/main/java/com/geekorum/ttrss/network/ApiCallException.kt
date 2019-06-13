@@ -22,13 +22,14 @@ package com.geekorum.ttrss.network
 
 import com.geekorum.ttrss.network.impl.Error
 import com.geekorum.ttrss.network.impl.ResponsePayload
+import com.geekorum.ttrss.network.impl.ResponsePayload.Companion.API_STATUS_OK
 
 /**
  * Exception raised when an Tiny Tiny Rss API call fail.
  */
 class ApiCallException : Exception {
 
-    private val errorCode: ApiError?
+    val errorCode: ApiError?
 
     enum class ApiError {
         NO_ERROR,
@@ -64,10 +65,12 @@ val ResponsePayload<*>.error: ApiCallException.ApiError?
     }
 
 /**
- * Throws an [ApiCallException] with the result of calling [lazyMessage]  if [ResponsePayload.isStatusOk] is not true.
+ * Throws an [ApiCallException] with the result of calling [lazyMessage]  if [ResponsePayload.status] is not OK.
  */
-fun ResponsePayload<*>.checkStatus(lazyMessage: () -> String) {
-    if (!isStatusOk) {
+@JvmOverloads
+@Throws(ApiCallException::class)
+fun ResponsePayload<*>.checkStatus(lazyMessage: () -> String = { "Api call failed" }) {
+    if (status != API_STATUS_OK) {
         val message = lazyMessage()
         throw ApiCallException(error ?: ApiCallException.ApiError.API_UNKNOWN, message)
     }
