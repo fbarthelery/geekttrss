@@ -26,7 +26,7 @@ package com.geekorum.ttrss.network;
 public class ApiCallException extends Exception {
 
     public enum ApiError { NO_ERROR, API_DISABLED,
-        API_UNKNOWN, LOGIN_FAILED, API_INCORRECT_USAGE, NOT_LOGGED_IN, API_UNKNOWN_METHOD }
+        API_UNKNOWN, LOGIN_FAILED, API_INCORRECT_USAGE, NOT_LOGGED_IN, API_FEED_NOT_FOUND, API_UNKNOWN_METHOD }
 
 
     private ApiError errorCode;

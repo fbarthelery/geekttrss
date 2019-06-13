@@ -114,6 +114,7 @@ abstract class BaseContent {
             "API_DISABLED" -> ApiCallException.ApiError.API_DISABLED
             "NOT_LOGGED_IN" -> ApiCallException.ApiError.NOT_LOGGED_IN
             "INCORRECT_USAGE" -> ApiCallException.ApiError.API_INCORRECT_USAGE
+            "FEED_NOT_FOUND" -> ApiCallException.ApiError.API_FEED_NOT_FOUND
             "UNKNOWN_METHOD" -> ApiCallException.ApiError.API_UNKNOWN_METHOD
             else -> ApiCallException.ApiError.API_UNKNOWN
         }

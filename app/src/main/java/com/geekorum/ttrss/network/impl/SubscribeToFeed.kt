@@ -135,37 +135,101 @@ internal data class SubscribeToFeedResponseContent(
     val status: Status? = null,
 
     override var error: String? = null
-) : BaseContent()
+) : BaseContent() {
 
+    @Serializable
+    internal data class Status(
+        @SerialName("code")
+        val resultCode: Int = 0,
+
+        @SerialName("message")
+        val message: String = "",
+
+        @SerialName("feed_id")
+        val feedId: Long = 0
+    )
+}
+
+
+
+/**
+ * Request Payload to unsubscribe from a feed
+ */
+@Keep
 @Serializable
-internal data class Status(
-    @SerialName("code")
-    val resultCode: Int = 0,
-
-    @SerialName("message")
-    val message: String = "",
-
+internal data class UnsubscribeFeedRequestPayload(
     @SerialName("feed_id")
-    val feedId: Long = 0
-)
+    private val feedId: Long
+) : LoggedRequestPayload() {
+
+    @SerialName("op")
+    override val operation = "unsubscribeFeed"
+}
 
 
-/*    public void unsubscribeFeed(final Feed feed) {
-    org.fox.ttrss.ApiRequest req = new org.fox.ttrss.ApiRequest(getApplicationContext()) {
-        protected void onPostExecute(JsonElement result) {
-            refresh();
+/**
+ * Response payload of unsubscribe from feed request
+ */
+@Keep
+internal data class UnsubscribeFeedResponsePayload(
+    @SerialName("seq")
+    override val sequence: Int? = null,
+    override val status: Int = 0,
+    override val content: UnsubscribeFeedResponseContent
+) : ResponsePayload<UnsubscribeFeedResponsePayload.UnsubscribeFeedResponseContent>() {
+
+    companion object {
+        fun serializer(): KSerializer<UnsubscribeFeedResponsePayload> {
+            return UnsubscribeFeedResponsePayloadSerializer()
         }
-    };
+    }
 
-    @SuppressWarnings("serial")
-    HashMap<String, String> map = new HashMap<String, String>() {
-        {
-            put("sid", "sessionId");
-            put("op", "unsubscribeFeed");
-            put("feed_id", String.valueOf(feed.id));
+    @Serializer(UnsubscribeFeedResponsePayload::class)
+    class UnsubscribeFeedResponsePayloadSerializer : KSerializer<UnsubscribeFeedResponsePayload> {
+        override fun serialize(encoder: Encoder, obj: UnsubscribeFeedResponsePayload) {
+            TODO("not implemented")
         }
-    };
 
-    req.execute(map);
+        override fun deserialize(decoder: Decoder): UnsubscribeFeedResponsePayload {
+            val contentDecoder = decoder.beginStructure(descriptor)
+            lateinit var content: UnsubscribeFeedResponseContent
+            var seq: Int? = null
+            var status = 0
+            loop@ while (true) {
+                when (val i = contentDecoder.decodeElementIndex(descriptor)) {
+                    CompositeDecoder.READ_DONE -> break@loop
+                    0 -> seq = contentDecoder.decodeNullableSerializableElement(descriptor, i, makeNullable(
+                        IntSerializer))
+                    1 -> status = contentDecoder.decodeIntElement(descriptor, i)
+                    2 -> {
+                        val contentSerializer = UnsubscribeFeedResponseContent.serializer()
+                        content = contentDecoder.decodeSerializableElement(contentSerializer.descriptor, i,
+                            contentSerializer)
+                    }
+                }
+            }
+            contentDecoder.endStructure(descriptor)
+            return UnsubscribeFeedResponsePayload(
+                content = content,
+                sequence = seq,
+                status = status
+            )
+        }
+    }
 
-}*/
+
+
+    @Serializable
+    internal data class UnsubscribeFeedResponseContent(
+
+        val status: Status? = null,
+
+        override var error: String? = null
+    ) : BaseContent() {
+
+        internal enum class Status {
+            OK,
+            KO
+        }
+    }
+}
