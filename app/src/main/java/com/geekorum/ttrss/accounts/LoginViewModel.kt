@@ -20,6 +20,7 @@
  */
 package com.geekorum.ttrss.accounts
 
+import android.security.NetworkSecurityPolicy
 import android.view.inputmethod.EditorInfo
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
@@ -37,6 +38,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
 import retrofit2.HttpException
+import java.io.IOException
 import javax.inject.Inject
 
 /**
@@ -128,7 +130,8 @@ internal class LoginViewModel @Inject constructor(
 
     @VisibleForTesting
     internal suspend fun doLogin() {
-        val serverInformation = DataServerInformation(httpUrl!!.toString(), http_auth_username, http_auth_password)
+        val serverUrl = requireNotNull(httpUrl)
+        val serverInformation = DataServerInformation(serverUrl.toString(), http_auth_username, http_auth_password)
         val urlModule = TinyRssServerInformationModule(serverInformation)
         val networkComponent = networkComponentBuilder
             .tinyRssServerInformationModule(urlModule)
@@ -158,6 +161,13 @@ internal class LoginViewModel @Inject constructor(
                 403 -> loginFailedEvent.value = LoginFailedEvent(R.string.error_http_forbidden)
                 404 -> loginFailedEvent.value = LoginFailedEvent(R.string.error_http_not_found)
                 else -> loginFailedEvent.value = LoginFailedEvent(R.string.error_unknown)
+            }
+        } catch (e: IOException) {
+            val isCleartextTrafficPermitted = NetworkSecurityPolicy.getInstance().isCleartextTrafficPermitted
+            if (!serverUrl.isHttps && !isCleartextTrafficPermitted) {
+                loginFailedEvent.value = LoginFailedEvent(R.string.error_cleartext_traffic_not_allowed)
+            } else {
+                loginFailedEvent.value = LoginFailedEvent(R.string.error_unknown)
             }
         } catch (e: Exception) {
             loginFailedEvent.value = LoginFailedEvent(R.string.error_unknown)

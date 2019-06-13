@@ -119,5 +119,8 @@
     <string name="error_ssl_hostname_rejected">Error: SSL hostname not verified</string>
     <string name="error_api_unknown_method">Error: unknown API method</string>
     <string name="error_network_unavailable">Error: network unavailable</string>
+    <string name="error_cleartext_traffic_not_allowed">Error: Cleartext (http) traffic not allowed on this version of Android</string>
+
+    <!-- features title -->
     <string name="title_manage_feeds">Manage feeds</string>
 </resources>
