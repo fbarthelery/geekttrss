@@ -38,6 +38,7 @@ import com.geekorum.ttrss.BaseActivity
 import com.geekorum.ttrss.BuildConfig
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.databinding.ActivitySettingsBinding
+import com.geekorum.ttrss.debugtools.withStrictMode
 
 
 class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
@@ -80,7 +81,9 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
         private val summaryBinder = PreferenceSummaryBinder()
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-            addPreferencesFromResource(R.xml.pref_general)
+            withStrictMode(StrictMode.allowThreadDiskReads()) {
+                addPreferencesFromResource(R.xml.pref_general)
+            }
 
             findPreference(KEY_THEME).apply {
                 summaryBinder.bindPreferenceSummaryToValue(this)
