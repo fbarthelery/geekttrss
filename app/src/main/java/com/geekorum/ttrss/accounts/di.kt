@@ -25,7 +25,6 @@ import android.accounts.AccountManager
 import android.app.Activity
 import android.content.Context
 import androidx.lifecycle.ViewModel
-import com.geekorum.geekdroid.accounts.AccountTokenRetriever
 import com.geekorum.geekdroid.dagger.ViewModelKey
 import com.geekorum.geekdroid.network.TokenRetriever
 import com.geekorum.geekdroid.security.SecretEncryption
@@ -96,7 +95,7 @@ class NetworkLoginModule {
     @Provides
     @PerAccount
     fun providesTokenRetriever(accountManager: AccountManager, account: Account): TokenRetriever {
-        return AccountTokenRetriever(accountManager, AccountAuthenticator.TTRSS_AUTH_TOKEN_SESSION_ID, account, true)
+        return TinyrssAccountTokenRetriever(accountManager, account)
     }
 
     @Provides
