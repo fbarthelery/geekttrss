@@ -24,7 +24,6 @@ import android.accounts.Account
 import android.app.Application
 import android.app.job.JobInfo
 import android.app.job.JobScheduler
-import android.content.ComponentName
 import android.content.ContentResolver
 import android.content.Context
 import android.content.SyncRequest
@@ -42,7 +41,6 @@ import com.geekorum.geekdroid.dagger.AppInitializer
 import com.geekorum.geekdroid.dagger.AppInitializersModule
 import com.geekorum.ttrss.add_feed.AddFeedWorker
 import com.geekorum.ttrss.providers.ArticlesContract
-import com.geekorum.ttrss.providers.PurgeArticlesJobService
 import com.geekorum.ttrss.providers.PurgeArticlesWorker
 import com.geekorum.ttrss.sync.SyncContract
 import dagger.Binds

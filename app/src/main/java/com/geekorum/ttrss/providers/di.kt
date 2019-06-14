@@ -25,7 +25,6 @@ import androidx.work.WorkerFactory
 import com.geekorum.geekdroid.dagger.AndroidComponentsModule
 import com.geekorum.geekdroid.dagger.PerAndroidComponent
 import com.geekorum.geekdroid.dagger.WorkerKey
-import com.geekorum.ttrss.add_feed.AddFeedWorker
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Module
@@ -37,7 +36,7 @@ import dagger.multibindings.IntoMap
 /**
  * Dagger module declaring the subcomponents of the providers package
  */
-@Module(subcomponents = [PurgeArticleJobServiceComponent::class, ArticleProviderComponent::class])
+@Module(subcomponents = [ArticleProviderComponent::class])
 abstract class AndroidInjectorsModule {
 
     @Binds
@@ -49,51 +48,24 @@ abstract class AndroidInjectorsModule {
 
     @Binds
     @IntoMap
-    @ClassKey(PurgeArticlesJobService::class)
-    abstract fun bindPurgeArticlesJobServiceInjectorFactory(
-        builder: PurgeArticleJobServiceComponent.Builder
-    ): AndroidInjector.Factory<*>
-
-    @Binds
-    @IntoMap
     @WorkerKey(PurgeArticlesWorker::class)
     abstract fun providesPurgeArticlesWorkerFactory(workerFactory: PurgeArticlesWorker.Factory): WorkerFactory
 
 }
 
 
-interface BaseComponent<T> : AndroidInjector<T> {
-
-    abstract class Builder<T> : AndroidInjector.Builder<T>() {
-
-        @BindsInstance
-        abstract fun bindAndroidComponent(context: Context?): Builder<T>
-    }
-}
-
 @Subcomponent(modules = [AndroidComponentsModule::class])
 @PerAndroidComponent
-interface PurgeArticleJobServiceComponent : BaseComponent<PurgeArticlesJobService> {
-    @Subcomponent.Builder
-    abstract class Builder : BaseComponent.Builder<PurgeArticlesJobService>() {
-
-        override fun seedInstance(instance: PurgeArticlesJobService) {
-            bindAndroidComponent(instance)
-        }
-    }
-}
-
-
-@Subcomponent(modules = [AndroidComponentsModule::class])
-@PerAndroidComponent
-interface ArticleProviderComponent : BaseComponent<ArticlesProvider> {
+interface ArticleProviderComponent : AndroidInjector<ArticlesProvider> {
 
     @Subcomponent.Builder
-    abstract class Builder : BaseComponent.Builder<ArticlesProvider>() {
+    abstract class Builder : AndroidInjector.Builder<ArticlesProvider>() {
 
         override fun seedInstance(instance: ArticlesProvider) {
             bindAndroidComponent(instance.context)
         }
 
+        @BindsInstance
+        abstract fun bindAndroidComponent(context: Context?): Builder
     }
 }

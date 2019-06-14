@@ -60,5 +60,4 @@ class PurgeArticlesWorker(
             return PurgeArticlesWorker(appContext, workerParameters, articlesProvidersDao)
         }
     }
-
 }

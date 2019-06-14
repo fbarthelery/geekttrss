@@ -77,8 +77,6 @@ class AddFeedWorker(
         override fun createWorker(
             appContext: Context, workerClassName: String, workerParameters: WorkerParameters
         ): ListenableWorker? {
-
-
             if (workerClassName != AddFeedWorker::class.java.name) {
                 return null
             }
