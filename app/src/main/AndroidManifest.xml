@@ -133,6 +133,10 @@
             android:name="com.geekorum.ttrss.providers.ArticlesProvider"
             android:exported="false"/>
 
+        <!-- Disable WorkManagerInitializer and initialize manually in Application -->
+        <provider android:name="androidx.work.impl.WorkManagerInitializer"
+                android:enabled="false"/>
+
     </application>
 
 </manifest>

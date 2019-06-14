@@ -22,7 +22,10 @@ package com.geekorum.ttrss.add_feed
 
 import android.accounts.Account
 import androidx.lifecycle.ViewModel
+import androidx.work.WorkerFactory
 import com.geekorum.geekdroid.dagger.ViewModelKey
+import com.geekorum.geekdroid.dagger.WorkerInjectionModule
+import com.geekorum.geekdroid.dagger.WorkerKey
 import com.geekorum.ttrss.accounts.NetworkLoginModule
 import com.geekorum.ttrss.accounts.PerAccount
 import com.geekorum.ttrss.di.AssistedFactoriesModule
@@ -43,7 +46,7 @@ import dagger.multibindings.IntoMap
  *
  */
 
-@Module
+@Module(includes = [WorkerInjectionModule::class, AddFeedComponentModule::class])
 abstract class AndroidInjectorsModule {
 
     @ContributesAndroidInjector(modules = [AddFeedComponentModule::class])
@@ -52,16 +55,21 @@ abstract class AndroidInjectorsModule {
     @ContributesAndroidInjector(modules = [ViewModelsModule::class])
     abstract fun contributeAddFeedActivityInjector(): AddFeedActivity
 
+    @Binds
+    @IntoMap
+    @WorkerKey(AddFeedWorker::class)
+    abstract fun providesAddFeedWorkerFactory(workerFactory: AddFeedWorker.Factory): WorkerFactory
+
 }
 
 
 @Module(subcomponents = [AddFeedComponent::class])
-private abstract class AddFeedComponentModule
+abstract class AddFeedComponentModule
 
 
 @Subcomponent(modules = [AssistedFactoriesModule::class, NetworkLoginModule::class, TinyrssApiModule::class])
 @PerAccount
-internal interface AddFeedComponent {
+interface AddFeedComponent {
 
     val addFeedJobFactory: AddFeedJob.Factory
 

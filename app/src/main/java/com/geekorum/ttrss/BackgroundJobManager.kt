@@ -32,9 +32,16 @@ import android.os.Build
 import android.os.Bundle
 import androidx.annotation.RequiresApi
 import androidx.core.content.getSystemService
+import androidx.work.Configuration
+import androidx.work.Constraints
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.geekorum.geekdroid.dagger.AppInitializer
 import com.geekorum.geekdroid.dagger.AppInitializersModule
-import com.geekorum.ttrss.add_feed.AddFeedService
+import com.geekorum.geekdroid.dagger.DaggerDelegateWorkersFactory
+import com.geekorum.geekdroid.dagger.WorkerInjectionModule
+import com.geekorum.ttrss.add_feed.AddFeedWorker
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.providers.PurgeArticlesJobService
 import com.geekorum.ttrss.sync.SyncContract
@@ -151,8 +158,15 @@ private open class BackgroundJobManagerImpl internal constructor(
         account: Account, feedUrl: String,
         categoryId: Long, feedLogin: String, feedPassword: String
     ) {
-        AddFeedService.subscribeToFeed(BackgroundJobManager.SUBSCRIBE_TO_FEED_JOB_ID, context, account, feedUrl, categoryId, feedLogin,
-            feedPassword)
+        val inputData = AddFeedWorker.getInputData(account, feedUrl, categoryId, feedLogin, feedPassword)
+        val workRequest = OneTimeWorkRequestBuilder<AddFeedWorker>()
+            .setConstraints(Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build())
+            .setInputData(inputData)
+            .build()
+        WorkManager.getInstance(context).enqueue(workRequest)
+
     }
 
 }
@@ -160,15 +174,21 @@ private open class BackgroundJobManagerImpl internal constructor(
 
 
 class BackgrounJobManagerInitializer @Inject constructor(
-    private val backgroundJobManager: BackgroundJobManager
+    private val backgroundJobManager: BackgroundJobManager,
+    private val workerFactory: DaggerDelegateWorkersFactory
 ) : AppInitializer {
 
     override fun initialize(app: Application) {
         backgroundJobManager.setupPeriodicJobs()
+
+        val config = Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
+        WorkManager.initialize(app, config)
     }
 }
 
-@Module(includes = [AppInitializersModule::class])
+@Module(includes = [AppInitializersModule::class, WorkerInjectionModule::class])
 abstract class BackgroundJobsModule {
 
     @Binds

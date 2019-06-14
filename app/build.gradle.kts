@@ -185,6 +185,8 @@ dependencies {
     androidTestImplementation("androidx.room:room-testing:$roomVersion")
     dualTestImplementation("androidx.test.ext:truth:1.1.0")
 
+    implementation("androidx.work:work-runtime-ktx:2.1.0-beta01")
+
     val kotlinVersion: String by rootProject.extra
     implementation(enforcedPlatform(kotlin("bom", kotlinVersion)))
     implementation(kotlin("stdlib-jdk8"))
