@@ -33,18 +33,22 @@ import android.os.Bundle
 import androidx.annotation.RequiresApi
 import androidx.core.content.getSystemService
 import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.geekorum.geekdroid.dagger.AppInitializer
 import com.geekorum.geekdroid.dagger.AppInitializersModule
 import com.geekorum.ttrss.add_feed.AddFeedWorker
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.providers.PurgeArticlesJobService
+import com.geekorum.ttrss.providers.PurgeArticlesWorker
 import com.geekorum.ttrss.sync.SyncContract
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoSet
+import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -81,6 +85,7 @@ class BackgroundJobManager @Inject constructor(
 
     companion object {
         const val PERIODIC_PURGE_JOB_ID = 3
+        const val PERIODIC_PURGE_JOB = "periodic_purge"
 
         val PERIODIC_PURGE_JOB_INTERVAL_MILLIS = TimeUnit.DAYS.toMillis(1)
         val PERIODIC_REFRESH_JOB_INTERVAL_S = TimeUnit.HOURS.toSeconds(2)
@@ -100,18 +105,10 @@ private class BackgroundJobManagerNougatImpl(
         // reschedule a job will stop a current running job and reset the timers
         val pendingJob = getPendingJob(BackgroundJobManager.PERIODIC_PURGE_JOB_ID)
         if (pendingJob != null) {
-            return
+            Timber.i("Cancel periodic purge job to replace it with WorkManager implementation")
+            jobScheduler.cancel(BackgroundJobManager.PERIODIC_PURGE_JOB_ID)
         }
-
-        //TODO use workmanager instead
-        val builder = JobInfo.Builder(BackgroundJobManager.PERIODIC_PURGE_JOB_ID,
-            ComponentName(context, PurgeArticlesJobService::class.java))
-        builder.setRequiredNetworkType(JobInfo.NETWORK_TYPE_NONE)
-            .setPeriodic(BackgroundJobManager.PERIODIC_PURGE_JOB_INTERVAL_MILLIS)
-            .setPersisted(true)
-            .setRequiresDeviceIdle(true)
-            .setRequiresCharging(true)
-        jobScheduler.schedule(builder.build())
+        super.setupPeriodicPurge()
     }
 
     fun getPendingJob(id: Int): JobInfo? {
@@ -147,7 +144,16 @@ private open class BackgroundJobManagerImpl internal constructor(
     }
 
     open fun setupPeriodicPurge() {
-        // nothing to do here
+        //TODO only setup on account creation
+        val request = PeriodicWorkRequestBuilder<PurgeArticlesWorker>(
+            BackgroundJobManager.PERIODIC_PURGE_JOB_INTERVAL_MILLIS, TimeUnit.MILLISECONDS)
+            .setConstraints(Constraints.Builder()
+                .setRequiresDeviceIdle(true)
+                .setRequiresCharging(true)
+                .build())
+            .build()
+        WorkManager.getInstance(context)
+            .enqueueUniquePeriodicWork(BackgroundJobManager.PERIODIC_PURGE_JOB, ExistingPeriodicWorkPolicy.KEEP, request)
     }
 
     fun subscribeToFeed(
@@ -161,7 +167,9 @@ private open class BackgroundJobManagerImpl internal constructor(
                 .build())
             .setInputData(inputData)
             .build()
-        WorkManager.getInstance(context).enqueue(workRequest)
+
+        WorkManager.getInstance(context)
+            .enqueue(workRequest)
     }
 
 }

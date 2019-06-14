@@ -21,8 +21,11 @@
 package com.geekorum.ttrss.providers
 
 import android.content.Context
+import androidx.work.WorkerFactory
 import com.geekorum.geekdroid.dagger.AndroidComponentsModule
 import com.geekorum.geekdroid.dagger.PerAndroidComponent
+import com.geekorum.geekdroid.dagger.WorkerKey
+import com.geekorum.ttrss.add_feed.AddFeedWorker
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Module
@@ -50,6 +53,11 @@ abstract class AndroidInjectorsModule {
     abstract fun bindPurgeArticlesJobServiceInjectorFactory(
         builder: PurgeArticleJobServiceComponent.Builder
     ): AndroidInjector.Factory<*>
+
+    @Binds
+    @IntoMap
+    @WorkerKey(PurgeArticlesWorker::class)
+    abstract fun providesPurgeArticlesWorkerFactory(workerFactory: PurgeArticlesWorker.Factory): WorkerFactory
 
 }
 
