@@ -49,9 +49,6 @@ import dagger.multibindings.IntoMap
 @Module(includes = [WorkerInjectionModule::class, AddFeedComponentModule::class])
 abstract class AndroidInjectorsModule {
 
-    @ContributesAndroidInjector(modules = [AddFeedComponentModule::class])
-    abstract fun contributeAddFeedServiceInjector(): AddFeedService
-
     @ContributesAndroidInjector(modules = [ViewModelsModule::class])
     abstract fun contributeAddFeedActivityInjector(): AddFeedActivity
 

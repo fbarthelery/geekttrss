@@ -55,7 +55,7 @@ import javax.inject.Inject
  * Manage the different background jobs submitted to the JobScheduler class
  */
 class BackgroundJobManager @Inject constructor(
-    application: android.app.Application
+    application: Application
 ) {
     private val impl: BackgroundJobManagerImpl = BackgroundJobManagerNougatImpl(application)
 

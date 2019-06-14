@@ -107,9 +107,6 @@
         <service android:name="com.geekorum.ttrss.providers.PurgeArticlesJobService"
                  android:permission="android.permission.BIND_JOB_SERVICE" />
 
-        <service android:name="com.geekorum.ttrss.add_feed.AddFeedService"
-                 android:permission="android.permission.BIND_JOB_SERVICE" />
-
         <service android:name="com.geekorum.ttrss.accounts.AuthenticatorService"
                  tools:ignore="ExportedService">
             <intent-filter>
