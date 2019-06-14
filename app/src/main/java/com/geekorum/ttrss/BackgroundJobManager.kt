@@ -32,15 +32,12 @@ import android.os.Build
 import android.os.Bundle
 import androidx.annotation.RequiresApi
 import androidx.core.content.getSystemService
-import androidx.work.Configuration
 import androidx.work.Constraints
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.geekorum.geekdroid.dagger.AppInitializer
 import com.geekorum.geekdroid.dagger.AppInitializersModule
-import com.geekorum.geekdroid.dagger.DaggerDelegateWorkersFactory
-import com.geekorum.geekdroid.dagger.WorkerInjectionModule
 import com.geekorum.ttrss.add_feed.AddFeedWorker
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.providers.PurgeArticlesJobService
@@ -83,7 +80,6 @@ class BackgroundJobManager @Inject constructor(
     }
 
     companion object {
-        const val SUBSCRIBE_TO_FEED_JOB_ID = 1
         const val PERIODIC_PURGE_JOB_ID = 3
 
         val PERIODIC_PURGE_JOB_INTERVAL_MILLIS = TimeUnit.DAYS.toMillis(1)
@@ -166,7 +162,6 @@ private open class BackgroundJobManagerImpl internal constructor(
             .setInputData(inputData)
             .build()
         WorkManager.getInstance(context).enqueue(workRequest)
-
     }
 
 }
@@ -174,21 +169,15 @@ private open class BackgroundJobManagerImpl internal constructor(
 
 
 class BackgrounJobManagerInitializer @Inject constructor(
-    private val backgroundJobManager: BackgroundJobManager,
-    private val workerFactory: DaggerDelegateWorkersFactory
+    private val backgroundJobManager: BackgroundJobManager
 ) : AppInitializer {
 
     override fun initialize(app: Application) {
         backgroundJobManager.setupPeriodicJobs()
-
-        val config = Configuration.Builder()
-            .setWorkerFactory(workerFactory)
-            .build()
-        WorkManager.initialize(app, config)
     }
 }
 
-@Module(includes = [AppInitializersModule::class, WorkerInjectionModule::class])
+@Module(includes = [AppInitializersModule::class])
 abstract class BackgroundJobsModule {
 
     @Binds
