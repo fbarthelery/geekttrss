@@ -49,6 +49,7 @@ internal fun Project.configureTests() {
         defaultConfig {
             testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
             testInstrumentationRunnerArgument("clearPackageData", "true")
+            testInstrumentationRunnerArgument("disableAnalytics", "true")
         }
 
         testOptions {
