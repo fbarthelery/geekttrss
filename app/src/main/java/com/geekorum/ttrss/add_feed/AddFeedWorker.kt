@@ -28,29 +28,27 @@ import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.geekorum.ttrss.network.ApiService
 import timber.log.Timber
 import javax.inject.Inject
 
 class AddFeedWorker(
     contex: Context,
     params: WorkerParameters,
-    private val addFeedJobFactory: AddFeedJob.Factory
+    private val apiService: ApiService
 ) : CoroutineWorker(contex, params) {
     override suspend fun doWork(): Result {
-        val addFeedJob = createAddFeedJob(inputData)
-        if (!addFeedJob.addFeed()) {
-            Timber.e("Unable to add feed")
-            return Result.failure()
-        }
-        return Result.success()
-    }
-
-    private fun createAddFeedJob(inputData: Data): AddFeedJob {
         val feedUrl = requireNotNull(inputData.getString("url"))
         val categoryId = inputData.getLong("categoryId", 0)
         val feedLogin = inputData.getString("login") ?: ""
         val feedPassword = inputData.getString("password") ?: ""
-        return addFeedJobFactory.create(feedUrl, categoryId, feedLogin, feedPassword)
+
+        val result = apiService.subscribeToFeed(feedUrl, categoryId, feedLogin, feedPassword)
+        if (!result) {
+            Timber.e("Unable to add feed")
+            return Result.failure()
+        }
+        return Result.success()
     }
 
     companion object {
@@ -87,7 +85,7 @@ class AddFeedWorker(
             }
 
             val addFeedComponent = feedComponentBuilder.seedAccount(account).build()
-            return AddFeedWorker(appContext, workerParameters, addFeedComponent.addFeedJobFactory)
+            return AddFeedWorker(appContext, workerParameters, addFeedComponent.apiService)
         }
     }
 

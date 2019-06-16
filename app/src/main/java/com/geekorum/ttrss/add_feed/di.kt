@@ -29,6 +29,7 @@ import com.geekorum.geekdroid.dagger.WorkerKey
 import com.geekorum.ttrss.accounts.NetworkLoginModule
 import com.geekorum.ttrss.accounts.PerAccount
 import com.geekorum.ttrss.di.AssistedFactoriesModule
+import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.network.TinyrssApiModule
 import dagger.Binds
 import dagger.BindsInstance
@@ -68,7 +69,7 @@ abstract class AddFeedComponentModule
 @PerAccount
 interface AddFeedComponent {
 
-    val addFeedJobFactory: AddFeedJob.Factory
+    val apiService: ApiService
 
     @Subcomponent.Builder
     interface Builder {
