@@ -21,11 +21,6 @@ import androidx.work.WorkerParameters
 import androidx.work.testing.TestDriver
 import androidx.work.testing.TestListenableWorkerBuilder
 import androidx.work.testing.WorkManagerTestInitHelper
-import com.geekorum.ttrss.data.Article
-import com.geekorum.ttrss.data.Category
-import com.geekorum.ttrss.data.Feed
-import com.geekorum.ttrss.network.ApiService
-import com.geekorum.ttrss.providers.ArticlesContract
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.runBlocking
@@ -165,32 +160,8 @@ class AddFeedWorkerWithConstraintsTest {
     }
 }
 
-private class MockApiService : ApiService {
+private class MockApiService : SubscribeToFeedService {
     var subscribeToFeedResult = true
-
-    override suspend fun getArticles(
-        feedId: Long, sinceId: Long, offset: Int, showExcerpt: Boolean, showContent: Boolean
-    ): List<Article> {
-        TODO("not implemented")
-    }
-
-    override suspend fun getArticlesOrderByDateReverse(
-        feedId: Long, sinceId: Long, offset: Int, showExcerpt: Boolean, showContent: Boolean
-    ): List<Article> {
-        TODO("not implemented")
-    }
-
-    override suspend fun getCategories(): List<Category> {
-        TODO("not implemented")
-    }
-
-    override suspend fun getFeeds(): List<Feed> {
-        TODO("not implemented")
-    }
-
-    override suspend fun updateArticleField(id: Long, field: ArticlesContract.Transaction.Field, value: Boolean) {
-        TODO("not implemented")
-    }
 
     override suspend fun subscribeToFeed(
         feedUrl: String, categoryId: Long, feedLogin: String, feedPassword: String

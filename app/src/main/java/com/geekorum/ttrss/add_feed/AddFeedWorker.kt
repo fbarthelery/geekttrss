@@ -37,7 +37,7 @@ import javax.inject.Inject
 class AddFeedWorker(
     contex: Context,
     params: WorkerParameters,
-    private val apiService: ApiService
+    private val apiService: SubscribeToFeedService
 ) : CoroutineWorker(contex, params) {
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {

@@ -28,12 +28,12 @@ import com.geekorum.geekdroid.dagger.WorkerInjectionModule
 import com.geekorum.geekdroid.dagger.WorkerKey
 import com.geekorum.ttrss.accounts.NetworkLoginModule
 import com.geekorum.ttrss.accounts.PerAccount
-import com.geekorum.ttrss.di.AssistedFactoriesModule
 import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.network.TinyrssApiModule
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Module
+import dagger.Provides
 import dagger.Subcomponent
 import dagger.android.ContributesAndroidInjector
 import dagger.multibindings.IntoMap
@@ -65,11 +65,11 @@ abstract class AndroidInjectorsModule {
 abstract class AddFeedComponentModule
 
 
-@Subcomponent(modules = [AssistedFactoriesModule::class, NetworkLoginModule::class, TinyrssApiModule::class])
+@Subcomponent(modules = [SubscribeToFeedServiceModule::class])
 @PerAccount
 interface AddFeedComponent {
 
-    val apiService: ApiService
+    val apiService: SubscribeToFeedService
 
     @Subcomponent.Builder
     interface Builder {
@@ -81,6 +81,13 @@ interface AddFeedComponent {
     }
 }
 
+@Module(includes = [TinyrssApiModule::class, NetworkLoginModule::class])
+internal class SubscribeToFeedServiceModule {
+    @Provides
+    fun providesSubscribeToFeedService(apiService: ApiService): SubscribeToFeedService {
+        return SubscribeToFeedServiceApiDelegate(apiService)
+    }
+}
 
 @Module
 private abstract class ViewModelsModule {
