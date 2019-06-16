@@ -129,7 +129,8 @@
 
         <!-- Disable WorkManagerInitializer and initialize manually in Application -->
         <provider android:name="androidx.work.impl.WorkManagerInitializer"
-                android:enabled="false"/>
+                  android:authorities="${applicationId}.workmanager-init"
+                  android:enabled="false"/>
 
     </application>
 

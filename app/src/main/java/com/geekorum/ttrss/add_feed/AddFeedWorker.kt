@@ -29,6 +29,8 @@ import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.geekorum.ttrss.network.ApiService
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -37,7 +39,8 @@ class AddFeedWorker(
     params: WorkerParameters,
     private val apiService: ApiService
 ) : CoroutineWorker(contex, params) {
-    override suspend fun doWork(): Result {
+
+    override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         val feedUrl = requireNotNull(inputData.getString("url"))
         val categoryId = inputData.getLong("categoryId", 0)
         val feedLogin = inputData.getString("login") ?: ""
@@ -46,9 +49,9 @@ class AddFeedWorker(
         val result = apiService.subscribeToFeed(feedUrl, categoryId, feedLogin, feedPassword)
         if (!result) {
             Timber.e("Unable to add feed")
-            return Result.failure()
+            return@withContext Result.failure()
         }
-        return Result.success()
+        Result.success()
     }
 
     companion object {
