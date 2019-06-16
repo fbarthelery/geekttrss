@@ -24,6 +24,7 @@ import androidx.room.Room
 import com.geekorum.geekdroid.dagger.AndroidFrameworkModule
 import com.geekorum.geekdroid.dagger.AppInitializersModule
 import com.geekorum.geekdroid.dagger.FragmentFactoriesModule
+import com.geekorum.geekdroid.dagger.WorkerInjectionModule
 import com.geekorum.ttrss.accounts.LoginActivityTestModule
 import com.geekorum.ttrss.data.ArticlesDatabase
 import com.geekorum.ttrss.data.migrations.MigrationFrom1To2
@@ -66,6 +67,7 @@ class TestGoogleFlavorApplication : TestApplication()
     AllFeaturesInstalledModule::class,
     BatteryFriendlyActivityTestModule::class,
     LoginActivityTestModule::class,
+    WorkerInjectionModule::class,
     MockDatabaseModule::class
 ])
 interface TestApplicationComponent : ApplicationComponent {
