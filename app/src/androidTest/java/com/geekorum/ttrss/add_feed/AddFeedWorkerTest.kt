@@ -86,7 +86,7 @@ class AddFeedWorkerTest {
     @Test
     fun testTailingWorker() = runBlocking {
         val worker = workerBuilder.build()
-        apiService.subscribeToFeedResult = false
+        apiService.subscribeToFeedResult = ResultCode.INVALID_URL
         val result = worker.doWork()
         assertThat(result).isEqualTo(Result.success())
     }
@@ -137,7 +137,7 @@ class AddFeedWorkerWithConstraintsTest {
     fun testFailingWorkerWithConstraints() {
         val request = createOneTimeWorkRequest()
 
-        apiService.subscribeToFeedResult = false
+        apiService.subscribeToFeedResult = ResultCode.INVALID_URL
         workManager.enqueue(request).result.get()
 
         testDriver.setAllConstraintsMet(request.id)
@@ -181,11 +181,11 @@ class AddFeedWorkerWithConstraintsTest {
 }
 
 private class MockApiService : SubscribeToFeedService {
-    var subscribeToFeedResult = true
+    var subscribeToFeedResult = ResultCode.SUCCESS
 
     override suspend fun subscribeToFeed(
         feedUrl: String, categoryId: Long, feedLogin: String, feedPassword: String
-    ): Boolean {
+    ): ResultCode {
         return subscribeToFeedResult
     }
 }

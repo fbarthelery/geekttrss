@@ -65,7 +65,7 @@ internal enum class SubscribeResultCode(val code: Int) {
 
     companion object {
         fun valueOf(code: Int): SubscribeResultCode {
-            return SubscribeResultCode.values().firstOrNull { it.code == code } ?: throw IllegalArgumentException()
+            return values().firstOrNull { it.code == code } ?: throw IllegalArgumentException()
         }
     }
 }

@@ -47,8 +47,8 @@ class AddFeedWorker(
         val feedPassword = inputData.getString("password") ?: ""
 
         val result = apiService.subscribeToFeed(feedUrl, categoryId, feedLogin, feedPassword)
-        if (!result) {
-            Timber.e("Unable to add feed")
+        if (result != ResultCode.SUCCESS) {
+            Timber.e("Unable to add feed $result")
             return@withContext Result.failure()
         }
         Result.success()

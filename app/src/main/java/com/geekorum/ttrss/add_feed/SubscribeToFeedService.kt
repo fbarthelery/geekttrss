@@ -30,15 +30,23 @@ interface SubscribeToFeedService {
 
     @Throws(ApiCallException::class)
     suspend fun subscribeToFeed(feedUrl: String, categoryId: Long = 0,
-                                feedLogin: String = "", feedPassword: String = ""): Boolean
+                                feedLogin: String = "", feedPassword: String = ""): ResultCode
 }
+
+enum class ResultCode {
+    SUCCESS, INVALID_URL, UNKNOWN_ERROR
+}
+
 
 internal class SubscribeToFeedServiceApiDelegate(
     private val apiService: ApiService
 ) : SubscribeToFeedService {
     override suspend fun subscribeToFeed(
         feedUrl: String, categoryId: Long, feedLogin: String, feedPassword: String
-    ): Boolean {
-        return apiService.subscribeToFeed(feedUrl, categoryId, feedLogin, feedPassword)
+    ): ResultCode {
+        if (apiService.subscribeToFeed(feedUrl, categoryId, feedLogin, feedPassword)) {
+            return ResultCode.SUCCESS
+        }
+        return ResultCode.UNKNOWN_ERROR
     }
 }
