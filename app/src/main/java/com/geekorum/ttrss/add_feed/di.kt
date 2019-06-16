@@ -26,10 +26,11 @@ import androidx.work.WorkerFactory
 import com.geekorum.geekdroid.dagger.ViewModelKey
 import com.geekorum.geekdroid.dagger.WorkerInjectionModule
 import com.geekorum.geekdroid.dagger.WorkerKey
+import com.geekorum.geekdroid.network.TokenRetriever
 import com.geekorum.ttrss.accounts.NetworkLoginModule
 import com.geekorum.ttrss.accounts.PerAccount
-import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.network.TinyrssApiModule
+import com.geekorum.ttrss.network.impl.TinyRssApi
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Module
@@ -84,8 +85,8 @@ interface AddFeedComponent {
 @Module(includes = [TinyrssApiModule::class, NetworkLoginModule::class])
 internal class SubscribeToFeedServiceModule {
     @Provides
-    fun providesSubscribeToFeedService(apiService: ApiService): SubscribeToFeedService {
-        return SubscribeToFeedServiceApiDelegate(apiService)
+    fun providesSubscribeToFeedService(tokenRetriever: TokenRetriever, tinyrssApi: TinyRssApi): SubscribeToFeedService {
+        return RetrofitSubscribeToFeedService(tokenRetriever, tinyrssApi)
     }
 }
 

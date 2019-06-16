@@ -31,7 +31,6 @@ import com.geekorum.ttrss.network.impl.GetArticlesRequestPayload.SortOrder.FEED_
 import com.geekorum.ttrss.network.impl.GetCategoriesRequestPayload
 import com.geekorum.ttrss.network.impl.GetFeedsRequestPayload
 import com.geekorum.ttrss.network.impl.ResponsePayload
-import com.geekorum.ttrss.network.impl.SubscribeToFeedRequestPayload
 import com.geekorum.ttrss.network.impl.TinyRssApi
 import com.geekorum.ttrss.network.impl.UpdateArticleRequestPayload
 import com.geekorum.ttrss.providers.ArticlesContract
@@ -39,13 +38,51 @@ import kotlinx.coroutines.Deferred
 import retrofit2.HttpException
 import java.io.IOException
 
+
+class RetrofitServiceHelper(
+    private val tokenRetriever: TokenRetriever
+) {
+
+    @Throws(ApiCallException::class)
+    suspend fun <T : ResponsePayload<*>> executeOrFail(failingMessage: String, block: () -> Deferred<T>): T {
+        try {
+            val body = retryIfInvalidToken(block)
+            body.checkStatus { failingMessage }
+            return body
+        } catch (e: IOException) {
+            throw ApiCallException(failingMessage, e)
+        } catch (e: HttpException) {
+            throw ApiCallException(failingMessage, e)
+        }
+    }
+
+    @Throws(IOException::class)
+    suspend fun <T : ResponsePayload<*>> retryIfInvalidToken(block: () -> Deferred<T>): T {
+        val body = block().await()
+        try {
+            body.checkStatus()
+        } catch (e: ApiCallException) {
+            val error = e.errorCode
+            if (error == ApiCallException.ApiError.LOGIN_FAILED || error == ApiCallException.ApiError.NOT_LOGGED_IN) {
+                tokenRetriever.invalidateToken()
+                return block().await()
+            }
+        }
+        return body
+    }
+
+}
+
+
 /**
  * Implementation of [ApiService] which use retrofit to communicate with the Api server.
  */
 class ApiRetrofitService(
-        private val tokenRetriever: TokenRetriever,
+        tokenRetriever: TokenRetriever,
         private val tinyrssApi: TinyRssApi
 ) : ApiService {
+
+    private val helper = RetrofitServiceHelper(tokenRetriever)
 
     @Throws(ApiCallException::class)
     override suspend fun getArticles(feedId: Long, sinceId: Long, offset: Int,
@@ -111,45 +148,9 @@ class ApiRetrofitService(
         }
     }
 
-    override suspend fun subscribeToFeed(
-        feedUrl: String,
-        categoryId: Long,
-        feedLogin: String,
-        feedPassword: String
-    ): Boolean {
-        val payload = SubscribeToFeedRequestPayload(feedUrl, categoryId, feedLogin, feedPassword)
-        val subscribeResult = executeOrFail("Unable to subscribe to feed") {
-            tinyrssApi.subscribeToFeed(payload)
-        }
-        return subscribeResult.success
-    }
-
-    @Throws(IOException::class)
-    private suspend fun <T : ResponsePayload<*>> retryIfInvalidToken(block: () -> Deferred<T>): T {
-        val body = block().await()
-        try {
-            body.checkStatus()
-        } catch (e: ApiCallException) {
-            val error = e.errorCode
-            if (error == ApiCallException.ApiError.LOGIN_FAILED || error == ApiCallException.ApiError.NOT_LOGGED_IN) {
-                tokenRetriever.invalidateToken()
-                return block().await()
-            }
-        }
-        return body
-    }
-
     @Throws(ApiCallException::class)
-    private suspend fun <T : ResponsePayload<*>> executeOrFail(failingMessage: String, block: () -> Deferred<T>): T {
-        try {
-            val body = retryIfInvalidToken(block)
-            body.checkStatus { failingMessage }
-            return body
-        } catch (e: IOException) {
-            throw ApiCallException(failingMessage, e)
-        } catch (e: HttpException) {
-            throw ApiCallException(failingMessage, e)
-        }
+    suspend fun <T : ResponsePayload<*>> executeOrFail(failingMessage: String, block: () -> Deferred<T>): T {
+        return helper.executeOrFail(failingMessage, block)
     }
 
     companion object {

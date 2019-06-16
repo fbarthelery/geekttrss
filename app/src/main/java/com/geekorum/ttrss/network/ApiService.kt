@@ -50,9 +50,6 @@ interface ApiService {
     @Throws(ApiCallException::class)
     suspend fun updateArticleField(id: Long, field: ArticlesContract.Transaction.Field, value: Boolean)
 
-    suspend fun subscribeToFeed(feedUrl: String, categoryId: Long = 0,
-                                feedLogin: String = "", feedPassword: String = ""): Boolean
-
     companion object {
         val ALL_ARTICLES_FEED_ID: Long = -4
     }

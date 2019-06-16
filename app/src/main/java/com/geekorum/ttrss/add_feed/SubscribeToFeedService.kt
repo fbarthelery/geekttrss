@@ -20,8 +20,12 @@
  */
 package com.geekorum.ttrss.add_feed
 
+import com.geekorum.geekdroid.network.TokenRetriever
 import com.geekorum.ttrss.network.ApiCallException
-import com.geekorum.ttrss.network.ApiService
+import com.geekorum.ttrss.network.RetrofitServiceHelper
+import com.geekorum.ttrss.network.impl.SubscribeResultCode
+import com.geekorum.ttrss.network.impl.SubscribeToFeedRequestPayload
+import com.geekorum.ttrss.network.impl.TinyRssApi
 
 /**
  * ApiService to subscribe to a feed
@@ -38,15 +42,27 @@ enum class ResultCode {
 }
 
 
-internal class SubscribeToFeedServiceApiDelegate(
-    private val apiService: ApiService
+/* Implementation */
+
+internal class RetrofitSubscribeToFeedService(
+    tokenRetriever: TokenRetriever,
+    private val tinyrssApi: TinyRssApi
 ) : SubscribeToFeedService {
+
+    private val helper = RetrofitServiceHelper(tokenRetriever)
+
     override suspend fun subscribeToFeed(
         feedUrl: String, categoryId: Long, feedLogin: String, feedPassword: String
     ): ResultCode {
-        if (apiService.subscribeToFeed(feedUrl, categoryId, feedLogin, feedPassword)) {
-            return ResultCode.SUCCESS
+        val payload = SubscribeToFeedRequestPayload(feedUrl, categoryId, feedLogin, feedPassword)
+        val subscribeResult = helper.executeOrFail("Unable to subscribe to feed") {
+            tinyrssApi.subscribeToFeed(payload)
         }
-        return ResultCode.UNKNOWN_ERROR
+        val subscribeResultCode = subscribeResult.content.status?.let { SubscribeResultCode.valueOf(it.resultCode) }
+        return when (subscribeResultCode) {
+            SubscribeResultCode.FEED_ALREADY_EXIST, SubscribeResultCode.FEED_ADDED -> ResultCode.SUCCESS
+            SubscribeResultCode.INVALID_URL -> ResultCode.INVALID_URL
+            else -> ResultCode.UNKNOWN_ERROR
+        }
     }
 }
