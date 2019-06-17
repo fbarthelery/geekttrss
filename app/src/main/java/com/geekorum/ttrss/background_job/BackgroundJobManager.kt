@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.geekorum.ttrss
+package com.geekorum.ttrss.background_job
 
 import android.accounts.Account
 import android.app.Application
@@ -37,8 +37,10 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import androidx.work.WorkerFactory
 import com.geekorum.geekdroid.dagger.AppInitializer
 import com.geekorum.geekdroid.dagger.AppInitializersModule
+import com.geekorum.geekdroid.dagger.DaggerDelegateWorkersFactory
 import com.geekorum.ttrss.add_feed.AddFeedWorker
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.providers.PurgeArticlesWorker
@@ -56,7 +58,8 @@ import javax.inject.Inject
 class BackgroundJobManager @Inject constructor(
     application: Application
 ) {
-    private val impl: BackgroundJobManagerImpl = BackgroundJobManagerNougatImpl(application)
+    private val impl: BackgroundJobManagerImpl =
+        BackgroundJobManagerNougatImpl(application)
 
     fun refresh(account: Account) {
         impl.refresh(account)
@@ -101,7 +104,8 @@ private class BackgroundJobManagerNougatImpl(
     override fun setupPeriodicPurge() {
         // don't reschedule the job if it is already pending or running.
         // reschedule a job will stop a current running job and reset the timers
-        val pendingJob = getPendingJob(BackgroundJobManager.PERIODIC_PURGE_JOB_ID)
+        val pendingJob = getPendingJob(
+            BackgroundJobManager.PERIODIC_PURGE_JOB_ID)
         if (pendingJob != null) {
             Timber.i("Cancel periodic purge job to replace it with WorkManager implementation")
             jobScheduler.cancel(BackgroundJobManager.PERIODIC_PURGE_JOB_ID)
@@ -151,7 +155,8 @@ private open class BackgroundJobManagerImpl internal constructor(
                 .build())
             .build()
         WorkManager.getInstance(context)
-            .enqueueUniquePeriodicWork(BackgroundJobManager.PERIODIC_PURGE_JOB, ExistingPeriodicWorkPolicy.KEEP, request)
+            .enqueueUniquePeriodicWork(
+                BackgroundJobManager.PERIODIC_PURGE_JOB, ExistingPeriodicWorkPolicy.KEEP, request)
     }
 
     fun subscribeToFeed(
@@ -190,4 +195,6 @@ abstract class BackgroundJobsModule {
     @IntoSet
     abstract fun providesBackgroundJobsInitializer(initializer: BackgrounJobManagerInitializer): AppInitializer
 
+    @Binds
+    abstract fun providesApplicationWorkerFactory(factory: DaggerDelegateWorkersFactory): WorkerFactory
 }

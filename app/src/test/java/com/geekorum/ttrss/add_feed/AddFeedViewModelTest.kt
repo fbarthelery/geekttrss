@@ -25,7 +25,7 @@ import android.accounts.AccountManager
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
-import com.geekorum.ttrss.BackgroundJobManager
+import com.geekorum.ttrss.background_job.BackgroundJobManager
 import com.geekorum.ttrss.html.FeedExtractor
 import com.geekorum.ttrss.html.FeedInformation
 import com.google.common.truth.Truth.assertThat

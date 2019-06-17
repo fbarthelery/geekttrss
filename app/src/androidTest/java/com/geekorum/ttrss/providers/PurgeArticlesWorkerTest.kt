@@ -39,7 +39,7 @@ import androidx.work.testing.SynchronousExecutor
 import androidx.work.testing.TestDriver
 import androidx.work.testing.TestWorkerBuilder
 import androidx.work.testing.WorkManagerTestInitHelper
-import com.geekorum.ttrss.BackgroundJobManager
+import com.geekorum.ttrss.background_job.BackgroundJobManager
 import com.google.common.truth.Truth.assertThat
 import org.junit.runner.RunWith
 import java.util.concurrent.Executor

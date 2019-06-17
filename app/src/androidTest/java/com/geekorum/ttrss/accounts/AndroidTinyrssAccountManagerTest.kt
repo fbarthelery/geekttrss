@@ -28,7 +28,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.geekorum.geekdroid.security.SecretCipher
 import com.geekorum.geekdroid.security.SecretEncryption
-import com.geekorum.ttrss.BackgroundJobManager
+import com.geekorum.ttrss.background_job.BackgroundJobManager
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.sync.SyncContract
 import com.google.common.truth.Truth.assertThat

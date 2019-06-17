@@ -31,7 +31,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.geekorum.geekdroid.accounts.AccountsLiveData
 import com.geekorum.geekdroid.app.lifecycle.EmptyEvent
-import com.geekorum.ttrss.BackgroundJobManager
+import com.geekorum.ttrss.background_job.BackgroundJobManager
 import com.geekorum.ttrss.accounts.AccountAuthenticator
 import com.geekorum.ttrss.html.FeedExtractor
 import com.geekorum.ttrss.html.FeedInformation

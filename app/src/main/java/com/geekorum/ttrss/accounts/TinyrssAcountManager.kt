@@ -26,7 +26,7 @@ import android.os.Bundle
 import android.os.StrictMode
 import android.util.Base64
 import com.geekorum.geekdroid.security.SecretCipher
-import com.geekorum.ttrss.BackgroundJobManager
+import com.geekorum.ttrss.background_job.BackgroundJobManager
 import com.geekorum.ttrss.debugtools.withStrictMode
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.sync.SyncContract
