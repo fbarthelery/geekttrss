@@ -119,12 +119,11 @@ android {
 dependencies {
 
     implementation("androidx.core:core-ktx:1.0.2")
-    implementation("androidx.fragment:fragment-ktx:1.1.0-alpha09")
-    implementation("androidx.activity:activity-ktx:1.0.0-alpha08")
+    implementation("androidx.fragment:fragment-ktx:1.1.0-beta01")
+    implementation("androidx.activity:activity-ktx:1.0.0-beta01")
 
     // androidx ui
-    api("androidx.appcompat:appcompat:1.1.0-alpha05")
-    implementation("androidx.drawerlayout:drawerlayout:1.1.0-alpha01")
+    implementation("androidx.drawerlayout:drawerlayout:1.1.0-alpha02")
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")
     implementation("androidx.recyclerview:recyclerview:1.0.0")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.0.0")
@@ -144,9 +143,7 @@ dependencies {
     }
 
     implementation("com.google.android.material:material:1.1.0-alpha07")
-    implementation("com.squareup.retrofit2:retrofit:2.5.0")
     implementation("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")
-    implementation("com.squareup.okhttp3:okhttp:3.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:3.12.0")
     testImplementation("com.squareup.okhttp3:mockwebserver:3.12.0")
     implementation("com.squareup.picasso:picasso:2.5.2")
@@ -162,7 +159,6 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
     kapt("androidx.lifecycle:lifecycle-compiler:$lifecycleVersion")
     dualTestImplementation("androidx.arch.core:core-testing:2.0.1")
-    api("androidx.paging:paging-runtime:2.1.0")
 
     // dagger
     val daggerVersion: String by rootProject.extra
@@ -179,14 +175,11 @@ dependencies {
     kapt("com.squareup.inject:assisted-inject-processor-dagger2:0.4.0")
 
     val roomVersion: String by rootProject.extra
-    api("androidx.room:room-runtime:$roomVersion")
-    api("androidx.room:room-ktx:$roomVersion")
     kapt("androidx.room:room-compiler:$roomVersion")
     androidTestImplementation("androidx.room:room-testing:$roomVersion")
     dualTestImplementation("androidx.test.ext:truth:1.1.0")
 
     val workVersion = "2.1.0-beta01"
-    implementation("androidx.work:work-runtime-ktx:$workVersion")
     androidTestImplementation("androidx.work:work-testing:$workVersion")
 
     val kotlinVersion: String by rootProject.extra
@@ -200,13 +193,21 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$coroutinesVersion")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
 
-    implementation("com.jakewharton.timber:timber:4.7.1")
-
     add("googleImplementation", "com.crashlytics.sdk.android:crashlytics:2.9.6")
     // ensure that the free flavor don't get any firebase dependencies
     configurations["freeImplementation"].exclude(group = "com.google.firebase")
 
     add("googleImplementation", "com.google.android.play:core:1.5.0")
+
+    // api dependencies for features modules
+    api("androidx.appcompat:appcompat:1.1.0-beta01")
+    api("androidx.work:work-runtime-ktx:$workVersion")
+    api("androidx.room:room-runtime:$roomVersion")
+    api("androidx.room:room-ktx:$roomVersion")
+    api("androidx.paging:paging-runtime:2.1.0")
+    api("com.squareup.retrofit2:retrofit:2.5.0")
+    api("com.squareup.okhttp3:okhttp:3.12.0")
+    api("com.jakewharton.timber:timber:4.7.1")
 
 }
 
