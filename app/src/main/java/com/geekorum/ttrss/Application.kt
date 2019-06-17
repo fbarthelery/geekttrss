@@ -22,9 +22,7 @@ package com.geekorum.ttrss
 
 import android.app.Activity
 import androidx.work.Configuration
-import androidx.work.WorkManager
 import com.geekorum.geekdroid.dagger.AppInitializer
-import com.geekorum.geekdroid.dagger.DaggerDelegateWorkersFactory
 import com.geekorum.geekdroid.dagger.initialize
 import com.geekorum.ttrss.debugtools.StrictModeInitializer
 import com.geekorum.ttrss.di.ApplicationComponent
@@ -41,7 +39,7 @@ open class Application : DaggerApplication(), Configuration.Provider {
     lateinit var appInitializers: MutableSet<AppInitializer>
 
     @Inject
-    lateinit var workerFactory: DaggerDelegateWorkersFactory
+    lateinit var workManagerConfig: Configuration
 
     open val applicationComponent by lazy {
         DaggerApplicationComponent.builder().bindApplication(this).build()
@@ -66,9 +64,7 @@ open class Application : DaggerApplication(), Configuration.Provider {
     }
 
     override fun getWorkManagerConfiguration(): Configuration {
-        return Configuration.Builder()
-            .setWorkerFactory(workerFactory)
-            .build()
+        return workManagerConfig
     }
 
 }

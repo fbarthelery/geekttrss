@@ -177,24 +177,3 @@ private open class BackgroundJobManagerImpl internal constructor(
 
 }
 
-
-
-class BackgrounJobManagerInitializer @Inject constructor(
-    private val backgroundJobManager: BackgroundJobManager
-) : AppInitializer {
-
-    override fun initialize(app: Application) {
-        backgroundJobManager.setupPeriodicJobs()
-    }
-}
-
-@Module(includes = [AppInitializersModule::class])
-abstract class BackgroundJobsModule {
-
-    @Binds
-    @IntoSet
-    abstract fun providesBackgroundJobsInitializer(initializer: BackgrounJobManagerInitializer): AppInitializer
-
-    @Binds
-    abstract fun providesApplicationWorkerFactory(factory: DaggerDelegateWorkersFactory): WorkerFactory
-}
