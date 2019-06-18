@@ -21,10 +21,12 @@
 package com.geekorum.ttrss.background_job
 
 import androidx.work.Configuration
+import androidx.work.DelegatingWorkerFactory
 import androidx.work.WorkerFactory
 import com.geekorum.geekdroid.dagger.AppInitializer
 import com.geekorum.geekdroid.dagger.AppInitializersModule
 import com.geekorum.geekdroid.dagger.DaggerDelegateWorkersFactory
+import com.geekorum.ttrss.features_api.FeaturesWorkerFactory
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -38,9 +40,6 @@ abstract class BackgroundJobsModule {
     @IntoSet
     internal abstract fun providesBackgroundJobsInitializer(initializer: BackgroundJobManagerInitializer): AppInitializer
 
-    @Binds
-    internal abstract fun providesApplicationWorkerFactory(factory: DaggerDelegateWorkersFactory): WorkerFactory
-
     @Module
     companion object {
 
@@ -51,5 +50,18 @@ abstract class BackgroundJobsModule {
                 .setWorkerFactory(workerFactory)
                 .build()
         }
+
+        @Provides
+        @JvmStatic
+        internal fun providesApplicationWorkerFactory(
+            daggerDelegate: DaggerDelegateWorkersFactory,
+            featuresWorkerFactory: FeaturesWorkerFactory
+        ): WorkerFactory {
+            return DelegatingWorkerFactory().apply {
+                addFactory(daggerDelegate)
+                addFactory(featuresWorkerFactory)
+            }
+        }
+
     }
 }
