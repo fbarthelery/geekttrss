@@ -17,7 +17,6 @@ android {
     defaultConfig {
         minSdkVersion(24)
         targetSdkVersion(28)
-
     }
 
     configureJavaVersion()

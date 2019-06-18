@@ -20,27 +20,47 @@
  */
 package com.geekorum.ttrss.manage_feeds
 
+import android.accounts.Account
 import androidx.lifecycle.ViewModel
 import com.geekorum.geekdroid.dagger.FragmentFactoriesModule
 import com.geekorum.geekdroid.dagger.ViewModelKey
+import com.geekorum.ttrss.accounts.PerAccount
 import com.geekorum.ttrss.data.ArticlesDatabase
 import com.geekorum.ttrss.di.FeatureScope
 import com.geekorum.ttrss.di.ViewModelsModule
 import com.geekorum.ttrss.features_api.ManageFeedsDependencies
 import dagger.Binds
+import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
 import dagger.Provides
+import dagger.Subcomponent
 import dagger.multibindings.IntoMap
 
 @Component(dependencies = [ManageFeedsDependencies::class],
-    modules = [FragmentFactoriesModule::class,
-        ManageFeedModule::class,
-        ViewModelsModule::class])
+    modules = [])
 @FeatureScope
 interface ManageFeedComponent {
 
+    fun createUiComponent(): UiComponent.Builder
+}
+
+@PerAccount
+@Subcomponent(modules = [FragmentFactoriesModule::class,
+    ViewModelsModule::class,
+    ManageFeedModule::class])
+interface UiComponent {
+
     fun inject(activity: ManageFeedsActivity)
+
+    @Subcomponent.Builder
+    interface Builder {
+
+        @BindsInstance
+        fun bindsActivity(activity: ManageFeedsActivity): Builder
+
+        fun build(): UiComponent
+    }
 }
 
 @Module
@@ -56,6 +76,11 @@ private abstract class ManageFeedModule {
         @Provides
         @JvmStatic
         fun providesFeedsDao(articlesDatabase: ArticlesDatabase) = articlesDatabase.manageFeedsDao()
+
+        @JvmStatic
+        @Provides
+        fun providesAccount(manageFeedsActivity: ManageFeedsActivity): Account = manageFeedsActivity.account!!
+
     }
 }
 

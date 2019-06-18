@@ -41,8 +41,15 @@ class ManageFeedsActivity : SessionActivity() {
     private val adapter = FeedsAdapter()
 
     private val moduleComponent by lazy {
-        DaggerManageFeedComponent.builder()
+    }
+
+    private val uiComponent by lazy {
+        val manageFeedComponent = DaggerManageFeedComponent.builder()
             .manageFeedsDependencies(applicationComponent)
+            .build()
+        manageFeedComponent.
+            createUiComponent()
+            .bindsActivity(this)
             .build()
     }
 
@@ -56,7 +63,7 @@ class ManageFeedsActivity : SessionActivity() {
     }
 
     override fun inject() {
-        moduleComponent.inject(this)
+        uiComponent.inject(this)
     }
 
     private inner class FeedsAdapter : PagedListAdapter<Feed, FeedViewHolder>(DiffFeed) {

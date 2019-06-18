@@ -25,7 +25,6 @@ import androidx.lifecycle.ViewModel
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.geekorum.ttrss.data.Feed
-import com.geekorum.ttrss.data.FeedsDao
 import com.geekorum.ttrss.data.ManageFeedsDao
 import javax.inject.Inject
 
