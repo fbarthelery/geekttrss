@@ -40,19 +40,6 @@ class ManageFeedsActivity : SessionActivity() {
     private lateinit var binding: ActivityManageFeedsBinding
     private val adapter = FeedsAdapter()
 
-    private val moduleComponent by lazy {
-    }
-
-    private val uiComponent by lazy {
-        val manageFeedComponent = DaggerManageFeedComponent.builder()
-            .manageFeedsDependencies(applicationComponent)
-            .build()
-        manageFeedComponent.
-            createUiComponent()
-            .bindsActivity(this)
-            .build()
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_manage_feeds)
@@ -63,7 +50,10 @@ class ManageFeedsActivity : SessionActivity() {
     }
 
     override fun inject() {
-        uiComponent.inject(this)
+        val manageFeedComponent = DaggerManageFeedComponent.builder()
+            .manageFeedsDependencies(applicationComponent)
+            .build()
+        manageFeedComponent.activityInjector.inject(this)
     }
 
     private inner class FeedsAdapter : PagedListAdapter<Feed, FeedViewHolder>(DiffFeed) {
