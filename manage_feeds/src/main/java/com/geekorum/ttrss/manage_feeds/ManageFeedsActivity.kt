@@ -66,6 +66,7 @@ class ManageFeedsActivity : SessionActivity() {
             val feed = getItem(position)
             checkNotNull(feed)
             holder.setFeed(feed)
+            holder.setViewModel(viewModel)
             holder.binding.executePendingBindings()
         }
     }
@@ -74,6 +75,11 @@ class ManageFeedsActivity : SessionActivity() {
         fun setFeed(feed: Feed?) {
             val title = feed?.displayTitle?.takeIf { it.isNotEmpty() } ?: feed?.title
             binding.setVariable(BR.name, title)
+            binding.setVariable(BR.feed, feed)
+        }
+
+        fun setViewModel(viewModel: ManageFeedViewModel) {
+            binding.setVariable(BR.viewModel, viewModel)
         }
     }
 

@@ -26,6 +26,8 @@
 
     <data>
         <variable name="name" type="String" />
+        <variable name="feed" type="com.geekorum.ttrss.data.Feed" />
+        <variable name="viewModel" type="com.geekorum.ttrss.manage_feeds.ManageFeedViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -35,7 +37,8 @@
             android:paddingEnd="?listPreferredItemPaddingEnd"
             android:foreground="?selectableItemBackground"
             android:clickable="true"
-            android:focusable="true">
+            android:focusable="true"
+            android:onClick="@{(v) -> viewModel.unsubscribeFeed(v, feed)}">
 
         <ImageView android:id="@+id/feed_icon"
                    android:layout_width="40dp"
