@@ -21,6 +21,7 @@
 package com.geekorum.ttrss
 
 import androidx.room.Room
+import androidx.work.Configuration
 import com.geekorum.geekdroid.dagger.AndroidFrameworkModule
 import com.geekorum.geekdroid.dagger.AppInitializersModule
 import com.geekorum.geekdroid.dagger.FragmentFactoriesModule
@@ -41,6 +42,8 @@ import com.geekorum.ttrss.settings.SettingsModule
 import dagger.Component
 import dagger.Module
 import dagger.Provides
+import io.mockk.mockk
+import okhttp3.OkHttpClient
 import javax.inject.Singleton
 
 /**
@@ -68,7 +71,9 @@ class TestGoogleFlavorApplication : TestApplication()
     BatteryFriendlyActivityTestModule::class,
     LoginActivityTestModule::class,
     WorkerInjectionModule::class,
-    MockDatabaseModule::class
+    WorkManagerConfigurationModule::class,
+    MockDatabaseModule::class,
+    MockNetworkModule::class
 ])
 interface TestApplicationComponent : ApplicationComponent {
     @Component.Builder
@@ -91,4 +96,19 @@ private class MockDatabaseModule {
                 MigrationFrom7To8)
             .build()
     }
+}
+
+@Module
+private class MockNetworkModule {
+    @Provides
+    fun providesOkHttpClient(): OkHttpClient = mockk()
+}
+
+@Module
+private class WorkManagerConfigurationModule {
+    @Provides
+    fun provideWorkManagerConfiguration(): Configuration {
+        return Configuration.Builder().build()
+    }
+
 }
