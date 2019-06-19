@@ -52,4 +52,7 @@ public interface TinyRssApi {
     @POST("api/")
     Deferred<SubscribeToFeedResponsePayload> subscribeToFeed(@Body SubscribeToFeedRequestPayload subscribeToFeedRequestPayload);
 
+    @POST("api/")
+    Deferred<UnsubscribeFeedResponsePayload> unsubscribeFromFeed(@Body UnsubscribeFeedRequestPayload unsubscribeFeedRequestPayload);
+
 }

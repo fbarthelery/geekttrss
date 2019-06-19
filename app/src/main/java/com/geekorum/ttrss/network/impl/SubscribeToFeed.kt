@@ -155,7 +155,7 @@ internal data class SubscribeToFeedResponsePayload(
  */
 @Keep
 @Serializable
-internal data class UnsubscribeFeedRequestPayload(
+data class UnsubscribeFeedRequestPayload(
     @SerialName("feed_id")
     private val feedId: Long
 ) : LoggedRequestPayload() {
@@ -169,7 +169,7 @@ internal data class UnsubscribeFeedRequestPayload(
  * Response payload of unsubscribe from feed request
  */
 @Keep
-internal data class UnsubscribeFeedResponsePayload(
+data class UnsubscribeFeedResponsePayload(
     @SerialName("seq")
     override val sequence: Int? = null,
     override val status: Int = 0,
@@ -216,11 +216,12 @@ internal data class UnsubscribeFeedResponsePayload(
     }
 
     @Serializable
-    internal data class Content(
+    data class Content(
         val status: Status? = null,
         override var error: Error? = null
     ) : BaseContent() {
-        internal enum class Status {
+
+        enum class Status {
             OK,
             KO
         }

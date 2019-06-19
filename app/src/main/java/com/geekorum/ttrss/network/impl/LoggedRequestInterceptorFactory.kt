@@ -29,7 +29,7 @@ import java.lang.reflect.Type
 import javax.inject.Inject
 
 /**
- * This [Converter.Factory] intercept all RequestBody conversion for []LoggedRequestPayload] and its subclasses
+ * This [Converter.Factory] intercept all RequestBody conversion for [LoggedRequestPayload] and its subclasses
  * and set the [LoggedRequestPayload.sessionId] .
  */
 // Don't @Inject it otherwise it can't be an Optional binding

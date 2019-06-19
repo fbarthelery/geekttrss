@@ -42,6 +42,7 @@ interface ApiService {
         showExcerpt: Boolean, showContent: Boolean
     ): List<Article>
 
+    @Throws(ApiCallException::class)
     suspend fun getCategories(): List<Category>
 
     @Throws(ApiCallException::class)
