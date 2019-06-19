@@ -35,6 +35,12 @@ android {
             dimension = "distribution"
         }
     }
+
+    buildTypes {
+        named("release") {
+            proguardFile("proguard-rules.pro")
+        }
+    }
 }
 
 
