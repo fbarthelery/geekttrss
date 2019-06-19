@@ -1,4 +1,3 @@
 # Keep dynamically added DataBinderMapper from this feature module
-# it should be added automatically but I guess this is a bug.
-# TODO report or look for it
+# https://issuetracker.google.com/issues/135574730
 -keep class com.geekorum.ttrss.manage_feeds.DataBinderMapperImpl { *; }

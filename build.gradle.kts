@@ -20,15 +20,16 @@
  */
 import com.geekorum.build.createComponentsPlatforms
 import com.geekorum.build.setupGoogleContent
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.net.URI
 
 plugins {
     id("com.google.android.gms.oss-licenses-plugin") version "0.9.5.1" apply false
     id("com.google.gms.google-services") version "3.2.0" apply false
     id("io.fabric") version "1.25.4" apply false
-    kotlin("android") version "1.3.30" apply false
-    kotlin("kapt") version "1.3.30" apply false
-    id("kotlinx-serialization") version "1.3.30" apply false
+    kotlin("android") version "1.3.40" apply false
+    kotlin("kapt") version "1.3.40" apply false
+    id("kotlinx-serialization") version "1.3.40" apply false
 }
 
 
@@ -37,7 +38,7 @@ extra["compileSdkVersion"] = "android-29"
 extra["daggerVersion"] = "2.21"
 extra["lifecycleVersion"] = "2.2.0-alpha01"
 extra["roomVersion"] = "2.1.0-beta01"
-extra["kotlinVersion"] = "1.3.30"
+extra["kotlinVersion"] = "1.3.40"
 extra["coroutinesVersion"] = "1.2.1"
 
 
@@ -54,6 +55,10 @@ allprojects {
     }
     dependencies {
         createComponentsPlatforms()
+    }
+
+    tasks.withType<KotlinCompile> {
+        kotlinOptions.jvmTarget = "1.8"
     }
 }
 
