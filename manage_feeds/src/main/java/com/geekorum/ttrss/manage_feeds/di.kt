@@ -23,6 +23,7 @@ package com.geekorum.ttrss.manage_feeds
 import android.accounts.Account
 import android.app.Activity
 import androidx.lifecycle.ViewModel
+import androidx.work.WorkerFactory
 import com.geekorum.geekdroid.dagger.FragmentFactoriesModule
 import com.geekorum.geekdroid.dagger.ViewModelKey
 import com.geekorum.ttrss.accounts.PerAccount
@@ -30,6 +31,8 @@ import com.geekorum.ttrss.data.ArticlesDatabase
 import com.geekorum.ttrss.di.FeatureScope
 import com.geekorum.ttrss.di.ViewModelsModule
 import com.geekorum.ttrss.features_api.ManageFeedsDependencies
+import com.geekorum.ttrss.manage_feeds.workers.WorkerComponent
+import com.geekorum.ttrss.manage_feeds.workers.WorkersModule
 import dagger.Binds
 import dagger.Component
 import dagger.Module
@@ -40,9 +43,14 @@ import dagger.android.support.AndroidSupportInjectionModule
 import dagger.multibindings.IntoMap
 
 @Component(dependencies = [ManageFeedsDependencies::class],
-    modules = [AndroidInjectorsModule::class])
+    modules = [AndroidInjectorsModule::class,
+        WorkersModule::class])
 @FeatureScope
 interface ManageFeedComponent {
+
+    fun getWorkerFactory(): WorkerFactory
+
+    fun createWorkerComponent() : WorkerComponent.Builder
 
     val activityInjector: DispatchingAndroidInjector<Activity>
 }
