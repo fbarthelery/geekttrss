@@ -20,23 +20,43 @@
  */
 package com.geekorum.ttrss.manage_feeds
 
+import android.accounts.Account
+import android.view.View
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
+import androidx.work.Constraints
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.data.ManageFeedsDao
+import com.geekorum.ttrss.manage_feeds.workers.UnsubscribeWorker
 import javax.inject.Inject
 
 /**
  * ViewModel to manage feeds
  */
 class ManageFeedViewModel @Inject constructor(
+    private val account: Account,
     private val feedsDao: ManageFeedsDao
 ): ViewModel() {
 
     val feeds: LiveData<PagedList<Feed>> by lazy {
         LivePagedListBuilder(feedsDao.allFeeds, 40).build()
+    }
+
+    fun unsubscribeFeed(view: View, feed: Feed) {
+        val workManager = WorkManager.getInstance(view.context)
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+        val request = OneTimeWorkRequestBuilder<UnsubscribeWorker>()
+            .setConstraints(constraints)
+            .setInputData(UnsubscribeWorker.getInputData(account, feed.id))
+            .build()
+        workManager.enqueue(request)
     }
 }
 
