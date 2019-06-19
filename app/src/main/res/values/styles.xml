@@ -48,11 +48,11 @@
 
     <style name="AppTheme.ArticleListActivity" parent="AppTheme.NoActionBar">
         <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">?android:windowBackground</item>
+        <item name="android:navigationBarColor">?android:colorBackground</item>
     </style>
 
     <style name="AppTheme.ArticleDetailActivity" parent="AppTheme.NoActionBar">
-        <item name="android:navigationBarColor">?android:windowBackground</item>
+        <item name="android:navigationBarColor">?android:colorBackground</item>
     </style>
 
     <style name="AppTheme.AddFeedActivity" parent="@style/Theme.Geekdroid.Light.BottomSheetDialogActivity">

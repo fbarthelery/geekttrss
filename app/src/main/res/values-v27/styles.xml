@@ -25,13 +25,13 @@
     <style name="AppTheme.ArticleListActivity" parent="AppTheme.NoActionBar">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowLightNavigationBar">true</item>
-        <item name="android:navigationBarColor">?android:windowBackground</item>
+        <item name="android:navigationBarColor">?android:colorBackground</item>
     </style>
 
     <style name="AppTheme.ArticleDetailActivity" parent="AppTheme.NoActionBar">
         <item name="android:statusBarColor">?android:windowBackground</item>
         <item name="android:windowLightStatusBar">true</item>
-        <item name="android:navigationBarColor">?android:windowBackground</item>
+        <item name="android:navigationBarColor">?android:colorBackground</item>
         <item name="android:windowLightNavigationBar">true</item>
     </style>
 </resources>
