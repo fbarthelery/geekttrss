@@ -23,6 +23,7 @@ package com.geekorum.ttrss.features_api
 import android.accounts.AccountManager
 import android.os.PowerManager
 import com.geekorum.ttrss.data.ArticlesDatabase
+import okhttp3.OkHttpClient
 
 /**
  * Provides dependencies for the ManageFeeds feature.
@@ -39,4 +40,5 @@ interface ManageFeedsDependencies {
 
     fun getArticlesDatabase(): ArticlesDatabase
 
+    fun getOkHttpClient(): OkHttpClient
 }
