@@ -59,7 +59,6 @@ class StrictModeInitializer @Inject constructor() : AppInitializer {
             .detectLeakedClosableObjects()
             .detectLeakedRegistrationObjects()
             .detectLeakedSqlLiteObjects()
-            .penaltyLog()
             .apply {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     detectContentUriWithoutPermission()
@@ -74,6 +73,8 @@ class StrictModeInitializer @Inject constructor() : AppInitializer {
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                     penaltyListener(listenerExecutor, violationListener)
+                } else {
+                    penaltyLog()
                 }
                 if (shouldBeFatal) {
                     penaltyDeath()
@@ -83,10 +84,11 @@ class StrictModeInitializer @Inject constructor() : AppInitializer {
 
         StrictMode.setThreadPolicy(StrictMode.ThreadPolicy.Builder()
             .detectAll()
-            .penaltyLog()
             .apply {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                     penaltyListener(listenerExecutor, violationListener)
+                } else {
+                    penaltyLog()
                 }
                 if (shouldBeFatal) {
                     penaltyDeath()
