@@ -23,4 +23,10 @@
 -->
 <resources>
     <string name="activity_manage_feed_title">My feeds</string>
+
+<!--   Confirmation fragment-->
+    <string name="fragment_confirmation_title">Unsubscribe ?</string>
+    <string name="btn_confirm">Unsubscribe</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="lbl_unsubscribe_msg">You won\'t receive any updates from</string>
 </resources>

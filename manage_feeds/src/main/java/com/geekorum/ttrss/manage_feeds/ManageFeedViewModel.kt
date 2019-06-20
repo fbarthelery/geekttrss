@@ -53,14 +53,14 @@ class ManageFeedViewModel @Inject constructor(
         LivePagedListBuilder(feedsDao.allFeeds, 40).build()
     }
 
-    fun unsubscribeFeed(view: View, feed: Feed) {
-        val workManager = WorkManager.getInstance(view.context)
+    fun unsubscribeFeed(feedId: Long) {
+        val workManager = WorkManager.getInstance(application)
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
         val request = OneTimeWorkRequestBuilder<UnsubscribeWorker>()
             .setConstraints(constraints)
-            .setInputData(UnsubscribeWorker.getInputData(account, feed.id))
+            .setInputData(UnsubscribeWorker.getInputData(account, feedId))
             .build()
         workManager.enqueue(request)
     }

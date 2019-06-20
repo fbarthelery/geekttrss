@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+
+    Geekttrss is a RSS feed reader application on the Android Platform.
+
+    Copyright (C) 2017-2019 by Frederic-Charles Barthelery.
+
+    This file is part of Geekttrss.
+
+    Geekttrss is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Geekttrss is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable name="title" type="String" />
+
+        <variable name="url" type="String" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="24dp">
+
+        <TextView
+                android:id="@+id/info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:text="@string/lbl_unsubscribe_msg"
+                android:textAppearance="?textAppearanceBody1"
+                />
+
+        <TextView
+                android:id="@+id/feed_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/info"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="24dp"
+                android:text="@{title}"
+                android:textAppearance="?textAppearanceBody1"
+                android:textStyle="bold"
+                tools:text="My feed"
+                />
+
+        <TextView
+                android:id="@+id/feed_url"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/feed_title"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:text="@{url}"
+                android:textAppearance="?textAppearanceBody2"
+                tools:text="https://sample.feed.com/feed"
+                />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

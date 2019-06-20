@@ -20,20 +20,31 @@
  */
 package com.geekorum.ttrss.manage_feeds
 
+import android.app.Dialog
 import android.os.Bundle
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
+import androidx.fragment.app.FragmentFactory
 import androidx.lifecycle.observe
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.geekorum.geekdroid.app.lifecycle.EventObserver
+import com.geekorum.geekdroid.dagger.DaggerDelegateFragmentFactory
+import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory
+import com.geekorum.ttrss.BaseDialogFragment
+import com.geekorum.ttrss.activityViewModels
 import com.geekorum.ttrss.applicationComponent
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.manage_feeds.databinding.ActivityManageFeedsBinding
+import com.geekorum.ttrss.manage_feeds.databinding.DialogUnsubscribeFeedBinding
 import com.geekorum.ttrss.manage_feeds.databinding.ItemFeedBinding
 import com.geekorum.ttrss.session.SessionActivity
 import com.geekorum.ttrss.viewModels
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import javax.inject.Inject
 
 class ManageFeedsActivity : SessionActivity() {
     private val viewModel: ManageFeedViewModel by viewModels()
@@ -47,6 +58,10 @@ class ManageFeedsActivity : SessionActivity() {
         viewModel.feeds.observe(this) {
             adapter.submitList(it)
         }
+
+        viewModel.feedClickedEvent.observe(this, EventObserver {
+            showConfirmationDialog(it)
+        })
     }
 
     override fun inject() {
@@ -54,6 +69,11 @@ class ManageFeedsActivity : SessionActivity() {
             .manageFeedsDependencies(applicationComponent)
             .build()
         manageFeedComponent.activityInjector.inject(this)
+    }
+
+    private fun showConfirmationDialog(feed: Feed) {
+        val confirmationFragment = ConfirmationFragment.newInstance(supportFragmentManager.fragmentFactory, feed)
+        confirmationFragment.show(supportFragmentManager, null)
     }
 
     private inner class FeedsAdapter : PagedListAdapter<Feed, FeedViewHolder>(DiffFeed) {
@@ -90,6 +110,51 @@ class ManageFeedsActivity : SessionActivity() {
 
         override fun areContentsTheSame(oldItem: Feed, newItem: Feed): Boolean {
             return oldItem == newItem
+        }
+    }
+
+    class ConfirmationFragment @Inject constructor(
+        viewModelsFactory: DaggerDelegateViewModelsFactory,
+        fragmentFactory: DaggerDelegateFragmentFactory
+    ) : BaseDialogFragment(viewModelsFactory, fragmentFactory) {
+
+        private val viewModel: ManageFeedViewModel by activityViewModels()
+
+        override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+            val inflater =  requireActivity().layoutInflater
+
+            val binding = DialogUnsubscribeFeedBinding.inflate(inflater, null, false)
+            val arguments = requireArguments()
+            with(arguments) {
+                binding.title = getString(ARG_FEED_TITLE)
+                binding.url = getString(ARG_FEED_URL)
+            }
+            val feedId = arguments.getLong(ARG_FEED_ID)
+            return MaterialAlertDialogBuilder(requireActivity())
+                .setView(binding.root)
+                .setTitle(R.string.fragment_confirmation_title)
+                .setPositiveButton(R.string.btn_confirm) { _, _ ->
+                    viewModel.unsubscribeFeed(feedId)
+                }
+                .setNegativeButton(R.string.btn_cancel, null)
+                .create()
+        }
+
+        companion object {
+            const val ARG_FEED_ID = "feed_id"
+            const val ARG_FEED_TITLE = "feed_title"
+            const val ARG_FEED_URL = "feed_url"
+
+            @JvmStatic
+            fun newInstance(fragmentFactory: FragmentFactory, feed: Feed): ConfirmationFragment {
+                return fragmentFactory.instantiate(ConfirmationFragment::class.java.classLoader!!,
+                    ConfirmationFragment::class.java.name).apply {
+                    arguments = bundleOf(
+                        ARG_FEED_ID to feed.id,
+                        ARG_FEED_TITLE to feed.title,
+                        ARG_FEED_URL to feed.url)
+                } as ConfirmationFragment
+            }
         }
     }
 

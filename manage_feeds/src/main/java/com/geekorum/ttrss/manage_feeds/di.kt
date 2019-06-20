@@ -22,9 +22,11 @@ package com.geekorum.ttrss.manage_feeds
 
 import android.accounts.Account
 import android.app.Activity
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.work.WorkerFactory
 import com.geekorum.geekdroid.dagger.FragmentFactoriesModule
+import com.geekorum.geekdroid.dagger.FragmentKey
 import com.geekorum.geekdroid.dagger.ViewModelKey
 import com.geekorum.ttrss.accounts.PerAccount
 import com.geekorum.ttrss.data.ArticlesDatabase
@@ -72,6 +74,11 @@ private abstract class ManageFeedModule {
     @IntoMap
     @ViewModelKey(ManageFeedViewModel::class)
     abstract fun bindManageFeedViewModel(vm: ManageFeedViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @FragmentKey(ManageFeedsActivity.ConfirmationFragment::class)
+    abstract fun bindConfirmationFragment(fragment: ManageFeedsActivity.ConfirmationFragment): Fragment
 
     @Module
     companion object {
