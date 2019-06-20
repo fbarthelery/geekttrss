@@ -25,13 +25,4 @@
     <style name="ThemeOverlay.AppTheme.DayNight" parent="@style/ThemeOverlay.MaterialComponents.Dark"/>
     <style name="ThemeOverlay.AppTheme.DayNight.Inverse" parent="@style/ThemeOverlay.MaterialComponents.Light" />
 
-    <style name="AppTheme.AddFeedActivity" parent="@style/Theme.Geekdroid.BottomSheetDialogActivity">
-        <!-- use the material Blue Grey palette -->
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/primary_dark</item>
-        <item name="colorPrimaryVariant">@color/primary_dark</item>
-        <item name="colorSecondary">@color/secondary</item>
-        <item name="colorSecondaryVariant">@color/secondary_dark</item>
-        <item name="colorOnSecondary">@android:color/white</item>
-    </style>
 </resources>

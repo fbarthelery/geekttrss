@@ -125,7 +125,7 @@
                   app:layout_constraintEnd_toEndOf="parent"
                   app:layout_constraintTop_toTopOf="@id/accounts_panel"
                   android:gravity="center_vertical"
-                  android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+                  android:textAppearance="?textAppearanceCaption"
                   android:textColor="?android:textColorPrimary"
                   android:text="@string/activity_add_feed_account_subtitle"
                 />
