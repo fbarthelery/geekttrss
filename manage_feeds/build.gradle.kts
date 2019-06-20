@@ -76,6 +76,7 @@ dependencies {
 
     val lifecycleVersion: String by rootProject.extra
     implementation("androidx.lifecycle:lifecycle-livedata-core-ktx:$lifecycleVersion")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
 
     androidTestImplementation("androidx.work:work-testing:2.1.0-beta01")
     androidTestImplementation("androidx.arch.core:core-testing:2.0.1")

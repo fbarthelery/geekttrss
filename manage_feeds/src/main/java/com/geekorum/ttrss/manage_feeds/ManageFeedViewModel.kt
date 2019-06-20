@@ -25,6 +25,7 @@ import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import androidx.work.Constraints
@@ -35,6 +36,7 @@ import com.geekorum.geekdroid.app.lifecycle.Event
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.data.ManageFeedsDao
 import com.geekorum.ttrss.manage_feeds.workers.UnsubscribeWorker
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -50,10 +52,13 @@ class ManageFeedViewModel @Inject constructor(
     val feedClickedEvent: LiveData<Event<Feed>> = _feedClickedEvent
 
     val feeds: LiveData<PagedList<Feed>> by lazy {
-        LivePagedListBuilder(feedsDao.allFeeds, 40).build()
+        LivePagedListBuilder(feedsDao.allSubscribedFeeds, 40).build()
     }
 
     fun unsubscribeFeed(feedId: Long) {
+        viewModelScope.launch {
+            feedsDao.updateIsSubscribedFeed(feedId, false)
+        }
         val workManager = WorkManager.getInstance(application)
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)

@@ -27,6 +27,9 @@ import androidx.room.Query
 @Dao
 interface ManageFeedsDao {
 
-    @get:Query("SELECT * FROM feeds ORDER BY title")
-    val allFeeds: DataSource.Factory<Integer, Feed>
+    @get:Query("SELECT * FROM feeds WHERE is_subscribed == 1 ORDER BY title")
+    val allSubscribedFeeds: DataSource.Factory<Int, Feed>
+
+    @Query("UPDATE feeds SET is_subscribed=:isSubscribed WHERE _id=:feedId")
+    suspend fun updateIsSubscribedFeed(feedId: Long, isSubscribed: Boolean)
 }
