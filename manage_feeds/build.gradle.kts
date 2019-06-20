@@ -72,6 +72,8 @@ dependencies {
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.0.0")
     implementation("com.google.android.material:material:1.1.0-alpha07")
 
+    implementation("androidx.core:core-ktx:1.0.2")
+
     val lifecycleVersion: String by rootProject.extra
     implementation("androidx.lifecycle:lifecycle-livedata-core-ktx:$lifecycleVersion")
 

@@ -38,7 +38,7 @@
             android:foreground="?selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
-            android:onClick="@{(v) -> viewModel.unsubscribeFeed(v, feed)}">
+            android:onClick="@{() -> viewModel.onFeedClicked(feed)}">
 
         <ImageView android:id="@+id/feed_icon"
                    android:layout_width="40dp"
