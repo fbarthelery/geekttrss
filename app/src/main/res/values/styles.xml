@@ -36,6 +36,7 @@
         <item name="articleTextColor">@color/article_text_color</item>
         <item name="linkColor">?android:textColorLink</item>
         <item name="bottomAppBarStyle">@style/BottomAppBarStyle</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.AppTheme.AlertDialog</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -76,6 +77,14 @@
 
     <style name="ThemeOverlay.AppTheme.LoginForm" parent="ThemeOverlay.AppTheme.DayNight">
         <item name="textInputStyle">@style/LoginForm.TextInputStyle</item>
+    </style>
+
+    <style name="ThemeOverlay.AppTheme.AlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="materialAlertDialogTitleTextStyle">@style/AlertDialogTitleTextStyle</item>
+    </style>
+
+    <style name="AlertDialogTitleTextStyle" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
+        <item name="android:textAppearance">?attr/textAppearanceHeadline6</item>
     </style>
 
     <style name="BottomAppBarStyle" parent="Widget.MaterialComponents.BottomAppBar">

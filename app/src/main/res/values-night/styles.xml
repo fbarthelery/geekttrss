@@ -37,6 +37,7 @@
         <item name="articleTextColor">@color/article_text_color</item>
         <item name="linkColor">?android:textColorLink</item>
         <item name="bottomAppBarStyle">@style/BottomAppBarStyle</item>
+        <item name="materialAlertDialogTheme">@style/ThemeOverlay.AppTheme.AlertDialog</item>
     </style>
 
 

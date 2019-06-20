@@ -25,6 +25,7 @@ import android.content.Context
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -57,6 +58,14 @@ inline fun <reified VM : ViewModel> BaseFragment.activityViewModels(): Lazy<VM> 
     return activityViewModels { viewModelsFactory }
 }
 
+inline fun <reified VM : ViewModel> BaseDialogFragment.viewModels(): Lazy<VM> {
+    return viewModels { viewModelsFactory }
+}
+
+inline fun <reified VM : ViewModel> BaseDialogFragment.activityViewModels(): Lazy<VM> {
+    return activityViewModels { viewModelsFactory }
+}
+
 /**
  * Common base Activity for the application.
  * As it supports Dagger injection, the Activity must have a corresponding [AndroidInjector]
@@ -86,6 +95,17 @@ open class BaseFragment (
     val viewModelsFactory: DaggerDelegateViewModelsFactory,
     val fragmentFactory: DaggerDelegateFragmentFactory
 ) : Fragment() {
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        childFragmentManager.fragmentFactory = fragmentFactory
+    }
+}
+
+open class BaseDialogFragment (
+    val viewModelsFactory: DaggerDelegateViewModelsFactory,
+    val fragmentFactory: DaggerDelegateFragmentFactory
+) : DialogFragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
