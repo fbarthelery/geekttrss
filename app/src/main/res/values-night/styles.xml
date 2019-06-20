@@ -22,7 +22,10 @@
 
 -->
 <resources>
-    <style name="AppTheme" parent="Theme.MaterialComponents">
+    <style name="ThemeOverlay.AppTheme.DayNight" parent="@style/ThemeOverlay.MaterialComponents.Dark"/>
+    <style name="ThemeOverlay.AppTheme.DayNight.Inverse" parent="@style/ThemeOverlay.MaterialComponents.Light" />
+
+    <style name="AppTheme.AddFeedActivity" parent="@style/Theme.Geekdroid.BottomSheetDialogActivity">
         <!-- use the material Blue Grey palette -->
         <item name="colorPrimary">@color/primary</item>
         <item name="colorPrimaryDark">@color/primary_dark</item>
@@ -30,28 +33,5 @@
         <item name="colorSecondary">@color/secondary</item>
         <item name="colorSecondaryVariant">@color/secondary_dark</item>
         <item name="colorOnSecondary">@android:color/white</item>
-
-        <!-- used to configure style on the content webview -->
-        <item name="articleBackground">?android:colorBackground</item>
-        <!-- must be a color, not a drawable -->
-        <item name="articleTextColor">@color/article_text_color</item>
-        <item name="linkColor">?android:textColorLink</item>
-        <item name="bottomAppBarStyle">@style/BottomAppBarStyle</item>
-        <item name="materialAlertDialogTheme">@style/ThemeOverlay.AppTheme.AlertDialog</item>
-    </style>
-
-
-    <style name="ThemeOverlay.AppTheme.DayNight" parent="@style/ThemeOverlay.MaterialComponents.Dark"/>
-    <style name="ThemeOverlay.AppTheme.DayNight.Inverse" parent="@style/ThemeOverlay.MaterialComponents.Light" />
-
-    <style name="AppTheme.AddFeedActivity" parent="@style/Theme.Geekdroid.BottomSheetDialogActivity">
-        <!-- use the material Blue Grey palette -->
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/material_blue_grey_700</item>
-        <item name="colorAccent">@color/material_green_a700</item>
-    </style>
-
-    <style name="ThemeOverlay.AppTheme.AddFeedActivity.AccountsPanel" parent="ThemeOverlay.AppTheme.DayNight">
-        <item name="android:colorBackground">@color/material_blue_grey_800</item>
     </style>
 </resources>
