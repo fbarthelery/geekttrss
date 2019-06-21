@@ -35,13 +35,14 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+                app:liftOnScroll="true">
 
-            <androidx.appcompat.widget.Toolbar
+            <com.google.android.material.appbar.MaterialToolbar
                     android:id="@+id/toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+                    style="?appBarToolbarStyle"
+                    />
 
         </com.google.android.material.appbar.AppBarLayout>
 

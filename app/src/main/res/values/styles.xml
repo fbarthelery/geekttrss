@@ -38,6 +38,8 @@
         <item name="linkColor">?android:textColorLink</item>
         <item name="bottomAppBarStyle">@style/BottomAppBarStyle</item>
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.AppTheme.AlertDialog</item>
+        <item name="appBarToolbarStyle">@style/AppBar.Toolbar.DayNight</item>
+        <item name="appBarCollapsingToolbarStyle">@style/AppBar.CollapsingToolbar.DayNight</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -72,6 +74,8 @@
         <item name="android:windowTranslucentStatus">false</item>
     </style>
 
+    <!-- Theme overlays -->
+
     <style name="ThemeOverlay.AppTheme.AddFeedActivity.AccountsPanel" parent="ThemeOverlay.AppTheme.DayNight">
         <item name="android:colorBackground">@color/background_add_feed_accounts_spinner</item>
     </style>
@@ -80,16 +84,18 @@
         <item name="colorButtonNormal">@android:color/transparent</item>
     </style>
 
-    <style name="LoginForm.TextInputStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
-        <item name="errorEnabled">true</item>
-    </style>
-
     <style name="ThemeOverlay.AppTheme.LoginForm" parent="ThemeOverlay.AppTheme.DayNight">
         <item name="textInputStyle">@style/LoginForm.TextInputStyle</item>
     </style>
 
     <style name="ThemeOverlay.AppTheme.AlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
         <item name="materialAlertDialogTitleTextStyle">@style/AlertDialogTitleTextStyle</item>
+    </style>
+
+    <!-- Widget styles -->
+
+    <style name="LoginForm.TextInputStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="errorEnabled">true</item>
     </style>
 
     <style name="AlertDialogTitleTextStyle" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
@@ -101,12 +107,36 @@
         <item name="fabCradleRoundedCornerRadius">32dp</item>
     </style>
 
+    <style name="AppBar.Toolbar.DayNight" parent="Widget.MaterialComponents.Toolbar.Primary"/>
+
+    <style name="AppBar.CollapsingToolbar.DayNight" parent="">
+        <item name="expandedTitleTextAppearance">@style/TextAppearance.AppTheme.CollapsingToolbar.Expanded.Primary</item>
+        <item name="collapsedTitleTextAppearance">@style/TextAppearance.AppTheme.CollapsingToolbar.Collapsed.Primary</item>
+    </style>
+
     <style name="HeadlineCardFooterButton">
         <item name="android:layout_width">48dp</item>
         <item name="android:layout_height">48dp</item>
         <item name="android:clickable">true</item>
         <item name="android:focusable">true</item>
         <item name="android:padding">12dp</item>
+    </style>
+
+    <!-- Text appearances -->
+    <style name="TextAppearance.AppTheme.CollapsingToolbar.Expanded.Primary" parent="TextAppearance.Design.CollapsingToolbar.Expanded">
+        <item name="android:textColor">?colorOnPrimary</item>
+    </style>
+
+    <style name="TextAppearance.AppTheme.CollapsingToolbar.Collapsed.Primary" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textColor">?colorOnPrimary</item>
+    </style>
+
+    <style name="TextAppearance.AppTheme.CollapsingToolbar.Expanded.Surface" parent="TextAppearance.Design.CollapsingToolbar.Expanded">
+        <item name="android:textColor">@color/mtrl_on_surface_emphasis_high_type</item>
+    </style>
+
+    <style name="TextAppearance.AppTheme.CollapsingToolbar.Collapsed.Surface" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textColor">@color/mtrl_on_surface_emphasis_high_type</item>
     </style>
 
     <!-- defined in feature modules -->

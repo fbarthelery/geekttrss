@@ -129,7 +129,7 @@ class ArticleListActivity : SessionActivity() {
     }
 
     private fun setupToolbar() {
-        val toolbar = binding.toolbar.toolbar
+        val toolbar = binding.toolbar
         setupSearch()
 
         actionBarDrawerToggle = ActionBarDrawerToggle(this, binding.headlinesDrawer, toolbar,
@@ -139,7 +139,7 @@ class ArticleListActivity : SessionActivity() {
     }
 
     private fun setupSearch() {
-        val searchItem = with(binding.toolbar.toolbar) {
+        val searchItem = with(binding.toolbar) {
             inflateMenu(R.menu.activity_articles_list)
             menu.findItem(R.id.articles_search)
         }
@@ -216,7 +216,7 @@ class ArticleListActivity : SessionActivity() {
         }
         navigateUpToList()
         title = feed.title
-        binding.toolbar.toolbar.title = title
+        binding.toolbar.title = title
         supportFragmentManager.commit {
             val hf = ArticlesListFragment.newInstance(supportFragmentManager.fragmentFactory, feed.id)
             replace(R.id.middle_pane_layout, hf, FRAGMENT_ARTICLES_LIST)

@@ -25,4 +25,11 @@
     <style name="ThemeOverlay.AppTheme.DayNight" parent="@style/ThemeOverlay.MaterialComponents.Dark"/>
     <style name="ThemeOverlay.AppTheme.DayNight.Inverse" parent="@style/ThemeOverlay.MaterialComponents.Light" />
 
+    <!-- Widget styles -->
+    <style name="AppBar.Toolbar.DayNight" parent="@style/Widget.MaterialComponents.Toolbar.Surface"/>
+
+    <style name="AppBar.CollapsingToolbar.DayNight" parent="">
+        <item name="expandedTitleTextAppearance">@style/TextAppearance.AppTheme.CollapsingToolbar.Expanded.Surface</item>
+        <item name="collapsedTitleTextAppearance">@style/TextAppearance.AppTheme.CollapsingToolbar.Collapsed.Surface</item>
+    </style>
 </resources>

@@ -41,14 +41,13 @@
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?android:windowBackground"
-        app:liftOnScroll="true">
+        app:liftOnScroll="true"
+        style="@style/Widget.MaterialComponents.AppBarLayout.Surface">
 
-        <androidx.appcompat.widget.Toolbar
+        <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/detail_toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="?android:attr/actionBarSize"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                android:layout_height="wrap_content"
                 />
 
     </com.google.android.material.appbar.AppBarLayout>

@@ -22,7 +22,13 @@
 
 -->
 <resources>
-   <attr name="articleBackground" format="reference|color" />
+    <attr name="articleBackground" format="reference|color" />
     <attr name="linkColor" format="reference|color" />
     <attr name="articleTextColor" format="reference|color" />
+
+    <!-- Style to use on a toolbar inside an AppBarLayout
+        This is not use automatically, you have to set it on the toolbar
+        -->
+    <attr name="appBarToolbarStyle" format="reference" />
+    <attr name="appBarCollapsingToolbarStyle" format="reference" />
 </resources>
