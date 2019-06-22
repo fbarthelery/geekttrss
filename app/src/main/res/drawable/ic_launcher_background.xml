@@ -32,6 +32,6 @@
             android:fillColor="@color/primary" />
     <path
             android:pathData="M0,108 L108,0108L108,0 Z"
-            android:fillColor="@color/primary_dark" />
+            android:fillColor="@color/primary_darker" />
 
 </vector>

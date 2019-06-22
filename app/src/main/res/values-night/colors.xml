@@ -21,6 +21,18 @@
 
 -->
 <resources>
+    <!-- Theme colors -->
+    <color name="primary">@color/material_blue_grey_300</color>
+    <color name="primary_variant">@color/primary_darker</color>
+    <color name="primary_darker">#62757f</color>
+    <color name="primary_lighter">#c1d5e0</color>
+    <color name="secondary">@color/material_green_a200</color>
+    <color name="secondary_variant">@color/secondary_darker</color>
+    <color name="secondary_darker">#2bbd7e</color>
+    <color name="secondary_lighter">#9fffe0</color>
+    <color name="color_on_primary">@android:color/white</color>
+    <color name="color_on_secondary">@android:color/black</color>
+
     <color name="image_scrim">#88000000</color>
     <color name="article_text_color">#b3ffffff</color>
 

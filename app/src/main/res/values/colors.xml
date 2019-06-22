@@ -29,15 +29,23 @@
     <!-- We use the same value -->
     <color name="material_blue_grey_800" tools:override="true">#37474F</color>
     <color name="material_blue_grey_900" tools:override="true">#263238</color>
+    <color name="material_green_a200">#69f0ae</color>
     <color name="material_green_a700">#00C853</color>
 
     <!-- Theme colors -->
     <color name="primary">@color/material_blue_grey_500</color>
-    <color name="primary_dark">@color/material_blue_grey_700</color>
-    <color name="primary_light">#8eacbb</color>
+    <color name="primary_variant">@color/primary_darker</color>
+    <color name="primary_darker">#34515e</color>
+    <color name="primary_lighter">#8eacbb</color>
     <color name="secondary">@color/material_green_a700</color>
-    <color name="secondary_dark">#009624</color>
-    <color name="secondary_light">#5efc82</color>
+    <color name="secondary_variant">@color/secondary_darker</color>
+    <color name="secondary_darker">#009624</color>
+    <color name="secondary_lighter">#5efc82</color>
+    <color name="color_on_primary">@android:color/white</color>
+    <color name="color_on_secondary">@android:color/white</color>
+
+    <!-- Can be used as color_surface with a primary tint in dark mode-->
+    <color name="dark_color_primary_surface">#181a1b</color>
 
     <color name="unreadCounterColor">#909090</color>
     <color name="headlineExcerptTextColor">#323232</color>
