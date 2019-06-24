@@ -25,7 +25,6 @@
         <variable
             name="viewModel"
             type="com.geekorum.ttrss.article_details.ArticleDetailsViewModel" />
-        <variable name="colorPrimary" type="int"/>
     </data>
 
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -72,10 +71,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            app:backgroundTint="@{!viewModel.article.transientUnread ? @color/material_grey_600 : colorPrimary }"
+            app:backgroundTint="@{viewModel.article.transientUnread ? @color/article_detail_bottom_appbar_unread : @color/article_detail_bottom_appbar_read }"
             app:fabAlignmentMode="end"
             app:hideOnScroll="true"
-            android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"/>
+            style="@style/ArticleDetail.BottomAppBarStyle"
+            />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

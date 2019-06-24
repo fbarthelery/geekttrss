@@ -32,4 +32,11 @@
         <item name="expandedTitleTextAppearance">@style/TextAppearance.AppTheme.CollapsingToolbar.Expanded.Surface</item>
         <item name="collapsedTitleTextAppearance">@style/TextAppearance.AppTheme.CollapsingToolbar.Collapsed.Surface</item>
     </style>
+
+    <style name="ArticleDetail.BottomAppBarStyle" parent="Widget.MaterialComponents.BottomAppBar">
+        <item name="fabCradleMargin">8dp</item>
+        <item name="fabCradleRoundedCornerRadius">32dp</item>
+        <item name="materialThemeOverlay">@style/ThemeOverlay.MaterialComponents.BottomAppBar.Surface</item>
+    </style>
+
 </resources>

@@ -109,6 +109,11 @@
         <item name="fabCradleRoundedCornerRadius">32dp</item>
     </style>
 
+    <style name="ArticleDetail.BottomAppBarStyle" parent="Widget.MaterialComponents.BottomAppBar.Colored">
+        <item name="fabCradleMargin">8dp</item>
+        <item name="fabCradleRoundedCornerRadius">32dp</item>
+    </style>
+
     <style name="AppBar.Toolbar.DayNight" parent="Widget.MaterialComponents.Toolbar.Primary"/>
 
     <style name="AppBar.CollapsingToolbar.DayNight" parent="">

@@ -22,10 +22,8 @@ package com.geekorum.ttrss.article_details;
 
 import android.content.ContentUris;
 import android.content.Intent;
-import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.TypedValue;
 import androidx.appcompat.app.ActionBar;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProviders;
@@ -55,12 +53,6 @@ public class ArticleDetailActivity extends SessionActivity {
         binding.setLifecycleOwner(this);
         articleDetailsViewModel = ViewModelProviders.of(this, getViewModelsFactory()).get(ArticleDetailsViewModel.class);
         binding.setViewModel(articleDetailsViewModel);
-
-        Resources.Theme theme = getTheme();
-        TypedValue tv = new TypedValue();
-        theme.resolveAttribute(R.attr.colorPrimary, tv, true);
-        int colorPrimary = tv.data;
-        binding.setColorPrimary(colorPrimary);
         setSupportActionBar(binding.detailToolbar);
         setUpBottomAppBar();
 
