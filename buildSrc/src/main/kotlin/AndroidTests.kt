@@ -33,9 +33,8 @@ import org.gradle.kotlin.dsl.kotlin
 import org.gradle.kotlin.dsl.provideDelegate
 
 const val espressoVersion = "3.2.0"
-const val androidxTestRunnerVersion = "1.1.1"
-const val androidxTestCoreVersion = "1.1.0"
-const val androidxTestExtVersion = "1.1.0"
+const val androidxTestRunnerVersion = "1.2.0"
+const val androidxTestCoreVersion = "1.2.0"
 const val robolectricVersion = "4.1"
 
 
@@ -68,7 +67,7 @@ internal fun Project.configureTests() {
 
         androidTestUtil("androidx.test:orchestrator:$androidxTestRunnerVersion")
         androidTestImplementation("androidx.test:runner:$androidxTestRunnerVersion")
-        dualTestImplementation("androidx.test.ext:junit-ktx:$androidxTestExtVersion")
+        dualTestImplementation("androidx.test.ext:junit-ktx:1.1.1")
 
         dualTestImplementation("androidx.test:core-ktx:$androidxTestCoreVersion")
         dualTestImplementation("androidx.test:rules:$androidxTestRunnerVersion")
@@ -78,8 +77,8 @@ internal fun Project.configureTests() {
         dualTestImplementation("androidx.test.espresso:espresso-intents:$espressoVersion")
 
         // assertions
-        dualTestImplementation("com.google.truth:truth:0.44")
-        dualTestImplementation("androidx.test.ext:truth:$androidxTestExtVersion")
+        dualTestImplementation("com.google.truth:truth:0.45")
+        dualTestImplementation("androidx.test.ext:truth:1.2.0")
 
         // fix for guava listenablefuture conflict with application runtime version
         dualTestImplementation("com.google.guava:listenablefuture:1.0") {
