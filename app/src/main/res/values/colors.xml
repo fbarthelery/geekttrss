@@ -53,7 +53,7 @@
     <color name="articleHeaderSeparator">#cccccc</color>
     <color name="accent">@color/material_green_a700</color>
     <color name="image_scrim">#ccffffff</color>
-    <color name="article_text_color">#8a000000</color>
+    <color name="article_text_color">?android:textColorTertiary</color>
 
     <!-- Add feed account panel -->
     <color name="background_add_feed_accounts_panel">@color/material_blue_grey_100</color>

@@ -35,7 +35,7 @@
         <!-- used to configure style on the content webview -->
         <item name="articleBackground">?colorSurface</item>
         <!-- must be a color, not a drawable -->
-        <item name="articleTextColor">?colorOnSurface</item>
+        <item name="articleTextColor">@color/article_text_color</item>
         <item name="linkColor">?colorSecondary</item>
         <item name="bottomAppBarStyle">@style/BottomAppBarStyle</item>
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.AppTheme.AlertDialog</item>

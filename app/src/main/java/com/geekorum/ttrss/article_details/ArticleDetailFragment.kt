@@ -38,6 +38,7 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.core.view.doOnNextLayout
@@ -203,13 +204,28 @@ class ArticleDetailFragment @Inject constructor(
             fun fromTheme(theme: Resources.Theme): WebViewColors {
                 val typedValue = TypedValue()
                 theme.resolveAttribute(R.attr.articleBackground, typedValue, true)
-                val backgroundColor = typedValue.data
+                val backgroundColor = toColorInt(typedValue, theme)
                 theme.resolveAttribute(R.attr.articleTextColor, typedValue, true)
-                val textColor = typedValue.data
+                val textColor = toColorInt(typedValue, theme)
                 theme.resolveAttribute(R.attr.linkColor, typedValue, true)
-                val linkColor = typedValue.data
+                val linkColor = toColorInt(typedValue, theme)
                 return WebViewColors(backgroundColor, textColor, linkColor)
             }
+
+            @ColorInt
+            private fun toColorInt(typedValue: TypedValue, theme: Resources.Theme ): Int {
+                return when (typedValue.type) {
+                    in TypedValue.TYPE_FIRST_COLOR_INT..TypedValue.TYPE_LAST_COLOR_INT -> typedValue.data
+                    TypedValue.TYPE_REFERENCE -> ResourcesCompat.getColor(theme.resources, typedValue.data, theme)
+                    TypedValue.TYPE_STRING -> ResourcesCompat.getColor(theme.resources, typedValue.resourceId, theme)
+                    TypedValue.TYPE_ATTRIBUTE -> {
+                        theme.resolveAttribute(typedValue.data, typedValue, true)
+                        toColorInt(typedValue, theme)
+                    }
+                    else -> throw IllegalArgumentException("Theme attribute expected to be a color")
+                }
+            }
+
         }
     }
 

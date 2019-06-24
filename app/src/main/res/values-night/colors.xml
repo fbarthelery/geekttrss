@@ -34,7 +34,6 @@
     <color name="color_on_secondary">@android:color/black</color>
 
     <color name="image_scrim">#88000000</color>
-    <color name="article_text_color">#b3ffffff</color>
 
     <!-- Add feed account panel -->
     <color name="background_add_feed_accounts_panel">@color/material_blue_grey_900</color>
