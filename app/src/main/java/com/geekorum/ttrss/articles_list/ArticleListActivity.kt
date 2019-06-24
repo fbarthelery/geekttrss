@@ -33,6 +33,7 @@ import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import androidx.fragment.app.commit
+import androidx.lifecycle.observe
 import androidx.lifecycle.Observer
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.R
@@ -74,7 +75,7 @@ class ArticleListActivity : SessionActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        activityViewModel.selectedFeed.observe(this, Observer { onFeedSelected(it) })
+        activityViewModel.selectedFeed.observe(this) { onFeedSelected(it) }
 
         activityViewModel.articleSelectedEvent.observe(this, EventObserver { (position, article) ->
             onArticleSelected(position, article)

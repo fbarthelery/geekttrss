@@ -44,7 +44,6 @@ import androidx.core.os.bundleOf
 import androidx.core.view.doOnNextLayout
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.FragmentFactory
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import com.geekorum.geekdroid.dagger.DaggerDelegateFragmentFactory
@@ -110,8 +109,8 @@ class ArticleDetailFragment @Inject constructor(
         super.onViewCreated(view, savedInstanceState)
         configureWebView()
 
-        articleDetailsViewModel.article.observe(this, Observer { this.article = it })
-        articleDetailsViewModel.articleContent.observe(this, Observer { renderContent(it) })
+        articleDetailsViewModel.article.observe(this) { this.article = it }
+        articleDetailsViewModel.articleContent.observe(this) { renderContent(it) }
 
         binding.root.setOnScrollChangeListener { v, _, _, _, _ ->
             markReadJob?.cancel()
