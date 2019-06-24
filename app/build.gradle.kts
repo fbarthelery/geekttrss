@@ -174,7 +174,7 @@ dependencies {
     implementation("com.squareup.inject:assisted-inject-annotations-dagger2:0.4.0")
     kapt("com.squareup.inject:assisted-inject-processor-dagger2:0.4.0")
 
-    val roomVersion: String by rootProject.extra
+    val roomVersion = "2.1.0"
     kapt("androidx.room:room-compiler:$roomVersion")
     androidTestImplementation("androidx.room:room-testing:$roomVersion")
 

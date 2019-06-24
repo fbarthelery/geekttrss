@@ -37,7 +37,6 @@ plugins {
 extra["compileSdkVersion"] = "android-29"
 extra["daggerVersion"] = "2.21"
 extra["lifecycleVersion"] = "2.2.0-alpha01"
-extra["roomVersion"] = "2.1.0-beta01"
 extra["kotlinVersion"] = "1.3.40"
 extra["coroutinesVersion"] = "1.2.1"
 
