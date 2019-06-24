@@ -177,9 +177,8 @@ dependencies {
     val roomVersion: String by rootProject.extra
     kapt("androidx.room:room-compiler:$roomVersion")
     androidTestImplementation("androidx.room:room-testing:$roomVersion")
-    dualTestImplementation("androidx.test.ext:truth:1.1.0")
 
-    val workVersion = "2.1.0-beta01"
+    val workVersion = "2.1.0-beta02"
     androidTestImplementation("androidx.work:work-testing:$workVersion")
 
     val kotlinVersion: String by rootProject.extra
