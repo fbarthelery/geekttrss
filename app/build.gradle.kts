@@ -147,7 +147,7 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:3.12.0")
     testImplementation("com.squareup.okhttp3:mockwebserver:3.12.0")
     implementation("com.squareup.picasso:picasso:2.5.2")
-    implementation("com.google.android.gms:play-services-oss-licenses:16.0.2")
+    implementation("com.google.android.gms:play-services-oss-licenses:17.0.0")
 
     implementation("org.jsoup:jsoup:1.10.2")
 
@@ -192,7 +192,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$coroutinesVersion")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
 
-    add("googleImplementation", "com.crashlytics.sdk.android:crashlytics:2.9.6")
+    implementation(enforcedPlatform("com.google.firebase:firebase-bom:20.1.0"))
+    add("googleImplementation", "com.crashlytics.sdk.android:crashlytics")
     // ensure that the free flavor don't get any firebase dependencies
     configurations["freeImplementation"].exclude(group = "com.google.firebase")
 
