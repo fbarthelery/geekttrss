@@ -44,7 +44,12 @@ abstract class WorkersModule {
     @Binds
     @IntoMap
     @WorkerKey(UnsubscribeWorker::class)
-    abstract fun providesAddFeedWorkerFactory(workerFactory: UnsubscribeWorker.Factory): WorkerFactory
+    abstract fun providesUnsubscribeWorkerFactory(workerFactory: UnsubscribeWorker.Factory): WorkerFactory
+
+    @Binds
+    @IntoMap
+    @WorkerKey(SubscribeWorker::class)
+    abstract fun providesSubscribeWorkerFactory(workerFactory: SubscribeWorker.Factory): WorkerFactory
 
     @Binds
     abstract fun daggerWorkerFactory(workerFactory: DaggerDelegateWorkersFactory): WorkerFactory

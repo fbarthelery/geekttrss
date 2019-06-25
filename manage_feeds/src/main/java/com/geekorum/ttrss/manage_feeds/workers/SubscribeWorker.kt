@@ -25,49 +25,50 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.ListenableWorker
-import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.geekorum.ttrss.Application
-import com.geekorum.ttrss.manage_feeds.DaggerManageFeedComponent
 import com.geekorum.ttrss.network.ApiCallException
+import timber.log.Timber
 import javax.inject.Inject
 
-/**
- * Background worker to unsubscribe from a feed.
- */
-class UnsubscribeWorker(
-    appContext: Context,
-    private val params: WorkerParameters,
+class SubscribeWorker(
+    contex: Context,
+    params: WorkerParameters,
     private val apiService: ManageFeedService
-) : CoroutineWorker(
-    appContext, params
-) {
+) : CoroutineWorker(contex, params) {
+
     override suspend fun doWork(): Result {
-        val feedId = params.inputData.getLong("feed_id", -1)
-        if (feedId == -1L) {
-            return Result.failure()
-        }
+        val feedUrl = requireNotNull(inputData.getString("url"))
+        val categoryId = inputData.getLong("categoryId", 0)
+        val feedLogin = inputData.getString("login") ?: ""
+        val feedPassword = inputData.getString("password") ?: ""
+
         return try {
-            val success = apiService.unsubscribeFromFeed(feedId)
-            if (success) {
-                Result.success()
-            } else {
+            val result = apiService.subscribeToFeed(feedUrl, categoryId, feedLogin, feedPassword)
+            if (result != ResultCode.SUCCESS) {
+                Timber.e("Unable to add feed $result")
                 Result.failure()
+            } else {
+                Result.success()
             }
         } catch (e: ApiCallException) {
-            // TODO check when we can retry or not
             Result.retry()
         }
     }
 
     companion object {
         fun getInputData(account: Account,
-                         feedId: Long): Data {
+                         feedUrl: String,
+                         categoryId: Long = 0,
+                         feedLogin: String = "",
+                         feedPassword: String = ""): Data {
             return workDataOf(
                 "account_name" to account.name,
                 "account_type" to account.type,
-                "feed_id" to feedId
+                "url" to feedUrl,
+                "categoryId" to categoryId,
+                "login" to feedLogin,
+                "password" to feedPassword
             )
         }
     }
@@ -78,7 +79,7 @@ class UnsubscribeWorker(
         override fun createWorker(
             appContext: Context, workerClassName: String, workerParameters: WorkerParameters
         ): ListenableWorker? {
-            if (workerClassName != UnsubscribeWorker::class.java.name) {
+            if (workerClassName != SubscribeWorker::class.java.name) {
                 return null
             }
             val account = with(workerParameters.inputData) {
@@ -92,10 +93,8 @@ class UnsubscribeWorker(
                 .setAccount(account)
                 .build()
                 .getManageFeedService()
-
-            return UnsubscribeWorker(appContext, workerParameters, apiService)
+            return SubscribeWorker(appContext, workerParameters, apiService)
         }
     }
+
 }
-
-

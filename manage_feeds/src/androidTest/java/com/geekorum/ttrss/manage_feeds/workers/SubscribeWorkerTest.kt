@@ -37,8 +37,8 @@ import org.junit.runner.RunWith
 import kotlin.test.BeforeTest
 
 @RunWith(AndroidJUnit4::class)
-class UnsubscribeWorkerTest {
-    lateinit var workerBuilder: TestListenableWorkerBuilder<UnsubscribeWorker>
+class SubscribeWorkerTest {
+    lateinit var workerBuilder: TestListenableWorkerBuilder<SubscribeWorker>
     private lateinit var apiService: MockManageFeedService
 
     @BeforeTest
@@ -50,7 +50,7 @@ class UnsubscribeWorkerTest {
             override fun createWorker(
                 appContext: Context, workerClassName: String, workerParameters: WorkerParameters
             ): ListenableWorker? {
-                return UnsubscribeWorker(appContext, workerParameters, apiService)
+                return SubscribeWorker(appContext, workerParameters, apiService)
             }
         })
     }
@@ -58,7 +58,8 @@ class UnsubscribeWorkerTest {
 
     @Test
     fun testSuccessfulWorker() = runBlocking {
-        val inputData = UnsubscribeWorker.getInputData(Account("account", "type"), 42)
+        val inputData = SubscribeWorker.getInputData(Account("account", "type"),
+            "https://my.example.feed")
 
         val worker = workerBuilder.setInputData(inputData).build()
         val result = worker.startWork().get()
@@ -67,17 +68,19 @@ class UnsubscribeWorkerTest {
 
     @Test
     fun testFailingWorker() = runBlocking {
-        val inputData = UnsubscribeWorker.getInputData(Account("account", "type"), 42)
+        val inputData = SubscribeWorker.getInputData(Account("account", "type"),
+            "https://my.example.feed")
 
         val worker = workerBuilder.setInputData(inputData).build()
-        apiService.unsubscribeFromFeedResult = false
+        apiService.subscribeToFeedResult = ResultCode.INVALID_URL
         val result = worker.startWork().get()
         assertThat(result).isEqualTo(Result.failure())
     }
 
     @Test
     fun testThatApiCallsExceptionRetryWorker() = runBlocking {
-        val inputData = UnsubscribeWorker.getInputData(Account("account", "type"), 42)
+        val inputData = SubscribeWorker.getInputData(Account("account", "type"),
+            "https://my.example.feed")
 
         val worker = workerBuilder.setInputData(inputData).build()
         apiService.apiCallException = ApiCallException(ApiCallException.ApiError.API_INCORRECT_USAGE,  "error from api")
@@ -86,3 +89,4 @@ class UnsubscribeWorkerTest {
     }
 
 }
+
