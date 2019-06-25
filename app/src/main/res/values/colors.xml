@@ -45,13 +45,10 @@
     <color name="color_on_secondary">@android:color/white</color>
 
     <!-- Can be used as color_surface with a primary tint in dark mode-->
-    <color name="dark_color_primary_surface">#181a1b</color>
+    <color name="dark_color_primary_surface" tools:ignore="UnusedResources">#181a1b</color>
 
     <color name="unreadCounterColor">#909090</color>
-    <color name="headlineExcerptTextColor">#323232</color>
-    <color name="headlineSecondaryTextColor">#909090</color>
     <color name="articleHeaderSeparator">#cccccc</color>
-    <color name="accent">@color/material_green_a700</color>
     <color name="image_scrim">#ccffffff</color>
     <color name="article_text_color">?android:textColorTertiary</color>
 

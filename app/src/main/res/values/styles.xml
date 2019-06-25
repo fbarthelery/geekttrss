@@ -20,7 +20,8 @@
     along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
 
 -->
-<resources xmlns:android="http://schemas.android.com/apk/res/android">
+<resources xmlns:android="http://schemas.android.com/apk/res/android"
+           xmlns:tools="http://schemas.android.com/tools">
 
     <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <!-- use the material Blue Grey palette -->
@@ -147,6 +148,6 @@
     </style>
 
     <!-- defined in feature modules -->
-    <style name="AppTheme.ManageFeedsActivity" />
+    <style name="AppTheme.ManageFeedsActivity" tools:ignore="UnusedResources"/>
 
 </resources>

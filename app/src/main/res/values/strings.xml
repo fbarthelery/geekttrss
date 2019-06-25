@@ -48,9 +48,6 @@
 
     <string name="star_article">Add to favorites</string>
 
-    <!-- article detail activity -->
-    <string name="article_flavor_image_content_description">article image</string>
-
     <!-- Strings related to Settings -->
     <string name="activity_settings_title">Settings</string>
     <string name="pref_title_theme">Theme</string>
