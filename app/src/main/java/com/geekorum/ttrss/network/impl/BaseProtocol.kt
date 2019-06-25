@@ -150,13 +150,13 @@ data class ListContent<T>(
             }
         }
 
-        override fun serialize(output: Encoder, obj: ListContent<E>) {
+        override fun serialize(encoder: Encoder, obj: ListContent<E>) {
             TODO("not implemented")
         }
 
-        override fun deserialize(input: Decoder): ListContent<E> {
+        override fun deserialize(decoder: Decoder): ListContent<E> {
             // fallback to error parsing
-            return deserializeList(input) ?: deserializeBaseContent(input)
+            return deserializeList(decoder) ?: deserializeBaseContent(decoder)
         }
 
         private fun deserializeBaseContent(input: Decoder): ListContent<E> {
@@ -224,12 +224,12 @@ data class ListResponsePayload<T>(
             }
         }
 
-        override fun serialize(output: Encoder, obj: ListResponsePayload<E>) {
+        override fun serialize(encoder: Encoder, obj: ListResponsePayload<E>) {
             TODO("not implemented")
         }
 
-        override fun deserialize(input: Decoder): ListResponsePayload<E> {
-            val contentDecoder = input.beginStructure(descriptor)
+        override fun deserialize(decoder: Decoder): ListResponsePayload<E> {
+            val contentDecoder = decoder.beginStructure(descriptor)
             lateinit var listContent: ListContent<E>
             var seq: Int? = null
             var status = 0

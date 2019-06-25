@@ -138,12 +138,12 @@ data class UpdateArticleResponsePayload(
 
     @Serializer(UpdateArticleResponsePayload::class)
     class UpdateArticleResponsePayloadSerializer : KSerializer<UpdateArticleResponsePayload> {
-        override fun serialize(output: Encoder, obj: UpdateArticleResponsePayload) {
+        override fun serialize(encoder: Encoder, obj: UpdateArticleResponsePayload) {
             TODO("not implemented")
         }
 
-        override fun deserialize(input: Decoder): UpdateArticleResponsePayload {
-            val contentDecoder = input.beginStructure(descriptor)
+        override fun deserialize(decoder: Decoder): UpdateArticleResponsePayload {
+            val contentDecoder = decoder.beginStructure(descriptor)
             lateinit var content: Content
             var seq: Int? = null
             var status = 0

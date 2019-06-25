@@ -105,16 +105,14 @@ class ArticleListActivity : SessionActivity() {
 
         binding.lifecycleOwner = this
         binding.activityViewModel = activityViewModel
-        if (binding.headlinesDrawer != null) {
-            with(binding.startPaneLayout) {
-                // dispatch window inset up to the navigation view (FeedsListFragment)
-                setOnApplyWindowInsetsListener { _, insets ->
-                    var result = insets
-                    children.forEach {
-                        result = it.dispatchApplyWindowInsets(result)
-                    }
-                    result
+        with(binding.startPaneLayout) {
+            // dispatch window inset up to the navigation view (FeedsListFragment)
+            setOnApplyWindowInsetsListener { _, insets ->
+                var result = insets
+                children.forEach {
+                    result = it.dispatchApplyWindowInsets(result)
                 }
+                result
             }
         }
 
@@ -241,7 +239,7 @@ class ArticleListActivity : SessionActivity() {
 
     override fun onBackPressed() {
         if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout?.closeDrawers()
+            drawerLayout.closeDrawers()
         } else {
             super.onBackPressed()
         }
