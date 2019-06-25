@@ -87,9 +87,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 
             findPreference(KEY_THEME).apply {
                 summaryBinder.bindPreferenceSummaryToValue(this)
-                onPreferenceChangeListener = ThemePreferenceListener(
-                    requireActivity(),
-                    onPreferenceChangeListener)
+                onPreferenceChangeListener = ThemePreferenceListener(onPreferenceChangeListener)
             }
             displayVersion()
         }
@@ -106,7 +104,6 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
     }
 
     private class ThemePreferenceListener(
-        private val activity: Activity,
         private val wrapped: Preference.OnPreferenceChangeListener
     ) : Preference.OnPreferenceChangeListener {
 
@@ -116,7 +113,6 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
             if (newValue != oldValue) {
                 val nighMode = Integer.valueOf(newValue as String)
                 AppCompatDelegate.setDefaultNightMode(nighMode)
-                activity.recreate()
             }
             return result
         }
