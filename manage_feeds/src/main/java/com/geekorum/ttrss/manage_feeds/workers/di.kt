@@ -56,7 +56,7 @@ abstract class WorkersModule {
 @Subcomponent(modules = [ApiServiceModule::class] )
 interface WorkerComponent {
 
-    fun getUnsubscribeFromFeedService(): UnsubscribeFromFeedService
+    fun getManageFeedService(): ManageFeedService
 
     @Subcomponent.Builder
     interface Builder {
@@ -77,8 +77,8 @@ internal class ApiServiceModule {
 
     @Provides
     @PerAccount
-    fun providesUnsubscribeService(tokenRetriever: TokenRetriever, tinyrssApi: TinyRssApi) : UnsubscribeFromFeedService {
-        return RetrofitUnsubscribeFromFeedService(tokenRetriever, tinyrssApi)
+    fun providesManageFeedService(tokenRetriever: TokenRetriever, tinyrssApi: TinyRssApi) : ManageFeedService {
+        return RetrofitManageFeedService(tokenRetriever, tinyrssApi)
     }
 }
 

@@ -38,7 +38,7 @@ import javax.inject.Inject
 class UnsubscribeWorker(
     appContext: Context,
     private val params: WorkerParameters,
-    private val apiService: UnsubscribeFromFeedService
+    private val apiService: ManageFeedService
 ) : CoroutineWorker(
     appContext, params
 ) {
@@ -90,7 +90,7 @@ class UnsubscribeWorker(
             val apiService = manageFeedComponent.createWorkerComponent()
                 .setAccount(account)
                 .build()
-                .getUnsubscribeFromFeedService()
+                .getManageFeedService()
 
             return UnsubscribeWorker(appContext, workerParameters, apiService)
         }

@@ -36,7 +36,7 @@ import kotlinx.serialization.internal.makeNullable
  */
 @Keep
 @Serializable
-internal data class SubscribeToFeedRequestPayload(
+data class SubscribeToFeedRequestPayload(
     @SerialName("feed_url")
     private val feedUrl: String,
 
@@ -58,7 +58,7 @@ internal data class SubscribeToFeedRequestPayload(
 /**
  * Result code for the SubscribeToFeedResponsePayload
  */
-internal enum class SubscribeResultCode(val code: Int) {
+enum class SubscribeResultCode(val code: Int) {
     FEED_ALREADY_EXIST(0), FEED_ADDED(1), INVALID_URL(2),
     NO_FEED_IN_HTML_URL(3), MULTIPLE_FEEDS_IN_HTML_URL(4),
     ERROR_DOWNLOADING_URL(5), INVALID_CONTENT_URL(6);
@@ -74,7 +74,7 @@ internal enum class SubscribeResultCode(val code: Int) {
  * Response payload of subscribe to feed request
  */
 @Keep
-internal data class SubscribeToFeedResponsePayload(
+data class SubscribeToFeedResponsePayload(
     @SerialName("seq")
     override val sequence: Int? = null,
     override val status: Int = 0,
@@ -128,13 +128,13 @@ internal data class SubscribeToFeedResponsePayload(
 
 
     @Serializable
-    internal data class Content(
+    data class Content(
         val status: Status? = null,
         override var error: Error? = null
     ) : BaseContent() {
 
         @Serializable
-        internal data class Status(
+        data class Status(
             @SerialName("code")
             val resultCode: Int = 0,
 

@@ -29,7 +29,6 @@ import androidx.work.ListenableWorker.Result
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import androidx.work.testing.TestListenableWorkerBuilder
-import com.geekorum.ttrss.add_feed.AddFeedWorker
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
@@ -38,7 +37,7 @@ import kotlin.test.BeforeTest
 
 @RunWith(AndroidJUnit4::class)
 class UnsubscribeWorkerTest {
-    lateinit var workerBuilder: TestListenableWorkerBuilder<AddFeedWorker>
+    lateinit var workerBuilder: TestListenableWorkerBuilder<UnsubscribeWorker>
     private lateinit var apiService: MockApiService
 
     @BeforeTest
@@ -77,7 +76,7 @@ class UnsubscribeWorkerTest {
 }
 
 
-private class MockApiService : UnsubscribeFromFeedService {
+private class MockApiService : ManageFeedService {
     var unsubscribeFromFeedResult = true
 
     override suspend fun unsubscribeFromFeed(feedId: Long): Boolean {
