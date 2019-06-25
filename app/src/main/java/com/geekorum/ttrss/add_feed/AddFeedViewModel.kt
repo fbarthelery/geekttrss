@@ -89,11 +89,15 @@ class AddFeedViewModel @Inject constructor(
         accounts.removeObserver(accountObserver)
     }
 
-    fun init(documentUrl: HttpUrl) = viewModelScope.launch {
-        initWithUrl(documentUrl)
+    fun init(documentUrl: HttpUrl?) = viewModelScope.launch {
+        if (documentUrl != null) {
+            initWithUrl(documentUrl)
+        } else {
+            feedsInformation.value = emptyList()
+        }
     }
 
-    @VisibleForTesting()
+    @VisibleForTesting
     internal suspend fun initWithUrl(documentUrl: HttpUrl) {
         try {
             val document = getHtmlDocument(documentUrl)

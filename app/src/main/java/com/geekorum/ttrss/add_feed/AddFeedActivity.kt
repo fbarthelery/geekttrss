@@ -76,9 +76,7 @@ class AddFeedActivity : BottomSheetDialogActivity(), CoroutineScope {
         val urlString = intent.data?.toString() ?: intent.extras?.getString(Intent.EXTRA_TEXT) ?: ""
 
         val url = HttpUrl.parse(urlString)
-        url?.let {
-            viewModel.init(url)
-        }
+        viewModel.init(url)
 
         val binding = ActivityAddFeedBinding.inflate(layoutInflater, null, false)
         binding.viewModel = viewModel
