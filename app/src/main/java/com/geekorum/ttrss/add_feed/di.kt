@@ -54,6 +54,9 @@ abstract class AndroidInjectorsModule {
     @ContributesAndroidInjector(modules = [ViewModelsModule::class])
     abstract fun contributeAddFeedActivityInjector(): AddFeedActivity
 
+    @ContributesAndroidInjector(modules = [ViewModelsModule::class])
+    abstract fun contributeAddFeedLauncherActivityInjector(): AddFeedLauncherActivity
+
     @Binds
     @IntoMap
     @WorkerKey(AddFeedWorker::class)

@@ -86,7 +86,11 @@
         <activity android:name=".add_feed.AddFeedActivity"
                   android:label="@string/activity_add_feed_title"
                   android:theme="@style/AppTheme.AddFeedActivity"
-                  android:noHistory="true">
+                  android:noHistory="true"/>
+
+        <activity android:name=".add_feed.AddFeedLauncherActivity"
+                  android:label="@string/activity_add_feed_title"
+                  android:theme="@style/AppTheme.LauncherActivity">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
