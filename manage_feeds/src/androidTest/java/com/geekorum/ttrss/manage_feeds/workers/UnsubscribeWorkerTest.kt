@@ -29,6 +29,7 @@ import androidx.work.ListenableWorker.Result
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import androidx.work.testing.TestListenableWorkerBuilder
+import com.geekorum.ttrss.network.ApiCallException
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
@@ -73,14 +74,40 @@ class UnsubscribeWorkerTest {
         val result = worker.startWork().get()
         assertThat(result).isEqualTo(Result.failure())
     }
+
+    @Test
+    fun testThatApiCallsExceptionRetryWorker() = runBlocking {
+        val inputData = UnsubscribeWorker.getInputData(Account("account", "type"), 42)
+
+        val worker = workerBuilder.setInputData(inputData).build()
+        apiService.apiCallException = ApiCallException(ApiCallException.ApiError.API_INCORRECT_USAGE,  "error from api")
+        val result = worker.startWork().get()
+        assertThat(result).isEqualTo(Result.retry())
+    }
+
 }
 
 
 private class MockApiService : ManageFeedService {
     var unsubscribeFromFeedResult = true
+    var subscribeFromFeedResult = ResultCode.SUCCESS
+
+    var apiCallException: ApiCallException? = null
 
     override suspend fun unsubscribeFromFeed(feedId: Long): Boolean {
+        apiCallException?.let {
+            throw it
+        }
         return unsubscribeFromFeedResult
+    }
+
+    override suspend fun subscribeToFeed(
+        feedUrl: String, categoryId: Long, feedLogin: String, feedPassword: String
+    ): ResultCode {
+        apiCallException?.let {
+            throw it
+        }
+        return subscribeFromFeedResult
     }
 
 }

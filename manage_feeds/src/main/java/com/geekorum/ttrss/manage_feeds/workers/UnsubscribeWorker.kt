@@ -30,6 +30,7 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.geekorum.ttrss.Application
 import com.geekorum.ttrss.manage_feeds.DaggerManageFeedComponent
+import com.geekorum.ttrss.network.ApiCallException
 import javax.inject.Inject
 
 /**
@@ -47,12 +48,16 @@ class UnsubscribeWorker(
         if (feedId == -1L) {
             return Result.failure()
         }
-        val success = apiService.unsubscribeFromFeed(feedId)
-        // TODO check when we can retry or not
-        return if (success) {
-            Result.success()
-        } else {
-            Result.failure()
+        return try {
+            val success = apiService.unsubscribeFromFeed(feedId)
+            if (success) {
+                Result.success()
+            } else {
+                Result.failure()
+            }
+        } catch (e: ApiCallException) {
+            // TODO check when we can retry or not
+            Result.retry()
         }
     }
 
