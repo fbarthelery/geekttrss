@@ -18,10 +18,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.geekorum.ttrss.html
+package com.geekorum.ttrss.htmlparsers
 
 import com.google.common.truth.Truth.assertThat
-import okhttp3.HttpUrl
 import org.jsoup.Jsoup
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -38,7 +37,7 @@ private val htmlDocWithOneRssFeed = """
     """.trimIndent()
 
 private val rssAdvisoryBoardFeedInfo = FeedInformation(
-    href = HttpUrl.parse("http://feeds.rssboard.org/rssboard")!!,
+    href = "http://feeds.rssboard.org/rssboard",
     type = "application/rss+xml", title = "RSS Advisory Board")
 
 private val htmlDocWithOneRelativeRssFeed = """
@@ -52,7 +51,7 @@ private val htmlDocWithOneRelativeRssFeed = """
     """.trimIndent()
 
 private val rssAdvisoryBoardFeedInfoNoTitle = FeedInformation(
-    href = HttpUrl.parse("http://feeds.rssboard.org/rssboard")!!,
+    href = "http://feeds.rssboard.org/rssboard",
     type = "application/rss+xml")
 
 
@@ -68,7 +67,7 @@ private val htmlDocWithOneAtomFeed = """
 
 private val githubRecentCommitsFeedInfo =
     FeedInformation(
-        href = HttpUrl.parse("https://github.com/codepath/android_guides/commits/master.atom")!!,
+        href = "https://github.com/codepath/android_guides/commits/master.atom",
         type = "application/atom+xml", title = "Recent Commits to android_guides:master")
 
 private val htmlDocWithCombinedFeeds = """

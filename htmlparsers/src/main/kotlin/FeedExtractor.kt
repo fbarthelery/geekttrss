@@ -18,9 +18,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.geekorum.ttrss.html
 
-import okhttp3.HttpUrl
+package com.geekorum.ttrss.htmlparsers
+
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import javax.inject.Inject
@@ -37,9 +37,9 @@ class FeedExtractor @Inject constructor() : HtmlExtractor<FeedInformation>() {
             return head.getElementsByTag("link")
                 .filter { isValidLinkFeed(it) }
                 .map {
-                    FeedInformation(href = HttpUrl.parse(it.attr("abs:href"))!!,
-                                    type = it.attr("type"),
-                                    title = it.attr("title"))
+                    FeedInformation(href = it.attr("abs:href")!!,
+                        type = it.attr("type"),
+                        title = it.attr("title"))
                 }
         }
         return emptyList()
@@ -50,7 +50,7 @@ class FeedExtractor @Inject constructor() : HtmlExtractor<FeedInformation>() {
         val url = elem.attr("abs:href")
         return elem.attr("rel") == "alternate"
                 && type in VALID_FEED_MIMETYPE
-                && HttpUrl.parse(url) != null
+                && url.isNotBlank()
     }
 }
 
@@ -58,6 +58,6 @@ class FeedExtractor @Inject constructor() : HtmlExtractor<FeedInformation>() {
  * Information about a Feed.
  */
 data class FeedInformation(
-    val href: HttpUrl,
+    val href: String,
     val type: String = "",
     val title: String = "")

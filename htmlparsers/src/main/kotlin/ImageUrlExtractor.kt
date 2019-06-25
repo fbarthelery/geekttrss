@@ -18,22 +18,22 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.geekorum.ttrss.html
 
-import okhttp3.HttpUrl
+package com.geekorum.ttrss.htmlparsers
+
 import org.jsoup.nodes.Document
 import javax.inject.Inject
 
 /**
  * Allows to extract urls of images from an Html Document.
  */
-class ImageUrlExtractor @Inject constructor() : HtmlExtractor<HttpUrl>() {
+class ImageUrlExtractor @Inject constructor() : HtmlExtractor<String>() {
 
-    override fun extract(document: Document): Collection<HttpUrl> {
+    override fun extract(document: Document): Collection<String> {
         val imgs = document.select("img")
         return imgs.asSequence()
             .mapNotNull {
-                HttpUrl.parse(it.attr("abs:src") ?: "")
+                it.attr("abs:src")
             }
             .toSet()
     }

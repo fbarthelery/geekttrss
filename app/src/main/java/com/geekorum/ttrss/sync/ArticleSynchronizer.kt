@@ -28,7 +28,7 @@ import android.security.NetworkSecurityPolicy
 import com.geekorum.geekdroid.accounts.CancellableSyncAdapter
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.Category
-import com.geekorum.ttrss.html.ImageUrlExtractor
+import com.geekorum.ttrss.htmlparsers.ImageUrlExtractor
 import com.geekorum.ttrss.network.ApiCallException
 import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.providers.ArticlesContract
@@ -230,7 +230,7 @@ class ArticleSynchronizer @AssistedInject constructor(
             .forEach {
                 launch {
                     try {
-                        cacheHttpRequest(it)
+                        cacheHttpRequest(HttpUrl.parse(it))
                     } catch (e: IOException) {
                         Timber.w(e,"Unable to cache request $it")
                     }
@@ -239,9 +239,12 @@ class ArticleSynchronizer @AssistedInject constructor(
     }
 
     @Throws(IOException::class)
-    private fun cacheHttpRequest(it: HttpUrl) {
-        if (it.canBeCache()) {
-            httpCacher.cacheHttpRequest(it)
+    private fun cacheHttpRequest(url: HttpUrl?) {
+        if (url == null) {
+            return
+        }
+        if (url.canBeCache()) {
+            httpCacher.cacheHttpRequest(url)
         }
     }
 

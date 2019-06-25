@@ -31,10 +31,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.geekorum.geekdroid.accounts.AccountsLiveData
 import com.geekorum.geekdroid.app.lifecycle.EmptyEvent
-import com.geekorum.ttrss.background_job.BackgroundJobManager
 import com.geekorum.ttrss.accounts.AccountAuthenticator
-import com.geekorum.ttrss.html.FeedExtractor
-import com.geekorum.ttrss.html.FeedInformation
+import com.geekorum.ttrss.background_job.BackgroundJobManager
+import com.geekorum.ttrss.htmlparsers.FeedExtractor
+import com.geekorum.ttrss.htmlparsers.FeedInformation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

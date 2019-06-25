@@ -36,7 +36,7 @@ import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.databinding.ActivityAddFeedBinding
-import com.geekorum.ttrss.html.FeedInformation
+import com.geekorum.ttrss.htmlparsers.FeedInformation
 import dagger.android.AndroidInjection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

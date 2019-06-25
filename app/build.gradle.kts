@@ -141,6 +141,7 @@ dependencies {
     create(group = "com.geekorum", name = "geekdroid-firebase", version = "0.0.1", ext = geekdroidExt).also {
         add("googleImplementation", it)
     }
+    implementation(project(":htmlparsers"))
 
     implementation("com.google.android.material:material:1.1.0-alpha07")
     implementation("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")

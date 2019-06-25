@@ -18,16 +18,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.geekorum.ttrss.html
+plugins {
+    kotlin("jvm")
+    id("com.geekorum.build.source-license-checker")
+}
 
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
+dependencies {
+    val kotlinVersion: String by rootProject.extra
+    implementation(kotlin("stdlib-jdk8"))
+    implementation(enforcedPlatform(kotlin("bom", kotlinVersion)))
 
-/**
- * Extract some data T from an HtmlDocument
- */
-abstract class HtmlExtractor<out T> {
-    abstract fun extract(document: Document) : Collection<T>
+    implementation("javax.inject:javax.inject:1")
+    api("org.jsoup:jsoup:1.10.2")
 
-    fun extract(html: String) = extract(Jsoup.parse(html))
+    testImplementation("com.google.truth:truth:0.45")
+    testImplementation(kotlin("test-junit", kotlinVersion))
 }
