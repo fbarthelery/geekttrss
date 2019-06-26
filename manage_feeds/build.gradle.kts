@@ -1,4 +1,5 @@
 import com.geekorum.build.configureJavaVersion
+import com.geekorum.build.dualTestImplementation
 import com.geekorum.build.enforcedDaggerPlatform
 
 plugins {
@@ -78,9 +79,10 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-livedata-core-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
 
+    implementation(project(":htmlparsers"))
     implementation(project(":webapi"))
 
     androidTestImplementation("androidx.work:work-testing:2.1.0-beta02")
-    androidTestImplementation("androidx.arch.core:core-testing:2.0.1")
+    dualTestImplementation("androidx.arch.core:core-testing:2.0.1")
 
 }
