@@ -20,7 +20,8 @@
  */
 package com.geekorum.ttrss.manage_feeds.workers
 
-import com.geekorum.ttrss.network.ApiCallException
+import com.geekorum.ttrss.webapi.ApiCallException
+
 
 internal class MockManageFeedService : ManageFeedService {
     var unsubscribeFromFeedResult = true

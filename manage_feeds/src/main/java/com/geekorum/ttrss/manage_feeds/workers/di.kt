@@ -24,12 +24,12 @@ import android.accounts.Account
 import androidx.work.WorkerFactory
 import com.geekorum.geekdroid.dagger.DaggerDelegateWorkersFactory
 import com.geekorum.geekdroid.dagger.WorkerKey
-import com.geekorum.geekdroid.network.TokenRetriever
 import com.geekorum.ttrss.accounts.AndroidTinyrssAccountManagerModule
 import com.geekorum.ttrss.accounts.NetworkLoginModule
 import com.geekorum.ttrss.accounts.PerAccount
 import com.geekorum.ttrss.network.TinyrssApiModule
-import com.geekorum.ttrss.network.impl.TinyRssApi
+import com.geekorum.ttrss.webapi.TinyRssApi
+import com.geekorum.ttrss.webapi.TokenRetriever
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Module

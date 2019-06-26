@@ -20,14 +20,14 @@
  */
 package com.geekorum.ttrss.manage_feeds.workers
 
-import com.geekorum.geekdroid.network.TokenRetriever
-import com.geekorum.ttrss.network.ApiCallException
-import com.geekorum.ttrss.network.RetrofitServiceHelper
-import com.geekorum.ttrss.network.impl.SubscribeResultCode
-import com.geekorum.ttrss.network.impl.SubscribeToFeedRequestPayload
-import com.geekorum.ttrss.network.impl.TinyRssApi
-import com.geekorum.ttrss.network.impl.UnsubscribeFeedRequestPayload
-import com.geekorum.ttrss.network.impl.UnsubscribeFeedResponsePayload.Content.Status.OK
+import com.geekorum.ttrss.webapi.ApiCallException
+import com.geekorum.ttrss.webapi.RetrofitServiceHelper
+import com.geekorum.ttrss.webapi.TinyRssApi
+import com.geekorum.ttrss.webapi.TokenRetriever
+import com.geekorum.ttrss.webapi.model.SubscribeResultCode
+import com.geekorum.ttrss.webapi.model.SubscribeToFeedRequestPayload
+import com.geekorum.ttrss.webapi.model.UnsubscribeFeedRequestPayload
+import com.geekorum.ttrss.webapi.model.UnsubscribeFeedResponsePayload.Content.Status.OK
 import timber.log.Timber
 
 /**

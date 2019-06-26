@@ -27,7 +27,7 @@ import androidx.work.Data
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.geekorum.ttrss.network.ApiCallException
+import com.geekorum.ttrss.webapi.ApiCallException
 import timber.log.Timber
 import javax.inject.Inject
 

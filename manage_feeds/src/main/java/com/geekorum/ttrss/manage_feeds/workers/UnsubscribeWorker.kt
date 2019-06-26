@@ -25,12 +25,9 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.ListenableWorker
-import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.geekorum.ttrss.Application
-import com.geekorum.ttrss.manage_feeds.DaggerManageFeedComponent
-import com.geekorum.ttrss.network.ApiCallException
+import com.geekorum.ttrss.webapi.ApiCallException
 import javax.inject.Inject
 
 /**

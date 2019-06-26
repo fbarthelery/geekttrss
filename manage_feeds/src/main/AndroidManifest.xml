@@ -36,7 +36,6 @@
     <application>
         <activity android:name="com.geekorum.ttrss.manage_feeds.ManageFeedsActivity"
                   android:theme="@style/AppTheme.ManageFeedsActivity" />
-        <activity android:name=".TestActivity" />
     </application>
 </manifest>
 
