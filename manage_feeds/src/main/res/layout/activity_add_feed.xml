@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+
+    Geekttrss is a RSS feed reader application on the Android Platform.
+
+    Copyright (C) 2017-2019 by Frederic-Charles Barthelery.
+
+    This file is part of Geekttrss.
+
+    Geekttrss is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Geekttrss is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        >
+
+    <data>
+        <import type="android.view.View" />
+        <variable name="viewModel" type="com.geekorum.ttrss.manage_feeds.add_feed.AddFeedViewModel" />
+    </data>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        <TextView android:id="@+id/title"
+                  android:layout_width="match_parent"
+                  android:layout_height="96dp"
+                  android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+                  android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+                  app:layout_constraintStart_toStartOf="parent"
+                  app:layout_constraintEnd_toEndOf="parent"
+                  app:layout_constraintTop_toTopOf="parent"
+                  android:layout_marginBottom="16dp"
+                  android:gravity="center_vertical"
+                  android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+                  android:textColor="?android:textColorPrimary"
+                  android:textSize="28sp"
+                  android:text="@string/activity_add_feed_title"
+                  android:background="@color/primary"
+                  android:theme="@style/ThemeOverlay.AppCompat.Dark"
+                />
+
+
+        <Spinner android:id="@+id/available_feeds"
+                 android:layout_width="match_parent"
+                 android:layout_height="?attr/listPreferredItemHeightSmall"
+                 app:layout_constraintStart_toStartOf="parent"
+                 app:layout_constraintEnd_toEndOf="parent"
+                 app:layout_constraintTop_toBottomOf="@+id/title"
+                 android:paddingStart="8dp"
+                 android:paddingEnd="8dp"
+                 android:visibility="@{viewModel.availableFeeds.size() &gt; 1 ? View.VISIBLE : View.INVISIBLE }"
+                 android:onItemSelected="@{(spinner, view, position, id) -> viewModel.setSelectedFeed(spinner.getItemAtPosition(position))}"
+                />
+
+
+        <androidx.core.widget.ContentLoadingProgressBar
+                android:id="@+id/loading_progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="?android:listPreferredItemPaddingStart"
+                android:layout_marginEnd="?android:listPreferredItemPaddingStart"
+                android:layout_marginHorizontal="?android:listPreferredItemPaddingStart"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/available_feeds_single"
+                app:layout_constraintBottom_toBottomOf="@+id/available_feeds_single"
+                style="?android:progressBarStyleSmall"
+                tools:ignore="UnusedAttribute" />
+
+
+        <TextView android:id="@+id/available_feeds_single"
+                 android:layout_width="0dp"
+                 android:layout_height="?attr/listPreferredItemHeightSmall"
+                 app:layout_constraintStart_toEndOf="@+id/loading_progress"
+                 app:layout_constraintEnd_toEndOf="parent"
+                 app:layout_constraintTop_toBottomOf="@+id/title"
+                 android:paddingStart="?android:listPreferredItemPaddingStart"
+                 android:paddingEnd="?android:listPreferredItemPaddingStart"
+                 android:textAppearance="?android:attr/textAppearanceLargePopupMenu"
+                 android:gravity="center_vertical"
+                 android:visibility="@{viewModel.availableFeeds.size() &gt; 1 ? View.INVISIBLE : View.VISIBLE }"
+                 android:text="@string/activity_add_feed_looking_for_feed"
+                />
+
+
+
+        <androidx.constraintlayout.widget.Group
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                app:constraint_referenced_ids="accounts_panel,accounts_label,available_accounts"
+                android:visibility="@{viewModel.accounts.length &gt; 1 ? View.VISIBLE : View.GONE }"
+                />
+
+
+        <!-- Background of the accounts panel -->
+        <View android:id="@+id/accounts_panel"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/available_feeds"
+                app:layout_constraintBottom_toTopOf="@id/button_bar"
+                android:layout_marginTop="?listPreferredItemHeightSmall"
+                android:background="@color/background_add_feed_accounts_panel"/>
+
+        <TextView android:id="@+id/accounts_label"
+                  android:layout_width="match_parent"
+                  android:layout_height="24dp"
+                  android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+                  android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
+                  app:layout_constraintStart_toStartOf="parent"
+                  app:layout_constraintEnd_toEndOf="parent"
+                  app:layout_constraintTop_toTopOf="@id/accounts_panel"
+                  android:gravity="center_vertical"
+                  android:textAppearance="?textAppearanceCaption"
+                  android:textColor="?android:textColorPrimary"
+                  android:text="@string/activity_add_feed_account_subtitle"
+                />
+
+        <Spinner android:id="@+id/available_accounts"
+                 android:layout_width="match_parent"
+                 android:layout_height="?attr/listPreferredItemHeightSmall"
+                 app:layout_constraintStart_toStartOf="parent"
+                 app:layout_constraintEnd_toEndOf="parent"
+                 app:layout_constraintTop_toBottomOf="@+id/accounts_label"
+                 android:paddingEnd="8dp"
+                 android:paddingStart="8dp"
+                 android:onItemSelected="@{(spinner, view, position, id) -> viewModel.setSelectedAccount(spinner.getItemAtPosition(position))}"
+                 android:theme="@style/ThemeOverlay.AppTheme.AddFeedActivity.AccountsPanel"
+        />
+
+        <LinearLayout
+                android:id="@+id/button_bar"
+                style="?attr/buttonBarStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/available_accounts"
+                android:gravity="end|center_vertical"
+                android:orientation="horizontal"
+                android:measureWithLargestChild="true"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:elevation="8dp">
+
+            <Button
+                    android:id="@+id/cancel"
+                    android:layout_width="wrap_content"
+                    android:layout_gravity="start"
+                    android:maxLines="2"
+                    style="?attr/buttonBarNegativeButtonStyle"
+                    android:minHeight="48dp"
+                    android:layout_height="wrap_content"
+                    android:text="@android:string/cancel"
+                    android:onClick="@{() -> viewModel.cancel()}"
+                    />
+
+            <Button
+                    android:id="@+id/subscribe"
+                    android:layout_width="wrap_content"
+                    android:layout_gravity="end"
+                    android:maxLines="2"
+                    android:minHeight="48dp"
+                    style="?attr/buttonBarPositiveButtonStyle"
+                    android:layout_height="wrap_content"
+                    android:text="@string/activity_add_feed_btn_subscribe"
+                    android:onClick="@{() -> viewModel.subscribeToFeed()}"
+                    android:enabled="@{viewModel.canSubscribe}"
+                    />
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</layout>

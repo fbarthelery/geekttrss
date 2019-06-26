@@ -67,6 +67,8 @@ dependencies {
     val geekdroidExt = GEEKDROID_PROJECT_DIR?.let { "" } ?: "aar"
     implementation(group = "com.geekorum", name = "geekdroid", version = "0.0.1", ext = geekdroidExt)
 
+    implementation("androidx.activity:activity-ktx:1.0.0-beta01")
+
     // androidx UI
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")
     implementation("androidx.recyclerview:recyclerview:1.0.0")
@@ -78,6 +80,7 @@ dependencies {
     val lifecycleVersion: String by rootProject.extra
     implementation("androidx.lifecycle:lifecycle-livedata-core-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
 
     implementation(project(":htmlparsers"))
     implementation(project(":webapi"))
