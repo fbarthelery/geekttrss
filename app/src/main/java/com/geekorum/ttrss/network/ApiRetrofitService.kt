@@ -22,18 +22,23 @@ package com.geekorum.ttrss.network
 
 import com.geekorum.geekdroid.network.TokenRetriever
 import com.geekorum.ttrss.data.Article
+import com.geekorum.ttrss.data.ArticleContentIndexed
 import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
-import com.geekorum.ttrss.network.impl.GetArticlesRequestPayload
-import com.geekorum.ttrss.network.impl.GetArticlesRequestPayload.SortOrder
-import com.geekorum.ttrss.network.impl.GetArticlesRequestPayload.SortOrder.DATE_REVERSE
-import com.geekorum.ttrss.network.impl.GetArticlesRequestPayload.SortOrder.FEED_DATES
-import com.geekorum.ttrss.network.impl.GetCategoriesRequestPayload
-import com.geekorum.ttrss.network.impl.GetFeedsRequestPayload
-import com.geekorum.ttrss.network.impl.ResponsePayload
-import com.geekorum.ttrss.network.impl.TinyRssApi
-import com.geekorum.ttrss.network.impl.UpdateArticleRequestPayload
 import com.geekorum.ttrss.providers.ArticlesContract
+import com.geekorum.ttrss.webapi.ApiCallException
+import com.geekorum.ttrss.webapi.TinyRssApi
+import com.geekorum.ttrss.webapi.checkStatus
+import com.geekorum.ttrss.webapi.model.FeedCategory
+import com.geekorum.ttrss.webapi.model.GetArticlesRequestPayload
+import com.geekorum.ttrss.webapi.model.GetArticlesRequestPayload.SortOrder.DATE_REVERSE
+import com.geekorum.ttrss.webapi.model.GetArticlesRequestPayload.SortOrder
+import com.geekorum.ttrss.webapi.model.GetArticlesRequestPayload.SortOrder.FEED_DATES
+import com.geekorum.ttrss.webapi.model.GetCategoriesRequestPayload
+import com.geekorum.ttrss.webapi.model.GetFeedsRequestPayload
+import com.geekorum.ttrss.webapi.model.Headline
+import com.geekorum.ttrss.webapi.model.ResponsePayload
+import com.geekorum.ttrss.webapi.model.UpdateArticleRequestPayload
 import kotlinx.coroutines.Deferred
 import retrofit2.HttpException
 import java.io.IOException
@@ -157,4 +162,46 @@ class ApiRetrofitService(
         private const val OFFLINE_SYNC_SEQ = 50
     }
 
+}
+
+private fun Headline.toDataType(): Article {
+    return Article(
+        id = id,
+        contentData = ArticleContentIndexed(
+            title = title,
+            content = content,
+            author = author,
+            tags = tags.joinToString(", ")),
+        isUnread = unread,
+        isTransientUnread = unread,
+        isStarred = marked,
+        isPublished = published,
+        score = score,
+        lastTimeUpdate = lastUpdatedTimestamp,
+        isUpdated = isUpdated,
+        link = link,
+        feedId = feedId ?: 0,
+        contentExcerpt = excerpt
+    )
+}
+
+private fun FeedCategory.toDataType(): Category {
+    return Category().apply {
+        this.id = this@toDataType.id
+        this.title = this@toDataType.title
+        this.unreadCount = nbUnreadArticles
+    }
+}
+
+private fun com.geekorum.ttrss.webapi.model.Feed.toDataType(): Feed {
+    return Feed(
+        id = id,
+        title = title,
+        displayTitle = displayTitle,
+        url = url,
+        unreadCount = nbUnreadArticles,
+        catId = categoryId,
+        lastTimeUpdate = lastUpdatedTimestamp,
+        isSubscribed = true
+    )
 }

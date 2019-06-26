@@ -22,7 +22,7 @@ package com.geekorum.ttrss.network
 
 import com.geekorum.ttrss.accounts.ServerInformation
 import com.geekorum.ttrss.network.TinyrssApiModule
-import com.geekorum.ttrss.network.impl.LoginRequestPayload
+import com.geekorum.ttrss.webapi.model.LoginRequestPayload
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient

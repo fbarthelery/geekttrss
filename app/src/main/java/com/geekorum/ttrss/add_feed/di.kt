@@ -26,11 +26,11 @@ import androidx.work.WorkerFactory
 import com.geekorum.geekdroid.dagger.ViewModelKey
 import com.geekorum.geekdroid.dagger.WorkerInjectionModule
 import com.geekorum.geekdroid.dagger.WorkerKey
-import com.geekorum.geekdroid.network.TokenRetriever
 import com.geekorum.ttrss.accounts.NetworkLoginModule
 import com.geekorum.ttrss.accounts.PerAccount
 import com.geekorum.ttrss.network.TinyrssApiModule
-import com.geekorum.ttrss.network.impl.TinyRssApi
+import com.geekorum.ttrss.webapi.TinyRssApi
+import com.geekorum.ttrss.webapi.TokenRetriever
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Module

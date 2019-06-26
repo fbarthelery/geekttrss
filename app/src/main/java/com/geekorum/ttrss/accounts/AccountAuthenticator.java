@@ -31,11 +31,11 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import com.geekorum.ttrss.BuildConfig;
 import com.geekorum.ttrss.R;
-import com.geekorum.ttrss.network.ApiCallException;
-import com.geekorum.ttrss.network.ApiCallExceptionKt;
-import com.geekorum.ttrss.network.impl.LoginRequestPayload;
-import com.geekorum.ttrss.network.impl.LoginResponsePayload;
-import com.geekorum.ttrss.network.impl.TinyRssApi;
+import com.geekorum.ttrss.webapi.ApiCallException;
+import com.geekorum.ttrss.webapi.ApiCallExceptionKt;
+import com.geekorum.ttrss.webapi.TinyRssApi;
+import com.geekorum.ttrss.webapi.model.LoginRequestPayload;
+import com.geekorum.ttrss.webapi.model.LoginResponsePayload;
 import kotlinx.coroutines.future.FutureKt;
 import timber.log.Timber;
 

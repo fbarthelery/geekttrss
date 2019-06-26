@@ -20,12 +20,12 @@
  */
 package com.geekorum.ttrss.add_feed
 
-import com.geekorum.geekdroid.network.TokenRetriever
-import com.geekorum.ttrss.network.ApiCallException
-import com.geekorum.ttrss.network.RetrofitServiceHelper
-import com.geekorum.ttrss.network.impl.SubscribeResultCode
-import com.geekorum.ttrss.network.impl.SubscribeToFeedRequestPayload
-import com.geekorum.ttrss.network.impl.TinyRssApi
+import com.geekorum.ttrss.webapi.ApiCallException
+import com.geekorum.ttrss.webapi.RetrofitServiceHelper
+import com.geekorum.ttrss.webapi.TinyRssApi
+import com.geekorum.ttrss.webapi.TokenRetriever
+import com.geekorum.ttrss.webapi.model.SubscribeResultCode
+import com.geekorum.ttrss.webapi.model.SubscribeToFeedRequestPayload
 
 /**
  * ApiService to subscribe to a feed

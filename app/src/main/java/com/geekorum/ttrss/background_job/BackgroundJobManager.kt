@@ -37,17 +37,10 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import androidx.work.WorkerFactory
-import com.geekorum.geekdroid.dagger.AppInitializer
-import com.geekorum.geekdroid.dagger.AppInitializersModule
-import com.geekorum.geekdroid.dagger.DaggerDelegateWorkersFactory
 import com.geekorum.ttrss.add_feed.AddFeedWorker
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.providers.PurgeArticlesWorker
 import com.geekorum.ttrss.sync.SyncContract
-import dagger.Binds
-import dagger.Module
-import dagger.multibindings.IntoSet
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject

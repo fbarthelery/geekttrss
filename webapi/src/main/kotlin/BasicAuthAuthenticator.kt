@@ -30,7 +30,7 @@ import okhttp3.Route
  * A basic HTTP Authenticator
  */
 class BasicAuthAuthenticator(
-    private val usermame: String = "",
+    private val username: String = "",
     private val password: String = ""
 ): Authenticator {
     override fun authenticate(route: Route?, response: Response): Request? {
@@ -39,7 +39,7 @@ class BasicAuthAuthenticator(
         }
 
         val credentials = Credentials.basic(
-            usermame,
+            username,
             password)
         return response.request().newBuilder()
             .header("Authorization", credentials)

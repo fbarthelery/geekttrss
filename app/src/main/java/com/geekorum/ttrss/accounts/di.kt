@@ -29,8 +29,8 @@ import com.geekorum.geekdroid.dagger.ViewModelKey
 import com.geekorum.geekdroid.network.TokenRetriever
 import com.geekorum.geekdroid.security.SecretEncryption
 import com.geekorum.ttrss.network.TinyrssApiModule
-import com.geekorum.ttrss.network.impl.LoggedRequestInterceptorFactory
-import com.geekorum.ttrss.network.impl.TinyRssApi
+import com.geekorum.ttrss.webapi.LoggedRequestInterceptorFactory
+import com.geekorum.ttrss.webapi.TinyRssApi
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -39,6 +39,7 @@ import dagger.android.ContributesAndroidInjector
 import dagger.multibindings.IntoMap
 import javax.inject.Scope
 import kotlin.annotation.AnnotationRetention.RUNTIME
+import com.geekorum.ttrss.webapi.TokenRetriever as WebapiTokenRetriever
 
 /**
  * Dependency injection pieces for the account authenticator functionality.
@@ -100,7 +101,26 @@ class NetworkLoginModule {
 
     @Provides
     @PerAccount
-    fun providesLoggedRequestInterceptorFactory(tokenRetriever: TokenRetriever): LoggedRequestInterceptorFactory {
+    fun providesWebApiTokenRetriever(tokenRetriever: TokenRetriever ): WebapiTokenRetriever {
+        return object : WebapiTokenRetriever {
+            override fun getToken(): String {
+                return try {
+                    tokenRetriever.token
+                } catch (e: TokenRetriever.RetrieverException) {
+                    throw WebapiTokenRetriever.RetrieverException(e.message, e)
+                }
+            }
+
+            override fun invalidateToken() {
+                tokenRetriever.invalidateToken()
+            }
+        }
+    }
+
+
+    @Provides
+    @PerAccount
+    fun providesLoggedRequestInterceptorFactory(tokenRetriever: WebapiTokenRetriever): LoggedRequestInterceptorFactory {
         return LoggedRequestInterceptorFactory(tokenRetriever)
     }
 

@@ -31,9 +31,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.geekorum.geekdroid.app.lifecycle.Event
 import com.geekorum.ttrss.R
-import com.geekorum.ttrss.network.ApiCallException
-import com.geekorum.ttrss.network.checkStatus
-import com.geekorum.ttrss.network.impl.LoginRequestPayload
+import com.geekorum.ttrss.webapi.ApiCallException
+import com.geekorum.ttrss.webapi.checkStatus
+import com.geekorum.ttrss.webapi.model.LoginRequestPayload
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

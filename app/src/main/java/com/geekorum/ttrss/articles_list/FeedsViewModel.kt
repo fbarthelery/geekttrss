@@ -27,8 +27,8 @@ import androidx.lifecycle.liveData
 import androidx.lifecycle.switchMap
 import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
-import com.geekorum.ttrss.network.ApiCallException
 import com.geekorum.ttrss.network.ApiService
+import com.geekorum.ttrss.webapi.ApiCallException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import timber.log.Timber

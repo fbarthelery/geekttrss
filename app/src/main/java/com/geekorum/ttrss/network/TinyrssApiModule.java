@@ -22,8 +22,9 @@ package com.geekorum.ttrss.network;
 
 import com.geekorum.geekdroid.network.TokenRetriever;
 import com.geekorum.ttrss.accounts.ServerInformation;
-import com.geekorum.ttrss.network.impl.LoggedRequestInterceptorFactory;
-import com.geekorum.ttrss.network.impl.TinyRssApi;
+import com.geekorum.ttrss.webapi.LoggedRequestInterceptorFactory;
+import com.geekorum.ttrss.webapi.TinyRssApi;
+import com.geekorum.ttrss.webapi.BasicAuthAuthenticator;
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory;
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.KotlinSerializationConverterFactory;
 import dagger.BindsOptionalOf;
@@ -63,9 +64,10 @@ public abstract class TinyrssApiModule {
 
         loggedRequestInterceptorFactory.ifPresent(retrofitBuilder::addConverterFactory);
 
-        if (serverInformation.getBasicHttpAuthPassword() != null
-                || serverInformation.getBasicHttpAuthUsername() != null) {
-            Authenticator serverAuthenticator = new BasicAuthAuthenticator(serverInformation);
+        String basicHttpAuthPassword = serverInformation.getBasicHttpAuthPassword();
+        String basicHttpAuthUsername = serverInformation.getBasicHttpAuthUsername();
+        if (basicHttpAuthPassword != null || basicHttpAuthUsername != null) {
+            Authenticator serverAuthenticator = new BasicAuthAuthenticator(basicHttpAuthUsername, basicHttpAuthPassword);
             okHttpClient = okHttpClient.newBuilder().authenticator(serverAuthenticator).build();
         }
 

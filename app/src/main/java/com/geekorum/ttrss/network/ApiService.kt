@@ -24,6 +24,7 @@ import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.providers.ArticlesContract
+import com.geekorum.ttrss.webapi.ApiCallException
 
 /**
  * Interface needed to communicate with the Tiny Tiny Rss server.

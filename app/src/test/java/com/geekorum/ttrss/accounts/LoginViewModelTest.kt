@@ -26,10 +26,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.geekorum.geekdroid.app.lifecycle.Event
 import com.geekorum.ttrss.R
-import com.geekorum.ttrss.network.impl.Error
-import com.geekorum.ttrss.network.impl.LoginResponsePayload
-import com.geekorum.ttrss.network.impl.ResponsePayload
-import com.geekorum.ttrss.network.impl.TinyRssApi
+import com.geekorum.ttrss.webapi.TinyRssApi
+import com.geekorum.ttrss.webapi.model.Error
+import com.geekorum.ttrss.webapi.model.LoginResponsePayload
+import com.geekorum.ttrss.webapi.model.ResponsePayload
 import dagger.Component
 import dagger.Module
 import dagger.Provides
@@ -52,9 +52,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.util.concurrent.Executors
-import kotlin.Any
-import kotlin.Boolean
-import kotlin.toString
 
 
 class LoginViewModelTest {

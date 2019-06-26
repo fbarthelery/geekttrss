@@ -29,11 +29,11 @@ import com.geekorum.geekdroid.accounts.CancellableSyncAdapter
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.htmlparsers.ImageUrlExtractor
-import com.geekorum.ttrss.network.ApiCallException
 import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.sync.SyncContract.EXTRA_FEED_ID
 import com.geekorum.ttrss.sync.SyncContract.EXTRA_NUMBER_OF_LATEST_ARTICLES_TO_REFRESH
+import com.geekorum.ttrss.webapi.ApiCallException
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope

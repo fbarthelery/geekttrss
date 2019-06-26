@@ -33,7 +33,6 @@ plugins {
     id("com.google.android.gms.oss-licenses-plugin")
     kotlin("android")
     kotlin("kapt")
-    id("kotlinx-serialization")
     id("com.geekorum.build.android-tests")
     id("com.geekorum.build.android-signing")
     id("com.geekorum.build.android-genymotion")
@@ -132,9 +131,9 @@ dependencies {
     // androidx others
     implementation("androidx.browser:browser:1.0.0")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.11.0")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.4.0")
 
+    // internal libraries
     val GEEKDROID_PROJECT_DIR: String? by project
     val geekdroidExt = GEEKDROID_PROJECT_DIR?.let { "" } ?: "aar"
     implementation(group = "com.geekorum", name = "geekdroid", version = "0.0.1", ext = geekdroidExt)
@@ -142,6 +141,7 @@ dependencies {
         add("googleImplementation", it)
     }
     implementation(project(":htmlparsers"))
+    implementation(project(":webapi"))
 
     implementation("com.google.android.material:material:1.1.0-alpha07")
     implementation("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")

@@ -22,6 +22,7 @@ package com.geekorum.ttrss.network
 
 import com.geekorum.geekdroid.network.TokenRetriever
 import com.geekorum.ttrss.accounts.ServerInformation
+import com.geekorum.ttrss.webapi.ApiCallException
 import dagger.Component
 import dagger.Module
 import dagger.Provides
