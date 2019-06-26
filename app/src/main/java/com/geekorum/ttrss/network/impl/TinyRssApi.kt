@@ -18,12 +18,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.geekorum.ttrss.network.impl;
+package com.geekorum.ttrss.network.impl
 
-import androidx.annotation.Keep;
-import kotlinx.coroutines.Deferred;
-import retrofit2.http.Body;
-import retrofit2.http.POST;
+import androidx.annotation.Keep
+import kotlinx.coroutines.Deferred
+import retrofit2.http.Body
+import retrofit2.http.POST
 
 /**
  * Interface of the Tiny Tiny Rss api.
@@ -31,28 +31,28 @@ import retrofit2.http.POST;
  * This describes the different endpoints.
  */
 @Keep
-public interface TinyRssApi {
+interface TinyRssApi {
 
     @POST("api/")
-    Deferred<LoginResponsePayload> login(@Body LoginRequestPayload loginRequestPayload);
+    fun login(@Body loginRequestPayload: LoginRequestPayload): Deferred<LoginResponsePayload>
 
     @POST("api/")
-    Deferred<UpdateArticleResponsePayload> updateArticle(@Body UpdateArticleRequestPayload updateFieldRequestPayload);
+    fun updateArticle(@Body updateFieldRequestPayload: UpdateArticleRequestPayload): Deferred<UpdateArticleResponsePayload>
 
     @POST("api/")
-    Deferred<ListResponsePayload<Feed>> getFeeds(@Body GetFeedsRequestPayload getFeedsRequestPayload);
+    fun getFeeds(@Body getFeedsRequestPayload: GetFeedsRequestPayload): Deferred<ListResponsePayload<Feed>>
 
     @POST("api/")
-    Deferred<ListResponsePayload<FeedCategory>> getCategories(@Body GetCategoriesRequestPayload getFeedsRequestPayload);
+    fun getCategories(@Body getFeedsRequestPayload: GetCategoriesRequestPayload): Deferred<ListResponsePayload<FeedCategory>>
 
 
     @POST("api/")
-    Deferred<ListResponsePayload<Headline>> getArticles(@Body GetArticlesRequestPayload getFeedsRequestPayload);
+    fun getArticles(@Body getFeedsRequestPayload: GetArticlesRequestPayload): Deferred<ListResponsePayload<Headline>>
 
     @POST("api/")
-    Deferred<SubscribeToFeedResponsePayload> subscribeToFeed(@Body SubscribeToFeedRequestPayload subscribeToFeedRequestPayload);
+    fun subscribeToFeed(@Body subscribeToFeedRequestPayload: SubscribeToFeedRequestPayload): Deferred<SubscribeToFeedResponsePayload>
 
     @POST("api/")
-    Deferred<UnsubscribeFeedResponsePayload> unsubscribeFromFeed(@Body UnsubscribeFeedRequestPayload unsubscribeFeedRequestPayload);
+    fun unsubscribeFromFeed(@Body unsubscribeFeedRequestPayload: UnsubscribeFeedRequestPayload): Deferred<UnsubscribeFeedResponsePayload>
 
 }
