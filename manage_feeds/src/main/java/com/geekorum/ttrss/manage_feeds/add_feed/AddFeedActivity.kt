@@ -24,6 +24,7 @@ import android.accounts.Account
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.StrictMode
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
@@ -36,6 +37,7 @@ import com.geekorum.geekdroid.app.BottomSheetDialogActivity
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory
 import com.geekorum.ttrss.applicationComponent
+import com.geekorum.ttrss.debugtools.withStrictMode
 import com.geekorum.ttrss.htmlparsers.FeedInformation
 import com.geekorum.ttrss.manage_feeds.DaggerManageFeedComponent
 import com.geekorum.ttrss.manage_feeds.R
@@ -71,7 +73,9 @@ class AddFeedActivity : BottomSheetDialogActivity() {
         val url = HttpUrl.parse(urlString)
         viewModel.init(url)
 
-        val binding = ActivityAddFeedBinding.inflate(layoutInflater, null, false)
+        val binding = withStrictMode(StrictMode.allowThreadDiskReads()) {
+            ActivityAddFeedBinding.inflate(layoutInflater, null, false)
+        }
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
         setContentView(binding.root)
