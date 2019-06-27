@@ -23,4 +23,26 @@
 -->
 <resources>
     <style name="AppTheme.ManageFeedsActivity" parent="AppTheme.NoActionBar"/>
+
+    <style name="AppTheme.AddFeedActivity" parent="@style/Theme.MaterialComponents.DayNight.BottomSheetDialog">
+        <!-- use the material Blue Grey palette -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primary_darker</item>
+        <item name="colorPrimaryVariant">@color/primary_variant</item>
+        <item name="colorSecondary">@color/secondary</item>
+        <item name="colorSecondaryVariant">@color/secondary_variant</item>
+        <item name="colorOnPrimary">@color/color_on_primary</item>
+        <item name="colorOnSecondary">@color/color_on_secondary</item>
+
+        <!-- needed for a BottomDialogActivity -->
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:windowTranslucentStatus">false</item>
+    </style>
+
+    <!-- Theme overlays -->
+
+    <style name="ThemeOverlay.AppTheme.AddFeedActivity.AccountsPanel" parent="ThemeOverlay.AppTheme.DayNight">
+        <item name="android:colorBackground">@color/background_add_feed_accounts_spinner</item>
+    </style>
 </resources>

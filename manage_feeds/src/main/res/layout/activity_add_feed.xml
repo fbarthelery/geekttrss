@@ -36,22 +36,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-        <TextView android:id="@+id/title"
-                  android:layout_width="match_parent"
-                  android:layout_height="96dp"
-                  android:paddingStart="?android:attr/listPreferredItemPaddingStart"
-                  android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
-                  app:layout_constraintStart_toStartOf="parent"
-                  app:layout_constraintEnd_toEndOf="parent"
-                  app:layout_constraintTop_toTopOf="parent"
-                  android:layout_marginBottom="16dp"
-                  android:gravity="center_vertical"
-                  android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-                  android:textColor="?android:textColorPrimary"
-                  android:textSize="28sp"
-                  android:text="@string/activity_add_feed_title"
-                  android:background="@color/primary"
-                  android:theme="@style/ThemeOverlay.AppCompat.Dark"
+        <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
+                style="@style/Widget.MaterialComponents.Toolbar.Primary"
+                android:layout_width="match_parent"
+                android:layout_height="96dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginBottom="16dp"
+                app:title="@string/activity_add_feed_title"
+                app:titleTextAppearance="?textAppearanceHeadline5"
                 />
 
 
@@ -60,7 +55,7 @@
                  android:layout_height="?attr/listPreferredItemHeightSmall"
                  app:layout_constraintStart_toStartOf="parent"
                  app:layout_constraintEnd_toEndOf="parent"
-                 app:layout_constraintTop_toBottomOf="@+id/title"
+                 app:layout_constraintTop_toBottomOf="@+id/toolbar"
                  android:paddingStart="8dp"
                  android:paddingEnd="8dp"
                  android:visibility="@{viewModel.availableFeeds.size() &gt; 1 ? View.VISIBLE : View.INVISIBLE }"
@@ -87,7 +82,7 @@
                  android:layout_height="?attr/listPreferredItemHeightSmall"
                  app:layout_constraintStart_toEndOf="@+id/loading_progress"
                  app:layout_constraintEnd_toEndOf="parent"
-                 app:layout_constraintTop_toBottomOf="@+id/title"
+                 app:layout_constraintTop_toBottomOf="@+id/toolbar"
                  android:paddingStart="?android:listPreferredItemPaddingStart"
                  android:paddingEnd="?android:listPreferredItemPaddingStart"
                  android:textAppearance="?android:attr/textAppearanceLargePopupMenu"
@@ -97,24 +92,24 @@
                 />
 
 
+        <!--
+        Seems that you can't use Group inside a feature module. The ids are not found.
+        W/ConstraintHelper: Could not find id of "available_accounts"
+        TODO investigate
+        -->
 
-        <androidx.constraintlayout.widget.Group
-                android:layout_width="wrap_content" android:layout_height="wrap_content"
-                app:constraint_referenced_ids="accounts_panel,accounts_label,available_accounts"
-                android:visibility="@{viewModel.accounts.length &gt; 1 ? View.VISIBLE : View.GONE }"
-                />
-
-
-        <!-- Background of the accounts panel -->
-        <View android:id="@+id/accounts_panel"
+        <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/accounts_panel"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/available_feeds"
-                app:layout_constraintBottom_toTopOf="@id/button_bar"
-                android:layout_marginTop="?listPreferredItemHeightSmall"
-                android:background="@color/background_add_feed_accounts_panel"/>
+                app:layout_constraintBottom_toTopOf="@+id/button_bar"
+                android:visibility="@{viewModel.accounts.length &gt; 1 ? View.VISIBLE : View.GONE }"
+                tools:visibility="visible"
+                android:background="@color/background_add_feed_accounts_panel"
+                >
 
         <TextView android:id="@+id/accounts_label"
                   android:layout_width="match_parent"
@@ -123,7 +118,7 @@
                   android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
                   app:layout_constraintStart_toStartOf="parent"
                   app:layout_constraintEnd_toEndOf="parent"
-                  app:layout_constraintTop_toTopOf="@id/accounts_panel"
+                  app:layout_constraintTop_toTopOf="parent"
                   android:gravity="center_vertical"
                   android:textAppearance="?textAppearanceCaption"
                   android:textColor="?android:textColorPrimary"
@@ -141,6 +136,7 @@
                  android:onItemSelected="@{(spinner, view, position, id) -> viewModel.setSelectedAccount(spinner.getItemAtPosition(position))}"
                  android:theme="@style/ThemeOverlay.AppTheme.AddFeedActivity.AccountsPanel"
         />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <LinearLayout
                 android:id="@+id/button_bar"
@@ -150,7 +146,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/available_accounts"
+                app:layout_constraintTop_toBottomOf="@id/accounts_panel"
                 android:gravity="end|center_vertical"
                 android:orientation="horizontal"
                 android:measureWithLargestChild="true"

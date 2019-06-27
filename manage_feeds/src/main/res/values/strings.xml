@@ -29,4 +29,12 @@
     <string name="btn_confirm">Unsubscribe</string>
     <string name="btn_cancel">Cancel</string>
     <string name="lbl_unsubscribe_msg">You won\'t receive any updates from</string>
+
+    <!-- activity add feed -->
+    <string name="activity_add_feed_title">Subscribe to feed</string>
+    <string name="activity_add_feed_no_feeds_available">No feeds available</string>
+    <string name="activity_add_feed_looking_for_feed">Looking for feed</string>
+    <string name="activity_add_feed_account_subtitle">Account</string>
+    <string name="activity_add_feed_btn_subscribe">Subscribe</string>
+
 </resources>

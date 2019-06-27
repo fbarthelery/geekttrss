@@ -36,6 +36,11 @@
     <application>
         <activity android:name="com.geekorum.ttrss.manage_feeds.ManageFeedsActivity"
                   android:theme="@style/AppTheme.ManageFeedsActivity" />
+
+        <activity android:name="com.geekorum.ttrss.manage_feeds.add_feed.AddFeedActivity"
+                  android:label="@string/activity_add_feed_title"
+                  android:theme="@style/AppTheme.AddFeedActivity"
+                  android:noHistory="true"/>
     </application>
 </manifest>
 

@@ -35,14 +35,16 @@ import androidx.lifecycle.lifecycleScope
 import com.geekorum.geekdroid.app.BottomSheetDialogActivity
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory
-import com.geekorum.ttrss.R
+import com.geekorum.ttrss.applicationComponent
 import com.geekorum.ttrss.htmlparsers.FeedInformation
+import com.geekorum.ttrss.manage_feeds.DaggerManageFeedComponent
+import com.geekorum.ttrss.manage_feeds.R
 import com.geekorum.ttrss.manage_feeds.databinding.ActivityAddFeedBinding
-import dagger.android.AndroidInjection
 import kotlinx.coroutines.delay
 import okhttp3.HttpUrl
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import com.geekorum.ttrss.R as appR
 
 /**
  * Chrome share offline page as multipart/related content send in EXTRA_STREAM
@@ -61,7 +63,7 @@ class AddFeedActivity : BottomSheetDialogActivity() {
     private val viewModel: AddFeedViewModel by viewModels { viewModelFactory }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidInjection.inject(this)
+        inject()
         super.onCreate(savedInstanceState)
 
         val urlString = intent.data?.toString() ?: intent.extras?.getString(Intent.EXTRA_TEXT) ?: ""
@@ -111,6 +113,13 @@ class AddFeedActivity : BottomSheetDialogActivity() {
         })
     }
 
+    fun inject() {
+        val manageFeedComponent = DaggerManageFeedComponent.builder()
+            .manageFeedsDependencies(applicationComponent)
+            .build()
+        manageFeedComponent.activityInjector.inject(this)
+    }
+
 }
 
 private class FeedAdapter(context: Context) :
@@ -135,7 +144,8 @@ private class FeedAdapter(context: Context) :
 }
 
 
-private class AccountsAdapter(context: Context) : ArrayAdapter<Account>(context, R.layout.item_choose_account, R.id.account_row_text, mutableListOf()) {
+private class AccountsAdapter(context: Context) :
+    ArrayAdapter<Account>(context, R.layout.item_choose_account, R.id.account_row_text, mutableListOf()) {
     init {
         setDropDownViewResource(R.layout.item_choose_account)
     }
@@ -143,7 +153,7 @@ private class AccountsAdapter(context: Context) : ArrayAdapter<Account>(context,
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val v = super.getView(position, convertView, parent)
         val imageView = v.findViewById<ImageView>(R.id.account_row_icon)
-        imageView.setImageResource(R.mipmap.ic_launcher)
+        imageView.setImageResource(appR.mipmap.ic_launcher)
         val textView = v.findViewById<TextView>(R.id.account_row_text)
         val item = checkNotNull(getItem(position))
         textView.text = item.name
@@ -153,7 +163,7 @@ private class AccountsAdapter(context: Context) : ArrayAdapter<Account>(context,
     override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
         val v = super.getDropDownView(position, convertView, parent)
         val imageView = v.findViewById<ImageView>(R.id.account_row_icon)
-        imageView.setImageResource(R.mipmap.ic_launcher)
+        imageView.setImageResource(appR.mipmap.ic_launcher)
         val textView = v.findViewById<TextView>(R.id.account_row_text)
         val item = checkNotNull(getItem(position))
         textView.text = item.name
