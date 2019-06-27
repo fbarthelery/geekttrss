@@ -20,33 +20,19 @@
  */
 package com.geekorum.ttrss.providers
 
-import android.app.Application
 import android.content.Context
-import android.util.Log
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.work.Configuration
-import androidx.work.Constraints
 import androidx.work.ListenableWorker
 import androidx.work.ListenableWorker.Result
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkInfo
-import androidx.work.WorkManager
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
-import androidx.work.testing.SynchronousExecutor
-import androidx.work.testing.TestDriver
 import androidx.work.testing.TestWorkerBuilder
-import androidx.work.testing.WorkManagerTestInitHelper
-import com.geekorum.ttrss.background_job.BackgroundJobManager
 import com.google.common.truth.Truth.assertThat
 import org.junit.runner.RunWith
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
 import kotlin.test.BeforeTest
-import kotlin.test.Ignore
 import kotlin.test.Test
 
 
@@ -70,81 +56,10 @@ class PurgeArticlesWorkerTest {
     }
 
 
-    @Ignore("Fails because of https://issuetracker.google.com/issues/135275844")
     @Test
     fun testSuccessfulWorker() {
         val worker = workerBuilder.build()
         val result = worker.doWork()
         assertThat(result).isEqualTo(Result.success())
     }
-}
-
-
-@RunWith(AndroidJUnit4::class)
-class PurgeArticlesWorkerWithConstraintsTest {
-    lateinit var applicationContext: Application
-    lateinit var backgroundJobManager: BackgroundJobManager
-    lateinit var testDriver: TestDriver
-    lateinit var workManager: WorkManager
-
-    @BeforeTest
-    fun setUp() {
-        applicationContext = ApplicationProvider.getApplicationContext()
-        backgroundJobManager = BackgroundJobManager(applicationContext)
-        val articlesProvidersDao = ArticlesProvidersDao { 0 }
-
-        val configuration = Configuration.Builder()
-            .setMinimumLoggingLevel(Log.DEBUG)
-            .setExecutor(SynchronousExecutor())
-            .setWorkerFactory((object : WorkerFactory() {
-                override fun createWorker(
-                    appContext: Context, workerClassName: String, workerParameters: WorkerParameters
-                ): ListenableWorker? = PurgeArticlesWorker(appContext, workerParameters, articlesProvidersDao)
-            }))
-            .build()
-        WorkManagerTestInitHelper.initializeTestWorkManager(applicationContext, configuration)
-        testDriver = WorkManagerTestInitHelper.getTestDriver(applicationContext)!!
-        workManager = WorkManager.getInstance(applicationContext)
-    }
-
-    @Test
-    fun testPeriodicWorker() {
-        val request = PeriodicWorkRequestBuilder<PurgeArticlesWorker>(
-            BackgroundJobManager.PERIODIC_PURGE_JOB_INTERVAL_MILLIS, TimeUnit.MILLISECONDS)
-            .setConstraints(Constraints.Builder()
-                .setRequiresDeviceIdle(true)
-                .setRequiresCharging(true)
-                .build())
-            .build()
-
-        workManager.enqueue(request).result.get()
-
-        testDriver.apply {
-            setAllConstraintsMet(request.id)
-            setPeriodDelayMet(request.id)
-        }
-
-        val workInfo = workManager.getWorkInfoById(request.id).get()
-        assertThat(workInfo.state).isEqualTo(WorkInfo.State.ENQUEUED)
-    }
-
-    @Test
-    fun testSuccessfulWorkerWithConstraints() {
-        val request = OneTimeWorkRequestBuilder<PurgeArticlesWorker>()
-            .setConstraints(Constraints.Builder()
-                .setRequiresDeviceIdle(true)
-                .setRequiresCharging(true)
-                .build())
-            .build()
-
-        workManager.enqueue(request).result.get()
-
-        testDriver.apply {
-            setAllConstraintsMet(request.id)
-        }
-
-        val workInfo = workManager.getWorkInfoById(request.id).get()
-        assertThat(workInfo.state).isEqualTo(WorkInfo.State.SUCCEEDED)
-    }
-
 }
