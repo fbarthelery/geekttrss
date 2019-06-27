@@ -35,5 +35,6 @@ fun MavenArtifactRepository.setupGoogleContent() = apply {
         includeGroup("com.crashlytics.sdk.android")
         includeGroup("io.fabric.sdk.android")
         includeGroup("org.chromium.net")
+        includeGroup("zipflinger")
     }
 }
