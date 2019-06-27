@@ -35,7 +35,4 @@
 
     <color name="image_scrim">#88000000</color>
 
-    <!-- Add feed account panel -->
-    <color name="background_add_feed_accounts_panel">@color/material_blue_grey_900</color>
-    <color name="background_add_feed_accounts_spinner">@color/material_blue_grey_800</color>
 </resources>

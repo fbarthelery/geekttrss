@@ -51,8 +51,9 @@ class AddFeedLauncherActivity : BaseActivity() {
         if (isManageFeedInstalled()) {
             try {
                 val freshContext = createPackageContext(packageName, 0)
-                val intent = intent
-                intent.component = ComponentName(freshContext, AddFeedActivity::class.java)
+                val intent = intent.apply {
+                    component = ComponentName.createRelative(freshContext, "com.geekorum.ttrss.manage_feeds.add_feed.AddFeedActivity")
+                }
                 startActivity(intent)
                 finish()
             } catch (e: PackageManager.NameNotFoundException) {

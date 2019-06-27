@@ -33,11 +33,8 @@ import androidx.annotation.RequiresApi
 import androidx.core.content.getSystemService
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
-import com.geekorum.ttrss.add_feed.AddFeedWorker
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.providers.PurgeArticlesWorker
 import com.geekorum.ttrss.sync.SyncContract
@@ -64,13 +61,6 @@ class BackgroundJobManager @Inject constructor(
 
     fun setupPeriodicJobs() {
         setupPeriodicPurge()
-    }
-
-    fun subscribeToFeed(
-        account: Account, feedUrl: String, categoryId: Long,
-        feedLogin: String, feedPassword: String
-    ) {
-        impl.subscribeToFeed(account, feedUrl, categoryId, feedLogin, feedPassword)
     }
 
     private fun setupPeriodicPurge() {
@@ -150,22 +140,6 @@ private open class BackgroundJobManagerImpl internal constructor(
         WorkManager.getInstance(context)
             .enqueueUniquePeriodicWork(
                 BackgroundJobManager.PERIODIC_PURGE_JOB, ExistingPeriodicWorkPolicy.KEEP, request)
-    }
-
-    fun subscribeToFeed(
-        account: Account, feedUrl: String,
-        categoryId: Long, feedLogin: String, feedPassword: String
-    ) {
-        val inputData = AddFeedWorker.getInputData(account, feedUrl, categoryId, feedLogin, feedPassword)
-        val workRequest = OneTimeWorkRequestBuilder<AddFeedWorker>()
-            .setConstraints(Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
-                .build())
-            .setInputData(inputData)
-            .build()
-
-        WorkManager.getInstance(context)
-            .enqueue(workRequest)
     }
 
 }

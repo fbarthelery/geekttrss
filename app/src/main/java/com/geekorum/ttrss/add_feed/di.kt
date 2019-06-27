@@ -20,84 +20,15 @@
  */
 package com.geekorum.ttrss.add_feed
 
-import android.accounts.Account
-import androidx.lifecycle.ViewModel
-import androidx.work.WorkerFactory
-import com.geekorum.geekdroid.dagger.ViewModelKey
-import com.geekorum.geekdroid.dagger.WorkerInjectionModule
-import com.geekorum.geekdroid.dagger.WorkerKey
-import com.geekorum.ttrss.accounts.NetworkLoginModule
-import com.geekorum.ttrss.accounts.PerAccount
-import com.geekorum.ttrss.network.TinyrssApiModule
-import com.geekorum.ttrss.webapi.TinyRssApi
-import com.geekorum.ttrss.webapi.TokenRetriever
-import dagger.Binds
-import dagger.BindsInstance
 import dagger.Module
-import dagger.Provides
-import dagger.Subcomponent
 import dagger.android.ContributesAndroidInjector
-import dagger.multibindings.IntoMap
 
-
-/**
- * Dependency injection pieces for the Sync functionality.
- *
- * AddFeedService has a SubComponent of the ApplicationComponent, that allows it to inject to [AddFeedServicer].
- * ArticleSyncAdapter has a SubSubComponent which provides the actual SyncComponent
- *
- */
-
-@Module(includes = [WorkerInjectionModule::class, AddFeedComponentModule::class])
-abstract class AndroidInjectorsModule {
-
-    @ContributesAndroidInjector(modules = [ViewModelsModule::class])
-    abstract fun contributeAddFeedActivityInjector(): AddFeedActivity
-
-    @ContributesAndroidInjector(modules = [ViewModelsModule::class])
-    abstract fun contributeAddFeedLauncherActivityInjector(): AddFeedLauncherActivity
-
-    @Binds
-    @IntoMap
-    @WorkerKey(AddFeedWorker::class)
-    abstract fun providesAddFeedWorkerFactory(workerFactory: AddFeedWorker.Factory): WorkerFactory
-
-}
-
-
-@Module(subcomponents = [AddFeedComponent::class])
-abstract class AddFeedComponentModule
-
-
-@Subcomponent(modules = [SubscribeToFeedServiceModule::class])
-@PerAccount
-interface AddFeedComponent {
-
-    val apiService: SubscribeToFeedService
-
-    @Subcomponent.Builder
-    interface Builder {
-
-        @BindsInstance
-        fun seedAccount(account: Account): Builder
-
-        fun build(): AddFeedComponent
-    }
-}
-
-@Module(includes = [TinyrssApiModule::class, NetworkLoginModule::class])
-internal class SubscribeToFeedServiceModule {
-    @Provides
-    fun providesSubscribeToFeedService(tokenRetriever: TokenRetriever, tinyrssApi: TinyRssApi): SubscribeToFeedService {
-        return RetrofitSubscribeToFeedService(tokenRetriever, tinyrssApi)
-    }
-}
 
 @Module
-private abstract class ViewModelsModule {
-    @Binds
-    @IntoMap
-    @ViewModelKey(AddFeedViewModel::class)
-    abstract fun getAddFeedViewModel(addFeedViewModel: AddFeedViewModel): ViewModel
+abstract class AndroidInjectorsModule {
+
+    @ContributesAndroidInjector
+    abstract fun contributeAddFeedLauncherActivityInjector(): AddFeedLauncherActivity
 
 }
+
