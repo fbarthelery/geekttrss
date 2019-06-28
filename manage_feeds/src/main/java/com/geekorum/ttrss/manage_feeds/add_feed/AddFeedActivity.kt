@@ -66,16 +66,16 @@ class AddFeedActivity : BottomSheetDialogActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         inject()
-        super.onCreate(savedInstanceState)
+        val binding = withStrictMode(StrictMode.allowThreadDiskReads()) {
+            super.onCreate(savedInstanceState)
+            ActivityAddFeedBinding.inflate(layoutInflater, null, false)
+        }
 
         val urlString = intent.data?.toString() ?: intent.extras?.getString(Intent.EXTRA_TEXT) ?: ""
 
         val url = HttpUrl.parse(urlString)
         viewModel.init(url)
 
-        val binding = withStrictMode(StrictMode.allowThreadDiskReads()) {
-            ActivityAddFeedBinding.inflate(layoutInflater, null, false)
-        }
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
         setContentView(binding.root)
