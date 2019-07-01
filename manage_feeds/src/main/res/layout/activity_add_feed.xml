@@ -44,7 +44,6 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                android:layout_marginBottom="16dp"
                 app:title="@string/activity_add_feed_title"
                 app:titleTextAppearance="?textAppearanceHeadline5"
                 />
@@ -56,6 +55,7 @@
                  app:layout_constraintStart_toStartOf="parent"
                  app:layout_constraintEnd_toEndOf="parent"
                  app:layout_constraintTop_toBottomOf="@+id/toolbar"
+                 android:layout_marginTop="16dp"
                  android:paddingStart="8dp"
                  android:paddingEnd="8dp"
                  android:visibility="@{viewModel.availableFeeds.size() &gt; 1 ? View.VISIBLE : View.INVISIBLE }"
@@ -83,6 +83,7 @@
                  app:layout_constraintStart_toEndOf="@+id/loading_progress"
                  app:layout_constraintEnd_toEndOf="parent"
                  app:layout_constraintTop_toBottomOf="@+id/toolbar"
+                 android:layout_marginTop="16dp"
                  android:paddingStart="?android:listPreferredItemPaddingStart"
                  android:paddingEnd="?android:listPreferredItemPaddingStart"
                  android:textAppearance="?android:attr/textAppearanceLargePopupMenu"

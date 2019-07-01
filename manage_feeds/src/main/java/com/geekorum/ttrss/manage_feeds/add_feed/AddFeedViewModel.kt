@@ -53,8 +53,7 @@ import com.geekorum.geekdroid.app.lifecycle.EmptyEvent.Companion.makeEmptyEvent 
  * [ViewModel] to subscribe to a Feed
  */
 class AddFeedViewModel @Inject constructor(
-    private val feedExtractor: FeedExtractor,
-    private val okHttpClient: OkHttpClient,
+    private val feedsFinder: FeedsFinder,
     private val workManager: WorkManager,
     accountManager: AccountManager
 ) : ViewModel() {
@@ -104,15 +103,15 @@ class AddFeedViewModel @Inject constructor(
     @VisibleForTesting
     internal suspend fun initWithUrl(documentUrl: HttpUrl) {
         try {
-            val document = getHtmlDocument(documentUrl)
-            init(document)
+            val feeds = withContext(Dispatchers.IO) {
+                feedsFinder.findFeeds(documentUrl).map {
+                    FeedInformation(it.href, it.type, it.title)
+                }
+            }
+            feedsInformation.value = feeds
         } catch (exception: IOException) {
             feedsInformation.value = emptyList()
         }
-    }
-
-    fun init(document: String) {
-        feedsInformation.value = feedExtractor.extract(document).toList()
     }
 
     fun subscribeToFeed() {
@@ -149,12 +148,4 @@ class AddFeedViewModel @Inject constructor(
         workManager.enqueue(workRequest)
     }
 
-
-    private suspend fun getHtmlDocument(url: HttpUrl) = withContext(Dispatchers.IO) {
-        val request = Request.Builder().url(url).get().build()
-        val response = okHttpClient.newCall(request).execute()
-        response.use {
-            response.body()?.string() ?: ""
-        }
-    }
 }

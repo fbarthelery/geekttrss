@@ -27,18 +27,15 @@ import androidx.lifecycle.Observer
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
-import com.geekorum.ttrss.htmlparsers.FeedExtractor
 import com.geekorum.ttrss.htmlparsers.FeedInformation
+import com.geekorum.ttrss.manage_feeds.add_feed.FeedsFinder.FeedResult
+import com.geekorum.ttrss.manage_feeds.add_feed.FeedsFinder.Source.HTML
 import com.google.common.truth.Truth.assertThat
-import io.mockk.Runs
 import io.mockk.coEvery
-import io.mockk.every
-import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.runBlocking
 import okhttp3.HttpUrl
-import okhttp3.OkHttpClient
 import org.junit.Rule
 import java.io.IOException
 import kotlin.test.BeforeTest
@@ -52,45 +49,25 @@ class AddFeedViewModelTest {
 
 
     private lateinit var target: AddFeedViewModel
-    private lateinit var okHttpClient: OkHttpClient
-    private lateinit var feedExtractor: FeedExtractor
     private lateinit var workManager: WorkManager
     private lateinit var accountManager: AccountManager
+    private lateinit var feedsFinder: FeedsFinder
+
 
     @BeforeTest
     fun setup() {
-        okHttpClient = mockk()
-        feedExtractor = mockk()
         workManager = mockk(relaxed = true)
         accountManager = mockk(relaxed = true)
-        target = AddFeedViewModel(feedExtractor, okHttpClient, workManager, accountManager)
-    }
-
-    @Test
-    fun testThatInitDocumentReturnsCorrectFeeds() {
-        val feeds = listOf(
-            FeedInformation("https://google.com", "type", "title"),
-            FeedInformation("https://apple.com", "type2", "title2"))
-        every { feedExtractor.extract(any<String>()) }.returns( feeds)
-
-        var result: List<FeedInformation>? = null
-        val observer = Observer<List<FeedInformation>> {
-            result = it
-        }
-        target.availableFeeds.observeForever(observer)
-        target.init("long html document")
-
-        assertThat(result).isEqualTo(feeds)
+        feedsFinder = mockk()
+        target = AddFeedViewModel(feedsFinder, workManager, accountManager)
     }
 
     @Test
     fun testThatInitUrlReturnsCorrectFeeds() {
         val feeds = listOf(
-            FeedInformation("https://google.com", "type", "title"),
-            FeedInformation("https://apple.com", "type2", "title2"))
-        every { feedExtractor.extract(any<String>()) }.returns( feeds)
-        coEvery { okHttpClient.newCall(any()).execute().body()!!.string() } returns("anything")
-        coEvery { okHttpClient.newCall(any()).execute().close() } just Runs
+            FeedResult(HTML,"https://google.com", "type", "title"),
+            FeedResult(HTML, "https://apple.com", "type2", "title2"))
+        coEvery { feedsFinder.findFeeds(any()) }.returns( feeds)
 
         var result: List<FeedInformation>? = null
         val observer = Observer<List<FeedInformation>> {
@@ -101,13 +78,14 @@ class AddFeedViewModelTest {
             target.initWithUrl(HttpUrl.parse("https://some.google.com/")!!)
         }
 
-        assertThat(result).isEqualTo(feeds)
+        val expected = feeds.map { it.toFeedInformation()}
+        assertThat(result).isEqualTo(expected)
     }
 
 
     @Test
     fun testThatInitUrlWithExceptionReturnsEmptyFeeds() {
-        coEvery { okHttpClient.newCall(any()).execute() } throws IOException("No network")
+        coEvery { feedsFinder.findFeeds(any()) } throws IOException("No network")
 
         var result: List<FeedInformation>? = null
         val observer = Observer<List<FeedInformation>> {
