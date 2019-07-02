@@ -37,4 +37,8 @@
     <string name="activity_add_feed_account_subtitle">Account</string>
     <string name="activity_add_feed_btn_subscribe">Subscribe</string>
 
+    <!-- activity subscribe to feed -->
+    <string name="activity_subscribe_feed_btn_subscribe">Subscribe</string>
+    <string name="activity_subscribe_feed_btn_cancel">Cancel</string>
+
 </resources>
