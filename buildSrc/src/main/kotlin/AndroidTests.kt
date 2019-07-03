@@ -87,6 +87,7 @@ internal fun Project.configureTests() {
 
         // mock
         testImplementation("io.mockk:mockk:1.9")
+        androidTestImplementation("io.mockk:mockk-android:1.9")
         testImplementation("org.robolectric:robolectric:$robolectricVersion")
 
     }

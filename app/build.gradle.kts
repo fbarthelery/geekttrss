@@ -210,6 +210,12 @@ dependencies {
     api("com.squareup.okhttp3:okhttp:3.12.0")
     api("com.jakewharton.timber:timber:4.7.1")
 
+    // fragment testing declare some activities and resources that needs to be in the apk
+    // we don't use it. here but it is used in feature modules
+    debugImplementation("androidx.fragment:fragment-testing:1.2.0-alpha01")
+    // fragment testing doesn't request 1.2.0 yet, so force it
+    debugImplementation("androidx.test:core-ktx:1.2.0")
+
 }
 
 apply {

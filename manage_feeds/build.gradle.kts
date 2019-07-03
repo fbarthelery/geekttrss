@@ -89,4 +89,6 @@ dependencies {
     dualTestImplementation("androidx.arch.core:core-testing:2.0.1")
 
     implementation("androidx.navigation:navigation-fragment-ktx:2.1.0-alpha05")
+    debugImplementation("androidx.fragment:fragment-testing:1.2.0-alpha01")
+
 }
