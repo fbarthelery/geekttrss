@@ -36,15 +36,12 @@ import androidx.work.WorkManager
 import com.geekorum.geekdroid.accounts.AccountsLiveData
 import com.geekorum.geekdroid.app.lifecycle.EmptyEvent
 import com.geekorum.ttrss.accounts.AccountAuthenticator
-import com.geekorum.ttrss.htmlparsers.FeedExtractor
-import com.geekorum.ttrss.htmlparsers.FeedInformation
+import com.geekorum.ttrss.manage_feeds.add_feed.FeedsFinder.FeedResult
 import com.geekorum.ttrss.manage_feeds.workers.SubscribeWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import java.io.IOException
 import javax.inject.Inject
 import com.geekorum.geekdroid.app.lifecycle.EmptyEvent.Companion.makeEmptyEvent as CompleteEvent
@@ -58,14 +55,14 @@ class AddFeedViewModel @Inject constructor(
     accountManager: AccountManager
 ) : ViewModel() {
 
-    private val feedsInformation = MutableLiveData<List<FeedInformation>>()
-    val availableFeeds = feedsInformation as LiveData<List<FeedInformation>>
+    private val _availableFeeds = MutableLiveData<Collection<FeedResult>>()
+    val availableFeeds: LiveData<Collection<FeedResult>> = _availableFeeds
     val accounts = AccountsLiveData(accountManager, AccountAuthenticator.TTRSS_ACCOUNT_TYPE)
     private val _completeEvent = MutableLiveData<EmptyEvent>()
     val complete: LiveData<EmptyEvent> = _completeEvent
     val canSubscribe = ObservableBoolean(false)
 
-    internal var selectedFeed: FeedInformation? = null
+    internal var selectedFeed: FeedResult? = null
         set(value) {
             field = value
             canSubscribe.set(value != null  && selectedAccount != null)
@@ -96,7 +93,7 @@ class AddFeedViewModel @Inject constructor(
         if (documentUrl != null) {
             initWithUrl(documentUrl)
         } else {
-            feedsInformation.value = emptyList()
+            _availableFeeds.value = emptyList()
         }
     }
 
@@ -104,13 +101,12 @@ class AddFeedViewModel @Inject constructor(
     internal suspend fun initWithUrl(documentUrl: HttpUrl) {
         try {
             val feeds = withContext(Dispatchers.IO) {
-                feedsFinder.findFeeds(documentUrl).map {
-                    FeedInformation(it.href, it.type, it.title)
-                }
+                feedsFinder.findFeeds(documentUrl)
             }
-            feedsInformation.value = feeds
+
+            _availableFeeds.value = feeds
         } catch (exception: IOException) {
-            feedsInformation.value = emptyList()
+            _availableFeeds.value = emptyList()
         }
     }
 
@@ -126,7 +122,7 @@ class AddFeedViewModel @Inject constructor(
     }
 
     fun setSelectedFeed(feed: Any) {
-        selectedFeed = feed as FeedInformation
+        selectedFeed = feed as FeedResult
     }
 
     fun setSelectedAccount(account: Any) {

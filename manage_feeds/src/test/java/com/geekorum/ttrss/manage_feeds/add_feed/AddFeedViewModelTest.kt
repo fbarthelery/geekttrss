@@ -38,6 +38,7 @@ import kotlinx.coroutines.runBlocking
 import okhttp3.HttpUrl
 import org.junit.Rule
 import java.io.IOException
+import java.util.Collections
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -69,8 +70,8 @@ class AddFeedViewModelTest {
             FeedResult(HTML, "https://apple.com", "type2", "title2"))
         coEvery { feedsFinder.findFeeds(any()) }.returns( feeds)
 
-        var result: List<FeedInformation>? = null
-        val observer = Observer<List<FeedInformation>> {
+        var result: Collection<FeedResult>? = null
+        val observer = Observer<Collection<FeedResult>> {
             result = it
         }
         target.availableFeeds.observeForever(observer)
@@ -78,7 +79,7 @@ class AddFeedViewModelTest {
             target.initWithUrl(HttpUrl.parse("https://some.google.com/")!!)
         }
 
-        val expected = feeds.map { it.toFeedInformation()}
+        val expected = feeds
         assertThat(result).isEqualTo(expected)
     }
 
@@ -87,8 +88,8 @@ class AddFeedViewModelTest {
     fun testThatInitUrlWithExceptionReturnsEmptyFeeds() {
         coEvery { feedsFinder.findFeeds(any()) } throws IOException("No network")
 
-        var result: List<FeedInformation>? = null
-        val observer = Observer<List<FeedInformation>> {
+        var result: Collection<FeedResult>? = null
+        val observer = Observer<Collection<FeedResult>> {
             result = it
         }
         target.availableFeeds.observeForever(observer)
@@ -102,7 +103,7 @@ class AddFeedViewModelTest {
     @Test
     fun testThatSubscribeFeedEnqueueAWorkRequest() {
         val account: Account = mockk()
-        target.selectedFeed = FeedInformation("https://google.com/", "type", "title")
+        target.selectedFeed = FeedResult(HTML,"https://google.com", "type", "title")
         target.selectedAccount = account
 
         target.subscribeToFeed()
@@ -123,7 +124,7 @@ class AddFeedViewModelTest {
 
     @Test
     fun testThatSubscribeEmitCompleteEvent() {
-        target.selectedFeed = FeedInformation("https://google.com/", "type", "title")
+        target.selectedFeed = FeedResult(HTML,"https://google.com", "type", "title")
         target.selectedAccount = mockk()
 
         var called = false

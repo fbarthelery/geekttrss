@@ -38,7 +38,6 @@ import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory
 import com.geekorum.ttrss.applicationComponent
 import com.geekorum.ttrss.debugtools.withStrictMode
-import com.geekorum.ttrss.htmlparsers.FeedInformation
 import com.geekorum.ttrss.manage_feeds.DaggerManageFeedComponent
 import com.geekorum.ttrss.manage_feeds.R
 import com.geekorum.ttrss.manage_feeds.databinding.ActivityAddFeedBinding
@@ -124,27 +123,6 @@ class AddFeedActivity : BottomSheetDialogActivity() {
         manageFeedComponent.activityInjector.inject(this)
     }
 
-}
-
-private class FeedAdapter(context: Context) :
-    ArrayAdapter<FeedInformation>(context, android.R.layout.simple_dropdown_item_1line, mutableListOf()) {
-    init {
-        setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-    }
-
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val v = super.getView(position, convertView, parent) as TextView
-        val item = checkNotNull(getItem(position))
-        v.text = item.title
-        return v
-    }
-
-    override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val v = super.getDropDownView(position, convertView, parent) as TextView
-        val item = checkNotNull(getItem(position))
-        v.text = item.title
-        return v
-    }
 }
 
 
