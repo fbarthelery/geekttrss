@@ -40,6 +40,8 @@
     <!-- activity subscribe to feed -->
     <string name="activity_subscribe_feed_btn_subscribe">Subscribe</string>
     <string name="activity_subscribe_feed_btn_cancel">Cancel</string>
+    <string name="activity_subscribe_feed_btn_back">Back</string>
+    <string name="activity_subscribe_feed_btn_close">Close</string>
 
     <!-- fragment enter feed url -->
     <string name="fragment_enter_feed_url_label">Enter feed or website url</string>

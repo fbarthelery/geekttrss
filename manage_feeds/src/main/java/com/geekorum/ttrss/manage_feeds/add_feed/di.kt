@@ -20,12 +20,16 @@
  */
 package com.geekorum.ttrss.manage_feeds.add_feed
 
+import android.accounts.Account
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import com.geekorum.geekdroid.dagger.FragmentFactoriesModule
+import com.geekorum.geekdroid.dagger.FragmentKey
 import com.geekorum.geekdroid.dagger.ViewModelKey
 import com.geekorum.ttrss.di.ViewModelsModule
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.android.ContributesAndroidInjector
 import dagger.android.support.AndroidSupportInjectionModule
 import dagger.multibindings.IntoMap
@@ -39,10 +43,47 @@ abstract class AddFeedModule {
         ViewModelsModule::class])
     internal abstract fun contributesAddFeedActivityInjector(): AddFeedActivity
 
+    @ContributesAndroidInjector(modules = [
+        FragmentFactoriesModule::class,
+        ViewModelsModule::class,
+        SubscribeToFeedActivityModule::class])
+    internal abstract fun contributesSubscribeToFeedActivityInjector(): SubscribeToFeedActivity
+
     @Binds
     @IntoMap
     @ViewModelKey(AddFeedViewModel::class)
     abstract fun bindAddFeedViewModel(vm: AddFeedViewModel): ViewModel
+
+}
+
+@Module
+private abstract class SubscribeToFeedActivityModule {
+    @Module
+    companion object {
+        @JvmStatic
+        @Provides
+        fun providesAccount(subscribeToFeedActivity: SubscribeToFeedActivity): Account = subscribeToFeedActivity.account!!
+    }
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(SubscribeToFeedViewModel::class)
+    abstract fun bindAddFeedDialogViewModel(vm: SubscribeToFeedViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @FragmentKey(EnterFeedUrlFragment::class)
+    abstract fun bindEnterFeedUrlFragment(f: EnterFeedUrlFragment): Fragment
+
+    @Binds
+    @IntoMap
+    @FragmentKey(SelectFeedFragment::class)
+    abstract fun bindSelectFeedFragment(f: SelectFeedFragment): Fragment
+
+    @Binds
+    @IntoMap
+    @FragmentKey(DisplayErrorFragment::class)
+    abstract fun bindDisplayErrorFragment(f: DisplayErrorFragment): Fragment
 
 }
 

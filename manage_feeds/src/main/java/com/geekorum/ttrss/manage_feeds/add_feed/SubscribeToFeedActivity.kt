@@ -50,5 +50,41 @@ class SubscribeToFeedActivity : SessionActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_subscribe_to_feed)
+        binding.cancel.setOnClickListener {
+            if (!navController.popBackStack())
+                finish()
+        }
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            when (destination.id) {
+                R.id.enter_feed_url -> {
+                    binding.cancel.setText(R.string.activity_subscribe_feed_btn_cancel)
+                    binding.next.setText(R.string.activity_subscribe_feed_btn_subscribe)
+                    binding.next.setOnClickListener {
+                        viewModel.submitUrl(viewModel.urlTyped)
+                    }
+                    viewModel.resetAvailableFeeds()
+                }
+
+                R.id.select_feed -> {
+                    binding.cancel.setText(R.string.activity_subscribe_feed_btn_back)
+                    binding.next.setText(R.string.activity_subscribe_feed_btn_subscribe)
+                    binding.next.setOnClickListener {
+                        if (viewModel.selectedFeed != null) {
+                            viewModel.subscribeToFeed(viewModel.selectedFeed!!.toFeedInformation())
+                            finish()
+                        }
+                    }
+                }
+
+                R.id.display_error -> {
+                    binding.cancel.setText(R.string.activity_subscribe_feed_btn_back)
+                    binding.next.setText(R.string.activity_subscribe_feed_btn_close)
+                    binding.next.setOnClickListener {
+                        finish()
+                    }
+                }
+            }
+        }
     }
 }
