@@ -43,7 +43,9 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:text="@{@plurals/fragment_select_feed_label(viewModel.feedsFound.size, viewModel.feedsFound.size)}"/>
+                android:text="@{@plurals/fragment_select_feed_label(viewModel.feedsFound.size, viewModel.feedsFound.size)}"
+                android:textAppearance="?textAppearanceBody1"/>
+
 
 
         <Spinner android:id="@+id/available_feeds"

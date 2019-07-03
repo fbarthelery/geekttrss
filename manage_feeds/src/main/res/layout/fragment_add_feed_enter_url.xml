@@ -22,7 +22,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
                 android:text="@string/fragment_enter_feed_url_label"
-                />
+                android:textAppearance="?textAppearanceBody1"/>
 
         <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/feed_url"

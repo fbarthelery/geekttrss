@@ -30,7 +30,7 @@
     <color name="secondary_variant">@color/secondary_darker</color>
     <color name="secondary_darker">#2bbd7e</color>
     <color name="secondary_lighter">#9fffe0</color>
-    <color name="color_on_primary">@android:color/white</color>
+    <color name="color_on_primary">@android:color/black</color>
     <color name="color_on_secondary">@android:color/black</color>
 
     <color name="image_scrim">#88000000</color>

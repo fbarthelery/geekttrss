@@ -35,16 +35,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:liftOnScroll="true">
-
-            <com.google.android.material.appbar.MaterialToolbar
-                    android:id="@+id/toolbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    style="?appBarToolbarStyle"
-                    />
-
-        </com.google.android.material.appbar.AppBarLayout>
+                app:liftOnScroll="true"/>
 
         <com.google.android.material.card.MaterialCardView
                 android:layout_width="560dp"
