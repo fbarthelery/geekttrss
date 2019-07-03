@@ -64,6 +64,7 @@ class TestGoogleFlavorApplication : TestApplication()
 @Component(modules = [AppInitializersModule::class,
     AndroidFrameworkModule::class,
     AndroidBindingsModule::class,
+    CoreFactoriesModule::class,
     FragmentFactoriesModule::class,
     ViewModelsModule::class,
     SettingsModule::class,

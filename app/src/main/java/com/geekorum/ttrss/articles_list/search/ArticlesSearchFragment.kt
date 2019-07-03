@@ -26,8 +26,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentFactory
 import androidx.lifecycle.Observer
-import com.geekorum.geekdroid.dagger.DaggerDelegateFragmentFactory
-import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory
+import androidx.lifecycle.ViewModelProvider
 import com.geekorum.ttrss.BaseFragment
 import com.geekorum.ttrss.activityViewModels
 import com.geekorum.ttrss.articles_list.ActivityViewModel
@@ -43,8 +42,8 @@ import javax.inject.Inject
  * Display search results
  */
 class ArticlesSearchFragment @Inject constructor(
-    viewModelsFactory: DaggerDelegateViewModelsFactory,
-    fragmentFactory: DaggerDelegateFragmentFactory
+    viewModelsFactory: ViewModelProvider.Factory,
+    fragmentFactory: FragmentFactory
 ) : BaseFragment(viewModelsFactory, fragmentFactory) {
 
     lateinit var binding: FragmentArticlesSearchBinding

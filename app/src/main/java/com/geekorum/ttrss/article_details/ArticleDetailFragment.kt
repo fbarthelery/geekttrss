@@ -44,10 +44,9 @@ import androidx.core.os.bundleOf
 import androidx.core.view.doOnNextLayout
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.FragmentFactory
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
-import com.geekorum.geekdroid.dagger.DaggerDelegateFragmentFactory
-import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory
 import com.geekorum.geekdroid.network.OkHttpWebViewClient
 import com.geekorum.ttrss.BaseFragment
 import com.geekorum.ttrss.R
@@ -68,8 +67,8 @@ import javax.inject.Inject
  * on handsets.
  */
 class ArticleDetailFragment @Inject constructor(
-    viewModelsFactory: DaggerDelegateViewModelsFactory,
-    fragmentFactory: DaggerDelegateFragmentFactory,
+    viewModelsFactory: ViewModelProvider.Factory,
+    fragmentFactory: FragmentFactory,
     private val okHttpClient: OkHttpClient
 ) : BaseFragment(viewModelsFactory, fragmentFactory) {
 

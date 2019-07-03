@@ -40,9 +40,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.ActivityOptionsCompat;
 import androidx.fragment.app.FragmentFactory;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
-import com.geekorum.geekdroid.dagger.DaggerDelegateFragmentFactory;
-import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory;
 import com.geekorum.ttrss.BaseFragment;
 import com.geekorum.ttrss.Features;
 import com.geekorum.ttrss.R;
@@ -79,7 +78,7 @@ public class FeedListFragment extends BaseFragment implements NavigationView.OnN
     private final OnDemandModuleManager moduleManager;
 
     @Inject
-    public FeedListFragment(@NonNull DaggerDelegateViewModelsFactory viewModelsFactory, DaggerDelegateFragmentFactory fragmentFactory, OnDemandModuleManager moduleManager, SharedPreferences preferences) {
+    public FeedListFragment(@NonNull ViewModelProvider.Factory viewModelsFactory, FragmentFactory fragmentFactory, OnDemandModuleManager moduleManager, SharedPreferences preferences) {
         super(viewModelsFactory, fragmentFactory);
         this.moduleManager = moduleManager;
         this.preferences = preferences;

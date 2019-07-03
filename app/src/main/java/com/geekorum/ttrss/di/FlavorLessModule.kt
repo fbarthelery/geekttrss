@@ -22,6 +22,7 @@ package com.geekorum.ttrss.di
 
 import com.geekorum.geekdroid.dagger.AndroidFrameworkModule
 import com.geekorum.geekdroid.dagger.FragmentFactoriesModule
+import com.geekorum.ttrss.CoreFactoriesModule
 import com.geekorum.ttrss.background_job.BackgroundJobsModule
 import com.geekorum.ttrss.DefaultNightModeModule
 import com.geekorum.ttrss.accounts.AndroidTinyrssAccountManagerModule
@@ -35,6 +36,7 @@ import dagger.Module
  * Base module who includes all the modules common to all flavor of the applicatio
  */
 @Module(includes = [
+    CoreFactoriesModule::class,
     AndroidFrameworkModule::class,
     AndroidBindingsModule::class,
     ViewModelsModule::class,

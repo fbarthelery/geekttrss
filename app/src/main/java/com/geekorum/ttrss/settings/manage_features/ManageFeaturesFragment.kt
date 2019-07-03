@@ -25,12 +25,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.FragmentFactory
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
-import com.geekorum.geekdroid.dagger.DaggerDelegateFragmentFactory
-import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory
 import com.geekorum.ttrss.BaseFragment
 import com.geekorum.ttrss.databinding.FragmentManageFeaturesBinding
 import com.geekorum.ttrss.databinding.ItemFeatureBinding
@@ -38,8 +38,8 @@ import com.geekorum.ttrss.viewModels
 import javax.inject.Inject
 
 class ManageFeaturesFragment @Inject constructor(
-    viewModelsFactory: DaggerDelegateViewModelsFactory,
-    fragmentFactory: DaggerDelegateFragmentFactory
+    viewModelsFactory: ViewModelProvider.Factory,
+    fragmentFactory: FragmentFactory
 ) : BaseFragment(viewModelsFactory, fragmentFactory) {
 
     lateinit var binding: FragmentManageFeaturesBinding

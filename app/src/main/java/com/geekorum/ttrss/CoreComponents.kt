@@ -27,15 +27,20 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentFactory
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.geekorum.geekdroid.dagger.DaggerDelegateFragmentFactory
 import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory
+import dagger.Binds
+import dagger.Module
+import dagger.Provides
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import javax.inject.Inject
+import javax.inject.Provider
 
 /**
  * An activity who get a dagger injected [ViewModelProvider.Factory]
@@ -43,7 +48,7 @@ import javax.inject.Inject
 @SuppressLint("Registered")
 open class ViewModelProviderActivity : AppCompatActivity() {
     @Inject
-    lateinit var viewModelsFactory: DaggerDelegateViewModelsFactory
+    lateinit var viewModelsFactory: ViewModelProvider.Factory
 }
 
 inline fun <reified VM : ViewModel> ViewModelProviderActivity.viewModels(): Lazy<VM> {
@@ -73,7 +78,7 @@ inline fun <reified VM : ViewModel> BaseDialogFragment.activityViewModels(): Laz
 @SuppressLint("Registered")
 open class BaseActivity : BatteryFriendlyActivity() {
     @Inject
-    lateinit var daggerDelegateFragmentFactory: DaggerDelegateFragmentFactory
+    lateinit var daggerDelegateFragmentFactory: FragmentFactory
 
     override fun onCreate(savedInstanceState: Bundle?) {
         inject()
@@ -92,8 +97,8 @@ open class BaseActivity : BatteryFriendlyActivity() {
  * Common base Fragment for the application.
  */
 open class BaseFragment (
-    val viewModelsFactory: DaggerDelegateViewModelsFactory,
-    val fragmentFactory: DaggerDelegateFragmentFactory
+    val viewModelsFactory: ViewModelProvider.Factory,
+    val fragmentFactory: FragmentFactory
 ) : Fragment() {
 
     override fun onAttach(context: Context) {
@@ -103,12 +108,23 @@ open class BaseFragment (
 }
 
 open class BaseDialogFragment (
-    val viewModelsFactory: DaggerDelegateViewModelsFactory,
-    val fragmentFactory: DaggerDelegateFragmentFactory
+    val viewModelsFactory: ViewModelProvider.Factory,
+    val fragmentFactory: FragmentFactory
 ) : DialogFragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
         childFragmentManager.fragmentFactory = fragmentFactory
     }
+}
+
+
+@Module
+abstract class CoreFactoriesModule {
+
+    @Binds
+    abstract fun bindsViewModelFactory(factory: DaggerDelegateViewModelsFactory): ViewModelProvider.Factory
+
+    @Binds
+    abstract fun bindsFragmentFactory(factory: DaggerDelegateFragmentFactory): FragmentFactory
 }

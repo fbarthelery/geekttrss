@@ -28,13 +28,12 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentFactory;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import com.geekorum.geekdroid.dagger.DaggerDelegateFragmentFactory;
-import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory;
 import com.geekorum.geekdroid.views.recyclerview.ItemSwiper;
 import com.geekorum.geekdroid.views.recyclerview.ScrollFromBottomAppearanceItemAnimator;
 import com.geekorum.ttrss.BaseFragment;
@@ -62,7 +61,7 @@ public class ArticlesListFragment extends BaseFragment {
     private Snackbar setUnreadSnackbar = null;
 
     @Inject
-    public ArticlesListFragment(@NonNull DaggerDelegateViewModelsFactory viewModelsFactory, DaggerDelegateFragmentFactory fragmentFactory) {
+    public ArticlesListFragment(@NonNull ViewModelProvider.Factory viewModelsFactory, FragmentFactory fragmentFactory) {
         super(viewModelsFactory, fragmentFactory);
     }
 

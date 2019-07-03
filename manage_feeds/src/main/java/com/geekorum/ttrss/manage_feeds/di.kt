@@ -30,6 +30,7 @@ import androidx.work.WorkerFactory
 import com.geekorum.geekdroid.dagger.FragmentFactoriesModule
 import com.geekorum.geekdroid.dagger.FragmentKey
 import com.geekorum.geekdroid.dagger.ViewModelKey
+import com.geekorum.ttrss.CoreFactoriesModule
 import com.geekorum.ttrss.accounts.PerAccount
 import com.geekorum.ttrss.data.ArticlesDatabase
 import com.geekorum.ttrss.di.FeatureScope
@@ -49,6 +50,7 @@ import dagger.multibindings.IntoMap
 
 @Component(dependencies = [ManageFeedsDependencies::class],
     modules = [AndroidInjectorsModule::class,
+        CoreFactoriesModule::class,
         WorkManagerModule::class,
         AddFeedModule::class,
         WorkersModule::class])
