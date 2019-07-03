@@ -32,8 +32,16 @@
             tools:layout="@layout/fragment_add_feed_enter_url">
         <action android:id="@+id/action_show_available_feeds"
                 app:destination="@id/select_feed" />
+        <action android:id="@+id/action_display_error"
+                app:destination="@id/display_error" />
     </fragment>
     <fragment android:id="@+id/select_feed"
             android:name="com.geekorum.ttrss.manage_feeds.add_feed.SelectFeedFragment"
             tools:layout="@layout/fragment_add_feed_select_feed"/>
+
+    <fragment android:id="@+id/display_error"
+            android:name="com.geekorum.ttrss.manage_feeds.add_feed.DisplayErrorFragment"
+            tools:layout="@layout/fragment_add_feed_display_error">
+        <argument android:name="errorMsgId" app:argType="reference" android:defaultValue="@string/fragment_display_error_no_feeds_found" />
+    </fragment>
 </navigation>

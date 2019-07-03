@@ -51,4 +51,8 @@
         <item quantity="other">We found %d feeds on this website. Select the one you want to subscribe to.</item>
     </plurals>
 
+    <!-- fragment_display_error -->
+    <string name="fragment_display_error_no_feeds_found">We did not find any feeds on this website. Check the url</string>
+    <string name="fragment_display_error_io_error">Something went wrong. Check your internet connectivity</string>
+
 </resources>

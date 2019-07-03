@@ -17,7 +17,8 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
- */package com.geekorum.ttrss.manage_feeds.add_feed
+ */
+package com.geekorum.ttrss.manage_feeds.add_feed
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -25,41 +26,27 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentFactory
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.observe
+import androidx.navigation.fragment.navArgs
 import com.geekorum.ttrss.BaseFragment
-import com.geekorum.ttrss.activityViewModels
-import com.geekorum.ttrss.manage_feeds.R
-import com.geekorum.ttrss.manage_feeds.databinding.FragmentAddFeedSelectFeedBinding
+import com.geekorum.ttrss.manage_feeds.databinding.FragmentAddFeedDisplayErrorBinding
 import javax.inject.Inject
 
-class SelectFeedFragment @Inject constructor(
+
+class DisplayErrorFragment @Inject constructor(
     viewModelsFactory: ViewModelProvider.Factory,
     fragmentFactory: FragmentFactory
 ) : BaseFragment(viewModelsFactory, fragmentFactory) {
 
-    private lateinit var binding: FragmentAddFeedSelectFeedBinding
-    private val viewModel: SubscribeToFeedViewModel by activityViewModels()
+    private lateinit var binding: FragmentAddFeedDisplayErrorBinding
 
+    val args: DisplayErrorFragmentArgs by navArgs()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentAddFeedSelectFeedBinding.inflate(inflater, container, false)
+        binding = FragmentAddFeedDisplayErrorBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        binding.viewModel = viewModel
-        binding.lifecycleOwner = viewLifecycleOwner
-        val feedAdapter = FeedAdapter(requireContext())
-        binding.availableFeeds.adapter = feedAdapter
-
-        viewModel.feedsFound.observe(viewLifecycleOwner) {
-            val text = it?.firstOrNull()?.title ?: getString(
-                R.string.activity_add_feed_no_feeds_available)
-            binding.availableFeedsSingle.text = text
-            with(feedAdapter) {
-                clear()
-                addAll(it ?: emptyList())
-            }
-        }
+        binding.lblError.setText(args.errorMsgId)
     }
 }

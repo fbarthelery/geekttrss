@@ -37,6 +37,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
+import timber.log.Timber
+import java.io.IOException
 import javax.inject.Inject
 
 
@@ -52,6 +54,9 @@ class SubscribeToFeedViewModel @Inject constructor(
     private val _invalidUrlError = MutableLiveData<Event<String>>()
     val invalidUrlEvent: LiveData<Event<String>> = _invalidUrlError
 
+    private val _ioError = MutableLiveData<Event<IOException>>()
+    val ioErrorEvent: LiveData<Event<IOException>> = _ioError
+
     var urlTyped: String = ""
 
     internal var selectedFeed: FeedResult? = null
@@ -59,15 +64,14 @@ class SubscribeToFeedViewModel @Inject constructor(
     fun submitUrl(urlString: String) = viewModelScope.launch {
         val url = checkUrl(urlString) ?: return@launch
 
-        val feeds = withContext(Dispatchers.IO) {
-            feedsFinder.findFeeds(url)
-        }
-
-        when {
-            feeds.isEmpty() -> TODO("show error")
-            else ->  {
-                _feedsFound.value = feeds.toList()
+        try {
+            val feeds = withContext(Dispatchers.IO) {
+                feedsFinder.findFeeds(url)
             }
+            _feedsFound.value = feeds.toList()
+        } catch (e: IOException) {
+            Timber.w(e, "Unable to find feed")
+            _ioError.value = Event(e)
         }
     }
 
