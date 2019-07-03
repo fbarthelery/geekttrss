@@ -31,12 +31,14 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
+import com.geekorum.geekdroid.app.lifecycle.Event
 import com.geekorum.ttrss.manage_feeds.R
 import com.google.android.material.textfield.TextInputLayout
 import io.mockk.mockk
 import io.mockk.verify
 import junit.framework.AssertionFailedError
 import org.junit.runner.RunWith
+import java.io.IOException
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import com.google.android.material.R as matR
@@ -81,6 +83,39 @@ class EnterFeedUrlFragmentTest {
 
 
     @Test
+    fun testThatWhenIOErrorNavigateToDisplayError() {
+        val scenario = launchFragmentInContainer(themeResId = matR.style.Theme_MaterialComponents_Light) {
+            EnterFeedUrlFragment(viewModelFactory, framentFactory)
+        }
+
+        scenario.onFragment {
+            Navigation.setViewNavController(it.requireView(), navController)
+            subscribeToFeedViewModel._ioError.value = Event(IOException("error"))
+        }
+
+        val expectedNavigation = EnterFeedUrlFragmentDirections.actionDisplayError(
+            R.string.fragment_display_error_io_error)
+        verify { navController.navigate(eq(expectedNavigation)) }
+    }
+
+    @Test
+    fun testThatWhenNoFeedsAreFoundNavigateToDisplayError() {
+        val scenario = launchFragmentInContainer(themeResId = matR.style.Theme_MaterialComponents_Light) {
+            EnterFeedUrlFragment(viewModelFactory, framentFactory)
+        }
+
+        scenario.onFragment {
+            Navigation.setViewNavController(it.requireView(), navController)
+            subscribeToFeedViewModel._feedsFound.value = emptyList()
+        }
+
+        val expectedNavigation = EnterFeedUrlFragmentDirections.actionDisplayError(
+            R.string.fragment_display_error_no_feeds_found)
+        verify { navController.navigate(eq(expectedNavigation)) }
+    }
+
+
+    @Test
     fun testThatWhenManyFeedsAreFoundNavigateToSelectFeed() {
         val scenario = launchFragmentInContainer(themeResId = matR.style.Theme_MaterialComponents_Light) {
             EnterFeedUrlFragment(viewModelFactory, framentFactory)
@@ -91,7 +126,8 @@ class EnterFeedUrlFragmentTest {
             subscribeToFeedViewModel._feedsFound.value = listOf(mockk(), mockk())
         }
 
-        verify { navController.navigate(R.id.action_show_available_feeds) }
+        val expectedNavigation = EnterFeedUrlFragmentDirections.actionShowAvailableFeeds()
+        verify { navController.navigate(eq(expectedNavigation)) }
     }
 
 
@@ -120,7 +156,8 @@ class EnterFeedUrlFragmentTest {
             subscribeToFeedViewModel._feedsFound.value = listOf(FeedsFinder.FeedResult(FeedsFinder.Source.HTML, "url"))
         }
 
-        verify { navController.navigate(R.id.action_show_available_feeds) }
+        val expectedNavigation = EnterFeedUrlFragmentDirections.actionShowAvailableFeeds()
+        verify { navController.navigate(eq(expectedNavigation)) }
     }
 
 }

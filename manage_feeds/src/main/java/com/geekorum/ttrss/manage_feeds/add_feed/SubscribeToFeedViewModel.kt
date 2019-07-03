@@ -54,7 +54,7 @@ class SubscribeToFeedViewModel @Inject constructor(
     private val _invalidUrlError = MutableLiveData<Event<String>>()
     val invalidUrlEvent: LiveData<Event<String>> = _invalidUrlError
 
-    private val _ioError = MutableLiveData<Event<IOException>>()
+    internal val _ioError = MutableLiveData<Event<IOException>>()
     val ioErrorEvent: LiveData<Event<IOException>> = _ioError
 
     var urlTyped: String = ""

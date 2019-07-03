@@ -64,18 +64,30 @@ class EnterFeedUrlFragment @Inject constructor(
             if (it == null) return@observe
 
             when {
+                it.isEmpty() -> {
+                    val action = EnterFeedUrlFragmentDirections.actionDisplayError(
+                        R.string.fragment_display_error_no_feeds_found)
+                    navController.navigate(action)
+                }
+
                 it.size == 1 -> {
                     val info = it.single()
                     if (info.source == FeedsFinder.Source.URL) {
                         viewModel.subscribeToFeed(info.toFeedInformation())
                         requireActivity().finish()
                     } else {
-                        navController.navigate(R.id.action_show_available_feeds)
+                        navController.navigate(EnterFeedUrlFragmentDirections.actionShowAvailableFeeds())
                     }
                 }
 
-                it.size > 1 -> navController.navigate(R.id.action_show_available_feeds)
+                it.size > 1 -> navController.navigate(EnterFeedUrlFragmentDirections.actionShowAvailableFeeds())
             }
         }
+
+        viewModel.ioErrorEvent.observe(this, EventObserver {
+            val action = EnterFeedUrlFragmentDirections.actionDisplayError(
+                R.string.fragment_display_error_io_error)
+            navController.navigate(action)
+        })
     }
 }
