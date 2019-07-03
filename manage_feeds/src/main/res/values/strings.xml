@@ -45,4 +45,10 @@
     <string name="fragment_enter_feed_url_label">Enter feed or website url</string>
     <string name="fragment_enter_feed_url_field_label">Url</string>
 
+    <!-- fragment select feed -->
+    <plurals name="fragment_select_feed_label">
+        <item quantity="one">We found this feed on this website. Do you want to subscribe ?</item>
+        <item quantity="other">We found %d feeds on this website. Select the one you want to subscribe to.</item>
+    </plurals>
+
 </resources>

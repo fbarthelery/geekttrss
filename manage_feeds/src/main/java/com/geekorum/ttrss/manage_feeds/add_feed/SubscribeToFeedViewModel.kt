@@ -31,12 +31,12 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.geekorum.geekdroid.app.lifecycle.Event
 import com.geekorum.ttrss.htmlparsers.FeedInformation
+import com.geekorum.ttrss.manage_feeds.add_feed.FeedsFinder.FeedResult
 import com.geekorum.ttrss.manage_feeds.workers.SubscribeWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
-import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -46,15 +46,15 @@ class SubscribeToFeedViewModel @Inject constructor(
     private val account: Account
 ) : ViewModel() {
 
-    internal val _feedsFound = MutableLiveData<List<FeedsFinder.FeedResult>?>()
-    val feedsFound = _feedsFound as LiveData<List<FeedsFinder.FeedResult>?>
+    internal val _feedsFound = MutableLiveData<List<FeedResult>?>()
+    val feedsFound = _feedsFound as LiveData<List<FeedResult>?>
 
     private val _invalidUrlError = MutableLiveData<Event<String>>()
     val invalidUrlEvent: LiveData<Event<String>> = _invalidUrlError
 
     var urlTyped: String = ""
 
-    internal var selectedFeed: FeedInformation? = null
+    internal var selectedFeed: FeedResult? = null
 
     fun submitUrl(urlString: String) = viewModelScope.launch {
         val url = checkUrl(urlString) ?: return@launch
@@ -103,7 +103,7 @@ class SubscribeToFeedViewModel @Inject constructor(
     }
 
     fun setSelectedFeed(feed: Any) {
-        selectedFeed = feed as FeedInformation
+        selectedFeed = feed as FeedResult
     }
 
     fun resetAvailableFeeds() {

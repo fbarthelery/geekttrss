@@ -33,5 +33,7 @@
         <action android:id="@+id/action_show_available_feeds"
                 app:destination="@id/select_feed" />
     </fragment>
-    <fragment android:id="@+id/select_feed" />
+    <fragment android:id="@+id/select_feed"
+            android:name="com.geekorum.ttrss.manage_feeds.add_feed.SelectFeedFragment"
+            tools:layout="@layout/fragment_add_feed_select_feed"/>
 </navigation>

@@ -36,9 +36,9 @@ import com.google.android.material.textfield.TextInputLayout
 import io.mockk.mockk
 import io.mockk.verify
 import junit.framework.AssertionFailedError
-import org.junit.Before
-import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.test.BeforeTest
+import kotlin.test.Test
 import com.google.android.material.R as matR
 
 
@@ -50,7 +50,7 @@ class EnterFeedUrlFragmentTest {
     lateinit var navController: NavController
     lateinit var workManager: WorkManager
 
-    @Before
+    @BeforeTest
     fun setUp() {
         framentFactory = mockk()
         workManager = mockk(relaxed = true)

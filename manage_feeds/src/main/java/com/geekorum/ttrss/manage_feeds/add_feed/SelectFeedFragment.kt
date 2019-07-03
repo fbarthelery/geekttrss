@@ -1,0 +1,66 @@
+/*
+ * Geekttrss is a RSS feed reader application on the Android Platform.
+ *
+ * Copyright (C) 2017-2019 by Frederic-Charles Barthelery.
+ *
+ * This file is part of Geekttrss.
+ *
+ * Geekttrss is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Geekttrss is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
+ */package com.geekorum.ttrss.manage_feeds.add_feed
+
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.FragmentFactory
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.observe
+import com.geekorum.ttrss.BaseFragment
+import com.geekorum.ttrss.activityViewModels
+import com.geekorum.ttrss.manage_feeds.R
+import com.geekorum.ttrss.manage_feeds.databinding.FragmentAddFeedSelectFeedBinding
+import javax.inject.Inject
+
+class SelectFeedFragment @Inject constructor(
+    viewModelsFactory: ViewModelProvider.Factory,
+    fragmentFactory: FragmentFactory
+) : BaseFragment(viewModelsFactory, fragmentFactory) {
+
+    private lateinit var binding: FragmentAddFeedSelectFeedBinding
+    private val viewModel: SubscribeToFeedViewModel by activityViewModels()
+
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        binding = FragmentAddFeedSelectFeedBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
+        val feedAdapter = FeedAdapter(requireContext())
+        binding.availableFeeds.adapter = feedAdapter
+
+        viewModel.feedsFound.observe(viewLifecycleOwner) {
+            val feeds = checkNotNull(it)
+            val text = feeds.firstOrNull()?.title ?: getString(
+                R.string.activity_add_feed_no_feeds_available)
+            binding.availableFeedsSingle.text = text
+            with(feedAdapter) {
+                clear()
+                addAll(feeds)
+            }
+        }
+    }
+}
