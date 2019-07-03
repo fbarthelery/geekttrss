@@ -21,7 +21,9 @@
 package com.geekorum.ttrss.manage_feeds
 
 import android.app.Dialog
+import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingUtil
@@ -38,6 +40,7 @@ import com.geekorum.ttrss.BaseDialogFragment
 import com.geekorum.ttrss.activityViewModels
 import com.geekorum.ttrss.applicationComponent
 import com.geekorum.ttrss.data.Feed
+import com.geekorum.ttrss.manage_feeds.add_feed.SubscribeToFeedActivity
 import com.geekorum.ttrss.manage_feeds.databinding.ActivityManageFeedsBinding
 import com.geekorum.ttrss.manage_feeds.databinding.DialogUnsubscribeFeedBinding
 import com.geekorum.ttrss.manage_feeds.databinding.ItemFeedBinding
@@ -55,6 +58,11 @@ class ManageFeedsActivity : SessionActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_manage_feeds)
         binding.recyclerView.adapter = adapter
+
+        binding.fab.setOnClickListener {
+            startSubscribeToFeed()
+        }
+
         viewModel.feeds.observe(this) {
             adapter.submitList(it)
         }
@@ -75,6 +83,12 @@ class ManageFeedsActivity : SessionActivity() {
         val confirmationFragment = ConfirmationFragment.newInstance(supportFragmentManager.fragmentFactory, feed)
         confirmationFragment.show(supportFragmentManager, null)
     }
+
+    private fun startSubscribeToFeed() {
+        val intent = Intent(this, SubscribeToFeedActivity::class.java)
+        startActivity(intent)
+    }
+
 
     private inner class FeedsAdapter : PagedListAdapter<Feed, FeedViewHolder>(DiffFeed) {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedViewHolder {

@@ -30,11 +30,14 @@
     <fragment android:id="@+id/enter_feed_url"
             android:name="com.geekorum.ttrss.manage_feeds.add_feed.EnterFeedUrlFragment"
             tools:layout="@layout/fragment_add_feed_enter_url">
-        <action android:id="@+id/action_show_available_feeds"
-                app:destination="@id/select_feed" />
-        <action android:id="@+id/action_display_error"
-                app:destination="@id/display_error" />
+        <action android:id="@+id/action_show_available_feeds" app:destination="@id/select_feed"
+                app:enterAnim="@anim/slide_in_right" app:exitAnim="@anim/slide_out_left"
+                app:popEnterAnim="@anim/slide_in_left" app:popExitAnim="@anim/slide_out_right" />
+        <action android:id="@+id/action_display_error" app:destination="@id/display_error"
+                app:enterAnim="@anim/slide_in_right" app:exitAnim="@anim/slide_out_left"
+                app:popEnterAnim="@anim/slide_in_left" app:popExitAnim="@anim/slide_out_right" />
     </fragment>
+
     <fragment android:id="@+id/select_feed"
             android:name="com.geekorum.ttrss.manage_feeds.add_feed.SelectFeedFragment"
             tools:layout="@layout/fragment_add_feed_select_feed"/>
