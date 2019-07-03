@@ -30,6 +30,7 @@ plugins {
     kotlin("android") version "1.3.40" apply false
     kotlin("kapt") version "1.3.40" apply false
     id("kotlinx-serialization") version "1.3.40" apply false
+    id("androidx.navigation.safeargs.kotlin") version "2.1.0-alpha06" apply false
 }
 
 

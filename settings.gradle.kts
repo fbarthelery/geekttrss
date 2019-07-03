@@ -47,6 +47,7 @@ pluginManagement {
                 id == "com.github.triplet.play" -> useModule("com.github.triplet.gradle:play-publisher:${requested.version}")
                 id == "io.fabric" -> useModule("io.fabric.tools:gradle:${requested.version}")
                 id == "kotlinx-serialization" -> useModule("org.jetbrains.kotlin:kotlin-serialization:${requested.version}")
+                id == "androidx.navigation.safeargs.kotlin" -> useModule("androidx.navigation:navigation-safe-args-gradle-plugin:${requested.version}")
             }
         }
     }
