@@ -46,7 +46,7 @@ class SubscribeToFeedViewModel @Inject constructor(
     private val account: Account
 ) : ViewModel() {
 
-    private val _feedsFound = MutableLiveData<List<FeedsFinder.FeedResult>?>()
+    internal val _feedsFound = MutableLiveData<List<FeedsFinder.FeedResult>?>()
     val feedsFound = _feedsFound as LiveData<List<FeedsFinder.FeedResult>?>
 
     private val _invalidUrlError = MutableLiveData<Event<String>>()

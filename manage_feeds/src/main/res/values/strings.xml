@@ -41,4 +41,8 @@
     <string name="activity_subscribe_feed_btn_subscribe">Subscribe</string>
     <string name="activity_subscribe_feed_btn_cancel">Cancel</string>
 
+    <!-- fragment enter feed url -->
+    <string name="fragment_enter_feed_url_label">Enter feed or website url</string>
+    <string name="fragment_enter_feed_url_field_label">Url</string>
+
 </resources>
