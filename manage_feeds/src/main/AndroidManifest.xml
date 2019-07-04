@@ -22,6 +22,7 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           xmlns:dist="http://schemas.android.com/apk/distribution"
+          xmlns:tools="http://schemas.android.com/tools"
           package="com.geekorum.ttrss.manage_feeds">
 
     <dist:module
@@ -33,12 +34,13 @@
         <dist:fusing dist:include="true" />
     </dist:module>
 
-    <application>
+    <application tools:ignore="GoogleAppIndexingWarning">
         <activity android:name="com.geekorum.ttrss.manage_feeds.ManageFeedsActivity"
                   android:theme="@style/AppTheme.ManageFeedsActivity" />
 
         <activity android:name="com.geekorum.ttrss.manage_feeds.add_feed.SubscribeToFeedActivity"
-                android:theme="@style/AppTheme.NoActionBar" />
+                android:theme="@style/AppTheme.NoActionBar"
+                android:windowSoftInputMode="adjustResize"/>
 
         <activity android:name="com.geekorum.ttrss.manage_feeds.add_feed.AddFeedActivity"
                   android:label="@string/activity_add_feed_title"
