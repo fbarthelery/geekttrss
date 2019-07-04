@@ -28,14 +28,12 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isCompletelyDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.geekorum.ttrss.manage_feeds.R
-import com.geekorum.geekdroid.R as geekdroidR
 import com.google.common.truth.Truth.assertWithMessage
-import org.hamcrest.Matchers.allOf
 import org.junit.Test
 import org.junit.runner.RunWith
+import com.geekorum.geekdroid.R as geekdroidR
 
 @RunWith(AndroidJUnit4::class)
 class AddFeedActivityTest {

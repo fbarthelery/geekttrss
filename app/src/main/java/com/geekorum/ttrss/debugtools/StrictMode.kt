@@ -46,7 +46,6 @@ private const val TAG = "StrictMode"
  */
 class StrictModeInitializer @Inject constructor() : AppInitializer {
     private val listenerExecutor by lazy { Executors.newSingleThreadExecutor() }
-    private val shouldBeFatal: Boolean = (BuildConfig.DEBUG)
 
     @delegate:RequiresApi(Build.VERSION_CODES.P)
     private val violationListener: ViolationListener by lazy { ViolationListener() }
@@ -63,7 +62,7 @@ class StrictModeInitializer @Inject constructor() : AppInitializer {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     detectContentUriWithoutPermission()
                     // because crashlytics don't tag its socket
-                    if (BuildConfig.FLAVOR != "google" || !shouldBeFatal) {
+                    if (BuildConfig.FLAVOR != "google") {
                         detectUntaggedSockets()
                     }
                 }
@@ -76,9 +75,6 @@ class StrictModeInitializer @Inject constructor() : AppInitializer {
                 } else {
                     penaltyLog()
                 }
-                if (shouldBeFatal) {
-                    penaltyDeath()
-                }
             }
             .build())
 
@@ -89,9 +85,6 @@ class StrictModeInitializer @Inject constructor() : AppInitializer {
                     penaltyListener(listenerExecutor, violationListener)
                 } else {
                     penaltyLog()
-                }
-                if (shouldBeFatal) {
-                    penaltyDeath()
                 }
             }
             .build())
