@@ -27,7 +27,6 @@ import androidx.lifecycle.Observer
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
-import com.geekorum.ttrss.htmlparsers.FeedInformation
 import com.geekorum.ttrss.manage_feeds.add_feed.FeedsFinder.FeedResult
 import com.geekorum.ttrss.manage_feeds.add_feed.FeedsFinder.Source.HTML
 import com.google.common.truth.Truth.assertThat
