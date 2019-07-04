@@ -41,6 +41,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import io.mockk.verifySequence
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.runBlocking
@@ -53,7 +54,7 @@ import org.junit.Rule
 import org.junit.Test
 import java.util.concurrent.Executors
 
-
+@UseExperimental(ExperimentalCoroutinesApi::class)
 class LoginViewModelTest {
 
     @get:Rule

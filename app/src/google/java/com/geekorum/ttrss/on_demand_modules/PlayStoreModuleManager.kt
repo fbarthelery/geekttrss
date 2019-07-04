@@ -31,10 +31,10 @@ import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus
 import com.google.android.play.core.tasks.Task
 import dagger.Module
 import dagger.Provides
-import kotlinx.coroutines.channels.SendChannel
-import kotlinx.coroutines.runBlocking
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 
 class PlayStoreModuleManager constructor(
     private val splitInstallManager: SplitInstallManager
@@ -75,26 +75,22 @@ private class SplitInstallSession(
     private val splitInstallManager: SplitInstallManager,
     id: Int
 ) : InstallSession(id) {
-    override suspend fun sendStatesTo(channel: SendChannel<State>) {
-        val listener = SplitInstallStateUpdatedListener {
-            runBlocking {
+
+    @ExperimentalCoroutinesApi
+    override fun getSessionStates(): Flow<State> {
+        return callbackFlow {
+            val listener = SplitInstallStateUpdatedListener {
                 if (it.sessionId() != id) {
-                    return@runBlocking
+                    return@SplitInstallStateUpdatedListener
                 }
                 val installState = it.toInstallSessionState()
-                channel.send(installState)
+                channel.offer(installState)
                 if (it.isTerminal) {
                     channel.close()
                 }
             }
-        }
-        splitInstallManager.registerListener(listener)
-
-        suspendCoroutine<Unit> {cont ->
-            channel.invokeOnClose {
-                splitInstallManager.unregisterListener(listener)
-                cont.resume(Unit)
-            }
+            splitInstallManager.registerListener(listener)
+            awaitClose { splitInstallManager.unregisterListener(listener) }
         }
     }
 

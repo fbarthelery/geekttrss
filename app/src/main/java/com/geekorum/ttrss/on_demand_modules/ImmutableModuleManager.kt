@@ -20,8 +20,11 @@
  */
 package com.geekorum.ttrss.on_demand_modules
 
-import kotlinx.coroutines.channels.SendChannel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 
 /**
  * An Immutable modules installation
@@ -36,9 +39,7 @@ class ImmutableModuleManager(
         return if (toInstall.isEmpty())
             CompleteSession(nextSessionId++)
         else
-//            FailedSession(nextSessionId++)
-        MockedSession(nextSessionId++)
-
+            FailedSession(nextSessionId++)
     }
 
     override fun deferredInstall(vararg modules: String) {
@@ -65,10 +66,8 @@ internal class CompleteSession(id: Int) : InstallSession(id) {
 
     override suspend fun getSessionState(): State = state
 
-    override suspend fun sendStatesTo(channel: SendChannel<State>) {
-        channel.send(state)
-        channel.close()
-    }
+    @ExperimentalCoroutinesApi
+    override fun getSessionStates(): Flow<State> = flowOf(state)
 
     override fun cancel() {
         // no op
@@ -80,15 +79,12 @@ internal class CompleteSession(id: Int) : InstallSession(id) {
  */
 
 private class FailedSession(id: Int) : InstallSession(id) {
-
     private val state = State(State.Status.FAILED, 0, 0)
 
     override suspend fun getSessionState(): State = state
 
-    override suspend fun sendStatesTo(channel: SendChannel<State>) {
-        channel.send(state)
-        channel.close()
-    }
+    @ExperimentalCoroutinesApi
+    override fun getSessionStates(): Flow<State> = flowOf(state)
 
     override fun cancel() {
         // no op
@@ -97,31 +93,32 @@ private class FailedSession(id: Int) : InstallSession(id) {
 }
 
 class MockedSession(id: Int) : InstallSession(id) {
-    override suspend fun sendStatesTo(channel: SendChannel<State>) {
+
+    @ExperimentalCoroutinesApi
+    override fun getSessionStates(): Flow<State> = flow {
         var state = State(State.Status.PENDING, 0, 0)
-        channel.send(state)
+        emit(state)
         delay(500)
 
         state = State(State.Status.DOWNLOADING, 0, 1000)
-        channel.send(state)
+        emit(state)
         delay(500)
         state = State(State.Status.DOWNLOADING, 200, 1000)
-        channel.send(state)
+        emit(state)
         delay(500)
         state = State(State.Status.DOWNLOADING, 700, 1000)
-        channel.send(state)
+        emit(state)
         delay(500)
         state = State(State.Status.DOWNLOADING, 1000, 1000)
-        channel.send(state)
+        emit(state)
         delay(500)
 
         state = State(State.Status.INSTALLING, 1000, 1000)
-        channel.send(state)
+        emit(state)
         delay(500)
 
         state = State(State.Status.INSTALLED, 1000, 1000)
-        channel.send(state)
-        channel.close()
+        emit(state)
     }
 
     override fun cancel() {

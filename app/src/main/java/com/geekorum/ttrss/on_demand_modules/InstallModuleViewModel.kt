@@ -35,10 +35,12 @@ import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.INSTALLE
 import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.INSTALLING
 import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.PENDING
 import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.REQUIRES_USER_CONFIRMATION
-import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 class InstallModuleViewModel @Inject constructor(
     private val moduleManager: OnDemandModuleManager
@@ -65,18 +67,16 @@ class InstallModuleViewModel @Inject constructor(
         return module in moduleManager.installedModules
     }
 
+    @UseExperimental(ExperimentalCoroutinesApi::class)
     fun startInstallModules(vararg modules: String) = viewModelScope.launch {
         if (session != null) {
             return@launch
         }
 
         val session = moduleManager.startInstallModule(*modules)
-
-        val sessionStates = produceInstallSessionStates(session)
-
         this@InstallModuleViewModel.session = session
 
-        sessionStates.consumeEach {
+        session.getSessionStates().collect {
             _sessionState.value = it
         }
     }
@@ -92,7 +92,7 @@ class InstallModuleViewModel @Inject constructor(
         }
         val max = 100
         val percent = when (state.status) {
-            DOWNLOADING -> Math.round((state.bytesDownloaded.toFloat() / state.totalBytesDownloaded) * max)
+            DOWNLOADING -> ((state.bytesDownloaded.toFloat() / state.totalBytesDownloaded) * max).roundToInt()
             INSTALLED -> 100
             else -> 0
         }

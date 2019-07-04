@@ -20,9 +20,8 @@
  */
 package com.geekorum.ttrss.on_demand_modules
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.channels.SendChannel
-import kotlinx.coroutines.channels.produce
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Allows to manage On Demand modules
@@ -61,9 +60,10 @@ abstract class InstallSession(
 ) {
     abstract fun cancel()
 
-    abstract suspend fun sendStatesTo(channel: SendChannel<State>)
-
     abstract suspend fun getSessionState(): State
+
+    @UseExperimental(ExperimentalCoroutinesApi::class)
+    abstract fun getSessionStates(): Flow<State>
 
     data class State(
         val status: Status,
@@ -81,13 +81,6 @@ abstract class InstallSession(
             CANCELED
         }
     }
-}
-
-
-/* Extensions functions for easy usage */
-
-fun CoroutineScope.produceInstallSessionStates(session: InstallSession) = produce <InstallSession.State> {
-    session.sendStatesTo(channel)
 }
 
 

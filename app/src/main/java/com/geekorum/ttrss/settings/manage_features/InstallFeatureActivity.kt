@@ -71,7 +71,7 @@ class InstallFeatureActivity : BaseActivity() {
                 else -> startAnimation()
             }
         }
-        val features = intent.getStringArrayExtra(EXTRA_FEATURES_LIST)
+        val features = intent.getStringArrayExtra(EXTRA_FEATURES_LIST) ?: emptyArray()
         viewModel.startInstallModules(*features)
     }
 
