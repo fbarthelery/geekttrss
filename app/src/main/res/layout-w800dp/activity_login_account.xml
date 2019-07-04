@@ -42,7 +42,16 @@
                 android:layout_height="@dimen/app_bar_height"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent" />
+                app:layout_constraintEnd_toEndOf="parent">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    style="?appBarToolbarStyle"
+                    />
+
+        </com.google.android.material.appbar.AppBarLayout>
 
         <!-- not a MaterialCardView because they can't have databinding included view
             Bug: https://issuetracker.google.com/issues/134379499 -->
