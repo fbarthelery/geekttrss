@@ -42,7 +42,8 @@ import java.io.IOException
 import javax.inject.Inject
 
 
-class SubscribeToFeedViewModel @Inject constructor(
+// open for mocking in androidTests
+open class SubscribeToFeedViewModel @Inject constructor(
     private val feedsFinder: FeedsFinder,
     private val workManager: WorkManager,
     private val account: Account
@@ -85,7 +86,7 @@ class SubscribeToFeedViewModel @Inject constructor(
     }
 
 
-    fun subscribeToFeed(feedInfo: FeedInformation) {
+    open fun subscribeToFeed(feedInfo: FeedInformation) {
         subscribeToFeed(account, feedInfo.href)
     }
 

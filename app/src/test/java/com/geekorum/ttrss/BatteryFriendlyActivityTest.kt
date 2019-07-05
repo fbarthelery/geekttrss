@@ -71,7 +71,7 @@ class BatteryFriendlyActivityTest {
     fun testThatWhenPowerSaveIsOnNightModeConfigurationIsUsed() {
         val scenario = ActivityScenario.launch(BatteryFriendlyActivityRecordNightModeChanged::class.java)
         scenario.onActivity {
-            assertThat(it.nightMode).isEqualTo(MODE_NIGHT_FOLLOW_SYSTEM)
+            assertThat(it.nightMode).isEqualTo(MODE_NIGHT_UNSPECIFIED)
         }
 
         val powerManager = Shadows.shadowOf(application.getSystemService<PowerManager>())
@@ -87,7 +87,7 @@ class BatteryFriendlyActivityTest {
     fun testThatWhenBatteryIsLowNightModeConfigurationIsUsed() {
         val scenario = ActivityScenario.launch(BatteryFriendlyActivityRecordNightModeChanged::class.java)
         scenario.onActivity {
-            assertThat(it.nightMode).isEqualTo(MODE_NIGHT_FOLLOW_SYSTEM)
+            assertThat(it.nightMode).isEqualTo(MODE_NIGHT_UNSPECIFIED)
         }
 
         val application = ApplicationProvider.getApplicationContext<Application>()

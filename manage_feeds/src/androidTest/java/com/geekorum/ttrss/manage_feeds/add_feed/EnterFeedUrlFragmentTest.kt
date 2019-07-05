@@ -30,11 +30,11 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.WorkManager
-import androidx.work.WorkRequest
 import com.geekorum.geekdroid.app.lifecycle.Event
 import com.geekorum.ttrss.manage_feeds.R
 import com.google.android.material.textfield.TextInputLayout
 import io.mockk.mockk
+import io.mockk.spyk
 import io.mockk.verify
 import junit.framework.AssertionFailedError
 import org.junit.runner.RunWith
@@ -56,7 +56,7 @@ class EnterFeedUrlFragmentTest {
     fun setUp() {
         framentFactory = mockk()
         workManager = mockk(relaxed = true)
-        subscribeToFeedViewModel = SubscribeToFeedViewModel(mockk(), workManager, mockk())
+        subscribeToFeedViewModel = spyk(SubscribeToFeedViewModel(mockk(), workManager, mockk()))
         navController = mockk(relaxed = true)
         viewModelFactory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -142,7 +142,11 @@ class EnterFeedUrlFragmentTest {
             subscribeToFeedViewModel._feedsFound.value = listOf(FeedsFinder.FeedResult(FeedsFinder.Source.URL, "url"))
         }
 
-        verify { workManager.enqueue(any<WorkRequest>()) }
+        verify {
+            // enqueue() is final and cannot be mocked on api < 28, so we spy the call to subscribeToFeed instead
+            // workManager.enqueue(any<WorkRequest>())
+            subscribeToFeedViewModel.subscribeToFeed(any())
+        }
     }
 
     @Test
