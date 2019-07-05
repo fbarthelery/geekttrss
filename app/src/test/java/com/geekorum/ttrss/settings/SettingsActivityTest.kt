@@ -38,6 +38,7 @@ import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.runner.RunWith
+import org.robolectric.annotation.Config
 import kotlin.reflect.jvm.jvmName
 import kotlin.test.Test
 
@@ -46,6 +47,7 @@ import kotlin.test.Test
  * if the correct intent is fired. See androidTest/com.geekorum.test.SettingsActivityTest for a more complete test.
  */
 @RunWith(AndroidJUnit4::class)
+@Config(sdk = [28]) // for now we don't do robolectric on sdk 29 (needs to run on java9)
 class SettingsActivityTest {
 
     @get:Rule

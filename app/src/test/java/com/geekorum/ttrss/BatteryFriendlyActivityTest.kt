@@ -45,10 +45,12 @@ import io.mockk.verifySequence
 import org.junit.Rule
 import org.junit.runner.RunWith
 import org.robolectric.Shadows
+import org.robolectric.annotation.Config
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @RunWith(AndroidJUnit4::class)
+@Config(sdk = [28]) // for now we don't do robolectric on sdk 29 (needs to run on java9)
 class BatteryFriendlyActivityTest {
     val application: Application = ApplicationProvider.getApplicationContext()
 

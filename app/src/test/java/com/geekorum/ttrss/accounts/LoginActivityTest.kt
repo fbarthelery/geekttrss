@@ -42,6 +42,7 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
+@Config(sdk = [28]) // for now we don't do robolectric on sdk 29 (needs to run on java9)
 class LoginActivityTest {
 
     @Test
