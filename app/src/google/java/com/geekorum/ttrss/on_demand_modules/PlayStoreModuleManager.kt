@@ -20,6 +20,7 @@
  */
 package com.geekorum.ttrss.on_demand_modules
 
+import android.app.Activity
 import com.geekorum.geekdroid.gms.await
 import com.google.android.play.core.splitinstall.SplitInstallException
 import com.google.android.play.core.splitinstall.SplitInstallManager
@@ -102,6 +103,12 @@ private class SplitInstallSession(
     override fun cancel() {
         splitInstallManager.cancelInstall(id)
     }
+
+    override suspend fun startUserConfirmationDialog(activity: Activity, code: Int) {
+        val state = splitInstallManager.getSessionState(id).await()
+        splitInstallManager.startConfirmationDialogForResult(state, activity, code)
+    }
+
 }
 
 private fun SplitInstallSessionState.toInstallSessionState(): InstallSession.State {

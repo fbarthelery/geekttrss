@@ -20,6 +20,7 @@
  */
 package com.geekorum.ttrss.on_demand_modules
 
+import android.app.Activity
 import androidx.annotation.StringRes
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -101,6 +102,10 @@ class InstallModuleViewModel @Inject constructor(
             DOWNLOADING, INSTALLED, FAILED, CANCELED -> false
         }
         return InstallProgression(message, percent, max, progressIndeterminate)
+    }
+
+    fun startUserConfirmationDialog(activity: Activity, code: Int)= viewModelScope.launch {
+        session?.startUserConfirmationDialog(activity, code)
     }
 
 }

@@ -20,6 +20,7 @@
  */
 package com.geekorum.ttrss.on_demand_modules
 
+import android.app.Activity
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 
@@ -64,6 +65,8 @@ abstract class InstallSession(
 
     @UseExperimental(ExperimentalCoroutinesApi::class)
     abstract fun getSessionStates(): Flow<State>
+
+    abstract suspend fun startUserConfirmationDialog(activity: Activity, code: Int)
 
     data class State(
         val status: Status,

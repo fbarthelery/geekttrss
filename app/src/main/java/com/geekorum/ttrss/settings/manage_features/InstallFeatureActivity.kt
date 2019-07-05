@@ -32,6 +32,7 @@ import com.geekorum.ttrss.on_demand_modules.InstallModuleViewModel
 import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.CANCELED
 import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.FAILED
 import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.INSTALLED
+import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.REQUIRES_USER_CONFIRMATION
 import com.geekorum.ttrss.viewModels
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -43,6 +44,7 @@ class InstallFeatureActivity : BaseActivity() {
 
     companion object {
         const val EXTRA_FEATURES_LIST = "features"
+        const val CODE_REQUEST_USER_CONFIRMATION = 1
     }
 
     lateinit var binding: ActivityInstallFeatureBinding
@@ -68,6 +70,10 @@ class InstallFeatureActivity : BaseActivity() {
                 }
                 FAILED,
                 CANCELED -> stopAnimation()
+                REQUIRES_USER_CONFIRMATION -> {
+                    viewModel.startUserConfirmationDialog(this@InstallFeatureActivity,
+                        CODE_REQUEST_USER_CONFIRMATION)
+                }
                 else -> startAnimation()
             }
         }

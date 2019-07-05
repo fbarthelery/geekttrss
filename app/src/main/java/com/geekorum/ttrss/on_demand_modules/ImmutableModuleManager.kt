@@ -20,6 +20,7 @@
  */
 package com.geekorum.ttrss.on_demand_modules
 
+import android.app.Activity
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -72,6 +73,11 @@ internal class CompleteSession(id: Int) : InstallSession(id) {
     override fun cancel() {
         // no op
     }
+
+    override suspend fun startUserConfirmationDialog(activity: Activity, code: Int) {
+        // no op
+    }
+
 }
 
 /**
@@ -87,6 +93,10 @@ private class FailedSession(id: Int) : InstallSession(id) {
     override fun getSessionStates(): Flow<State> = flowOf(state)
 
     override fun cancel() {
+        // no op
+    }
+
+    override suspend fun startUserConfirmationDialog(activity: Activity, code: Int) {
         // no op
     }
 
@@ -126,6 +136,10 @@ class MockedSession(id: Int) : InstallSession(id) {
     }
 
     override suspend fun getSessionState(): State {
+        TODO("not implemented")
+    }
+
+    override suspend fun startUserConfirmationDialog(activity: Activity, code: Int) {
         TODO("not implemented")
     }
 
