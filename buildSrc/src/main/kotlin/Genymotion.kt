@@ -53,10 +53,12 @@ internal fun Project.configureGenymotionDevices(useLocalDevices: Boolean = false
                 register("$name-pixelc-v24") {
                     template = "Google Pixel C - 7.0.0 - API 24 - 2560x1800"
                     logcat = "$genymotionLogcatDir/$name.logcat"
+                    isClearLogAfterBoot = false
                 }
                 register("$name-pixel3-v28") {
                     template = "Google Pixel 3 - 9.0 - API 28 - 1080x2160"
                     logcat = "$genymotionLogcatDir/$name.logcat"
+                    isClearLogAfterBoot = false
                 }
             })
         }
