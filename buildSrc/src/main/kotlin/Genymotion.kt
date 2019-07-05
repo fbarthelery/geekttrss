@@ -25,7 +25,6 @@ import com.genymotion.GenymotionPluginExtension
 import com.genymotion.model.CloudVDLaunchDsl
 import com.genymotion.model.GenymotionConfig
 import com.genymotion.model.VDLaunchDsl
-import com.genymotion.tools.AndroidPluginTools
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
@@ -38,11 +37,13 @@ internal fun Project.configureGenymotionDevices(useLocalDevices: Boolean = false
 
     apply<GenymotionGradlePlugin>()
 
+    val genymotionLogcatDir = "${buildDir.absolutePath}/reports/genymotion/"
     configure<GenymotionPluginExtension> {
         if (useLocalDevices) {
             devices(closureOf<NamedDomainObjectContainer<VDLaunchDsl>> {
                 register("$name-pixelc-v24") {
                     template = "Google Pixel C - 7.0.0 - API 24 - 2560x1800"
+                    logcat = "$genymotionLogcatDir/$name.logcat"
                 }
             })
         }
@@ -51,13 +52,14 @@ internal fun Project.configureGenymotionDevices(useLocalDevices: Boolean = false
             cloudDevices(closureOf<NamedDomainObjectContainer<CloudVDLaunchDsl>> {
                 register("$name-pixelc-v24") {
                     template = "Google Pixel C - 7.0.0 - API 24 - 2560x1800"
+                    logcat = "$genymotionLogcatDir/$name.logcat"
                 }
                 register("$name-pixel3-v28") {
                     template = "Google Pixel 3 - 9.0 - API 28 - 1080x2160"
+                    logcat = "$genymotionLogcatDir/$name.logcat"
                 }
             })
         }
-
     }
 }
 
