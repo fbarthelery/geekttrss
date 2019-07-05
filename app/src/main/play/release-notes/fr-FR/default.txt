@@ -1,2 +1,3 @@
-Correction de crash lors d'une connection sur un appareil possédant un grand écran (tablette)
-Correction de crash lors de l'utilisation d'une URL de serveur incorrecte
+Il est maintenant possible de gérer ses flux dans l'application
+Amélioration du theme sombre
+Divers correctifs et améliorations

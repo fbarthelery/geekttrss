@@ -1,2 +1,3 @@
-Fix crash when trying to login on large screen devices (tablet)
-Fix crash when using some incorrect server url
+You can now manage your feeds from the application
+Dark theme improvements
+Other bug fixes and general improvements
