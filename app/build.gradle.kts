@@ -47,7 +47,7 @@ android {
     defaultConfig {
         applicationId = "com.geekorum.ttrss"
         minSdkVersion(24)
-        targetSdkVersion(28)
+        targetSdkVersion(29)
         val major = 1
         val minor = 3
         val patch = 1
@@ -201,7 +201,7 @@ dependencies {
     add("googleImplementation", "com.google.android.play:core:1.5.0")
 
     // api dependencies for features modules
-    api("androidx.appcompat:appcompat:1.1.0-beta01")
+    api("androidx.appcompat:appcompat:1.1.0-rc01")
     api("androidx.work:work-runtime-ktx:$workVersion")
     api("androidx.room:room-runtime:$roomVersion")
     api("androidx.room:room-ktx:$roomVersion")
