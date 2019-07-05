@@ -21,13 +21,6 @@
     along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
 
 -->
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:app="http://schemas.android.com/apk/res-auto">
-
-    <group android:id="@+id/feed_settings">
-        <item android:id="@+id/manage_feeds"
-              android:title="@string/title_manage_feeds"
-              android:icon="@drawable/ic_tune_black_24dp" />
-    </group>
-
-</menu>
+<resources>
+    <bool name="dev_show_manage_features">true</bool>
+</resources>
