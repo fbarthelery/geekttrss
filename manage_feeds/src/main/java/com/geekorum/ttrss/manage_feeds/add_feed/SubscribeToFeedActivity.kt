@@ -36,9 +36,7 @@ class SubscribeToFeedActivity : SessionActivity() {
 
     private lateinit var binding: ActivitySubscribeToFeedBinding
     private val viewModel: SubscribeToFeedViewModel by viewModels()
-    private val navController: NavController by lazy {
-        findNavController(R.id.nav_host_fragment)
-    }
+    private lateinit var navController: NavController
 
     override fun inject() {
         val manageFeedComponent = DaggerManageFeedComponent.builder()
@@ -50,6 +48,8 @@ class SubscribeToFeedActivity : SessionActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_subscribe_to_feed)
+        navController = findNavController(R.id.nav_host_fragment)
+
         binding.cancel.setOnClickListener {
             if (!navController.popBackStack())
                 finish()

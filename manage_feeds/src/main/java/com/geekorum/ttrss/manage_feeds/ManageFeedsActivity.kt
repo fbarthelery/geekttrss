@@ -21,18 +21,19 @@
 package com.geekorum.ttrss.manage_feeds
 
 import android.app.Dialog
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.FragmentFactory
-import androidx.fragment.app.commit
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -44,7 +45,6 @@ import com.geekorum.ttrss.BaseFragment
 import com.geekorum.ttrss.activityViewModels
 import com.geekorum.ttrss.applicationComponent
 import com.geekorum.ttrss.data.Feed
-import com.geekorum.ttrss.manage_feeds.add_feed.SubscribeToFeedActivity
 import com.geekorum.ttrss.manage_feeds.databinding.ActivityManageFeedsBinding
 import com.geekorum.ttrss.manage_feeds.databinding.DialogUnsubscribeFeedBinding
 import com.geekorum.ttrss.manage_feeds.databinding.FragmentManageFeedsBinding
@@ -55,26 +55,16 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import javax.inject.Inject
 
 class ManageFeedsActivity : SessionActivity() {
-    private val viewModel: ManageFeedViewModel by viewModels()
     private lateinit var binding: ActivityManageFeedsBinding
+    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_manage_feeds)
+        navController = findNavController(R.id.nav_host_fragment)
 
         binding.fab.setOnClickListener {
             startSubscribeToFeed()
-        }
-
-        viewModel.feedClickedEvent.observe(this, EventObserver {
-            showConfirmationDialog(it)
-        })
-
-        if (savedInstanceState == null) {
-            supportFragmentManager.commit {
-                val f = ManageFeedsFragment.newInstance(supportFragmentManager.fragmentFactory)
-                replace(R.id.container, f)
-            }
         }
     }
 
@@ -85,15 +75,9 @@ class ManageFeedsActivity : SessionActivity() {
         manageFeedComponent.activityInjector.inject(this)
     }
 
-    private fun showConfirmationDialog(feed: Feed) {
-        val confirmationFragment =
-            ConfirmUnsubscribeFragment.newInstance(supportFragmentManager.fragmentFactory, feed)
-        confirmationFragment.show(supportFragmentManager, null)
-    }
-
     private fun startSubscribeToFeed() {
-        val intent = Intent(this, SubscribeToFeedActivity::class.java)
-        startActivity(intent)
+        val direction = ManageFeedsFragmentDirections.actionSubscribeToFeed()
+        navController.navigate(direction)
     }
 
 }
@@ -120,7 +104,18 @@ class ManageFeedsFragment @Inject constructor(
         viewModel.feeds.observe(this) {
             adapter.submitList(it)
         }
+
+        viewModel.feedClickedEvent.observe(this, EventObserver {
+            showConfirmationDialog(it)
+        })
     }
+
+    private fun showConfirmationDialog(feed: Feed) {
+        val direction = ManageFeedsFragmentDirections.actionConfirmUnsubscribe(
+            feed.id, feed.title, feed.url)
+        findNavController().navigate(direction)
+    }
+
 
     private inner class FeedsAdapter : PagedListAdapter<Feed, FeedViewHolder>(DiffFeed) {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedViewHolder {
@@ -159,15 +154,6 @@ class ManageFeedsFragment @Inject constructor(
         }
     }
 
-    companion object {
-
-        @JvmStatic
-        fun newInstance(fragmentFactory: FragmentFactory): ManageFeedsFragment {
-            return fragmentFactory.instantiate(ManageFeedsFragment::class.java.classLoader!!,
-                ManageFeedsFragment::class.java.name).apply {
-            } as ManageFeedsFragment
-        }
-    }
 }
 
 class ConfirmUnsubscribeFragment @Inject constructor(
@@ -176,17 +162,17 @@ class ConfirmUnsubscribeFragment @Inject constructor(
 ) : BaseDialogFragment(viewModelsFactory, fragmentFactory) {
 
     private val viewModel: ManageFeedViewModel by activityViewModels()
+    private val args:ConfirmUnsubscribeFragmentArgs by navArgs()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val inflater = requireActivity().layoutInflater
 
         val binding = DialogUnsubscribeFeedBinding.inflate(inflater, null, false)
-        val arguments = requireArguments()
-        with(arguments) {
-            binding.title = getString(ARG_FEED_TITLE)
-            binding.url = getString(ARG_FEED_URL)
+        with(args) {
+            binding.title = feedTitle
+            binding.url = feedUrl
         }
-        val feedId = arguments.getLong(ARG_FEED_ID)
+        val feedId = args.feedId
         return MaterialAlertDialogBuilder(requireActivity())
             .setView(binding.root)
             .setTitle(R.string.fragment_confirmation_title)
@@ -195,22 +181,5 @@ class ConfirmUnsubscribeFragment @Inject constructor(
             }
             .setNegativeButton(R.string.btn_cancel, null)
             .create()
-    }
-
-    companion object {
-        const val ARG_FEED_ID = "feed_id"
-        const val ARG_FEED_TITLE = "feed_title"
-        const val ARG_FEED_URL = "feed_url"
-
-        @JvmStatic
-        fun newInstance(fragmentFactory: FragmentFactory, feed: Feed): ConfirmUnsubscribeFragment {
-            return fragmentFactory.instantiate(ConfirmUnsubscribeFragment::class.java.classLoader!!,
-                ConfirmUnsubscribeFragment::class.java.name).apply {
-                arguments = bundleOf(
-                    ARG_FEED_ID to feed.id,
-                    ARG_FEED_TITLE to feed.title,
-                    ARG_FEED_URL to feed.url)
-            } as ConfirmUnsubscribeFragment
-        }
     }
 }
