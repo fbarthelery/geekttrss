@@ -23,12 +23,15 @@ package com.geekorum.ttrss.manage_feeds
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.FragmentFactory
+import androidx.fragment.app.commit
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
@@ -37,12 +40,14 @@ import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.geekdroid.dagger.DaggerDelegateFragmentFactory
 import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory
 import com.geekorum.ttrss.BaseDialogFragment
+import com.geekorum.ttrss.BaseFragment
 import com.geekorum.ttrss.activityViewModels
 import com.geekorum.ttrss.applicationComponent
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.manage_feeds.add_feed.SubscribeToFeedActivity
 import com.geekorum.ttrss.manage_feeds.databinding.ActivityManageFeedsBinding
 import com.geekorum.ttrss.manage_feeds.databinding.DialogUnsubscribeFeedBinding
+import com.geekorum.ttrss.manage_feeds.databinding.FragmentManageFeedsBinding
 import com.geekorum.ttrss.manage_feeds.databinding.ItemFeedBinding
 import com.geekorum.ttrss.session.SessionActivity
 import com.geekorum.ttrss.viewModels
@@ -52,24 +57,25 @@ import javax.inject.Inject
 class ManageFeedsActivity : SessionActivity() {
     private val viewModel: ManageFeedViewModel by viewModels()
     private lateinit var binding: ActivityManageFeedsBinding
-    private val adapter = FeedsAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_manage_feeds)
-        binding.recyclerView.adapter = adapter
 
         binding.fab.setOnClickListener {
             startSubscribeToFeed()
         }
 
-        viewModel.feeds.observe(this) {
-            adapter.submitList(it)
-        }
-
         viewModel.feedClickedEvent.observe(this, EventObserver {
             showConfirmationDialog(it)
         })
+
+        if (savedInstanceState == null) {
+            supportFragmentManager.commit {
+                val f = ManageFeedsFragment.newInstance(supportFragmentManager.fragmentFactory)
+                replace(R.id.container, f)
+            }
+        }
     }
 
     override fun inject() {
@@ -80,7 +86,8 @@ class ManageFeedsActivity : SessionActivity() {
     }
 
     private fun showConfirmationDialog(feed: Feed) {
-        val confirmationFragment = ConfirmationFragment.newInstance(supportFragmentManager.fragmentFactory, feed)
+        val confirmationFragment =
+            ConfirmationFragment.newInstance(supportFragmentManager.fragmentFactory, feed)
         confirmationFragment.show(supportFragmentManager, null)
     }
 
@@ -90,42 +97,6 @@ class ManageFeedsActivity : SessionActivity() {
     }
 
 
-    private inner class FeedsAdapter : PagedListAdapter<Feed, FeedViewHolder>(DiffFeed) {
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedViewHolder {
-            val itemFeedBinding = ItemFeedBinding.inflate(layoutInflater, parent, false)
-            return FeedViewHolder(itemFeedBinding)
-        }
-
-        override fun onBindViewHolder(holder: FeedViewHolder, position: Int) {
-            val feed = getItem(position)
-            checkNotNull(feed)
-            holder.setFeed(feed)
-            holder.setViewModel(viewModel)
-            holder.binding.executePendingBindings()
-        }
-    }
-
-    class FeedViewHolder(val binding: ViewDataBinding): RecyclerView.ViewHolder(binding.root) {
-        fun setFeed(feed: Feed?) {
-            val title = feed?.displayTitle?.takeIf { it.isNotEmpty() } ?: feed?.title
-            binding.setVariable(BR.name, title)
-            binding.setVariable(BR.feed, feed)
-        }
-
-        fun setViewModel(viewModel: ManageFeedViewModel) {
-            binding.setVariable(BR.viewModel, viewModel)
-        }
-    }
-
-    private object DiffFeed : DiffUtil.ItemCallback<Feed>() {
-        override fun areItemsTheSame(oldItem: Feed, newItem: Feed): Boolean {
-            return oldItem.id == newItem.id
-        }
-
-        override fun areContentsTheSame(oldItem: Feed, newItem: Feed): Boolean {
-            return oldItem == newItem
-        }
-    }
 
     class ConfirmationFragment @Inject constructor(
         viewModelsFactory: DaggerDelegateViewModelsFactory,
@@ -135,7 +106,7 @@ class ManageFeedsActivity : SessionActivity() {
         private val viewModel: ManageFeedViewModel by activityViewModels()
 
         override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-            val inflater =  requireActivity().layoutInflater
+            val inflater = requireActivity().layoutInflater
 
             val binding = DialogUnsubscribeFeedBinding.inflate(inflater, null, false)
             val arguments = requireArguments()
@@ -171,5 +142,76 @@ class ManageFeedsActivity : SessionActivity() {
             }
         }
     }
+}
 
+class ManageFeedsFragment @Inject constructor(
+    viewModelsFactory: ViewModelProvider.Factory,
+    fragmentFactory: FragmentFactory
+) : BaseFragment(viewModelsFactory, fragmentFactory) {
+
+    private lateinit var binding: FragmentManageFeedsBinding
+    private val viewModel: ManageFeedViewModel by viewModels()
+    private val adapter = FeedsAdapter()
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View? {
+        binding = FragmentManageFeedsBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        binding.recyclerView.adapter = adapter
+
+        viewModel.feeds.observe(this) {
+            adapter.submitList(it)
+        }
+    }
+
+    private inner class FeedsAdapter : PagedListAdapter<Feed, FeedViewHolder>(DiffFeed) {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedViewHolder {
+            val itemFeedBinding = ItemFeedBinding.inflate(layoutInflater, parent, false)
+            return FeedViewHolder(itemFeedBinding)
+        }
+
+        override fun onBindViewHolder(holder: FeedViewHolder, position: Int) {
+            val feed = getItem(position)
+            checkNotNull(feed)
+            holder.setFeed(feed)
+            holder.setViewModel(viewModel)
+            holder.binding.executePendingBindings()
+        }
+    }
+
+    class FeedViewHolder(val binding: ViewDataBinding) : RecyclerView.ViewHolder(binding.root) {
+        fun setFeed(feed: Feed?) {
+            val title = feed?.displayTitle?.takeIf { it.isNotEmpty() } ?: feed?.title
+            binding.setVariable(BR.name, title)
+            binding.setVariable(BR.feed, feed)
+        }
+
+        fun setViewModel(viewModel: ManageFeedViewModel) {
+            binding.setVariable(BR.viewModel, viewModel)
+        }
+    }
+
+    private object DiffFeed : DiffUtil.ItemCallback<Feed>() {
+        override fun areItemsTheSame(oldItem: Feed, newItem: Feed): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: Feed, newItem: Feed): Boolean {
+            return oldItem == newItem
+        }
+    }
+
+    companion object {
+
+        @JvmStatic
+        fun newInstance(fragmentFactory: FragmentFactory): ManageFeedsFragment {
+            return fragmentFactory.instantiate(ManageFeedsFragment::class.java.classLoader!!,
+                ManageFeedsFragment::class.java.name).apply {
+            } as ManageFeedsFragment
+        }
+    }
 }
