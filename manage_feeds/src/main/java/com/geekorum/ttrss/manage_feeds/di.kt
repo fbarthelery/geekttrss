@@ -84,8 +84,8 @@ private abstract class ManageFeedModule {
 
     @Binds
     @IntoMap
-    @FragmentKey(ManageFeedsActivity.ConfirmationFragment::class)
-    abstract fun bindConfirmationFragment(fragment: ManageFeedsActivity.ConfirmationFragment): Fragment
+    @FragmentKey(ConfirmUnsubscribeFragment::class)
+    abstract fun bindConfirmUnsubscribeFragment(fragment: ConfirmUnsubscribeFragment): Fragment
 
     @Binds
     @IntoMap
