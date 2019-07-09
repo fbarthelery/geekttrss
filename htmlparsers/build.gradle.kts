@@ -31,6 +31,6 @@ dependencies {
     implementation("javax.inject:javax.inject:1")
     api("org.jsoup:jsoup:1.10.2")
 
-    testImplementation("com.google.truth:truth:0.45")
+    testImplementation("com.google.truth:truth:1.0")
     testImplementation(kotlin("test-junit", kotlinVersion))
 }

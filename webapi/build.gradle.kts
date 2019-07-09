@@ -41,6 +41,6 @@ dependencies {
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
 
 
-    testImplementation("com.google.truth:truth:0.45")
+    testImplementation("com.google.truth:truth:1.0")
     testImplementation(kotlin("test-junit", kotlinVersion))
 }

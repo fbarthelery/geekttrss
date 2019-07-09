@@ -24,7 +24,9 @@ import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.internal.dsl.TestOptions
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
+import org.gradle.api.artifacts.DependencyConstraint
 import org.gradle.api.artifacts.ExternalModuleDependency
+import org.gradle.api.artifacts.dsl.DependencyConstraintHandler
 import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.kotlin.dsl.closureOf
 import org.gradle.kotlin.dsl.dependencies
@@ -33,8 +35,8 @@ import org.gradle.kotlin.dsl.kotlin
 import org.gradle.kotlin.dsl.provideDelegate
 
 const val espressoVersion = "3.2.0"
-const val androidxTestRunnerVersion = "1.2.0"
-const val androidxTestCoreVersion = "1.2.0"
+const val androidxTestRunnerVersion = "1.3.0-alpha01"
+const val androidxTestCoreVersion = "1.2.1-alpha01"
 const val robolectricVersion = "4.1"
 
 
@@ -61,7 +63,6 @@ internal fun Project.configureTests() {
         }
     }
 
-
     dependencies {
         dualTestImplementation(kotlin("test-junit", kotlinVersion))
 
@@ -72,13 +73,19 @@ internal fun Project.configureTests() {
         dualTestImplementation("androidx.test:core-ktx:$androidxTestCoreVersion")
         dualTestImplementation("androidx.test:rules:$androidxTestRunnerVersion")
 
+        // fragment testing is usually declared on debugImplementation configuration and need these dependencies
+        constraints {
+            debugImplementation("androidx.test:core:$androidxTestCoreVersion")
+            debugImplementation("androidx.test:monitor:$androidxTestRunnerVersion")
+        }
+
         dualTestImplementation("androidx.test.espresso:espresso-core:$espressoVersion")
         dualTestImplementation("androidx.test.espresso:espresso-contrib:$espressoVersion")
         dualTestImplementation("androidx.test.espresso:espresso-intents:$espressoVersion")
 
         // assertions
-        dualTestImplementation("com.google.truth:truth:0.45")
-        dualTestImplementation("androidx.test.ext:truth:1.2.0")
+        dualTestImplementation("com.google.truth:truth:1.0")
+        dualTestImplementation("androidx.test.ext:truth:1.3.0-alpha01")
 
         // fix for guava listenablefuture conflict with application runtime version
         dualTestImplementation("com.google.guava:listenablefuture:1.0") {
@@ -104,13 +111,16 @@ fun DependencyHandler.dualTestImplementation(dependencyNotation: Any, action: Ex
     add("testImplementation", dependencyNotation, closure)
 }
 
-internal fun DependencyHandler.`androidTestImplementation`(dependencyNotation: Any): Dependency? =
+internal fun DependencyHandler.androidTestImplementation(dependencyNotation: Any): Dependency? =
     add("androidTestImplementation", dependencyNotation)
 
 
-internal fun DependencyHandler.`androidTestUtil`(dependencyNotation: Any): Dependency? =
+internal fun DependencyHandler.androidTestUtil(dependencyNotation: Any): Dependency? =
     add("androidTestUtil", dependencyNotation)
 
-internal fun DependencyHandler.`testImplementation`(dependencyNotation: Any): Dependency? =
+internal fun DependencyHandler.testImplementation(dependencyNotation: Any): Dependency? =
     add("testImplementation", dependencyNotation)
 
+
+internal fun DependencyConstraintHandler.debugImplementation(dependencyConstraintNotation: Any): DependencyConstraint? =
+    add("debugImplementation", dependencyConstraintNotation)
