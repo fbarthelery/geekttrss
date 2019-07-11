@@ -28,6 +28,7 @@ import android.content.res.Resources
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
+import android.os.StrictMode.allowThreadDiskReads
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -54,6 +55,7 @@ import com.geekorum.ttrss.activityViewModels
 import com.geekorum.ttrss.articles_list.ArticleListActivity
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.databinding.FragmentArticleDetailBinding
+import com.geekorum.ttrss.debugtools.withStrictMode
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import okhttp3.OkHttpClient
@@ -98,8 +100,10 @@ class ArticleDetailFragment @Inject constructor(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentArticleDetailBinding.inflate(inflater, container, false)
-        binding.setLifecycleOwner(this)
+        binding = withStrictMode(allowThreadDiskReads()) {
+            FragmentArticleDetailBinding.inflate(inflater, container, false)
+        }
+        binding.lifecycleOwner = this
         binding.viewModel = articleDetailsViewModel
         return binding.root
     }
@@ -177,7 +181,9 @@ class ArticleDetailFragment @Inject constructor(
     }
 
     private fun configureWebView() {
-        binding.articleContent.webViewClient = MyWebViewClient()
+        withStrictMode(allowThreadDiskReads()) {
+            binding.articleContent.webViewClient = MyWebViewClient()
+        }
 
         with(binding.articleContent.settings) {
             setSupportZoom(false)
