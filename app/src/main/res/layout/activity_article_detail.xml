@@ -74,7 +74,6 @@
             app:backgroundTint="@{viewModel.article.transientUnread ? @color/article_detail_bottom_appbar_unread : @color/article_detail_bottom_appbar_read }"
             app:fabAlignmentMode="end"
             app:hideOnScroll="true"
-            style="@style/ArticleDetail.BottomAppBarStyle"
             />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

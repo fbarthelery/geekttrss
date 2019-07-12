@@ -143,7 +143,7 @@ dependencies {
     implementation(project(":htmlparsers"))
     implementation(project(":webapi"))
 
-    implementation("com.google.android.material:material:1.1.0-alpha07")
+    implementation("com.google.android.material:material:1.1.0-alpha08")
     implementation("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")
     implementation("com.squareup.okhttp3:logging-interceptor:3.12.0")
     testImplementation("com.squareup.okhttp3:mockwebserver:3.12.0")

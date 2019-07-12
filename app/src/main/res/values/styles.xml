@@ -40,8 +40,9 @@
         <item name="linkColor">?colorSecondary</item>
         <item name="bottomAppBarStyle">@style/BottomAppBarStyle</item>
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.AppTheme.AlertDialog</item>
-        <item name="appBarToolbarStyle">@style/AppBar.Toolbar.DayNight</item>
-        <item name="appBarCollapsingToolbarStyle">@style/AppBar.CollapsingToolbar.DayNight</item>
+<!--        This style needs to be applied manually in layout to have the correct theme overlay -->
+        <item name="appBarToolbarStyle">@style/AppBar.Toolbar</item>
+        <item name="appBarCollapsingToolbarStyle">@style/AppBar.CollapsingToolbar</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -97,21 +98,18 @@
         <item name="android:textAppearance">?attr/textAppearanceHeadline6</item>
     </style>
 
-    <style name="BottomAppBarStyle" parent="Widget.MaterialComponents.BottomAppBar">
+    <style name="BottomAppBarStyle" parent="Widget.MaterialComponents.BottomAppBar.PrimarySurface">
         <item name="fabCradleMargin">8dp</item>
         <item name="fabCradleRoundedCornerRadius">32dp</item>
     </style>
 
-    <style name="ArticleDetail.BottomAppBarStyle" parent="Widget.MaterialComponents.BottomAppBar.Colored">
-        <item name="fabCradleMargin">8dp</item>
-        <item name="fabCradleRoundedCornerRadius">32dp</item>
+    <style name="AppBar.Toolbar" parent="Widget.MaterialComponents.Toolbar.PrimarySurface">
+        <item name="background">@null</item>
     </style>
 
-    <style name="AppBar.Toolbar.DayNight" parent="Widget.MaterialComponents.Toolbar.Primary"/>
-
-    <style name="AppBar.CollapsingToolbar.DayNight" parent="">
-        <item name="expandedTitleTextAppearance">@style/TextAppearance.AppTheme.CollapsingToolbar.Expanded.Primary</item>
-        <item name="collapsedTitleTextAppearance">@style/TextAppearance.AppTheme.CollapsingToolbar.Collapsed.Primary</item>
+    <style name="AppBar.CollapsingToolbar" parent="">
+        <item name="expandedTitleTextAppearance">@style/TextAppearance.AppTheme.CollapsingToolbar.Expanded</item>
+        <item name="collapsedTitleTextAppearance">@style/TextAppearance.AppTheme.CollapsingToolbar.Collapsed</item>
     </style>
 
     <style name="HeadlineCardFooterButton">
@@ -123,12 +121,12 @@
     </style>
 
     <!-- Text appearances -->
-    <style name="TextAppearance.AppTheme.CollapsingToolbar.Expanded.Primary" parent="TextAppearance.Design.CollapsingToolbar.Expanded">
-        <item name="android:textColor">?colorOnPrimary</item>
+    <style name="TextAppearance.AppTheme.CollapsingToolbar.Expanded" parent="TextAppearance.Design.CollapsingToolbar.Expanded">
+        <item name="android:textColor">?colorOnPrimarySurface</item>
     </style>
 
-    <style name="TextAppearance.AppTheme.CollapsingToolbar.Collapsed.Primary" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
-        <item name="android:textColor">?colorOnPrimary</item>
+    <style name="TextAppearance.AppTheme.CollapsingToolbar.Collapsed" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
+        <item name="android:textColor">?colorOnPrimarySurface</item>
     </style>
 
     <style name="TextAppearance.AppTheme.CollapsingToolbar.Expanded.Surface" parent="TextAppearance.Design.CollapsingToolbar.Expanded">
