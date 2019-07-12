@@ -86,7 +86,7 @@ dependencies {
     implementation(project(":htmlparsers"))
     implementation(project(":webapi"))
 
-    androidTestImplementation("androidx.work:work-testing:2.1.0-rc01")
+    androidTestImplementation("androidx.work:work-testing:2.1.0")
     dualTestImplementation("androidx.arch.core:core-testing:2.0.1")
 
     implementation("androidx.navigation:navigation-fragment-ktx:2.1.0-alpha06")
