@@ -74,11 +74,16 @@ class InstallModuleViewModel @Inject constructor(
             return@launch
         }
 
-        val session = moduleManager.startInstallModule(*modules)
-        this@InstallModuleViewModel.session = session
+        try {
+            val session = moduleManager.startInstallModule(*modules)
+            this@InstallModuleViewModel.session = session
 
-        session.getSessionStates().collect {
-            _sessionState.value = it
+            session.getSessionStates().collect {
+                _sessionState.value = it
+            }
+        } catch (e: OnDemandModuleException) {
+            Timber.w("Unable to start installation of modules : $modules", e)
+            _sessionState.value = InstallSession.State(FAILED, 0, 0)
         }
     }
 
