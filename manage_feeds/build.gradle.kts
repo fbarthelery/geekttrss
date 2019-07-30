@@ -1,4 +1,3 @@
-import com.geekorum.build.configureJavaVersion
 import com.geekorum.build.dualTestImplementation
 import com.geekorum.build.enforcedDaggerPlatform
 
@@ -20,8 +19,6 @@ android {
         minSdkVersion(24)
         targetSdkVersion(28)
     }
-
-    configureJavaVersion()
 
     dataBinding {
         isEnabled = true

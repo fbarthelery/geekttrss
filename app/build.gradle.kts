@@ -20,13 +20,10 @@
  */
 
 import com.geekorum.build.computeChangesetVersionCode
-import com.geekorum.build.configureJavaVersion
 import com.geekorum.build.dualTestImplementation
 import com.geekorum.build.enforcedCoroutinesPlatform
 import com.geekorum.build.enforcedDaggerPlatform
 import com.geekorum.build.getChangeSet
-import org.gradle.kotlin.dsl.extra
-import org.gradle.kotlin.dsl.kotlin
 
 plugins {
     id("com.android.application")
@@ -95,8 +92,6 @@ android {
     dataBinding {
         isEnabled = true
     }
-
-    configureJavaVersion()
 
     flavorDimensions("distribution")
     productFlavors {

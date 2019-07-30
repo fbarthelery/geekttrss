@@ -18,6 +18,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
+import com.android.build.gradle.BaseExtension
+import com.geekorum.build.configureJavaVersion
 import com.geekorum.build.createComponentsPlatforms
 import com.geekorum.build.setupGoogleContent
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
@@ -68,6 +70,9 @@ allprojects {
     afterEvaluate {
         extensions.findByType<KaptExtension>()?.arguments {
             arg("dagger.formatGeneratedSource", "enabled")
+        }
+        extensions.findByType<BaseExtension>()?.apply {
+            configureJavaVersion()
         }
     }
 }
