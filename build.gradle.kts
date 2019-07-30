@@ -20,6 +20,7 @@
  */
 import com.geekorum.build.createComponentsPlatforms
 import com.geekorum.build.setupGoogleContent
+import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.net.URI
 
@@ -36,7 +37,7 @@ plugins {
 
 // some extra properties
 extra["compileSdkVersion"] = "android-29"
-extra["daggerVersion"] = "2.21"
+extra["daggerVersion"] = "2.24"
 extra["lifecycleVersion"] = "2.2.0-alpha01"
 extra["kotlinVersion"] = "1.3.41"
 extra["coroutinesVersion"] = "1.3.0-M2"
@@ -61,6 +62,12 @@ allprojects {
         kotlinOptions {
             jvmTarget = "1.8"
             this.freeCompilerArgs = listOf("-Xuse-experimental=kotlin.Experimental")
+        }
+    }
+
+    afterEvaluate {
+        extensions.findByType<KaptExtension>()?.arguments {
+            arg("dagger.formatGeneratedSource", "enabled")
         }
     }
 }
