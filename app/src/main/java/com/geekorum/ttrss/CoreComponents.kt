@@ -72,11 +72,10 @@ inline fun <reified VM : ViewModel> BaseDialogFragment.activityViewModels(): Laz
 }
 
 /**
- * Common base Activity for the application.
  * As it supports Dagger injection, the Activity must have a corresponding [AndroidInjector]
  */
 @SuppressLint("Registered")
-open class BaseActivity : BatteryFriendlyActivity() {
+open class InjectableBaseActivity : BatteryFriendlyActivity() {
     @Inject
     lateinit var daggerDelegateFragmentFactory: FragmentFactory
 
@@ -92,6 +91,8 @@ open class BaseActivity : BatteryFriendlyActivity() {
      */
     protected open fun inject() = AndroidInjection.inject(this)
 }
+
+// BaseActivity is flavor dependant but extends InjectableBaseActivity
 
 /**
  * Common base Fragment for the application.
