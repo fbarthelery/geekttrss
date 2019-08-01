@@ -20,6 +20,7 @@
  */
 package com.geekorum.ttrss.articles_list
 
+import android.app.Activity
 import android.content.ContentUris
 import android.content.Intent
 import android.content.res.Configuration
@@ -42,9 +43,12 @@ import com.geekorum.ttrss.articles_list.search.ArticlesSearchFragment
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.databinding.ActivityArticleListBinding
+import com.geekorum.ttrss.in_app_update.InAppUpdateViewModel
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.session.SessionActivity
 import com.geekorum.ttrss.viewModels
+import com.google.android.material.snackbar.Snackbar
+import timber.log.Timber
 
 /**
  * An activity representing a list of Articles. This activity
@@ -60,6 +64,7 @@ class ArticleListActivity : SessionActivity() {
         private const val FRAGMENT_BACKSTACK_SEARCH = "search"
         private const val FRAGMENT_FEEDS_LIST = "feeds_list"
         private const val STATE_FEED_ID = "feed_id"
+        private const val CODE_START_IN_APP_UPDATE = 1
     }
 
     private var actionBarDrawerToggle: ActionBarDrawerToggle? = null
@@ -71,6 +76,7 @@ class ArticleListActivity : SessionActivity() {
 
     private val activityViewModel: ActivityViewModel by viewModels()
     private val accountViewModel: TtrssAccountViewModel by viewModels()
+    private val inAppUpdateViewModel: InAppUpdateViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -100,6 +106,30 @@ class ArticleListActivity : SessionActivity() {
         accountViewModel.noAccountSelectedEvent.observe(this, EventObserver {
             finish()
         })
+
+        inAppUpdateViewModel.isUpdateAvailable.observe(this) {
+            if (it) {
+                Timber.d("Update available")
+                val snackbar = Snackbar.make(binding.middlePaneLayout, "There is a new update",
+                    Snackbar.LENGTH_INDEFINITE)
+                snackbar.setAction("Install") {
+                    inAppUpdateViewModel.startUpdateFlow(this, CODE_START_IN_APP_UPDATE)
+                }
+                snackbar.show()
+            }
+        }
+
+        inAppUpdateViewModel.isUpdateReadyToInstall.observe(this) {
+            if (it) {
+                Timber.d("Update ready to install")
+                val snackbar = Snackbar.make(binding.middlePaneLayout, "Update is ready to install",
+                    Snackbar.LENGTH_INDEFINITE)
+                snackbar.setAction("Restart") {
+                    inAppUpdateViewModel.completeUpdate()
+                }
+                snackbar.show()
+            }
+        }
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_article_list)
 
@@ -134,6 +164,14 @@ class ArticleListActivity : SessionActivity() {
         actionBarDrawerToggle = ActionBarDrawerToggle(this, binding.headlinesDrawer, toolbar,
             R.string.drawer_open, R.string.drawer_close).also {
             binding.headlinesDrawer.addDrawerListener(it)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        Timber.d("activity result $requestCode result $resultCode")
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == CODE_START_IN_APP_UPDATE && resultCode != Activity.RESULT_OK) {
+            inAppUpdateViewModel.cancelUpdateFlow()
         }
     }
 

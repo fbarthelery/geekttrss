@@ -33,6 +33,7 @@ import com.geekorum.geekdroid.dagger.ViewModelKey
 import com.geekorum.ttrss.accounts.NetworkLoginModule
 import com.geekorum.ttrss.accounts.PerAccount
 import com.geekorum.ttrss.di.AssistedFactoriesModule
+import com.geekorum.ttrss.in_app_update.InAppUpdateViewModel
 import com.geekorum.ttrss.network.TinyrssApiModule
 import dagger.Binds
 import dagger.Module
@@ -99,6 +100,12 @@ private abstract class ArticlesListModule {
     @IntoMap
     @ViewModelKey(ActivityViewModel::class)
     abstract fun getActivityViewModel(activityViewModel: ActivityViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(InAppUpdateViewModel::class)
+    abstract fun getInAppUpdateViewModel(fragmentViewModel: InAppUpdateViewModel): ViewModel
+
 
     @Module
     companion object {
