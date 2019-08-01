@@ -131,6 +131,7 @@ class TinyrssApiModuleTest {
 
     }
 
+    @Test
     fun testThatNonProtectedResourcesWithoutHttpAuthenticationInfoReturnsResult(): Unit {
         val mockResponse = MockResponse().apply {
             setBody("""

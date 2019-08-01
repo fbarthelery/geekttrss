@@ -38,5 +38,5 @@ class CrashlyticsLoggingModule {
 
     @Provides
     @IntoSet
-    fun providesCrahslyticsInitializer(): AppInitializer = CrashlyticsInitializer()
+    fun providesCrashlyticsInitializer(): AppInitializer = CrashlyticsInitializer()
 }
