@@ -26,6 +26,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.geekorum.geekdroid.app.lifecycle.Event
 import com.geekorum.ttrss.R
+import com.geekorum.ttrss.waitForChildrenCoroutines
 import com.geekorum.ttrss.webapi.TinyRssApi
 import com.geekorum.ttrss.webapi.model.Error
 import com.geekorum.ttrss.webapi.model.LoginResponsePayload
@@ -183,10 +184,6 @@ class LoginViewModelTest {
         every { observer.onChanged(any()) } just Runs
         return observer
     }
-}
-
-private suspend fun ViewModel.waitForChildrenCoroutines() {
-    viewModelScope.coroutineContext[Job]!!.children.forEach { it.join() }
 }
 
 

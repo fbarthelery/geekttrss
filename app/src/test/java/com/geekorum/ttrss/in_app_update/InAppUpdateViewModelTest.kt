@@ -22,7 +22,8 @@ package com.geekorum.ttrss.in_app_update
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.Observer
-import com.google.android.play.core.install.model.InstallErrorCode
+import com.geekorum.ttrss.waitForChildrenCoroutines
+import com.geekorum.ttrss.waitForValue
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.every
@@ -34,9 +35,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.setMain
 import org.junit.Rule
 import java.util.concurrent.Executors
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -46,7 +50,7 @@ class InAppUpdateViewModelTest {
     @get:Rule
     val archRule = InstantTaskExecutorRule()
 
-    private val mainThreadSurrogate =  Executors.newSingleThreadExecutor {
+    private val mainThreadSurrogate = Executors.newSingleThreadExecutor {
         Thread(it, "UI Thread")
     }.asCoroutineDispatcher()
 
@@ -60,36 +64,46 @@ class InAppUpdateViewModelTest {
         subject = InAppUpdateViewModel(updateManager)
     }
 
+    @AfterTest
+    fun tearDown() {
+        Dispatchers.resetMain()
+        mainThreadSurrogate.close()
+    }
+
     @Test
-    fun testUpdateAvailable() {
+    fun testUpdateAvailable()= runBlockingTest {
         val observer: Observer<Boolean> = mockObserver()
         coEvery { updateManager.getUpdateAvailability() } returns UpdateAvailability.UPDATE_AVAILABLE
         subject.isUpdateAvailable.observeForever(observer)
+        subject.isUpdateAvailable.waitForValue()
 
         verify { observer.onChanged(true) }
     }
 
     @Test
-    fun testNoUpdateAvailable() {
+    fun testNoUpdateAvailable() = runBlockingTest {
         val observer: Observer<Boolean> = mockObserver()
         coEvery { updateManager.getUpdateAvailability() } returns UpdateAvailability.NO_UPDATE
         subject.isUpdateAvailable.observeForever(observer)
+        subject.isUpdateAvailable.waitForValue()
 
         verify { observer.onChanged(false) }
     }
 
     @Test
-    fun testAnUpdateFlowGoingToReadyToInstall() {
+    fun testAnUpdateFlowGoingToReadyToInstall() = runBlockingTest {
         val observer: Observer<Boolean> = mockObserver()
         coEvery { updateManager.startUpdate(any(), any()) } returns flowOf(
             UpdateState(UpdateState.Status.UNKNOWN),
-            UpdateState(UpdateState.Status.PENDING, InstallErrorCode.NO_ERROR),
-            UpdateState(UpdateState.Status.DOWNLOADING, InstallErrorCode.NO_ERROR),
-            UpdateState(UpdateState.Status.DOWNLOADED, InstallErrorCode.NO_ERROR)
+            UpdateState(UpdateState.Status.PENDING),
+            UpdateState(UpdateState.Status.DOWNLOADING),
+            UpdateState(UpdateState.Status.DOWNLOADED)
         )
         subject.isUpdateReadyToInstall.observeForever(observer)
 
         subject.startUpdateFlow(mockk(), 42)
+        subject.isUpdateReadyToInstall.waitForValue(numberOfChanged = 2)
+        subject.waitForChildrenCoroutines()
 
         verifyOrder {
             observer.onChanged(false)
