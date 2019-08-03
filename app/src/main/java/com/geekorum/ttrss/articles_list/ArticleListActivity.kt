@@ -81,7 +81,10 @@ class ArticleListActivity : SessionActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        activityViewModel.selectedFeed.observe(this) { onFeedSelected(it) }
+        activityViewModel.selectedFeed.observe(this) { bindFeedInformation(it) }
+        activityViewModel.feedSelectedEvent.observe(this, EventObserver {
+            onFeedSelected(it)
+        })
 
         activityViewModel.articleSelectedEvent.observe(this, EventObserver { (position, article) ->
             onArticleSelected(position, article)
@@ -244,18 +247,15 @@ class ArticleListActivity : SessionActivity() {
         startActivity(intent)
     }
 
-    /*
-     *  From MasterActivity
-     */
-    private fun onFeedSelected(feed: Feed?) {
-        if (feed == null) {
-            return
-        }
-        navigateUpToList()
-        title = feed.title
+    private fun bindFeedInformation(feed: Feed?) {
+        title = feed?.title ?: ""
         binding.toolbar.title = title
+    }
+
+    private fun onFeedSelected(feedId: Long) {
+        navigateUpToList()
         supportFragmentManager.commit {
-            val hf = ArticlesListFragment.newInstance(supportFragmentManager.fragmentFactory, feed.id)
+            val hf = ArticlesListFragment.newInstance(supportFragmentManager.fragmentFactory, feedId)
             replace(R.id.middle_pane_layout, hf, FRAGMENT_ARTICLES_LIST)
         }
         drawerLayout.closeDrawers()

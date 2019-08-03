@@ -27,6 +27,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.switchMap
 import com.geekorum.geekdroid.accounts.SyncInProgressLiveData
 import com.geekorum.geekdroid.app.lifecycle.EmptyEvent
 import com.geekorum.geekdroid.app.lifecycle.Event
@@ -36,7 +37,6 @@ import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.network.TtRssBrowserLauncher
 import com.geekorum.ttrss.providers.ArticlesContract
 import javax.inject.Inject
-import com.geekorum.geekdroid.app.lifecycle.EmptyEvent.Companion.makeEmptyEvent as RefreshEvent
 import com.geekorum.geekdroid.app.lifecycle.EmptyEvent.Companion.makeEmptyEvent as SearchClosedEvent
 import com.geekorum.geekdroid.app.lifecycle.EmptyEvent.Companion.makeEmptyEvent as SearchOpenedEvent
 
@@ -51,9 +51,13 @@ class ActivityViewModel @Inject constructor(
 ) : ViewModel() {
     private val account = MutableLiveData<Account>()
     private val _selectedFeed = MutableLiveData<Long>()
-    val selectedFeed: LiveData<Feed?> = Transformations.switchMap(_selectedFeed) {
+    val selectedFeed: LiveData<Feed?> =  _selectedFeed.switchMap {
         feedsRepository.getFeedById(it)
     }
+
+    private val _feedSelectedEvent = MutableLiveData<Event<Long>>()
+    val feedSelectedEvent: LiveData<Event<Long>> = _feedSelectedEvent
+
     private val _articleSelectedEvent = MutableLiveData<Event<ArticleSelectedParameters>>()
     val articleSelectedEvent: LiveData<Event<ArticleSelectedParameters>> = _articleSelectedEvent
 
@@ -80,6 +84,7 @@ class ActivityViewModel @Inject constructor(
 
     fun setSelectedFeed(id: Long) {
         _selectedFeed.value = id
+        _feedSelectedEvent.value = Event(id)
     }
 
     fun refresh() {
