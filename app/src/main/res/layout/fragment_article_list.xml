@@ -56,7 +56,7 @@
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     android:orientation="vertical"
                     tools:listitem="@layout/headlines_row"
-                    android:visibility="@{fragmentViewModel.articles.size == 0 ? View.GONE : View.VISIBLE}"
+                    android:visibility="@{fragmentViewModel.articles.size == 0 ? View.INVISIBLE : View.VISIBLE}"
                     />
 
         </FrameLayout>
