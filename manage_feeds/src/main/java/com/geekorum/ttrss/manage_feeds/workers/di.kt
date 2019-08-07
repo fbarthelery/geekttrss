@@ -21,8 +21,9 @@
 package com.geekorum.ttrss.manage_feeds.workers
 
 import android.accounts.Account
+import androidx.work.DelegatingWorkerFactory
 import androidx.work.WorkerFactory
-import com.geekorum.geekdroid.dagger.DaggerDelegateWorkersFactory
+import com.geekorum.geekdroid.dagger.WorkerInjectionModule
 import com.geekorum.geekdroid.dagger.WorkerKey
 import com.geekorum.ttrss.accounts.AndroidTinyrssAccountManagerModule
 import com.geekorum.ttrss.accounts.NetworkLoginModule
@@ -38,7 +39,7 @@ import dagger.Subcomponent
 import dagger.multibindings.IntoMap
 
 
-@Module(subcomponents = [WorkerComponent::class])
+@Module(subcomponents = [WorkerComponent::class], includes = [WorkerInjectionModule::class])
 abstract class WorkersModule {
 
     @Binds
@@ -51,8 +52,17 @@ abstract class WorkersModule {
     @WorkerKey(SubscribeWorker::class)
     abstract fun providesSubscribeWorkerFactory(workerFactory: SubscribeWorker.Factory): WorkerFactory
 
-    @Binds
-    abstract fun daggerWorkerFactory(workerFactory: DaggerDelegateWorkersFactory): WorkerFactory
+    @Module
+    companion object {
+        @Provides
+        @JvmStatic
+        fun daggerWorkerFactory(moduleFactories: MutableSet<WorkerFactory>): WorkerFactory {
+            return DelegatingWorkerFactory().apply {
+                moduleFactories.forEach(this::addFactory)
+            }
+        }
+    }
+
 
 }
 
