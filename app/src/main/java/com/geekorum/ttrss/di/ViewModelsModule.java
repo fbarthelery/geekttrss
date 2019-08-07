@@ -31,7 +31,7 @@ import dagger.multibindings.IntoMap;
 /**
  * Provides the different {@link ViewModel} of the application.
  */
-@Module
+@Module(includes = com.geekorum.geekdroid.dagger.ViewModelsModule.class)
 public abstract class ViewModelsModule {
 
     @Binds

@@ -33,6 +33,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.geekorum.geekdroid.dagger.DaggerDelegateFragmentFactory
+import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
 import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory
 import dagger.Binds
 import dagger.Module
@@ -47,8 +48,14 @@ import javax.inject.Provider
  */
 @SuppressLint("Registered")
 open class ViewModelProviderActivity : AppCompatActivity() {
+
+    val viewModelsFactory: ViewModelProvider.Factory by lazy {
+        savedStateVmFactoryCreator.create(this, intent?.extras)
+    }
+
     @Inject
-    lateinit var viewModelsFactory: ViewModelProvider.Factory
+    lateinit var savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator
+
 }
 
 inline fun <reified VM : ViewModel> ViewModelProviderActivity.viewModels(): Lazy<VM> {
