@@ -27,6 +27,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.FragmentFactory
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
+import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
 import com.geekorum.ttrss.BaseFragment
 import com.geekorum.ttrss.activityViewModels
 import com.geekorum.ttrss.manage_feeds.R
@@ -34,9 +35,9 @@ import com.geekorum.ttrss.manage_feeds.databinding.FragmentAddFeedSelectFeedBind
 import javax.inject.Inject
 
 class SelectFeedFragment @Inject constructor(
-    viewModelsFactory: ViewModelProvider.Factory,
+    savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator,
     fragmentFactory: FragmentFactory
-) : BaseFragment(viewModelsFactory, fragmentFactory) {
+) : BaseFragment(savedStateVmFactoryCreator, fragmentFactory) {
 
     private lateinit var binding: FragmentAddFeedSelectFeedBinding
     private val viewModel: SubscribeToFeedViewModel by activityViewModels()

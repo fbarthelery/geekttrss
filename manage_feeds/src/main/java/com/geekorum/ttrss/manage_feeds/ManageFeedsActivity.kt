@@ -39,6 +39,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.geekdroid.dagger.DaggerDelegateFragmentFactory
+import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
 import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory
 import com.geekorum.ttrss.BaseDialogFragment
 import com.geekorum.ttrss.BaseFragment
@@ -83,9 +84,9 @@ class ManageFeedsActivity : SessionActivity() {
 }
 
 class ManageFeedsFragment @Inject constructor(
-    viewModelsFactory: ViewModelProvider.Factory,
+    savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator,
     fragmentFactory: FragmentFactory
-) : BaseFragment(viewModelsFactory, fragmentFactory) {
+) : BaseFragment(savedStateVmFactoryCreator, fragmentFactory) {
 
     private lateinit var binding: FragmentManageFeedsBinding
     private val viewModel: ManageFeedViewModel by viewModels()
@@ -157,9 +158,9 @@ class ManageFeedsFragment @Inject constructor(
 }
 
 class ConfirmUnsubscribeFragment @Inject constructor(
-    viewModelsFactory: DaggerDelegateViewModelsFactory,
+    savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator,
     fragmentFactory: DaggerDelegateFragmentFactory
-) : BaseDialogFragment(viewModelsFactory, fragmentFactory) {
+) : BaseDialogFragment(savedStateVmFactoryCreator, fragmentFactory) {
 
     private val viewModel: ManageFeedViewModel by activityViewModels()
     private val args:ConfirmUnsubscribeFragmentArgs by navArgs()

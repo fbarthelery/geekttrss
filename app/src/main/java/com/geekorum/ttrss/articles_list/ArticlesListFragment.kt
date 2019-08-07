@@ -27,13 +27,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentFactory
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
 import com.geekorum.geekdroid.views.recyclerview.ItemSwiper
 import com.geekorum.geekdroid.views.recyclerview.ScrollFromBottomAppearanceItemAnimator
 import com.geekorum.ttrss.BaseFragment
@@ -55,8 +55,9 @@ private const val ARG_FEED_ID = "feed_id"
  * Display all the articles in a list.
  */
 class ArticlesListFragment @Inject constructor(
-    viewModelsFactory: ViewModelProvider.Factory, fragmentFactory: FragmentFactory
-) : BaseFragment(viewModelsFactory, fragmentFactory) {
+    savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator,
+    fragmentFactory: FragmentFactory
+) : BaseFragment(savedStateVmFactoryCreator, fragmentFactory) {
 
     private var feedId: Long = 0
 
