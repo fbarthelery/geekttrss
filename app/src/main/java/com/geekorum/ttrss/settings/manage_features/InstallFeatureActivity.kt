@@ -22,6 +22,7 @@ package com.geekorum.ttrss.settings.manage_features
 
 import android.app.Activity
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
@@ -33,7 +34,6 @@ import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.CANCELED
 import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.FAILED
 import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.INSTALLED
 import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.REQUIRES_USER_CONFIRMATION
-import com.geekorum.ttrss.viewModels
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 

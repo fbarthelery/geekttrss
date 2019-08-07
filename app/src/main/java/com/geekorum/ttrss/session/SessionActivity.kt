@@ -23,10 +23,10 @@ package com.geekorum.ttrss.session
 import android.accounts.Account
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.viewModels
 import com.geekorum.ttrss.BaseActivity
 import com.geekorum.ttrss.MainActivity
 import com.geekorum.ttrss.articles_list.TtrssAccountViewModel
-import com.geekorum.ttrss.viewModels
 
 /**
  * Base Activity for a Session that starts with a Logged Account interacting with the backend.

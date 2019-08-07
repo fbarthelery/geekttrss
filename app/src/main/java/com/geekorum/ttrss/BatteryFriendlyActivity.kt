@@ -24,6 +24,8 @@ import android.annotation.SuppressLint
 import android.app.Application
 import android.os.Bundle
 import android.os.PowerManager
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
@@ -39,7 +41,7 @@ import javax.inject.Inject
  * An [android.app.Activity] who switch to Night mode when battery is low or in saving mode.
  */
 @SuppressLint("Registered")
-open class BatteryFriendlyActivity : ViewModelProviderActivity() {
+open class BatteryFriendlyActivity : AppCompatActivity() {
 
     private val nightViewModel: ForceNightModeViewModel by viewModels()
 

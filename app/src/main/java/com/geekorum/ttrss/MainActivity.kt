@@ -22,6 +22,7 @@ package com.geekorum.ttrss
 
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.articles_list.ArticleListActivity

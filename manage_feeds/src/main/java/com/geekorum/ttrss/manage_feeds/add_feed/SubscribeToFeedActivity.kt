@@ -21,6 +21,7 @@
 package com.geekorum.ttrss.manage_feeds.add_feed
 
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -29,7 +30,6 @@ import com.geekorum.ttrss.manage_feeds.DaggerManageFeedComponent
 import com.geekorum.ttrss.manage_feeds.R
 import com.geekorum.ttrss.manage_feeds.databinding.ActivitySubscribeToFeedBinding
 import com.geekorum.ttrss.session.SessionActivity
-import com.geekorum.ttrss.viewModels
 
 
 class SubscribeToFeedActivity : SessionActivity() {
