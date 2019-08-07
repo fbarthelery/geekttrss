@@ -25,7 +25,7 @@ import androidx.work.DelegatingWorkerFactory
 import androidx.work.WorkerFactory
 import com.geekorum.geekdroid.dagger.AppInitializer
 import com.geekorum.geekdroid.dagger.AppInitializersModule
-import com.geekorum.geekdroid.dagger.DaggerDelegateWorkersFactory
+import com.geekorum.geekdroid.dagger.WorkerInjectionModule
 import com.geekorum.ttrss.features_api.FeaturesWorkerFactory
 import dagger.Binds
 import dagger.Module
@@ -33,7 +33,7 @@ import dagger.Provides
 import dagger.multibindings.IntoSet
 
 
-@Module(includes = [AppInitializersModule::class])
+@Module(includes = [AppInitializersModule::class, WorkerInjectionModule::class])
 abstract class BackgroundJobsModule {
 
     @Binds
@@ -54,11 +54,11 @@ abstract class BackgroundJobsModule {
         @Provides
         @JvmStatic
         internal fun providesApplicationWorkerFactory(
-            daggerDelegate: DaggerDelegateWorkersFactory,
+            applicationFactories: MutableSet<WorkerFactory>,
             featuresWorkerFactory: FeaturesWorkerFactory
         ): WorkerFactory {
             return DelegatingWorkerFactory().apply {
-                addFactory(daggerDelegate)
+                applicationFactories.forEach(this::addFactory)
                 addFactory(featuresWorkerFactory)
             }
         }
