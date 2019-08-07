@@ -29,6 +29,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.preference.PreferenceManager
 import com.geekorum.geekdroid.dagger.FragmentKey
+import com.geekorum.geekdroid.dagger.ViewModelAssistedFactory
 import com.geekorum.geekdroid.dagger.ViewModelKey
 import com.geekorum.ttrss.accounts.NetworkLoginModule
 import com.geekorum.ttrss.accounts.PerAccount
@@ -99,7 +100,7 @@ private abstract class ArticlesListModule {
     @Binds
     @IntoMap
     @ViewModelKey(ActivityViewModel::class)
-    abstract fun getActivityViewModel(activityViewModel: ActivityViewModel): ViewModel
+    abstract fun getActivityViewModel(activityViewModel: ActivityViewModel.Factory): ViewModelAssistedFactory<out ViewModel>
 
     @Binds
     @IntoMap

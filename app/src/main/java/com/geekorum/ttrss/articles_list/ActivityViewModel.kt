@@ -25,33 +25,37 @@ import android.content.Context
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.switchMap
 import com.geekorum.geekdroid.accounts.SyncInProgressLiveData
 import com.geekorum.geekdroid.app.lifecycle.EmptyEvent
 import com.geekorum.geekdroid.app.lifecycle.Event
+import com.geekorum.geekdroid.dagger.ViewModelAssistedFactory
 import com.geekorum.ttrss.background_job.BackgroundJobManager
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.network.TtRssBrowserLauncher
 import com.geekorum.ttrss.providers.ArticlesContract
-import javax.inject.Inject
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
 import com.geekorum.geekdroid.app.lifecycle.EmptyEvent.Companion.makeEmptyEvent as SearchClosedEvent
 import com.geekorum.geekdroid.app.lifecycle.EmptyEvent.Companion.makeEmptyEvent as SearchOpenedEvent
 
+private const val STATE_FEED_ID = "feed_id"
 
 /**
  * [ViewModel] for the [ArticleListActivity]
  */
-class ActivityViewModel @Inject constructor(
+class ActivityViewModel @AssistedInject constructor(
+    @Assisted private val state: SavedStateHandle,
     private val feedsRepository: FeedsRepository,
     private val backgroundJobManager: BackgroundJobManager,
     private val browserLauncher: TtRssBrowserLauncher
 ) : ViewModel() {
     private val account = MutableLiveData<Account>()
-    private val _selectedFeed = MutableLiveData<Long>()
-    val selectedFeed: LiveData<Feed?> =  _selectedFeed.switchMap {
+    val selectedFeed: LiveData<Feed?> =  state.getLiveData(STATE_FEED_ID, Feed.FEED_ID_ALL_ARTICLES).switchMap {
         feedsRepository.getFeedById(it)
     }
 
@@ -83,16 +87,17 @@ class ActivityViewModel @Inject constructor(
     }
 
     fun setSelectedFeed(id: Long) {
-        _selectedFeed.value = id
+        state[STATE_FEED_ID] = id
         _feedSelectedEvent.value = Event(id)
     }
 
     fun refresh() {
-        val feed = selectedFeed.value
-        if (feed != null) {
-            backgroundJobManager.refreshFeed(account.value!!, feed.id)
-        } else {
+        //TODO state.getLiveData(key, value) should save the value but it doesn't. Look for a bug report
+        val feedId: Long? = state[STATE_FEED_ID]
+        if (feedId == null || Feed.isVirtualFeed(feedId)) {
             backgroundJobManager.refresh(account.value!!)
+        } else {
+            backgroundJobManager.refreshFeed(account.value!!, feedId)
         }
     }
 
@@ -126,4 +131,9 @@ class ActivityViewModel @Inject constructor(
     private fun ArticleSelectedEvent(position: Int, article: Article) =
         Event(ArticleSelectedParameters(position, article))
 
+
+    @AssistedInject.Factory
+    interface Factory : ViewModelAssistedFactory<ActivityViewModel> {
+        override fun create(state: SavedStateHandle): ActivityViewModel
+    }
 }

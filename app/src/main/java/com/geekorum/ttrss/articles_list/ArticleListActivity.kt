@@ -34,8 +34,8 @@ import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import androidx.fragment.app.commit
-import androidx.lifecycle.observe
 import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.article_details.ArticleDetailActivity
@@ -63,7 +63,6 @@ class ArticleListActivity : SessionActivity() {
         private const val FRAGMENT_ARTICLES_LIST = "articles_list"
         private const val FRAGMENT_BACKSTACK_SEARCH = "search"
         private const val FRAGMENT_FEEDS_LIST = "feeds_list"
-        private const val STATE_FEED_ID = "feed_id"
         private const val CODE_START_IN_APP_UPDATE = 1
     }
 
@@ -154,9 +153,8 @@ class ArticleListActivity : SessionActivity() {
             supportFragmentManager.commit {
                 replace(R.id.start_pane_layout, feedListFragment, FRAGMENT_FEEDS_LIST)
             }
+            activityViewModel.setSelectedFeed(Feed.FEED_ID_ALL_ARTICLES)
         }
-        val feedId = savedInstanceState?.getLong(STATE_FEED_ID) ?: Feed.FEED_ID_ALL_ARTICLES
-        activityViewModel.setSelectedFeed(feedId)
         setupToolbar()
     }
 
@@ -233,10 +231,6 @@ class ArticleListActivity : SessionActivity() {
         actionBarDrawerToggle?.onConfigurationChanged(newConfig)
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putLong(STATE_FEED_ID, activityViewModel.selectedFeed.value?.id ?: Feed.FEED_ID_ALL_ARTICLES)
-    }
 
     private fun onArticleSelected(position: Int, item: Article) {
         val articleUri = ContentUris.withAppendedId(ArticlesContract.Article.CONTENT_URI, item.id)
