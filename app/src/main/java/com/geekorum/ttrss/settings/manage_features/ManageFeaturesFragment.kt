@@ -26,6 +26,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentFactory
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
@@ -34,7 +35,6 @@ import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
 import com.geekorum.ttrss.BaseFragment
 import com.geekorum.ttrss.databinding.FragmentManageFeaturesBinding
 import com.geekorum.ttrss.databinding.ItemFeatureBinding
-import com.geekorum.ttrss.viewModels
 import javax.inject.Inject
 
 class ManageFeaturesFragment @Inject constructor(

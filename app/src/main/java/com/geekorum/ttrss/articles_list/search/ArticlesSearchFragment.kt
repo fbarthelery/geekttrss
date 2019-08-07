@@ -25,6 +25,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.FragmentFactory
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
 import com.geekorum.ttrss.BaseFragment
@@ -35,7 +36,6 @@ import com.geekorum.ttrss.articles_list.CardEventHandler
 import com.geekorum.ttrss.articles_list.setupCardSpacing
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.databinding.FragmentArticlesSearchBinding
-import com.geekorum.ttrss.viewModels
 import javax.inject.Inject
 
 /**

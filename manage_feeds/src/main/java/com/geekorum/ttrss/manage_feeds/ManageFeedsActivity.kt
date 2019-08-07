@@ -28,6 +28,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.FragmentFactory
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.observe
 import androidx.navigation.NavController
@@ -51,7 +52,6 @@ import com.geekorum.ttrss.manage_feeds.databinding.DialogUnsubscribeFeedBinding
 import com.geekorum.ttrss.manage_feeds.databinding.FragmentManageFeedsBinding
 import com.geekorum.ttrss.manage_feeds.databinding.ItemFeedBinding
 import com.geekorum.ttrss.session.SessionActivity
-import com.geekorum.ttrss.viewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import javax.inject.Inject
 

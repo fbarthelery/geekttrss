@@ -27,6 +27,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentFactory
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -41,7 +42,6 @@ import com.geekorum.ttrss.R
 import com.geekorum.ttrss.activityViewModels
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.databinding.FragmentArticleListBinding
-import com.geekorum.ttrss.viewModels
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.delay

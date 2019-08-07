@@ -62,16 +62,8 @@ inline fun <reified VM : ViewModel> ViewModelProviderActivity.viewModels(): Lazy
     return viewModels { viewModelsFactory }
 }
 
-inline fun <reified VM : ViewModel> BaseFragment.viewModels(): Lazy<VM> {
-    return viewModels { viewModelsFactory }
-}
-
 inline fun <reified VM : ViewModel> BaseFragment.activityViewModels(): Lazy<VM> {
     return activityViewModels { viewModelsFactory }
-}
-
-inline fun <reified VM : ViewModel> BaseDialogFragment.viewModels(): Lazy<VM> {
-    return viewModels { viewModelsFactory }
 }
 
 inline fun <reified VM : ViewModel> BaseDialogFragment.activityViewModels(): Lazy<VM> {
@@ -113,6 +105,8 @@ open class BaseFragment (
         savedStateVmFactoryCreator.create(this, arguments)
     }
 
+    override fun getDefaultViewModelProviderFactory(): ViewModelProvider.Factory = viewModelsFactory
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         childFragmentManager.fragmentFactory = fragmentFactory
@@ -127,6 +121,8 @@ open class BaseDialogFragment (
     val viewModelsFactory: ViewModelProvider.Factory by lazy {
         savedStateVmFactoryCreator.create(this, arguments)
     }
+
+    override fun getDefaultViewModelProviderFactory(): ViewModelProvider.Factory = viewModelsFactory
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
