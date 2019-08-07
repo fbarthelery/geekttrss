@@ -113,8 +113,8 @@ android {
 dependencies {
 
     implementation("androidx.core:core-ktx:1.0.2")
-    implementation("androidx.fragment:fragment-ktx:1.1.0-beta01")
-    implementation("androidx.activity:activity-ktx:1.0.0-beta01")
+    implementation("androidx.fragment:fragment-ktx:1.2.0-alpha02")
+    implementation("androidx.activity:activity-ktx:1.1.0-alpha02")
 
     // androidx ui
     implementation("androidx.drawerlayout:drawerlayout:1.1.0-alpha02")
