@@ -20,14 +20,10 @@
  */
 package com.geekorum.ttrss.manage_feeds.add_feed
 
-import android.os.Bundle
 import androidx.fragment.app.FragmentFactory
 import androidx.fragment.app.testing.launchFragmentInContainer
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
-import androidx.savedstate.SavedStateRegistryOwner
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -36,7 +32,6 @@ import com.geekorum.geekdroid.app.lifecycle.Event
 import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
 import com.geekorum.ttrss.manage_feeds.R
 import com.google.android.material.textfield.TextInputLayout
-import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify
@@ -52,7 +47,6 @@ import com.google.android.material.R as matR
 class EnterFeedUrlFragmentTest {
     lateinit var framentFactory: FragmentFactory
     lateinit var viewModelFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator
-    lateinit var viewModelFactory: DaggerDelegateSavedStateVMFactory
     lateinit var subscribeToFeedViewModel: SubscribeToFeedViewModel
     lateinit var navController: NavController
     lateinit var workManager: WorkManager
@@ -63,10 +57,8 @@ class EnterFeedUrlFragmentTest {
         workManager = mockk(relaxed = true)
         subscribeToFeedViewModel = spyk(SubscribeToFeedViewModel(mockk(), workManager, mockk()))
         navController = mockk(relaxed = true)
-        viewModelFactory = mockk()
-        every { viewModelFactory.create(any(), any<Class<out ViewModel>>())} returns subscribeToFeedViewModel
-        viewModelFactoryCreator = mockk()
-        every { viewModelFactoryCreator.create(any(), any()) } returns  viewModelFactory
+        viewModelFactoryCreator =
+            createDaggerDelegateSavedStateVMFactoryCreator(subscribeToFeedViewModel)
     }
 
     @Test

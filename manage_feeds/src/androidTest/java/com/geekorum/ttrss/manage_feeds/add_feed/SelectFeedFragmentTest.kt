@@ -22,8 +22,6 @@ package com.geekorum.ttrss.manage_feeds.add_feed
 
 import androidx.fragment.app.FragmentFactory
 import androidx.fragment.app.testing.launchFragmentInContainer
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
@@ -38,7 +36,6 @@ import androidx.work.WorkManager
 import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
 import com.geekorum.ttrss.manage_feeds.R
 import com.geekorum.ttrss.manage_feeds.add_feed.FeedsFinder.FeedResult
-import io.mockk.every
 import io.mockk.mockk
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.Matchers.anything
@@ -52,7 +49,6 @@ import com.google.android.material.R as matR
 class SelectFeedFragmentTest {
     lateinit var framentFactory: FragmentFactory
     lateinit var viewModelFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator
-    lateinit var viewModelFactory: DaggerDelegateSavedStateVMFactory
     lateinit var subscribeToFeedViewModel: SubscribeToFeedViewModel
     lateinit var navController: NavController
     lateinit var workManager: WorkManager
@@ -63,10 +59,8 @@ class SelectFeedFragmentTest {
         workManager = mockk(relaxed = true)
         subscribeToFeedViewModel = SubscribeToFeedViewModel(mockk(), workManager, mockk())
         navController = mockk(relaxed = true)
-        viewModelFactory = mockk()
-        every { viewModelFactory.create(any(), any<Class<out ViewModel>>())} returns subscribeToFeedViewModel
-        viewModelFactoryCreator = mockk()
-        every { viewModelFactoryCreator.create(any(), any()) } returns  viewModelFactory
+        viewModelFactoryCreator =
+            createDaggerDelegateSavedStateVMFactoryCreator(subscribeToFeedViewModel)
     }
 
     @Test
