@@ -39,6 +39,7 @@ import com.geekorum.ttrss.webapi.model.LoginResponsePayload;
 import kotlinx.coroutines.future.FutureKt;
 import timber.log.Timber;
 
+import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -124,7 +125,11 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
                 return getRevalidateCredentialResponse(account);
             }
         } catch (InterruptedException | ExecutionException e) {
-            Timber.e(e, "Unable to login");
+            if (e.getCause() instanceof IOException) {
+                Timber.w(e, "Unable to login");
+            } else {
+                Timber.e(e, "Unable to login");
+            }
         }
         // if we got there an error happened, probably network
         result.putInt(AccountManager.KEY_ERROR_CODE, AccountManager.ERROR_CODE_NETWORK_ERROR);
