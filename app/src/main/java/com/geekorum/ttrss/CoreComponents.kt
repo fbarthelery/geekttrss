@@ -26,6 +26,8 @@ import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
+import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.geekorum.geekdroid.dagger.DaggerDelegateFragmentFactory
 import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
@@ -34,6 +36,18 @@ import dagger.Module
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import javax.inject.Inject
+
+
+/* We can't rely on Activity default ViewModelProvider.Factory
+ * During tests FragmentScenario don't allow us to override the Activity implementation
+ * and change the default ViewModelProvider.Factory */
+inline fun <reified VM : ViewModel> BaseFragment.activityViewModels(): Lazy<VM> {
+    return activityViewModels { viewModelsFactory }
+}
+
+inline fun <reified VM : ViewModel> BaseDialogFragment.activityViewModels(): Lazy<VM> {
+    return activityViewModels { viewModelsFactory }
+}
 
 /**
  * As it supports Dagger injection, the Activity must have a corresponding [AndroidInjector]

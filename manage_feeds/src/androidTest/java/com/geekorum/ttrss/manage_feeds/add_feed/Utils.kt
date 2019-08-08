@@ -27,11 +27,12 @@ import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
 import javax.inject.Provider
 
 fun createDaggerDelegateSavedStateVMFactoryCreator(
-    viewModel: ViewModel
+    viewModel: ViewModel,
+    key: Class<out ViewModel> = viewModel.javaClass
 ): DaggerDelegateSavedStateVMFactory.Creator {
     val viewModelProvider = Provider { viewModel }
     val simpleProvidersMap: Map<Class<out ViewModel>, @JvmSuppressWildcards Provider<ViewModel>> = mapOf(
-        viewModel.javaClass to viewModelProvider
+        key to viewModelProvider
     )
     return object: DaggerDelegateSavedStateVMFactory.Creator {
         override fun create(

@@ -27,7 +27,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.FragmentFactory
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
@@ -40,6 +39,7 @@ import com.geekorum.geekdroid.views.recyclerview.ItemSwiper
 import com.geekorum.geekdroid.views.recyclerview.ScrollFromBottomAppearanceItemAnimator
 import com.geekorum.ttrss.BaseFragment
 import com.geekorum.ttrss.R
+import com.geekorum.ttrss.activityViewModels
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.databinding.FragmentArticleListBinding
 import com.google.android.material.snackbar.BaseTransientBottomBar

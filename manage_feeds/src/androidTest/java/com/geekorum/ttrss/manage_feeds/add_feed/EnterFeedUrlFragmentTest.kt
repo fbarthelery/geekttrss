@@ -58,7 +58,7 @@ class EnterFeedUrlFragmentTest {
         subscribeToFeedViewModel = spyk(SubscribeToFeedViewModel(mockk(), workManager, mockk()))
         navController = mockk(relaxed = true)
         viewModelFactoryCreator =
-            createDaggerDelegateSavedStateVMFactoryCreator(subscribeToFeedViewModel)
+            createDaggerDelegateSavedStateVMFactoryCreator(subscribeToFeedViewModel, SubscribeToFeedViewModel::class.java)
     }
 
     @Test
