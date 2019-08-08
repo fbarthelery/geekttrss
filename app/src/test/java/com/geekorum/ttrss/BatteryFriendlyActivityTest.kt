@@ -20,19 +20,19 @@
  */
 package com.geekorum.ttrss
 
+import android.app.Application
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.content.res.Configuration
 import android.os.Bundle
 import android.os.PowerManager
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_UNSPECIFIED
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.core.content.getSystemService
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -173,6 +173,16 @@ class BatteryFriendlyActivityRecordNightModeChanged : BatteryFriendlyActivity() 
 
     override fun onNightModeChanged(mode: Int) {
         nightMode = mode
+    }
+
+    override fun getDefaultViewModelProviderFactory(): ViewModelProvider.Factory {
+        return object : ViewModelProvider.Factory {
+            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                return ForceNightModeViewModel(application,
+                    application.getSystemService()!!
+                ) as T
+            }
+        }
     }
 }
 

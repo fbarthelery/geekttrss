@@ -35,8 +35,10 @@ import androidx.test.espresso.matcher.ViewMatchers.withSpinnerText
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.WorkManager
+import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
 import com.geekorum.ttrss.manage_feeds.R
 import com.geekorum.ttrss.manage_feeds.add_feed.FeedsFinder.FeedResult
+import io.mockk.every
 import io.mockk.mockk
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.Matchers.anything
@@ -49,7 +51,8 @@ import com.google.android.material.R as matR
 @RunWith(AndroidJUnit4::class)
 class SelectFeedFragmentTest {
     lateinit var framentFactory: FragmentFactory
-    lateinit var viewModelFactory: ViewModelProvider.Factory
+    lateinit var viewModelFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator
+    lateinit var viewModelFactory: DaggerDelegateSavedStateVMFactory
     lateinit var subscribeToFeedViewModel: SubscribeToFeedViewModel
     lateinit var navController: NavController
     lateinit var workManager: WorkManager
@@ -60,11 +63,10 @@ class SelectFeedFragmentTest {
         workManager = mockk(relaxed = true)
         subscribeToFeedViewModel = SubscribeToFeedViewModel(mockk(), workManager, mockk())
         navController = mockk(relaxed = true)
-        viewModelFactory = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return subscribeToFeedViewModel as T
-            }
-        }
+        viewModelFactory = mockk()
+        every { viewModelFactory.create(any(), any<Class<out ViewModel>>())} returns subscribeToFeedViewModel
+        viewModelFactoryCreator = mockk()
+        every { viewModelFactoryCreator.create(any(), any()) } returns  viewModelFactory
     }
 
     @Test
@@ -75,7 +77,7 @@ class SelectFeedFragmentTest {
         )
 
         val scenario = launchFragmentInContainer(themeResId = matR.style.Theme_MaterialComponents_Light) {
-            SelectFeedFragment(viewModelFactory, framentFactory)
+            SelectFeedFragment(viewModelFactoryCreator, framentFactory)
         }
 
         scenario.onFragment {
@@ -104,7 +106,7 @@ class SelectFeedFragmentTest {
         )
 
         val scenario = launchFragmentInContainer(themeResId = matR.style.Theme_MaterialComponents_Light) {
-            SelectFeedFragment(viewModelFactory, framentFactory)
+            SelectFeedFragment(viewModelFactoryCreator, framentFactory)
         }
 
         scenario.onFragment {
@@ -128,7 +130,7 @@ class SelectFeedFragmentTest {
         )
 
         val scenario = launchFragmentInContainer(themeResId = matR.style.Theme_MaterialComponents_Light) {
-            SelectFeedFragment(viewModelFactory, framentFactory)
+            SelectFeedFragment(viewModelFactoryCreator, framentFactory)
         }
 
         var expectedMessage = ""
@@ -154,7 +156,7 @@ class SelectFeedFragmentTest {
         )
 
         val scenario = launchFragmentInContainer(themeResId = matR.style.Theme_MaterialComponents_Light) {
-            SelectFeedFragment(viewModelFactory, framentFactory)
+            SelectFeedFragment(viewModelFactoryCreator, framentFactory)
         }
 
         var expectedMessage = ""

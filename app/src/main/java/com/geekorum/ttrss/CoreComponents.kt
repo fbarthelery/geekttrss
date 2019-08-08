@@ -23,52 +23,17 @@ package com.geekorum.ttrss
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
-import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.geekorum.geekdroid.dagger.DaggerDelegateFragmentFactory
 import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
-import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory
 import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
 import javax.inject.Inject
-import javax.inject.Provider
-
-/**
- * An activity who get a dagger injected [ViewModelProvider.Factory]
- */
-@SuppressLint("Registered")
-open class ViewModelProviderActivity : AppCompatActivity() {
-
-    val viewModelsFactory: ViewModelProvider.Factory by lazy {
-        savedStateVmFactoryCreator.create(this, intent?.extras)
-    }
-
-    @Inject
-    lateinit var savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator
-
-}
-
-inline fun <reified VM : ViewModel> ViewModelProviderActivity.viewModels(): Lazy<VM> {
-    return viewModels { viewModelsFactory }
-}
-
-inline fun <reified VM : ViewModel> BaseFragment.activityViewModels(): Lazy<VM> {
-    return activityViewModels { viewModelsFactory }
-}
-
-inline fun <reified VM : ViewModel> BaseDialogFragment.activityViewModels(): Lazy<VM> {
-    return activityViewModels { viewModelsFactory }
-}
 
 /**
  * As it supports Dagger injection, the Activity must have a corresponding [AndroidInjector]
@@ -142,9 +107,6 @@ open class BaseDialogFragment (
 
 @Module
 abstract class CoreFactoriesModule {
-
-    @Binds
-    abstract fun bindsViewModelFactory(factory: DaggerDelegateViewModelsFactory): ViewModelProvider.Factory
 
     @Binds
     abstract fun bindsFragmentFactory(factory: DaggerDelegateFragmentFactory): FragmentFactory
