@@ -33,9 +33,8 @@ import javax.inject.Inject
 
 
 class DisplayErrorFragment @Inject constructor(
-    savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator,
-    fragmentFactory: FragmentFactory
-) : BaseFragment(savedStateVmFactoryCreator, fragmentFactory) {
+    savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator
+) : BaseFragment(savedStateVmFactoryCreator) {
 
     private lateinit var binding: FragmentAddFeedDisplayErrorBinding
 

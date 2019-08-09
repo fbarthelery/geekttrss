@@ -38,9 +38,8 @@ import com.geekorum.ttrss.databinding.ItemFeatureBinding
 import javax.inject.Inject
 
 class ManageFeaturesFragment @Inject constructor(
-    savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator,
-    fragmentFactory: FragmentFactory
-) : BaseFragment(savedStateVmFactoryCreator, fragmentFactory) {
+    savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator
+) : BaseFragment(savedStateVmFactoryCreator) {
 
     lateinit var binding: FragmentManageFeaturesBinding
     private val viewModel: ManageFeaturesViewModel by viewModels()

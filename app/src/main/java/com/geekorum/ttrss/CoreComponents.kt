@@ -85,8 +85,7 @@ open class InjectableBaseActivity : BatteryFriendlyActivity() {
  * Common base Fragment for the application.
  */
 open class BaseFragment (
-    private val savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator,
-    val fragmentFactory: FragmentFactory
+    private val savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator
 ) : Fragment() {
 
     val viewModelsFactory: ViewModelProvider.Factory by lazy {
@@ -95,15 +94,10 @@ open class BaseFragment (
 
     override fun getDefaultViewModelProviderFactory(): ViewModelProvider.Factory = viewModelsFactory
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        childFragmentManager.fragmentFactory = fragmentFactory
-    }
 }
 
 open class BaseDialogFragment (
-    private var savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator,
-    val fragmentFactory: FragmentFactory
+    private val savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator
 ) : DialogFragment() {
 
     val viewModelsFactory: ViewModelProvider.Factory by lazy {
@@ -111,11 +105,6 @@ open class BaseDialogFragment (
     }
 
     override fun getDefaultViewModelProviderFactory(): ViewModelProvider.Factory = viewModelsFactory
-
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        childFragmentManager.fragmentFactory = fragmentFactory
-    }
 }
 
 

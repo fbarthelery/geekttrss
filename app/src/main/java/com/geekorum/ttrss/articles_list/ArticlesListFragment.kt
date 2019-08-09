@@ -53,9 +53,8 @@ import javax.inject.Inject
  * Display all the articles in a list.
  */
 class ArticlesListFragment @Inject constructor(
-    savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator,
-    fragmentFactory: FragmentFactory
-) : BaseFragment(savedStateVmFactoryCreator, fragmentFactory) {
+    savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator
+) : BaseFragment(savedStateVmFactoryCreator) {
 
     private var feedId: Long = 0
 

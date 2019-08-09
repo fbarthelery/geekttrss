@@ -78,8 +78,8 @@ public class FeedListFragment extends BaseFragment implements NavigationView.OnN
     private final OnDemandModuleManager moduleManager;
 
     @Inject
-    public FeedListFragment(@NonNull DaggerDelegateSavedStateVMFactory.Creator savedStateVmFactoryCreator, FragmentFactory fragmentFactory, OnDemandModuleManager moduleManager, SharedPreferences preferences) {
-        super(savedStateVmFactoryCreator, fragmentFactory);
+    public FeedListFragment(@NonNull DaggerDelegateSavedStateVMFactory.Creator savedStateVmFactoryCreator, OnDemandModuleManager moduleManager, SharedPreferences preferences) {
+        super(savedStateVmFactoryCreator);
         this.moduleManager = moduleManager;
         this.preferences = preferences;
     }

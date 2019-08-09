@@ -42,9 +42,8 @@ import javax.inject.Inject
  * Display search results
  */
 class ArticlesSearchFragment @Inject constructor(
-    savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator,
-    fragmentFactory: FragmentFactory
-) : BaseFragment(savedStateVmFactoryCreator, fragmentFactory) {
+    savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator
+) : BaseFragment(savedStateVmFactoryCreator) {
 
     lateinit var binding: FragmentArticlesSearchBinding
     private val activityViewModel: ActivityViewModel by activityViewModels()

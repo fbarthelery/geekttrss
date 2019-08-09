@@ -82,9 +82,8 @@ class ManageFeedsActivity : SessionActivity() {
 }
 
 class ManageFeedsFragment @Inject constructor(
-    savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator,
-    fragmentFactory: FragmentFactory
-) : BaseFragment(savedStateVmFactoryCreator, fragmentFactory) {
+    savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator
+) : BaseFragment(savedStateVmFactoryCreator) {
 
     private lateinit var binding: FragmentManageFeedsBinding
     private val viewModel: ManageFeedViewModel by viewModels()
@@ -156,9 +155,8 @@ class ManageFeedsFragment @Inject constructor(
 }
 
 class ConfirmUnsubscribeFragment @Inject constructor(
-    savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator,
-    fragmentFactory: DaggerDelegateFragmentFactory
-) : BaseDialogFragment(savedStateVmFactoryCreator, fragmentFactory) {
+    savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator
+) : BaseDialogFragment(savedStateVmFactoryCreator) {
 
     private val viewModel: ManageFeedViewModel by activityViewModels()
     private val args:ConfirmUnsubscribeFragmentArgs by navArgs()

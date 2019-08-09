@@ -36,9 +36,8 @@ import com.geekorum.ttrss.manage_feeds.databinding.FragmentAddFeedEnterUrlBindin
 import javax.inject.Inject
 
 class EnterFeedUrlFragment @Inject constructor(
-    savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator,
-    fragmentFactory: FragmentFactory
-) : BaseFragment(savedStateVmFactoryCreator, fragmentFactory) {
+    savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator
+) : BaseFragment(savedStateVmFactoryCreator) {
 
     private lateinit var binding: FragmentAddFeedEnterUrlBinding
     private val viewModel: SubscribeToFeedViewModel by activityViewModels()

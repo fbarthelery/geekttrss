@@ -20,7 +20,6 @@
  */
 package com.geekorum.ttrss.manage_feeds.add_feed
 
-import androidx.fragment.app.FragmentFactory
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.NavController
 import androidx.test.espresso.Espresso
@@ -47,7 +46,6 @@ import com.google.android.material.R as matR
 
 @RunWith(AndroidJUnit4::class)
 class SelectFeedFragmentTest {
-    lateinit var framentFactory: FragmentFactory
     lateinit var viewModelFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator
     lateinit var subscribeToFeedViewModel: SubscribeToFeedViewModel
     lateinit var navController: NavController
@@ -55,7 +53,6 @@ class SelectFeedFragmentTest {
 
     @BeforeTest
     fun setUp() {
-        framentFactory = mockk()
         workManager = mockk(relaxed = true)
         subscribeToFeedViewModel = SubscribeToFeedViewModel(mockk(), workManager, mockk())
         navController = mockk(relaxed = true)
@@ -71,7 +68,7 @@ class SelectFeedFragmentTest {
         )
 
         val scenario = launchFragmentInContainer(themeResId = matR.style.Theme_MaterialComponents_Light) {
-            SelectFeedFragment(viewModelFactoryCreator, framentFactory)
+            SelectFeedFragment(viewModelFactoryCreator)
         }
 
         scenario.onFragment {
@@ -100,7 +97,7 @@ class SelectFeedFragmentTest {
         )
 
         val scenario = launchFragmentInContainer(themeResId = matR.style.Theme_MaterialComponents_Light) {
-            SelectFeedFragment(viewModelFactoryCreator, framentFactory)
+            SelectFeedFragment(viewModelFactoryCreator)
         }
 
         scenario.onFragment {
@@ -124,7 +121,7 @@ class SelectFeedFragmentTest {
         )
 
         val scenario = launchFragmentInContainer(themeResId = matR.style.Theme_MaterialComponents_Light) {
-            SelectFeedFragment(viewModelFactoryCreator, framentFactory)
+            SelectFeedFragment(viewModelFactoryCreator)
         }
 
         var expectedMessage = ""
@@ -150,7 +147,7 @@ class SelectFeedFragmentTest {
         )
 
         val scenario = launchFragmentInContainer(themeResId = matR.style.Theme_MaterialComponents_Light) {
-            SelectFeedFragment(viewModelFactoryCreator, framentFactory)
+            SelectFeedFragment(viewModelFactoryCreator)
         }
 
         var expectedMessage = ""

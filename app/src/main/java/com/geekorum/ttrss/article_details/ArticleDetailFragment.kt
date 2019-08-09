@@ -69,9 +69,8 @@ import javax.inject.Inject
  */
 class ArticleDetailFragment @Inject constructor(
     savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator,
-    fragmentFactory: FragmentFactory,
     private val okHttpClient: OkHttpClient
-) : BaseFragment(savedStateVmFactoryCreator, fragmentFactory) {
+) : BaseFragment(savedStateVmFactoryCreator) {
 
     private lateinit var binding: FragmentArticleDetailBinding
     private val articleDetailsViewModel: ArticleDetailsViewModel by activityViewModels()
