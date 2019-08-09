@@ -29,12 +29,14 @@ import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.SearchView
+import androidx.core.os.bundleOf
 import androidx.core.view.GravityCompat
 import androidx.core.view.children
 import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import androidx.fragment.app.commit
+import androidx.fragment.app.replace
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
@@ -149,9 +151,8 @@ class ArticleListActivity : SessionActivity() {
         }
 
         if (savedInstanceState == null) {
-            val feedListFragment = FeedListFragment.newInstance(supportFragmentManager.fragmentFactory)
             supportFragmentManager.commit {
-                replace(R.id.start_pane_layout, feedListFragment, FRAGMENT_FEEDS_LIST)
+                replace<FeedListFragment>(R.id.start_pane_layout, FRAGMENT_FEEDS_LIST)
             }
             activityViewModel.setSelectedFeed(Feed.FEED_ID_ALL_ARTICLES)
         }
@@ -249,16 +250,16 @@ class ArticleListActivity : SessionActivity() {
     private fun onFeedSelected(feedId: Long) {
         navigateUpToList()
         supportFragmentManager.commit {
-            val hf = ArticlesListFragment.newInstance(supportFragmentManager.fragmentFactory, feedId)
-            replace(R.id.middle_pane_layout, hf, FRAGMENT_ARTICLES_LIST)
+            replace<ArticlesListFragment>(R.id.middle_pane_layout, FRAGMENT_FEEDS_LIST, bundleOf(
+                ArticlesListFragment.ARG_FEED_ID to feedId
+            ))
         }
         drawerLayout.closeDrawers()
     }
 
     private fun navigateToSearch() {
         supportFragmentManager.commit {
-            val hf = ArticlesSearchFragment.newInstance(supportFragmentManager.fragmentFactory)
-            replace(R.id.middle_pane_layout, hf, FRAGMENT_ARTICLES_LIST)
+            replace<ArticlesSearchFragment>(R.id.middle_pane_layout, FRAGMENT_ARTICLES_LIST)
             addToBackStack(FRAGMENT_BACKSTACK_SEARCH)
         }
         drawerLayout.closeDrawers()

@@ -49,8 +49,6 @@ import kotlinx.coroutines.launch
 
 import javax.inject.Inject
 
-private const val ARG_FEED_ID = "feed_id"
-
 /**
  * Display all the articles in a list.
  */
@@ -199,21 +197,7 @@ class ArticlesListFragment @Inject constructor(
     }
 
     companion object {
-
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param feedId the id of the feed displayed by this fragment.
-         *
-         * @return A new instance of fragment ArticlesListFragment.
-         */
-        fun newInstance(fragmentFactory: FragmentFactory, feedId: Long): ArticlesListFragment {
-            return fragmentFactory.instantiate(ArticlesListFragment::class.java.classLoader!!,
-                    ArticlesListFragment::class.java.name).apply {
-                arguments = bundleOf(ARG_FEED_ID to feedId)
-            } as ArticlesListFragment
-        }
+        const val ARG_FEED_ID = "feed_id"
     }
 
 }

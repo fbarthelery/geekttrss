@@ -41,7 +41,6 @@ import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.net.toUri
-import androidx.core.os.bundleOf
 import androidx.core.view.doOnNextLayout
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.FragmentFactory
@@ -361,16 +360,7 @@ class ArticleDetailFragment @Inject constructor(
         get() = scrollY >= scrollRange - paddingBottom
 
     companion object {
-
-        private const val ARG_ARTICLE_URI = "article_uri"
-
-        @JvmStatic
-        fun newInstance(fragmentFactory: FragmentFactory, articleUri: Uri): ArticleDetailFragment {
-            return fragmentFactory.instantiate(ArticleDetailFragment::class.java.classLoader!!,
-                ArticleDetailFragment::class.java.name).apply {
-                arguments = bundleOf(ARG_ARTICLE_URI to articleUri)
-            } as ArticleDetailFragment
-        }
+        const val ARG_ARTICLE_URI = "article_uri"
     }
 
     private fun IntentFilter.isWebBrowserApp(): Boolean {

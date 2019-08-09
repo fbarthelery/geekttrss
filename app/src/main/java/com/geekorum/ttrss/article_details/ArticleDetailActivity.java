@@ -66,9 +66,10 @@ public class ArticleDetailActivity extends SessionActivity {
         Uri articleUri = intent.getData();
 
         if (savedInstanceState == null) {
-            ArticleDetailFragment articleDetailFragment = ArticleDetailFragment.newInstance(daggerDelegateFragmentFactory, articleUri);
+            Bundle args = new Bundle();
+            args.putParcelable(ArticleDetailFragment.ARG_ARTICLE_URI, articleUri);
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.content, articleDetailFragment)
+                    .replace(R.id.content, ArticleDetailFragment.class, args)
                     .commit();
         }
 

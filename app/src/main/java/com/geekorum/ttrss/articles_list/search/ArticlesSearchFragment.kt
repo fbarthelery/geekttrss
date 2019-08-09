@@ -100,12 +100,4 @@ class ArticlesSearchFragment @Inject constructor(
         }
     }
 
-    companion object {
-        @JvmStatic
-        fun newInstance(fragmentFactory: FragmentFactory): ArticlesSearchFragment {
-            return fragmentFactory.instantiate(ArticlesSearchFragment::class.java.classLoader!!,
-                ArticlesSearchFragment::class.java.name) as ArticlesSearchFragment
-        }
-    }
-
 }

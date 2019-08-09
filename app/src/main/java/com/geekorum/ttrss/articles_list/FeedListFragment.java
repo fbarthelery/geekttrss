@@ -316,9 +316,4 @@ public class FeedListFragment extends BaseFragment implements NavigationView.OnN
         }
     }
 
-    public static FeedListFragment newInstance(FragmentFactory factory) {
-        FeedListFragment fragment = (FeedListFragment) factory.instantiate(FeedListFragment.class.getClassLoader(),
-                FeedListFragment.class.getName());
-        return fragment;
-    }
 }
