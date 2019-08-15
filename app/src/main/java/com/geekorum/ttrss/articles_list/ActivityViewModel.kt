@@ -26,7 +26,6 @@ import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.switchMap
 import com.geekorum.geekdroid.accounts.SyncInProgressLiveData
@@ -44,6 +43,7 @@ import com.geekorum.geekdroid.app.lifecycle.EmptyEvent.Companion.makeEmptyEvent 
 import com.geekorum.geekdroid.app.lifecycle.EmptyEvent.Companion.makeEmptyEvent as SearchOpenedEvent
 
 private const val STATE_FEED_ID = "feed_id"
+private const val STATE_ACCOUNT = "account"
 
 /**
  * [ViewModel] for the [ArticleListActivity]
@@ -54,8 +54,11 @@ class ActivityViewModel @AssistedInject constructor(
     private val backgroundJobManager: BackgroundJobManager,
     private val browserLauncher: TtRssBrowserLauncher
 ) : ViewModel() {
-    private val account = MutableLiveData<Account>()
-    val selectedFeed: LiveData<Feed?> =  state.getLiveData(STATE_FEED_ID, Feed.FEED_ID_ALL_ARTICLES).switchMap {
+    val selectedFeed: LiveData<Feed?> = state.getLiveData(STATE_FEED_ID, Feed.FEED_ID_ALL_ARTICLES).apply{
+        // workaround for out of sync values see
+        // https://issuetracker.google.com/issues/129989646
+        value = value
+    }.switchMap {
         feedsRepository.getFeedById(it)
     }
 
@@ -74,16 +77,17 @@ class ActivityViewModel @AssistedInject constructor(
     private val _searchQuery = MutableLiveData<String>()
     val searchQuery: LiveData<String> = _searchQuery
 
-    val isRefreshing: LiveData<Boolean> = Transformations.switchMap(account) {
-        SyncInProgressLiveData(it, ArticlesContract.AUTHORITY)
-    }
+    val isRefreshing: LiveData<Boolean> =
+        state.getLiveData<Account>(STATE_ACCOUNT).switchMap {
+            SyncInProgressLiveData(it, ArticlesContract.AUTHORITY)
+        }
 
     init {
         browserLauncher.warmUp()
     }
 
     fun setAccount(account: Account) {
-        this.account.value = account
+        state[STATE_ACCOUNT] = account
     }
 
     fun setSelectedFeed(id: Long) {
@@ -92,12 +96,12 @@ class ActivityViewModel @AssistedInject constructor(
     }
 
     fun refresh() {
-        //TODO state.getLiveData(key, value) should save the value but it doesn't. Look for a bug report
-        val feedId: Long? = state[STATE_FEED_ID]
-        if (feedId == null || Feed.isVirtualFeed(feedId)) {
-            backgroundJobManager.refresh(account.value!!)
+        val feedId: Long = state[STATE_FEED_ID]!!
+        val account: Account = state[STATE_ACCOUNT]!!
+        if (Feed.isVirtualFeed(feedId)) {
+            backgroundJobManager.refresh(account)
         } else {
-            backgroundJobManager.refreshFeed(account.value!!, feedId)
+            backgroundJobManager.refreshFeed(account, feedId)
         }
     }
 
