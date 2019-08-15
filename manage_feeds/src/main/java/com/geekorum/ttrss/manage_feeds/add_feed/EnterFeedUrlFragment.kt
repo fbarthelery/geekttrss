@@ -24,7 +24,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.FragmentFactory
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.geekorum.geekdroid.app.lifecycle.EventObserver

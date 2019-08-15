@@ -43,7 +43,6 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.net.toUri
 import androidx.core.view.doOnNextLayout
 import androidx.core.widget.NestedScrollView
-import androidx.fragment.app.FragmentFactory
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
