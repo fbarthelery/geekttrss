@@ -56,8 +56,6 @@ class ArticlesListFragment @Inject constructor(
     savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator
 ) : BaseFragment(savedStateVmFactoryCreator) {
 
-    private var feedId: Long = 0
-
     private lateinit var binding: FragmentArticleListBinding
     private val adapter: SwipingArticlesListAdapter?
         get() = binding.articleList.adapter as? SwipingArticlesListAdapter
@@ -78,11 +76,6 @@ class ArticlesListFragment @Inject constructor(
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        feedId = requireArguments().getLong(ARG_FEED_ID)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -95,7 +88,6 @@ class ArticlesListFragment @Inject constructor(
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        fragmentViewModel.init(feedId)
         fragmentViewModel.articles.observe(this) { articles -> adapter!!.submitList(articles) }
 
         fragmentViewModel.getPendingArticlesSetUnread().observe(this) { nbArticles ->
@@ -109,7 +101,7 @@ class ArticlesListFragment @Inject constructor(
     }
 
     private fun updateUnreadSnackbar(nbArticles: Int) {
-        val text = resources.getQuantityString(R.plurals.undo_set_articles_read_text, nbArticles!!,
+        val text = resources.getQuantityString(R.plurals.undo_set_articles_read_text, nbArticles,
             nbArticles)
         unreadSnackbar.setText(text)
         unreadSnackbar.show()

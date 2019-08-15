@@ -24,25 +24,31 @@ import android.accounts.Account
 import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import androidx.paging.DataSource
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
+import com.geekorum.geekdroid.dagger.ViewModelAssistedFactory
 import com.geekorum.ttrss.background_job.BackgroundJobManager
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.session.Action
 import com.geekorum.ttrss.session.UndoManager
-import javax.inject.Inject
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
 
 private const val PREF_VIEW_MODE = "view_mode"
+private const val STATE_FEED_ID = "feed_id"
+private const val STATE_NEED_UNREAD = "need_unread"
 
 /**
  * [ViewModel] for the [ArticlesListFragment].
  */
-class FragmentViewModel @Inject constructor(
+class FragmentViewModel @AssistedInject constructor(
+    @Assisted private val state: SavedStateHandle,
     private val articlesRepository: ArticlesRepository,
     private val feedsRepository: FeedsRepository,
     private val backgroundJobManager: BackgroundJobManager,
@@ -56,22 +62,20 @@ class FragmentViewModel @Inject constructor(
         }
     }
 
-    init {
-        prefs.apply {
-            registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener)
-        }
+    private val feedId = state.getLiveData(STATE_FEED_ID, Feed.FEED_ID_ALL_ARTICLES).apply {
+        // workaround for out of sync values see
+        // https://issuetracker.google.com/issues/129989646
+        value = value
     }
-
-    private val feedId = MutableLiveData<Long>()
     private val _pendingArticlesSetUnread = MutableLiveData<Int>().apply { value = 0 }
-    private val feed: LiveData<Feed?> = feedId.switchMap { feedsRepository.getFeedById(it) }
 
-    val articles: LiveData<PagedList<Article>> = feed.switchMap {
+    val articles: LiveData<PagedList<Article>> = feedId.switchMap {
+        feedsRepository.getFeedById(it)
+    }.switchMap {
         checkNotNull(it)
         getArticlesForFeed(it)
     }
 
-    private val needUnreadLiveData = MutableLiveData<Boolean>()
     private val unreadActionUndoManager = UndoManager<Action>()
 
     // default value in databinding is False for boolean and 0 for int
@@ -80,15 +84,12 @@ class FragmentViewModel @Inject constructor(
     val haveZeroArticles = articles.map { it.size == 0 }
 
     init {
+        prefs.registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener)
         updateNeedUnread()
     }
 
-    fun init(feedId: Long) {
-        this.feedId.value = feedId
-    }
-
     private fun getArticlesForFeed(feed: Feed): LiveData<PagedList<Article>> {
-        return needUnreadLiveData.switchMap { needUnread ->
+        return state.getLiveData<Boolean>(STATE_NEED_UNREAD).switchMap { needUnread ->
             val factory: DataSource.Factory<Int, Article> = when {
                 feed.isStarredFeed -> if (needUnread)
                     articlesRepository.getAllUnreadStarredArticles()
@@ -124,14 +125,14 @@ class FragmentViewModel @Inject constructor(
     }
 
     private fun updateNeedUnread() {
-        when (prefs.getString(PREF_VIEW_MODE, "adaptive")!!) {
-            "unread", "adaptive" -> needUnreadLiveData.setValue(true)
-            else -> needUnreadLiveData.setValue(false)
+        state[STATE_NEED_UNREAD] = when (prefs.getString(PREF_VIEW_MODE, "adaptive")) {
+            "unread", "adaptive" -> true
+            else -> false
         }
     }
 
     fun refresh() {
-        backgroundJobManager.refreshFeed(account, feedId.value!!)
+        backgroundJobManager.refreshFeed(account, state[STATE_FEED_ID]!!)
     }
 
     fun setArticleUnread(articleId: Long, newValue: Boolean) {
@@ -178,5 +179,10 @@ class FragmentViewModel @Inject constructor(
         override fun onItemAtEndLoaded(itemAtEnd: T) {
             // nothing to do
         }
+    }
+
+    @AssistedInject.Factory
+    interface Factory : ViewModelAssistedFactory<FragmentViewModel> {
+        override fun create(state: SavedStateHandle): FragmentViewModel
     }
 }
