@@ -209,6 +209,7 @@ dependencies {
     // we don't use it. here but it is used in feature modules
     debugImplementation("androidx.fragment:fragment-testing:1.2.0-alpha01")
 
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.0-beta-2")
 }
 
 apply {
