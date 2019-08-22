@@ -100,7 +100,7 @@ android {
             applicationIdSuffix = ".free"
         }
 
-        register("google"){
+        register("google") {
             dimension = "distribution"
             versionNameSuffix = "-google"
         }
@@ -177,8 +177,7 @@ dependencies {
     val workVersion = "2.2.0"
     androidTestImplementation("androidx.work:work-testing:$workVersion")
 
-    val kotlinVersion: String by rootProject.extra
-    implementation(enforcedPlatform(kotlin("bom", kotlinVersion)))
+    implementation(enforcedPlatform(kotlin("bom")))
     implementation(kotlin("stdlib-jdk8"))
 
     val coroutinesVersion: String by rootProject.extra

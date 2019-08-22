@@ -24,13 +24,12 @@ plugins {
 }
 
 dependencies {
-    val kotlinVersion: String by rootProject.extra
     implementation(kotlin("stdlib-jdk8"))
-    implementation(enforcedPlatform(kotlin("bom", kotlinVersion)))
+    implementation(enforcedPlatform(kotlin("bom")))
 
     implementation("javax.inject:javax.inject:1")
     api("org.jsoup:jsoup:1.10.2")
 
     testImplementation("com.google.truth:truth:1.0")
-    testImplementation(kotlin("test-junit", kotlinVersion))
+    testImplementation(kotlin("test-junit"))
 }

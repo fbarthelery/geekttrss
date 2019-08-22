@@ -29,10 +29,9 @@ import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.artifacts.dsl.DependencyConstraintHandler
 import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.kotlin.dsl.closureOf
+import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.extra
 import org.gradle.kotlin.dsl.kotlin
-import org.gradle.kotlin.dsl.provideDelegate
 
 const val espressoVersion = "3.2.0"
 const val androidxTestRunnerVersion = "1.3.0-alpha01"
@@ -44,9 +43,7 @@ const val robolectricVersion = "4.1"
  * Configuration for espresso and robolectric usage in an Android project
  */
 internal fun Project.configureTests() {
-    val kotlinVersion: String by rootProject.extra
-
-    extensions.configure<BaseExtension>("android") {
+    extensions.configure<BaseExtension> {
         defaultConfig {
             testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
             testInstrumentationRunnerArgument("clearPackageData", "true")
@@ -64,7 +61,7 @@ internal fun Project.configureTests() {
     }
 
     dependencies {
-        dualTestImplementation(kotlin("test-junit", kotlinVersion))
+        dualTestImplementation(kotlin("test-junit"))
 
         androidTestUtil("androidx.test:orchestrator:$androidxTestRunnerVersion")
         androidTestImplementation("androidx.test:runner:$androidxTestRunnerVersion")

@@ -46,8 +46,7 @@ android {
 dependencies {
     implementation(project(":app"))
 
-    val kotlinVersion: String by rootProject.extra
-    implementation(enforcedPlatform(kotlin("bom", kotlinVersion)))
+    implementation(enforcedPlatform(kotlin("bom")))
     implementation(kotlin("stdlib-jdk8"))
 
     val daggerVersion: String by rootProject.extra
