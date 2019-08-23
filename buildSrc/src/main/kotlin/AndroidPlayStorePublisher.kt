@@ -48,23 +48,22 @@ internal fun Project.configureAndroidPlayStorePublisher(): Unit {
         defaultToAppBundles = true
         track = properties.getOrDefault("PLAY_STORE_TRACK", "internal") as String
         fromTrack = properties.getOrDefault("PLAY_STORE_FROM_TRACK", "internal") as String
-    }
-
-    val android = the<AppExtension>() as ExtensionAware
-    val playAccountConfigs: NamedDomainObjectContainer<PlayPublisherExtension> = android.extensions.getByType()
-
-    playAccountConfigs.register("google") {
         serviceAccountCredentials = file(properties["PLAY_STORE_JSON_KEY_FILE"]!!)
     }
 
-    // On GPP-2.1.0 flavors publishing tasks for variant without credentials are skipped
-    // However the flavors will still be build for nothing
-    // Use publishToGooglePlayStore task to specify exactly which variant to build and publish
+    val android = the<AppExtension>() as ExtensionAware
+
+    android.extensions.configure<NamedDomainObjectContainer<PlayPublisherExtension>> {
+        register("free") {
+            isEnabled = false
+        }
+    }
+
     tasks.apply {
         register("publishToGooglePlayStore") {
             group = "Continuous Delivery"
             description = "Publish project to Google play store"
-            dependsOn(named("publishGoogleRelease"))
+            dependsOn(named("publish"))
         }
 
         // only there for consistent naming scheme
