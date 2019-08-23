@@ -57,6 +57,11 @@ internal fun Project.configureAndroidPlayStorePublisher(): Unit {
         register("free") {
             isEnabled = false
         }
+        register("google") {
+            // we always build the release as a separate step when publishing
+            // use artifactDir to be sure that publish don't rebuild it
+            artifactDir = file("$buildDir/outputs/bundle/googleRelease")
+        }
     }
 
     tasks.apply {
