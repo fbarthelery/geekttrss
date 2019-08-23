@@ -84,11 +84,6 @@ internal fun Project.configureTests() {
         dualTestImplementation("com.google.truth:truth:1.0")
         dualTestImplementation("androidx.test.ext:truth:1.3.0-alpha01")
 
-        // fix for guava listenablefuture conflict with application runtime version
-        dualTestImplementation("com.google.guava:listenablefuture:1.0") {
-            isForce = true
-        }
-
         // mock
         testImplementation("io.mockk:mockk:1.9")
         androidTestImplementation("io.mockk:mockk-android:1.9")

@@ -88,4 +88,10 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment-ktx:2.1.0-alpha06")
     debugImplementation("androidx.fragment:fragment-testing:1.2.0-alpha01")
 
+    // the test apk need these dependencies because they provide some of its resources
+    // likely due to manifest merging with :app manifest
+    androidTestImplementation("androidx.fragment:fragment-testing:1.2.0-alpha01")
+    androidTestImplementation("com.squareup.leakcanary:leakcanary-android:2.0-beta-2")
+    androidTestImplementation("com.google.android.gms:play-services-oss-licenses:17.0.0")
+
 }
