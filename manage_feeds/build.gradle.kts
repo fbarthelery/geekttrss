@@ -94,4 +94,7 @@ dependencies {
     androidTestImplementation("com.squareup.leakcanary:leakcanary-android:2.0-beta-2")
     androidTestImplementation("com.google.android.gms:play-services-oss-licenses:17.0.0")
 
+    // used in test through geekdroid
+    androidTestImplementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:1.0.0-alpha03")
+
 }
