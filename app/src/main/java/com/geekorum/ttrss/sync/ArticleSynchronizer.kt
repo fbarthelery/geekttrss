@@ -223,30 +223,22 @@ class ArticleSynchronizer @AssistedInject constructor(
         }.forEach { cacheArticleImages(it) }
     }
 
-    private fun CoroutineScope.cacheArticleImages(article: Article) = launch(Dispatchers.IO) {
+    private fun CoroutineScope.cacheArticleImages(article: Article) {
         if (!backgroundDataUsageManager.canDownloadArticleImages()) {
-            return@launch
+            return
         }
         imageUrlExtractor.extract(article.content)
+            .mapNotNull { it.toHttpUrlOrNull() }
+            .filter { it.canBeCache() }
             .forEach {
-                launch {
+                launch(Dispatchers.IO) {
                     try {
-                        cacheHttpRequest(it.toHttpUrlOrNull())
+                        httpCacher.cacheHttpRequest(it)
                     } catch (e: IOException) {
                         Timber.w(e,"Unable to cache request $it")
                     }
                 }
             }
-    }
-
-    @Throws(IOException::class)
-    private fun cacheHttpRequest(url: HttpUrl?) {
-        if (url == null) {
-            return
-        }
-        if (url.canBeCache()) {
-            httpCacher.cacheHttpRequest(url)
-        }
     }
 
     private fun HttpUrl.canBeCache(): Boolean {
