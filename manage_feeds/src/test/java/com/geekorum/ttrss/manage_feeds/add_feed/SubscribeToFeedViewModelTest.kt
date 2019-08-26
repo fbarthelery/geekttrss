@@ -34,7 +34,7 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
-import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import org.junit.Rule
 import org.junit.Test
@@ -74,7 +74,7 @@ class SubscribeToFeedViewModelTest {
         val observer: Observer<Event<String>> = mockObserver()
         subject.invalidUrlEvent.observeForever(observer)
         val result = subject.checkUrl("https://google.com")
-        val expected = HttpUrl.parse("https://google.com")
+        val expected = "https://google.com".toHttpUrl()
         assertThat(result).isEqualTo(expected)
         verify(inverse = true) { observer.onChanged(any()) }
     }

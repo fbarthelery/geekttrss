@@ -28,13 +28,13 @@ import com.google.common.truth.Truth
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
-import okhttp3.HttpUrl
-import okhttp3.MediaType
+import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Protocol
 import okhttp3.Request
 import okhttp3.Response
-import okhttp3.ResponseBody
+import okhttp3.ResponseBody.Companion.toResponseBody
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -96,7 +96,7 @@ class FeedsFinderTest {
         every { feedExtractor.extract(any<String>()) } returns feedsFound
 
         val expected = feedsFound.map {
-            FeedResult(source = FeedsFinder.Source.HTML, href = it.href, type = it.type, title = it.title )
+            FeedResult(source = Source.HTML, href = it.href, type = it.type, title = it.title )
         }
 
         val result = subject.findFeeds(url.toHttpUrl())
@@ -109,15 +109,13 @@ class FeedsFinderTest {
         .url(url)
         .build()
 
-    private fun String.toHttpUrl() = HttpUrl.get(this)
-
     private fun getHttpResponse(url: String, code: Int = 200, contentType: String = "text/html") = Response.Builder()
         .request(getRequestForUrl(url))
         .code(code)
         .protocol(Protocol.HTTP_1_1)
         .message("")
         .body(
-            ResponseBody.create(MediaType.get(contentType), "")
+            "".toResponseBody(contentType.toMediaType())
         ).build()
 
 }

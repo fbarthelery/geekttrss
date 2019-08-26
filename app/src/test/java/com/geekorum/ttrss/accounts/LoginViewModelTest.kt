@@ -43,12 +43,11 @@ import io.mockk.verify
 import io.mockk.verifySequence
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
-import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -124,7 +123,7 @@ class LoginViewModelTest {
 
         viewModel.initialize(LoginActivity.ACTION_ADD_ACCOUNT)
         viewModel.loginInProgress.observeForever(observer)
-        viewModel.httpUrl = HttpUrl.parse("http://localhost")
+        viewModel.httpUrl = "http://localhost".toHttpUrl()
 
         runBlocking {
             viewModel.doLogin()
@@ -147,7 +146,7 @@ class LoginViewModelTest {
         viewModel.actionCompleteEvent.observeForever(observer)
         viewModel.username = "fred"
         viewModel.password = "password"
-        viewModel.httpUrl = HttpUrl.parse("http://localhost")
+        viewModel.httpUrl = "http://localhost".toHttpUrl()
 
         runBlocking {
             viewModel.doLogin()
@@ -170,7 +169,7 @@ class LoginViewModelTest {
         viewModel.loginFailedEvent.observeForever(observer)
         viewModel.username = "fred"
         viewModel.password = "password"
-        viewModel.httpUrl = HttpUrl.parse("http://localhost")
+        viewModel.httpUrl = "http://localhost".toHttpUrl()
 
         runBlocking {
             viewModel.doLogin()
@@ -188,7 +187,9 @@ class LoginViewModelTest {
 
 
 @Module
-class FakeTinyrssApiModule(val tinyRssApi: TinyRssApi) {
+class FakeTinyrssApiModule(
+    private val tinyRssApi: TinyRssApi
+) {
     @Provides
     fun providesTinyRssApi(): TinyRssApi {
         return tinyRssApi

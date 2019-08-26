@@ -140,8 +140,8 @@ dependencies {
 
     implementation("com.google.android.material:material:1.1.0-alpha08")
     implementation("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")
-    implementation("com.squareup.okhttp3:logging-interceptor:3.12.0")
-    testImplementation("com.squareup.okhttp3:mockwebserver:3.12.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.1.0")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.1.0")
     implementation("com.squareup.picasso:picasso:2.5.2")
     implementation("com.google.android.gms:play-services-oss-licenses:17.0.0")
 
@@ -200,7 +200,7 @@ dependencies {
     api("androidx.room:room-ktx:$roomVersion")
     api("androidx.paging:paging-runtime:2.1.0")
     api("com.squareup.retrofit2:retrofit:2.5.0")
-    api("com.squareup.okhttp3:okhttp:3.12.0")
+    api("com.squareup.okhttp3:okhttp:4.1.0")
     api("com.jakewharton.timber:timber:4.7.1")
 
     // fragment testing declare some activities and resources that needs to be in the apk

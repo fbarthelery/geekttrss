@@ -34,10 +34,9 @@ import io.mockk.coEvery
 import io.mockk.mockk
 import io.mockk.verify
 import kotlinx.coroutines.runBlocking
-import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.junit.Rule
 import java.io.IOException
-import java.util.Collections
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -75,7 +74,7 @@ class AddFeedViewModelTest {
         }
         target.availableFeeds.observeForever(observer)
         runBlocking {
-            target.initWithUrl(HttpUrl.parse("https://some.google.com/")!!)
+            target.initWithUrl("https://some.google.com/".toHttpUrl())
         }
 
         val expected = feeds
@@ -93,7 +92,7 @@ class AddFeedViewModelTest {
         }
         target.availableFeeds.observeForever(observer)
         runBlocking {
-            target.initWithUrl(HttpUrl.parse("https://some.google.com/")!!)
+            target.initWithUrl("https://some.google.com/".toHttpUrl())
         }
 
         assertThat(result).isEmpty()

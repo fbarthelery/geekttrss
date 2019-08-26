@@ -25,7 +25,7 @@ import com.geekorum.ttrss.htmlparsers.FeedInformation
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
-import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -34,10 +34,10 @@ import javax.inject.Inject
 
 
 private val FEED_MIMETYPES = listOf(
-    MediaType.get("application/rss+xml"),
-    MediaType.get("application/atom+xml"),
+    "application/rss+xml".toMediaType(),
+    "application/atom+xml".toMediaType(),
     // unfortunately most of web servers are not properly configured. so accept xml
-    MediaType.get("application/xml")
+    "application/xml".toMediaType()
 )
 
 
@@ -56,13 +56,13 @@ class FeedsFinder @Inject constructor(
     }
 
     private fun getResultFromResponse(response: Response): List<FeedResult> {
-        val body = response.body()
+        val body = response.body
         val contentType = body?.contentType()?.let {
             // remove charset if any
-            MediaType.get("${it.type()}/${it.subtype()}")
+            "${it.type}/${it.subtype}".toMediaType()
         }
         return if (contentType in FEED_MIMETYPES) {
-            val url = response.request().url().toString()
+            val url = response.request.url.toString()
             listOf(FeedResult(source = Source.URL, href = url,
                 type = contentType.toString()))
         } else { // assume html

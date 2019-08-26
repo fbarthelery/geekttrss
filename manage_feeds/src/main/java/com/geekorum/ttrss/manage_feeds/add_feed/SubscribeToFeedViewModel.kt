@@ -37,6 +37,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
@@ -77,7 +78,7 @@ open class SubscribeToFeedViewModel @Inject constructor(
     }
 
     internal fun checkUrl(url: String): HttpUrl? {
-        return HttpUrl.parse(url)
+        return url.toHttpUrlOrNull()
             .also {
                 if (it == null) {
                     _invalidUrlError.value = Event(url)

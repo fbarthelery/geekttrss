@@ -23,6 +23,7 @@ package com.geekorum.ttrss.sync
 import androidx.annotation.WorkerThread
 import okhttp3.CacheControl
 import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -55,9 +56,7 @@ class HttpCacher @Inject constructor(httpClient: OkHttpClient) {
         .build()
 
     @Throws(IOException::class)
-    fun cacheHttpRequest(url: String) = cacheHttpRequest(checkNotNull(HttpUrl.parse(url)) {
-        "Invalid http/https url"
-    })
+    fun cacheHttpRequest(url: String) = cacheHttpRequest(url.toHttpUrl())
 
     @Throws(IOException::class)
     @WorkerThread

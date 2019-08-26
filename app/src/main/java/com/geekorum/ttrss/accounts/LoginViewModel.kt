@@ -38,6 +38,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
@@ -80,7 +81,7 @@ internal class LoginViewModel @Inject constructor(
         this.action = action
         this.account = account
         username = account?.username ?: ""
-        httpUrl = HttpUrl.parse(account?.url ?: "")
+        httpUrl = account?.url?.toHttpUrlOrNull()
     }
 
     fun checkValidUrl(text: CharSequence) {
@@ -88,7 +89,7 @@ internal class LoginViewModel @Inject constructor(
         val invalidUrlMsgId = when {
             text.isEmpty() -> R.string.error_field_required
             httpUrl == null -> R.string.error_invalid_http_url
-            httpUrl?.pathSegments()?.last()?.isNotEmpty() == true -> R.string.error_http_url_must_end_wish_slash
+            httpUrl?.pathSegments?.last()?.isNotEmpty() == true -> R.string.error_http_url_must_end_wish_slash
             else -> null
         }
         fieldErrors.value = current.copy(invalidUrlMsgId = invalidUrlMsgId, hasEditUrl = true)
@@ -246,7 +247,7 @@ internal class LoginViewModel @Inject constructor(
         @JvmStatic
         @InverseMethod("convertHttpUrlToString")
         fun convertStringToHttpUrl(url: String): HttpUrl? {
-            return HttpUrl.parse(url)?.newBuilder() // remove fragment and query
+            return url.toHttpUrlOrNull()?.newBuilder() // remove fragment and query
                 ?.query(null)
                 ?.encodedFragment(null)
                 ?.build()

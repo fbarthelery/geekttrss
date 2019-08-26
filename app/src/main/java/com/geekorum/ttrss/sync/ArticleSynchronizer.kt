@@ -43,8 +43,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.yield
 import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import timber.log.Timber
 import java.io.IOException
+
+private const val PREF_LATEST_ARTICLE_SYNCED_ID = "latest_article_sync_id"
 
 /**
  * Synchronize Articles from the network.
@@ -63,8 +66,6 @@ class ArticleSynchronizer @AssistedInject constructor(
     interface Factory {
         fun create(params: Bundle): ArticleSynchronizer
     }
-
-    private val PREF_LATEST_ARTICLE_SYNCED_ID = "latest_article_sync_id"
 
     private val numberOfLatestArticlesToRefresh = params.getInt(EXTRA_NUMBER_OF_LATEST_ARTICLES_TO_REFRESH, 500)
     private val feedId = params.getLong(EXTRA_FEED_ID, ApiService.ALL_ARTICLES_FEED_ID)
@@ -135,7 +136,7 @@ class ArticleSynchronizer @AssistedInject constructor(
         }
 
         val articles = getArticles(ApiService.ALL_ARTICLES_FEED_ID, latestId, 0)
-        val latestReceivedId = articles.sortedBy { it.id }.lastOrNull()?.id
+        val latestReceivedId = articles.maxBy { it.id }?.id
         val difference = (latestReceivedId ?: latestId) - latestId
         if (difference > 1000) {
             collectNewArticlesGradually()
@@ -230,7 +231,7 @@ class ArticleSynchronizer @AssistedInject constructor(
             .forEach {
                 launch {
                     try {
-                        cacheHttpRequest(HttpUrl.parse(it))
+                        cacheHttpRequest(it.toHttpUrlOrNull())
                     } catch (e: IOException) {
                         Timber.w(e,"Unable to cache request $it")
                     }
@@ -249,7 +250,7 @@ class ArticleSynchronizer @AssistedInject constructor(
     }
 
     private fun HttpUrl.canBeCache(): Boolean {
-        if (scheme() == "http" && !NetworkSecurityPolicy.getInstance().isCleartextTrafficPermitted(host())) {
+        if (scheme == "http" && !NetworkSecurityPolicy.getInstance().isCleartextTrafficPermitted(host)) {
             Timber.d("Can't cache $this, clear text traffic not permitted")
             return false
         }
@@ -305,7 +306,7 @@ class ArticleSynchronizer @AssistedInject constructor(
         return articles
     }
 
-    private fun augmentArticle(article: com.geekorum.ttrss.data.Article): com.geekorum.ttrss.data.Article {
+    private fun augmentArticle(article: Article): Article {
         val augmenter = article.createAugmenter()
         article.contentExcerpt = augmenter.getContentExcerpt()
         article.flavorImageUri = augmenter.getFlavorImageUri()
