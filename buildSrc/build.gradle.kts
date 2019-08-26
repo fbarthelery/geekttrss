@@ -45,7 +45,7 @@ repositories {
 dependencies {
     // 3.5.0 and above make connectedTest in feature modules fails with a ResourceNotFoundException
     // from resources from the base app module
-    implementation("com.android.tools.build:gradle:3.42.0")
+    implementation("com.android.tools.build:gradle:3.4.2")
     implementation("com.genymotion:plugin:1.4.2")
     implementation("gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.14.0")
     implementation("com.github.triplet.gradle:play-publisher:2.3.0")
