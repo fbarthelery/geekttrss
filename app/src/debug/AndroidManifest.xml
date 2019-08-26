@@ -31,5 +31,10 @@
     <application>
         <!--Disable crashlytrics for debug build-->
         <meta-data android:name="firebase_crashlytics_collection_enabled" android:value="false" />
+
+        <!-- hide leak canary launcher icon. Use shortcut -->
+        <activity-alias android:name="leakcanary.internal.activity.LeakLauncherActivity"
+                tools:node="remove" />
+
     </application>
 </manifest>
