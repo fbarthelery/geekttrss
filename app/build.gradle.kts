@@ -179,7 +179,7 @@ dependencies {
     implementation(enforcedPlatform(kotlin("bom")))
     implementation(kotlin("stdlib-jdk8"))
 
-    val coroutinesVersion: String by rootProject.extra
+    val coroutinesVersion = "1.3.0"
     implementation(enforcedCoroutinesPlatform(coroutinesVersion))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion")
