@@ -121,6 +121,12 @@ data class Headline(
     @SerialName("always_display_attachments")
     val alwaysDisplayAttachment: Boolean = false,
 
+    @SerialName("flavor_image")
+    var flavorImage: String? = "",
+
+    @SerialName("flavor_stream")
+    var flavorStream: String? = "",
+
     // unuseful
     val attachments: List<JsonObject> = emptyList(),
     val labels: List<String> = emptyList(),
@@ -134,5 +140,3 @@ data class Headline(
     }
 
 }
-
-
