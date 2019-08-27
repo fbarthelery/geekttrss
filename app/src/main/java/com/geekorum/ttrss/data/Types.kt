@@ -27,14 +27,10 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Fts4
 import androidx.room.PrimaryKey
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
-import org.jsoup.nodes.Element
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.TimeZone
-import java.util.regex.Pattern
 
 /**
  * Types for the data storage layer
@@ -141,68 +137,6 @@ data class Article(
         return (a.get(Calendar.YEAR) == b.get(Calendar.YEAR)
                 && a.get(Calendar.MONTH) == b.get(Calendar.MONTH)
                 && a.get(Calendar.DAY_OF_YEAR) == b.get(Calendar.DAY_OF_YEAR))
-    }
-
-    /**
-     * Create an [ArticleAugmenter] to collect more information on the article
-     */
-    fun createAugmenter(): ArticleAugmenter {
-        return ArticleAugmenter()
-    }
-
-    /** Helper class to compute additionnal information about an article  */
-    inner class ArticleAugmenter internal constructor() {
-
-        private val EXCERPT_MAX_LENGTH = 256
-        private val articleDocument: Document
-        private var flavorImageElement: Element?
-
-        init {
-            articleDocument = Jsoup.parse(content)
-            flavorImageElement = findFlavorImageElement()
-        }
-
-        fun getFlavorImageUri(): String {
-            flavorImageElement?.let { element ->
-                if ("iframe" == element.tagName().toLowerCase()) {
-                    val srcEmbed = element.attr("src")
-
-                    if (srcEmbed.isNotEmpty()) {
-                        val pattern = Pattern.compile("/embed/([\\w-]+)")
-                        val matcher = pattern.matcher(srcEmbed)
-
-                        if (matcher.find()) {
-                            val youtubeVid = matcher.group(1)
-                            return "https://img.youtube.com/vi/$youtubeVid/hqdefault.jpg"
-                        }
-                    }
-                } else if ("img" == element.tagName().toLowerCase()) {
-                    var src = element.attr("src")
-                    if (src.startsWith("//")) {
-                        src = "https:" + src
-                    }
-                    return src
-                }
-            }
-            return ""
-        }
-
-        // calculate the excerpt
-        fun getContentExcerpt(): String {
-            var excerpt = articleDocument.text()
-            if (excerpt.length > EXCERPT_MAX_LENGTH) {
-                excerpt = excerpt.substring(0, EXCERPT_MAX_LENGTH) + "…"
-            }
-            return excerpt
-        }
-
-        private fun findFlavorImageElement(): Element? {
-            val mediaList = articleDocument.select("img,video,iframe[src*=youtube.com/embed/]")
-            val iframe = mediaList.filter { element -> "iframe" == element.tagName().toLowerCase() }.firstOrNull()
-            val img = mediaList.filter { element -> "img" == element.tagName().toLowerCase() }.firstOrNull()
-
-            return iframe ?: img
-        }
     }
 
     companion object {

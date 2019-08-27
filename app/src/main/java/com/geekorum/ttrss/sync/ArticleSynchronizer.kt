@@ -299,7 +299,7 @@ class ArticleSynchronizer @AssistedInject constructor(
     }
 
     private fun augmentArticle(article: Article): Article {
-        val augmenter = article.createAugmenter()
+        val augmenter = ArticleAugmenter(article)
         article.contentExcerpt = augmenter.getContentExcerpt()
         article.flavorImageUri = augmenter.getFlavorImageUri()
         return article
