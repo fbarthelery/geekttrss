@@ -23,6 +23,8 @@ package com.geekorum.ttrss.webapi
 import androidx.annotation.Keep
 import com.geekorum.ttrss.webapi.model.Feed
 import com.geekorum.ttrss.webapi.model.FeedCategory
+import com.geekorum.ttrss.webapi.model.GetApiLevelRequestPayload
+import com.geekorum.ttrss.webapi.model.GetApiLevelResponsePayload
 import com.geekorum.ttrss.webapi.model.GetArticlesRequestPayload
 import com.geekorum.ttrss.webapi.model.GetCategoriesRequestPayload
 import com.geekorum.ttrss.webapi.model.GetFeedsRequestPayload
@@ -36,6 +38,8 @@ import com.geekorum.ttrss.webapi.model.UnsubscribeFeedRequestPayload
 import com.geekorum.ttrss.webapi.model.UnsubscribeFeedResponsePayload
 import com.geekorum.ttrss.webapi.model.UpdateArticleRequestPayload
 import com.geekorum.ttrss.webapi.model.UpdateArticleResponsePayload
+import com.geekorum.ttrss.webapi.model.GetVersionRequestPayload
+import com.geekorum.ttrss.webapi.model.GetVersionResponsePayload
 import kotlinx.coroutines.Deferred
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -50,6 +54,12 @@ interface TinyRssApi {
 
     @POST("api/")
     fun login(@Body loginRequestPayload: LoginRequestPayload): Deferred<LoginResponsePayload>
+
+    @POST("api/")
+    fun getVersion(@Body getVersionRequestPayload: GetVersionRequestPayload): Deferred<GetVersionResponsePayload>
+
+    @POST("api/")
+    fun getApiLevel(@Body getApiLevelRequestPayload: GetApiLevelRequestPayload): Deferred<GetApiLevelResponsePayload>
 
     @POST("api/")
     fun updateArticle(@Body updateFieldRequestPayload: UpdateArticleRequestPayload): Deferred<UpdateArticleResponsePayload>

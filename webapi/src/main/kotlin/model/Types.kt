@@ -65,7 +65,6 @@ data class Feed(
 ) {
 
     @delegate:Transient
-    @kotlinx.serialization.Transient
     val lastUpdatedDate: LocalDateTime by lazy @RequiresApi(26) {
         LocalDateTime.ofEpochSecond(lastUpdatedTimestamp, 0, ZoneOffset.UTC)
     }
