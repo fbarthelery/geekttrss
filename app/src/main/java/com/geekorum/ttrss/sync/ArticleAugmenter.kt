@@ -73,7 +73,9 @@ internal class ArticleAugmenter constructor(
 
     // calculate the excerpt
     fun getContentExcerpt(): String {
-        val excerpt = article.contentExcerpt.takeIf { it.isNotBlank() } ?: articleDocument.text()
+        // tt-rss api return &hellip; instead of empty excerpt when there is none in the headline
+        val excerpt = article.contentExcerpt.takeIf { it.isNotBlank() && it != "&hellip;" }
+                ?: articleDocument.text()
         val continuation = if (excerpt.length > EXCERPT_MAX_LENGTH) "…" else ""
         return "${excerpt.take(EXCERPT_MAX_LENGTH)}$continuation"
     }
