@@ -20,11 +20,11 @@
  */
 package com.geekorum.ttrss.network;
 
-import com.geekorum.geekdroid.network.TokenRetriever;
 import com.geekorum.ttrss.accounts.ServerInformation;
 import com.geekorum.ttrss.webapi.LoggedRequestInterceptorFactory;
 import com.geekorum.ttrss.webapi.TinyRssApi;
 import com.geekorum.ttrss.webapi.BasicAuthAuthenticator;
+import com.geekorum.ttrss.webapi.TokenRetriever;
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.KotlinSerializationConverterFactory;
 import dagger.BindsOptionalOf;
 import dagger.Module;

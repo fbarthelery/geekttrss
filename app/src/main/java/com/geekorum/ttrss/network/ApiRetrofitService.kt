@@ -20,15 +20,15 @@
  */
 package com.geekorum.ttrss.network
 
-import com.geekorum.geekdroid.network.TokenRetriever
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleContentIndexed
 import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.webapi.ApiCallException
+import com.geekorum.ttrss.webapi.RetrofitServiceHelper
 import com.geekorum.ttrss.webapi.TinyRssApi
-import com.geekorum.ttrss.webapi.checkStatus
+import com.geekorum.ttrss.webapi.TokenRetriever
 import com.geekorum.ttrss.webapi.model.FeedCategory
 import com.geekorum.ttrss.webapi.model.GetArticlesRequestPayload
 import com.geekorum.ttrss.webapi.model.GetArticlesRequestPayload.SortOrder
@@ -39,51 +39,13 @@ import com.geekorum.ttrss.webapi.model.GetFeedsRequestPayload
 import com.geekorum.ttrss.webapi.model.Headline
 import com.geekorum.ttrss.webapi.model.ResponsePayload
 import com.geekorum.ttrss.webapi.model.UpdateArticleRequestPayload
-import retrofit2.HttpException
-import java.io.IOException
-
-
-class RetrofitServiceHelper(
-    private val tokenRetriever: TokenRetriever
-) {
-
-    @Throws(ApiCallException::class)
-    suspend fun <T : ResponsePayload<*>> executeOrFail(failingMessage: String, block: suspend () -> T): T {
-        try {
-            val body = retryIfInvalidToken(block)
-            body.checkStatus { failingMessage }
-            return body
-        } catch (e: IOException) {
-            throw ApiCallException(failingMessage, e)
-        } catch (e: HttpException) {
-            throw ApiCallException(failingMessage, e)
-        }
-    }
-
-    @Throws(IOException::class)
-    suspend fun <T : ResponsePayload<*>> retryIfInvalidToken(block: suspend () -> T): T {
-        val body = block()
-        try {
-            body.checkStatus()
-        } catch (e: ApiCallException) {
-            val error = e.errorCode
-            if (error == ApiCallException.ApiError.LOGIN_FAILED || error == ApiCallException.ApiError.NOT_LOGGED_IN) {
-                tokenRetriever.invalidateToken()
-                return block()
-            }
-        }
-        return body
-    }
-
-}
-
 
 /**
  * Implementation of [ApiService] which use retrofit to communicate with the Api server.
  */
 class ApiRetrofitService(
-        tokenRetriever: TokenRetriever,
-        private val tinyrssApi: TinyRssApi
+    tokenRetriever: TokenRetriever,
+    private val tinyrssApi: TinyRssApi
 ) : ApiService {
 
     private val helper = RetrofitServiceHelper(tokenRetriever)
