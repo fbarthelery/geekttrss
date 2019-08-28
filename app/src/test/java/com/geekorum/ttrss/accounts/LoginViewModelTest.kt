@@ -118,7 +118,7 @@ class LoginViewModelTest {
     @Test
     fun checkDoLoginSendProgressEvent() {
         val observer: Observer<Boolean> = mockObserver()
-        coEvery { tinyRssApi.login(any()).await() } returns successLoginResponse
+        coEvery { tinyRssApi.login(any()) } returns successLoginResponse
         every { accountManager.addAccount(any(), any()) } returns false
 
         viewModel.initialize(LoginActivity.ACTION_ADD_ACCOUNT)
@@ -140,7 +140,7 @@ class LoginViewModelTest {
         val observer: Observer<Event<LoginViewModel.ActionCompleteEvent>> = mockObserver()
         every { accountManager.addAccount(any(), any()) } returns true
         every { accountManager.initializeAccountSync(any()) } just Runs
-        coEvery { tinyRssApi.login(any()).await() } returns successLoginResponse
+        coEvery { tinyRssApi.login(any()) } returns successLoginResponse
 
         viewModel.initialize(LoginActivity.ACTION_ADD_ACCOUNT)
         viewModel.actionCompleteEvent.observeForever(observer)
@@ -163,7 +163,7 @@ class LoginViewModelTest {
     @Test
     fun checkDoLoginWithFailSendLoginFailedEvent() {
         val observer: Observer<Event<LoginViewModel.LoginFailedError>> = mockObserver()
-        coEvery { tinyRssApi.login(any()).await() } returns failedLoginResponse
+        coEvery { tinyRssApi.login(any()) } returns failedLoginResponse
 
         viewModel.initialize(LoginActivity.ACTION_ADD_ACCOUNT)
         viewModel.loginFailedEvent.observeForever(observer)

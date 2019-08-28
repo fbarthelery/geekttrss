@@ -40,9 +40,9 @@ import com.geekorum.ttrss.webapi.model.UpdateArticleRequestPayload
 import com.geekorum.ttrss.webapi.model.UpdateArticleResponsePayload
 import com.geekorum.ttrss.webapi.model.GetVersionRequestPayload
 import com.geekorum.ttrss.webapi.model.GetVersionResponsePayload
-import kotlinx.coroutines.Deferred
 import retrofit2.http.Body
 import retrofit2.http.POST
+import java.util.concurrent.CompletableFuture
 
 /**
  * Interface of the Tiny Tiny Rss api.
@@ -53,30 +53,34 @@ import retrofit2.http.POST
 interface TinyRssApi {
 
     @POST("api/")
-    fun login(@Body loginRequestPayload: LoginRequestPayload): Deferred<LoginResponsePayload>
+    @Deprecated("Use suspend login()", replaceWith = ReplaceWith("login"))
+    fun loginCompletable(@Body loginRequestPayload: LoginRequestPayload): CompletableFuture<LoginResponsePayload>
 
     @POST("api/")
-    fun getVersion(@Body getVersionRequestPayload: GetVersionRequestPayload): Deferred<GetVersionResponsePayload>
+    suspend fun login(@Body loginRequestPayload: LoginRequestPayload): LoginResponsePayload
 
     @POST("api/")
-    fun getApiLevel(@Body getApiLevelRequestPayload: GetApiLevelRequestPayload): Deferred<GetApiLevelResponsePayload>
+    suspend fun getVersion(@Body getVersionRequestPayload: GetVersionRequestPayload): GetVersionResponsePayload
 
     @POST("api/")
-    fun updateArticle(@Body updateFieldRequestPayload: UpdateArticleRequestPayload): Deferred<UpdateArticleResponsePayload>
+    suspend fun getApiLevel(@Body getApiLevelRequestPayload: GetApiLevelRequestPayload): GetApiLevelResponsePayload
 
     @POST("api/")
-    fun getFeeds(@Body getFeedsRequestPayload: GetFeedsRequestPayload): Deferred<ListResponsePayload<Feed>>
+    suspend fun updateArticle(@Body updateFieldRequestPayload: UpdateArticleRequestPayload): UpdateArticleResponsePayload
 
     @POST("api/")
-    fun getCategories(@Body getFeedsRequestPayload: GetCategoriesRequestPayload): Deferred<ListResponsePayload<FeedCategory>>
+    suspend fun getFeeds(@Body getFeedsRequestPayload: GetFeedsRequestPayload): ListResponsePayload<Feed>
 
     @POST("api/")
-    fun getArticles(@Body getFeedsRequestPayload: GetArticlesRequestPayload): Deferred<ListResponsePayload<Headline>>
+    suspend fun getCategories(@Body getFeedsRequestPayload: GetCategoriesRequestPayload): ListResponsePayload<FeedCategory>
 
     @POST("api/")
-    fun subscribeToFeed(@Body subscribeToFeedRequestPayload: SubscribeToFeedRequestPayload): Deferred<SubscribeToFeedResponsePayload>
+    suspend fun getArticles(@Body getFeedsRequestPayload: GetArticlesRequestPayload): ListResponsePayload<Headline>
 
     @POST("api/")
-    fun unsubscribeFromFeed(@Body unsubscribeFeedRequestPayload: UnsubscribeFeedRequestPayload): Deferred<UnsubscribeFeedResponsePayload>
+    suspend fun subscribeToFeed(@Body subscribeToFeedRequestPayload: SubscribeToFeedRequestPayload): SubscribeToFeedResponsePayload
+
+    @POST("api/")
+    suspend fun unsubscribeFromFeed(@Body unsubscribeFeedRequestPayload: UnsubscribeFeedRequestPayload): UnsubscribeFeedResponsePayload
 
 }

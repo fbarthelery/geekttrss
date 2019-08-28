@@ -36,7 +36,6 @@ import com.geekorum.ttrss.webapi.ApiCallExceptionKt;
 import com.geekorum.ttrss.webapi.TinyRssApi;
 import com.geekorum.ttrss.webapi.model.LoginRequestPayload;
 import com.geekorum.ttrss.webapi.model.LoginResponsePayload;
-import kotlinx.coroutines.future.FutureKt;
 import timber.log.Timber;
 
 import java.io.IOException;
@@ -154,7 +153,7 @@ public class AccountAuthenticator extends AbstractAccountAuthenticator {
                 .build();
         TinyRssApi api = authenticatorNetworkComponent.getTinyRssApi();
         LoginRequestPayload payload = new LoginRequestPayload(user, password);
-        CompletableFuture<LoginResponsePayload> future = FutureKt.asCompletableFuture(api.login(payload));
+        CompletableFuture<LoginResponsePayload> future = api.loginCompletable(payload);
         return future.get();
     }
 

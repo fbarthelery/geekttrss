@@ -69,7 +69,7 @@ class TinyrssApiModuleTest {
         try {
             runBlocking {
                 val requestPayload = LoginRequestPayload("user", "password")
-                tinyRssApi.login(requestPayload).await()
+                tinyRssApi.login(requestPayload)
             }
         } catch (e: HttpException) {
             assertThat(e.code()).isEqualTo(401)
@@ -94,7 +94,7 @@ class TinyrssApiModuleTest {
 
         val loginResponsePayload = runBlocking {
             val requestPayload = LoginRequestPayload("user", "password")
-            tinyRssApi.login(requestPayload).await()
+            tinyRssApi.login(requestPayload)
         }
 
         val unauthenticatedRequest = server.takeRequest()
@@ -123,7 +123,7 @@ class TinyrssApiModuleTest {
 
         runBlocking {
             val requestPayload = LoginRequestPayload("user", "password")
-            tinyRssApi.login(requestPayload).await()
+            tinyRssApi.login(requestPayload)
         }
 
         val request = server.takeRequest()
@@ -148,7 +148,7 @@ class TinyrssApiModuleTest {
 
         val loginResponsePayload = runBlocking {
             val requestPayload = LoginRequestPayload("user", "password")
-            tinyRssApi.login(requestPayload).await()
+            tinyRssApi.login(requestPayload)
         }
 
         assertThat(loginResponsePayload.sessionId).isEqualTo("XXX")

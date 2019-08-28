@@ -31,15 +31,14 @@ import com.geekorum.ttrss.webapi.TinyRssApi
 import com.geekorum.ttrss.webapi.checkStatus
 import com.geekorum.ttrss.webapi.model.FeedCategory
 import com.geekorum.ttrss.webapi.model.GetArticlesRequestPayload
-import com.geekorum.ttrss.webapi.model.GetArticlesRequestPayload.SortOrder.DATE_REVERSE
 import com.geekorum.ttrss.webapi.model.GetArticlesRequestPayload.SortOrder
+import com.geekorum.ttrss.webapi.model.GetArticlesRequestPayload.SortOrder.DATE_REVERSE
 import com.geekorum.ttrss.webapi.model.GetArticlesRequestPayload.SortOrder.FEED_DATES
 import com.geekorum.ttrss.webapi.model.GetCategoriesRequestPayload
 import com.geekorum.ttrss.webapi.model.GetFeedsRequestPayload
 import com.geekorum.ttrss.webapi.model.Headline
 import com.geekorum.ttrss.webapi.model.ResponsePayload
 import com.geekorum.ttrss.webapi.model.UpdateArticleRequestPayload
-import kotlinx.coroutines.Deferred
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -49,7 +48,7 @@ class RetrofitServiceHelper(
 ) {
 
     @Throws(ApiCallException::class)
-    suspend fun <T : ResponsePayload<*>> executeOrFail(failingMessage: String, block: () -> Deferred<T>): T {
+    suspend fun <T : ResponsePayload<*>> executeOrFail(failingMessage: String, block: suspend () -> T): T {
         try {
             val body = retryIfInvalidToken(block)
             body.checkStatus { failingMessage }
@@ -62,15 +61,15 @@ class RetrofitServiceHelper(
     }
 
     @Throws(IOException::class)
-    suspend fun <T : ResponsePayload<*>> retryIfInvalidToken(block: () -> Deferred<T>): T {
-        val body = block().await()
+    suspend fun <T : ResponsePayload<*>> retryIfInvalidToken(block: suspend () -> T): T {
+        val body = block()
         try {
             body.checkStatus()
         } catch (e: ApiCallException) {
             val error = e.errorCode
             if (error == ApiCallException.ApiError.LOGIN_FAILED || error == ApiCallException.ApiError.NOT_LOGGED_IN) {
                 tokenRetriever.invalidateToken()
-                return block().await()
+                return block()
             }
         }
         return body
@@ -154,9 +153,10 @@ class ApiRetrofitService(
     }
 
     @Throws(ApiCallException::class)
-    suspend fun <T : ResponsePayload<*>> executeOrFail(failingMessage: String, block: () -> Deferred<T>): T {
+    suspend fun <T : ResponsePayload<*>> executeOrFail(failingMessage: String, block: suspend () -> T): T {
         return helper.executeOrFail(failingMessage, block)
     }
+
 
     companion object {
         private const val OFFLINE_SYNC_SEQ = 50

@@ -32,7 +32,7 @@ dependencies {
 
     implementation("androidx.annotation:annotation:1.1.0")
     implementation("javax.inject:javax.inject:1")
-    implementation("com.squareup.retrofit2:retrofit:2.5.0")
+    implementation("com.squareup.retrofit2:retrofit:2.6.1")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.11.0")
 
     val coroutinesVersion = "1.3.0"

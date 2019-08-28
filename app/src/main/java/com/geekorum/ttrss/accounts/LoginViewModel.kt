@@ -143,7 +143,7 @@ internal class LoginViewModel @Inject constructor(
 
         try {
             loginInProgress.value = true
-            val response = tinyRssApi.login(loginPayload).await()
+            val response = tinyRssApi.login(loginPayload)
             response.checkStatus { "Login failed" }
             onUserLoggedIn()
         } catch (e: ApiCallException) {

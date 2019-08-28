@@ -30,7 +30,7 @@ class RetrofitServiceHelper(
 ) {
 
     @Throws(ApiCallException::class)
-    suspend fun <T : ResponsePayload<*>> executeOrFail(failingMessage: String, block: () -> Deferred<T>): T {
+    suspend fun <T : ResponsePayload<*>> executeOrFail(failingMessage: String, block: suspend () -> T): T {
         try {
             val body = retryIfInvalidToken(block)
             body.checkStatus { failingMessage }
@@ -43,15 +43,15 @@ class RetrofitServiceHelper(
     }
 
     @Throws(IOException::class)
-    suspend fun <T : ResponsePayload<*>> retryIfInvalidToken(block: () -> Deferred<T>): T {
-        val body = block().await()
+    suspend fun <T : ResponsePayload<*>> retryIfInvalidToken(block: suspend () -> T): T {
+        val body = block()
         try {
             body.checkStatus()
         } catch (e: ApiCallException) {
             val error = e.errorCode
             if (error == ApiCallException.ApiError.LOGIN_FAILED || error == ApiCallException.ApiError.NOT_LOGGED_IN) {
                 tokenRetriever.invalidateToken()
-                return block().await()
+                return block()
             }
         }
         return body
