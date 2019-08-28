@@ -58,14 +58,20 @@ abstract class AndroidInjectorsModule {
 @PerAndroidComponent
 interface ArticleProviderComponent : AndroidInjector<ArticlesProvider> {
 
+    // We need a Builder to bind other dependencies
+    // but DispatchingAndroidInjector requires AndroidInjector.Factory
+    // who already as an abstract create() method
     @Subcomponent.Builder
-    abstract class Builder : AndroidInjector.Builder<ArticlesProvider>() {
+    abstract class Builder : AndroidInjector.Factory<ArticlesProvider> {
 
-        override fun seedInstance(instance: ArticlesProvider) {
+        override fun create(instance: ArticlesProvider): AndroidInjector<ArticlesProvider> {
             bindAndroidComponent(instance.context)
+            return build()
         }
 
         @BindsInstance
         abstract fun bindAndroidComponent(context: Context?): Builder
+
+        abstract fun build(): AndroidInjector<ArticlesProvider>
     }
 }
