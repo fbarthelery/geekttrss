@@ -139,7 +139,6 @@ dependencies {
     implementation(project(":webapi"))
 
     implementation("com.google.android.material:material:1.1.0-alpha08")
-    implementation("com.jakewharton.retrofit:retrofit2-kotlin-coroutines-adapter:0.9.2")
     implementation("com.squareup.okhttp3:logging-interceptor:4.1.0")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.1.0")
     implementation("com.squareup.picasso:picasso:2.5.2")
@@ -199,7 +198,7 @@ dependencies {
     api("androidx.room:room-runtime:$roomVersion")
     api("androidx.room:room-ktx:$roomVersion")
     api("androidx.paging:paging-runtime:2.1.0")
-    api("com.squareup.retrofit2:retrofit:2.5.0")
+    api("com.squareup.retrofit2:retrofit:2.6.1")
     api("com.squareup.okhttp3:okhttp:4.1.0")
     api("com.jakewharton.timber:timber:4.7.1")
 

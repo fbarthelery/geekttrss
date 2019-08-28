@@ -25,11 +25,11 @@ import com.geekorum.ttrss.accounts.ServerInformation;
 import com.geekorum.ttrss.webapi.LoggedRequestInterceptorFactory;
 import com.geekorum.ttrss.webapi.TinyRssApi;
 import com.geekorum.ttrss.webapi.BasicAuthAuthenticator;
-import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory;
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.KotlinSerializationConverterFactory;
 import dagger.BindsOptionalOf;
 import dagger.Module;
 import dagger.Provides;
+import kotlinx.serialization.StringFormat;
 import kotlinx.serialization.json.Json;
 import okhttp3.Authenticator;
 import okhttp3.MediaType;
@@ -66,17 +66,16 @@ public abstract class TinyrssApiModule {
 
         String basicHttpAuthPassword = serverInformation.getBasicHttpAuthPassword();
         String basicHttpAuthUsername = serverInformation.getBasicHttpAuthUsername();
-        if (basicHttpAuthPassword != null || basicHttpAuthUsername != null) {
+        if (basicHttpAuthPassword != null && basicHttpAuthUsername != null) {
             Authenticator serverAuthenticator = new BasicAuthAuthenticator(basicHttpAuthUsername, basicHttpAuthPassword);
             okHttpClient = okHttpClient.newBuilder().authenticator(serverAuthenticator).build();
         }
 
-        Json.Companion json = Json.Companion;
+        StringFormat json = Json.Companion;
         retrofitBuilder.addConverterFactory(KotlinSerializationConverterFactory.create(
                 json,
                 Objects.requireNonNull(MediaType.parse("application/json"))
         ))
-                .addCallAdapterFactory(CoroutineCallAdapterFactory.create())
                 .client(okHttpClient);
 
         Retrofit retrofit = retrofitBuilder.build();

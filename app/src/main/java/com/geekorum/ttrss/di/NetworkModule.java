@@ -73,7 +73,7 @@ public class NetworkModule {
     static @Nullable HttpLoggingInterceptor providesHttpRequestLogger() {
         if (DEBUG_REQUEST) {
             HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+            logging.level(HttpLoggingInterceptor.Level.BODY);
             return logging;
         }
         return null;
