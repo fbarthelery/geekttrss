@@ -53,10 +53,6 @@ import java.util.concurrent.CompletableFuture
 interface TinyRssApi {
 
     @POST("api/")
-    @Deprecated("Use suspend login()", replaceWith = ReplaceWith("login"))
-    fun loginCompletable(@Body loginRequestPayload: LoginRequestPayload): CompletableFuture<LoginResponsePayload>
-
-    @POST("api/")
     suspend fun login(@Body loginRequestPayload: LoginRequestPayload): LoginResponsePayload
 
     @POST("api/")

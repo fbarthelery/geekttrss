@@ -36,6 +36,9 @@ import com.geekorum.ttrss.webapi.ApiCallException
 import com.geekorum.ttrss.webapi.checkStatus
 import com.geekorum.ttrss.webapi.model.LoginRequestPayload
 import com.geekorum.ttrss.webapi.model.LoginResponsePayload
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 import java.io.IOException
@@ -81,7 +84,6 @@ internal constructor(
         response: AccountAuthenticatorResponse, account: Account,
         authTokenType: String, options: Bundle?
     ): Bundle {
-        val result = Bundle()
         val ttRssAccount = accountManager.fromAndroidAccount(account)
         val password = try {
             accountManager.getPassword(ttRssAccount)
@@ -92,9 +94,11 @@ internal constructor(
 
         val serverInformation = accountManager.getServerInformation(ttRssAccount)
         try {
-            val responsePayload = login(ttRssAccount.username, password, serverInformation)
-            responsePayload.checkStatus()
-            val sessionId = responsePayload.sessionId
+            val sessionId = runBlocking {
+                val responsePayload = login(ttRssAccount.username, password, serverInformation)
+                responsePayload.checkStatus()
+                responsePayload.sessionId
+            }
             return bundleOf(
                 AccountManager.KEY_ACCOUNT_NAME to account.name,
                 AccountManager.KEY_ACCOUNT_TYPE to account.type,
@@ -113,9 +117,9 @@ internal constructor(
             Timber.log(priority, e,"Unable to login")
         }
         // if we got there an error happened, probably network
-        result.putInt(AccountManager.KEY_ERROR_CODE, AccountManager.ERROR_CODE_NETWORK_ERROR)
-        result.putString(AccountManager.KEY_ERROR_MESSAGE, "Unable to login")
-        return result
+        return bundleOf(
+            AccountManager.KEY_ERROR_CODE to AccountManager.ERROR_CODE_NETWORK_ERROR,
+            AccountManager.KEY_ERROR_MESSAGE to "Unable to login")
     }
 
     private fun getRevalidateCredentialResponse(account: Account): Bundle {
@@ -127,17 +131,16 @@ internal constructor(
     }
 
     @Throws(ExecutionException::class, InterruptedException::class)
-    private fun login(
+    private suspend fun login(
         user: String, password: String?, serverInformation: ServerInformation
-    ): LoginResponsePayload {
+    ): LoginResponsePayload = withContext(Dispatchers.IO) {
         val urlModule = TinyRssServerInformationModule(serverInformation)
         val authenticatorNetworkComponent = authenticatorBuilder
             .tinyRssServerInformationModule(urlModule)
             .build()
         val api = authenticatorNetworkComponent.getTinyRssApi()
         val payload = LoginRequestPayload(user, password ?: "")
-        val future = api.loginCompletable(payload)
-        return future.get()
+        api.login(payload)
     }
 
     override fun getAuthTokenLabel(authTokenType: String): String {
