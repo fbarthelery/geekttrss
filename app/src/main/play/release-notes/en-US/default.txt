@@ -1,3 +1,2 @@
-You can now manage your feeds from the application
-Dark theme improvements
+Fix synchronization issues with latest TinyTinyRss server version
 Other bug fixes and general improvements

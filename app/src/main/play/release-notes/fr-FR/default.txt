@@ -1,3 +1,2 @@
-Il est maintenant possible de gérer ses flux dans l'application
-Amélioration du theme sombre
+Correction des problemes de synchronisation avec les derniers versions du serveur TinyTinyRss
 Divers correctifs et améliorations
