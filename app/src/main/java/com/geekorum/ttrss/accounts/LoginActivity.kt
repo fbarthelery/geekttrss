@@ -27,9 +27,9 @@ import android.os.Bundle
 import android.transition.TransitionManager
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import com.geekorum.geekdroid.accounts.AccountAuthenticatorAppCompatActivity
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory
@@ -60,14 +60,14 @@ class LoginActivity : AccountAuthenticatorAppCompatActivity() {
 
     private lateinit var binding: ActivityLoginAccountBinding
 
+    private val loginViewModel: LoginViewModel by viewModels { viewModelFactory }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login_account)
-        binding.setLifecycleOwner(this)
+        binding.lifecycleOwner = this
         setSupportActionBar(binding.toolbar)
-        val loginViewModel = ViewModelProviders.of(this, viewModelFactory)[LoginViewModel::class.java]
         val account = intent.getParcelableExtra<Account>(EXTRA_ACCOUNT)?.let {
             accountManager.fromAndroidAccount(it)
         }
