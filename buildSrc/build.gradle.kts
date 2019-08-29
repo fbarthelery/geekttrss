@@ -48,5 +48,6 @@ dependencies {
     implementation("com.android.tools.build:gradle:3.4.2")
     implementation("com.genymotion:plugin:1.4.2")
     implementation("gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.14.0")
-    implementation("com.github.triplet.gradle:play-publisher:2.3.0")
+    // 2.3.0 requires AGP 3.5.0, wait for fix before upgrade
+    implementation("com.github.triplet.gradle:play-publisher:2.2.1")
 }
