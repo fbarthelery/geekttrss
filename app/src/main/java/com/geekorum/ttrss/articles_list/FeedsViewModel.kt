@@ -29,8 +29,10 @@ import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.webapi.ApiCallException
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -78,9 +80,11 @@ class FeedsViewModel @Inject constructor(
 
     @Throws(ApiCallException::class)
     private suspend fun refreshFeeds() = coroutineScope {
-        val feeds = async { apiService.getFeeds() }
-        val categories = async { apiService.getCategories() }
-        feedsRepository.setFeedsAndCategories(feeds.await(), categories.await())
+        withContext(Dispatchers.IO){
+            val feeds = async { apiService.getFeeds() }
+            val categories = async { apiService.getCategories() }
+            feedsRepository.setFeedsAndCategories(feeds.await(), categories.await())
+        }
     }
 
     /**
