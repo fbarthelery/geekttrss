@@ -23,6 +23,7 @@ package com.geekorum.ttrss.accounts
 import android.accounts.Account
 import android.accounts.AccountManager
 import com.geekorum.geekdroid.accounts.AccountTokenRetriever
+import com.geekorum.ttrss.webapi.TokenRetriever
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 
@@ -37,9 +38,13 @@ internal class TinyrssAccountTokenRetriever(
     accountManager,
     AccountAuthenticator.TTRSS_AUTH_TOKEN_SESSION_ID,
     account,
-    true) {
+    true), TokenRetriever {
 
     override fun getToken(): String = runBlocking(Dispatchers.IO) {
-        super.getToken()
+        try {
+            super.getToken()
+        } catch (e: com.geekorum.geekdroid.network.TokenRetriever.RetrieverException) {
+            throw TokenRetriever.RetrieverException("unable to retrieve token from account", e)
+        }
     }
 }
