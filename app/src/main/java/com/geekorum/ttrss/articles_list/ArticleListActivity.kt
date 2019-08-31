@@ -31,7 +31,6 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.SearchView
 import androidx.core.os.bundleOf
 import androidx.core.view.GravityCompat
-import androidx.core.view.children
 import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
@@ -139,16 +138,6 @@ class ArticleListActivity : SessionActivity() {
 
         binding.lifecycleOwner = this
         binding.activityViewModel = activityViewModel
-        with(binding.startPaneLayout) {
-            // dispatch window inset up to the navigation view (FeedsListFragment)
-            setOnApplyWindowInsetsListener { _, insets ->
-                var result = insets
-                children.forEach {
-                    result = it.dispatchApplyWindowInsets(result)
-                }
-                result
-            }
-        }
 
         if (savedInstanceState == null) {
             supportFragmentManager.commit {

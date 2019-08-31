@@ -55,7 +55,8 @@
                 android:layout_marginTop="?actionBarSize"
                 app:cardElevation="8dp">
 
-            <FrameLayout android:id="@+id/preferences_container"
+            <androidx.fragment.app.FragmentContainerView
+                         android:id="@+id/preferences_container"
                          android:layout_width="match_parent"
                          android:layout_height="match_parent"
                     />

@@ -60,13 +60,13 @@
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <FrameLayout
+        <androidx.fragment.app.FragmentContainerView
             android:id="@+id/middle_pane_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        </FrameLayout>
+        </androidx.fragment.app.FragmentContainerView>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/fab"
@@ -82,7 +82,7 @@
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-    <FrameLayout
+    <androidx.fragment.app.FragmentContainerView
             android:id="@+id/start_pane_layout"
             android:layout_width="300dp"
             android:layout_height="match_parent"
