@@ -20,16 +20,22 @@
  */
 package com.geekorum.ttrss.article_details
 
+import android.annotation.SuppressLint
 import android.content.ContentUris
 import android.os.Bundle
+import android.view.View
 import androidx.activity.viewModels
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.os.bundleOf
+import androidx.core.view.marginBottom
+import androidx.core.view.updateLayoutParams
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.commit
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.articles_list.ArticleListActivity
 import com.geekorum.ttrss.databinding.ActivityArticleDetailBinding
 import com.geekorum.ttrss.databinding.ToolbarArticleDetailsBinding
+import com.geekorum.ttrss.doOnApplyWindowInsets
 import com.geekorum.ttrss.session.SessionActivity
 
 /**
@@ -51,6 +57,7 @@ class ArticleDetailActivity : SessionActivity() {
         binding.viewModel = articleDetailsViewModel
         setSupportActionBar(binding.detailToolbar)
         setUpBottomAppBar()
+        setUpEdgeToEdge()
 
         // Show the Up button in the action bar.
         val actionBar = supportActionBar!!
@@ -67,6 +74,22 @@ class ArticleDetailActivity : SessionActivity() {
         }
 
         articleDetailsViewModel.init(ContentUris.parseId(articleUri!!))
+    }
+
+    @SuppressLint("RestrictedApi")
+    private fun setUpEdgeToEdge() {
+        binding.root.systemUiVisibility =
+            View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+        val fabInitialBottomMargin = binding.fab.marginBottom
+        binding.root.doOnApplyWindowInsets { view, insets, initialPadding ->
+            initialPadding.top += insets.systemWindowInsetTop
+            initialPadding.applyToView(view)
+            // we don't want to apply bottom padding on the whole view group, so we only update fab margin
+            binding.fab.updateLayoutParams<CoordinatorLayout.LayoutParams> {
+                bottomMargin = fabInitialBottomMargin + insets.systemWindowInsetBottom
+            }
+            insets
+        }
     }
 
     private fun setUpBottomAppBar() {
