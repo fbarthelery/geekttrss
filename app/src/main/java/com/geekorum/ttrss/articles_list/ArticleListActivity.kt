@@ -26,6 +26,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.SearchView
@@ -48,6 +49,7 @@ import com.geekorum.ttrss.databinding.ActivityArticleListBinding
 import com.geekorum.ttrss.in_app_update.InAppUpdateViewModel
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.session.SessionActivity
+import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.snackbar.Snackbar
 import timber.log.Timber
 
@@ -146,6 +148,18 @@ class ArticleListActivity : SessionActivity() {
             activityViewModel.setSelectedFeed(Feed.FEED_ID_ALL_ARTICLES)
         }
         setupToolbar()
+        setUpEdgeToEdge()
+    }
+
+    private fun setUpEdgeToEdge() {
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+
+        // the appBar doesn't redraw statusBarForeground correctly. force it
+        binding.appBar.addOnOffsetChangedListener(
+            AppBarLayout.OnOffsetChangedListener { _, _ ->
+                binding.appBar.invalidate()
+            })
     }
 
     private fun setupToolbar() {

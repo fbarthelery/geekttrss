@@ -34,6 +34,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.core.app.ActivityOptionsCompat
+import androidx.core.view.get
+import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.observe
@@ -46,6 +48,7 @@ import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.databinding.FragmentFeedsBinding
 import com.geekorum.ttrss.databinding.MenuFeedActionViewBinding
+import com.geekorum.ttrss.doOnApplyWindowInsets
 import com.geekorum.ttrss.on_demand_modules.OnDemandModuleManager
 import com.geekorum.ttrss.settings.SettingsActivity
 import com.geekorum.ttrss.settings.manage_features.InstallFeatureActivity
@@ -87,6 +90,17 @@ constructor(
         val designNavigationView = binding.navigationView
         designNavigationView.setNavigationItemSelectedListener(this)
         setupHeader()
+        setUpEdgeToEdge()
+    }
+
+    private fun setUpEdgeToEdge() {
+        val innerView = binding.navigationView[0]
+        val innerViewInitialPaddingBottom = innerView.paddingBottom
+        binding.navigationView.doOnApplyWindowInsets { _, insets, _ ->
+            innerView.updatePadding(
+                bottom = innerViewInitialPaddingBottom + insets.systemWindowInsetBottom)
+            insets
+        }
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
