@@ -18,30 +18,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.geekorum.ttrss.data;
+package com.geekorum.ttrss.data
 
-import androidx.room.Database;
-import androidx.room.RoomDatabase;
-import com.geekorum.ttrss.providers.ArticlesProvidersDao;
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
 
-@Database(entities = {Article.class, ArticleFTS.class,
-        Category.class, Feed.class, Transaction.class, AccountInfo.class},
-        version = 9)
-public abstract class ArticlesDatabase extends RoomDatabase {
+@Dao
+interface AccountInfoDao {
 
-    public static final String DATABASE_NAME = "room_articles.db";
+    @Query("SELECT * FROM account_info WHERE account_username=:username AND account_url=:url")
+    suspend fun getAccountInfo(username: String, url: String): AccountInfo
 
-    public abstract ArticleDao articleDao();
-
-    public abstract AccountInfoDao accountInfoDao();
-
-    public abstract TransactionsDao transactionsDao();
-
-    public abstract SynchronizationDao synchronizationDao();
-
-    public abstract ArticlesProvidersDao articlesProvidersDao();
-
-    public abstract FeedsDao feedsDao();
-
-    public abstract ManageFeedsDao manageFeedsDao();
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAccountInfo(accountInfo: AccountInfo)
 }

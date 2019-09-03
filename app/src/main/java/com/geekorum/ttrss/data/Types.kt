@@ -274,3 +274,17 @@ data class Transaction(
     var field: String = "",
     var value: Boolean = false
 )
+
+
+@Entity(tableName = "account_info")
+data class AccountInfo(
+    @PrimaryKey
+    @Embedded(prefix = "account_")
+    val account: Account,
+    @ColumnInfo(name = "server_version")
+    val serverVersion: String,
+    @ColumnInfo(name = "api_level")
+    val apiLevel: Int
+)
+
+data class Account(val username: String, val url: String)

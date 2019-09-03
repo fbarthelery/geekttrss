@@ -250,6 +250,72 @@ class ArticlesDatabaseMigrationTest {
         }
     }
 
+    private fun createSomeArticlesFromVersion8(db: SupportSQLiteDatabase) {
+        var values = contentValuesOf(
+            ArticlesContract.Category.TITLE to "category",
+            ArticlesContract.Category.UNREAD_COUNT to 2
+        )
+        db.insert(DbHelper.TABLE_CATEGORIES, SQLiteDatabase.CONFLICT_NONE, values)
+
+        values = contentValuesOf(
+            ArticlesContract.Feed.TITLE to "feed title",
+            ArticlesContract.Feed.URL to "feed url",
+            ArticlesContract.Feed.CAT_ID to 0,
+            ArticlesContract.Feed.UNREAD_COUNT to 2,
+            ArticlesContract.Feed.LAST_TIME_UPDATE to 0,
+            ArticlesContract.Feed.DISPLAY_TITLE to "display title",
+            ArticlesContract.Feed.IS_SUBSCRIBED to 1
+            )
+        db.insert(DbHelper.TABLE_FEEDS, SQLiteDatabase.CONFLICT_NONE, values)
+
+        values = contentValuesOf(
+            ArticlesContract.Article.TITLE to "article title",
+            ArticlesContract.Article.CONTENT to "a content",
+            ArticlesContract.Article.SCORE to 0,
+            ArticlesContract.Article.PUBLISHED to 1,
+            ArticlesContract.Article.LAST_TIME_UPDATE to 0,
+            ArticlesContract.Article.UNREAD to 1,
+            ArticlesContract.Article.TRANSIENT_UNREAD to 1,
+            ArticlesContract.Article.STARRED to 1,
+            ArticlesContract.Article.IS_UPDATED to 1,
+            ArticlesContract.Article.FEED_ID to 1,
+            ArticlesContract.Article.LINK to "article links",
+            ArticlesContract.Article.TAGS to "article tags",
+            ArticlesContract.Article.AUTHOR to "article author",
+            ArticlesContract.Article.FLAVOR_IMAGE_URI to "article flavor image uri",
+            ArticlesContract.Article.CONTENT_EXCERPT to "a content excerpt"
+        )
+        db.insert(DbHelper.TABLE_ARTICLES, SQLiteDatabase.CONFLICT_NONE, values)
+
+
+        values = contentValuesOf(
+            ArticlesContract.Transaction.FIELD to "transaction field",
+            ArticlesContract.Transaction.VALUE to 1,
+            ArticlesContract.Transaction.ARTICLE_ID to 1
+        )
+        db.insert(DbHelper.TABLE_TRANSACTIONS, SQLiteDatabase.CONFLICT_NONE, values)
+    }
+
+
+    @Test
+    fun migrate8To9() {
+        helper.createDatabase(TEST_DB, 8).use {
+            // db has schema version 8. insert some contentData using SQL queries.
+            // You cannot use DAO classes because they expect the latest schema.
+            // as our schema for this migration doesn't change much from the previous
+            // we can reuse the same function
+            createSomeArticlesFromVersion8(it)
+        }
+
+        helper.runMigrationsAndValidate(TEST_DB, 9, true,
+            MigrationFrom1To2, MigrationFrom2To3, MigrationFrom3To4, MigrationFrom4To5,
+            MigrationFrom5To6, MigrationFrom6To7, MigrationFrom7To8, MigrationFrom8To9).use {
+            // MigrationTestHelper automatically verifies the schema changes,
+            // but you need to validate that the contentData was migrated properly.
+            assertMigration7To8DataIntegrity(it)
+        }
+    }
+
     private inline fun <reified T> Cursor.getValue(columnName: String) : T {
         val index = getColumnIndexOrThrow(columnName)
         @Suppress("IMPLICIT_CAST_TO_ANY")

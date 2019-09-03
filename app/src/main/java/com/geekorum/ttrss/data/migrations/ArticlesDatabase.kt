@@ -401,3 +401,26 @@ object MigrationFrom7To8 : Migration(7, 8) {
     }
 
 }
+
+/**
+ * This migration adds the AccountInfo table
+ */
+object MigrationFrom8To9 : Migration(8, 9) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        createAccountInfoTable(database)
+    }
+
+    private fun createAccountInfoTable(database: SupportSQLiteDatabase) {
+        with(database) {
+            execSQL(
+                """CREATE TABLE IF NOT EXISTS `account_info` (
+                    |`server_version` TEXT NOT NULL,
+                    |`api_level` INTEGER NOT NULL,
+                    |`account_username` TEXT NOT NULL,
+                    |`account_url` TEXT NOT NULL,
+                    |PRIMARY KEY(`account_username`, `account_url`)
+                    |)""".trimMargin())
+        }
+    }
+}
+
