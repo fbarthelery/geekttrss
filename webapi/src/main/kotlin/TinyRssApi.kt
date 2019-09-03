@@ -27,6 +27,8 @@ import com.geekorum.ttrss.webapi.model.GetApiLevelRequestPayload
 import com.geekorum.ttrss.webapi.model.GetApiLevelResponsePayload
 import com.geekorum.ttrss.webapi.model.GetArticlesRequestPayload
 import com.geekorum.ttrss.webapi.model.GetCategoriesRequestPayload
+import com.geekorum.ttrss.webapi.model.GetConfigRequestPayload
+import com.geekorum.ttrss.webapi.model.GetConfigResponsePayload
 import com.geekorum.ttrss.webapi.model.GetFeedsRequestPayload
 import com.geekorum.ttrss.webapi.model.Headline
 import com.geekorum.ttrss.webapi.model.ListResponsePayload
@@ -57,6 +59,9 @@ interface TinyRssApi {
 
     @POST("api/")
     suspend fun getVersion(@Body getVersionRequestPayload: GetVersionRequestPayload): GetVersionResponsePayload
+
+    @POST("api/")
+    suspend fun getConfig(@Body getConfigRequestPayload: GetConfigRequestPayload): GetConfigResponsePayload
 
     @POST("api/")
     suspend fun getApiLevel(@Body getApiLevelRequestPayload: GetApiLevelRequestPayload): GetApiLevelResponsePayload
