@@ -50,6 +50,9 @@ interface ApiService {
     suspend fun getFeeds(): List<Feed>
 
     @Throws(ApiCallException::class)
+    suspend fun getServerInfo(): ServerInfo
+
+    @Throws(ApiCallException::class)
     suspend fun updateArticleField(id: Long, field: ArticlesContract.Transaction.Field, value: Boolean)
 
     companion object {
@@ -57,3 +60,13 @@ interface ApiService {
     }
 
 }
+
+/**
+ * Contains information on the server.
+ * Each field is optional and is null if it couldn't be retrieved
+ */
+data class ServerInfo(
+    val apiLevel: Int?,
+    val feedsIconsUrl: String?,
+    val serverVersion: String?
+)

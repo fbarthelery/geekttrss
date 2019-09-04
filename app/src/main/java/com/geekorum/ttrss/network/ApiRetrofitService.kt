@@ -20,6 +20,8 @@
  */
 package com.geekorum.ttrss.network
 
+import com.geekorum.ttrss.data.Account
+import com.geekorum.ttrss.data.AccountInfo
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleContentIndexed
 import com.geekorum.ttrss.data.Category
@@ -30,15 +32,21 @@ import com.geekorum.ttrss.webapi.RetrofitServiceHelper
 import com.geekorum.ttrss.webapi.TinyRssApi
 import com.geekorum.ttrss.webapi.TokenRetriever
 import com.geekorum.ttrss.webapi.model.FeedCategory
+import com.geekorum.ttrss.webapi.model.GetApiLevelRequestPayload
 import com.geekorum.ttrss.webapi.model.GetArticlesRequestPayload
 import com.geekorum.ttrss.webapi.model.GetArticlesRequestPayload.SortOrder
 import com.geekorum.ttrss.webapi.model.GetArticlesRequestPayload.SortOrder.DATE_REVERSE
 import com.geekorum.ttrss.webapi.model.GetArticlesRequestPayload.SortOrder.FEED_DATES
 import com.geekorum.ttrss.webapi.model.GetCategoriesRequestPayload
+import com.geekorum.ttrss.webapi.model.GetConfigRequestPayload
 import com.geekorum.ttrss.webapi.model.GetFeedsRequestPayload
+import com.geekorum.ttrss.webapi.model.GetVersionRequestPayload
 import com.geekorum.ttrss.webapi.model.Headline
 import com.geekorum.ttrss.webapi.model.ResponsePayload
 import com.geekorum.ttrss.webapi.model.UpdateArticleRequestPayload
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.supervisorScope
 
 /**
  * Implementation of [ApiService] which use retrofit to communicate with the Api server.
@@ -113,6 +121,37 @@ class ApiRetrofitService(
             tinyrssApi.updateArticle(payload)
         }
     }
+
+    override suspend fun getServerInfo(): ServerInfo = supervisorScope {
+        val versionDeferred = async {
+            val payload = GetVersionRequestPayload()
+            executeOrFail("Unable to get server version") {
+                tinyrssApi.getVersion(payload)
+            }
+        }
+
+        val configDeferred = async {
+            val payload = GetConfigRequestPayload()
+            executeOrFail("Unable to get server configuration") {
+                tinyrssApi.getConfig(payload).also {
+                    error("fail here")
+                }
+            }
+        }
+
+        val apiLevelDeferred = async {
+            val payload = GetApiLevelRequestPayload()
+            executeOrFail("Unable to get server api level") {
+                tinyrssApi.getApiLevel(payload)
+            }
+        }
+
+        ServerInfo(apiLevel = apiLevelDeferred.runCatching { await().level }.getOrNull() ,
+            feedsIconsUrl = configDeferred.runCatching { await().iconsUrl }.getOrNull(),
+            serverVersion = versionDeferred.runCatching { await().version}.getOrNull()
+        )
+    }
+
 
     @Throws(ApiCallException::class)
     suspend fun <T : ResponsePayload<*>> executeOrFail(failingMessage: String, block: suspend () -> T): T {
