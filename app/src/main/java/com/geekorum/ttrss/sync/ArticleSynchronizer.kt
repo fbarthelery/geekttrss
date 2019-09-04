@@ -26,6 +26,7 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.RemoteException
 import android.security.NetworkSecurityPolicy
+import android.util.Log
 import com.geekorum.geekdroid.accounts.CancellableSyncAdapter
 import com.geekorum.ttrss.data.AccountInfo
 import com.geekorum.ttrss.data.Article
@@ -38,6 +39,7 @@ import com.geekorum.ttrss.sync.SyncContract.EXTRA_NUMBER_OF_LATEST_ARTICLES_TO_R
 import com.geekorum.ttrss.webapi.ApiCallException
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -99,7 +101,8 @@ class ArticleSynchronizer @AssistedInject constructor(
         } catch (e: OperationApplicationException) {
             Timber.e(e, "unable to synchronize articles")
         } catch (e: RuntimeException) {
-            Timber.e(e, "unable to synchronize articles")
+            Timber.log(if (e is CancellationException) Log.WARN else Log.ERROR,
+                e,"unable to synchronize articles")
         }
     }
 
