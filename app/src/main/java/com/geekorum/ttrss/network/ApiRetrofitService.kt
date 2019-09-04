@@ -20,8 +20,6 @@
  */
 package com.geekorum.ttrss.network
 
-import com.geekorum.ttrss.data.Account
-import com.geekorum.ttrss.data.AccountInfo
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleContentIndexed
 import com.geekorum.ttrss.data.Category
@@ -45,7 +43,6 @@ import com.geekorum.ttrss.webapi.model.Headline
 import com.geekorum.ttrss.webapi.model.ResponsePayload
 import com.geekorum.ttrss.webapi.model.UpdateArticleRequestPayload
 import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.supervisorScope
 
 /**
@@ -133,9 +130,7 @@ class ApiRetrofitService(
         val configDeferred = async {
             val payload = GetConfigRequestPayload()
             executeOrFail("Unable to get server configuration") {
-                tinyrssApi.getConfig(payload).also {
-                    error("fail here")
-                }
+                tinyrssApi.getConfig(payload)
             }
         }
 

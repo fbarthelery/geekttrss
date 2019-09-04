@@ -91,4 +91,9 @@ public class ArticlesDatabaseModule {
         return database.feedsDao();
     }
 
+    @Provides
+    AccountInfoDao providesAccountInfoDao(ArticlesDatabase database) {
+        return database.accountInfoDao();
+    }
+
 }

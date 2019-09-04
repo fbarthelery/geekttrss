@@ -21,6 +21,8 @@
 package com.geekorum.ttrss.data.plugins
 
 import androidx.room.withTransaction
+import com.geekorum.ttrss.data.AccountInfo
+import com.geekorum.ttrss.data.AccountInfoDao
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticlesDatabase
 import com.geekorum.ttrss.data.Category
@@ -35,7 +37,8 @@ import javax.inject.Inject
  */
 class SynchronizationFacade @Inject constructor(
     private val database: ArticlesDatabase,
-    private val synchronizationDao: SynchronizationDao
+    private val synchronizationDao: SynchronizationDao,
+    private val accountInfoDao: AccountInfoDao
 ) : DatabaseService {
 
     override suspend fun updateArticleMetadata(
@@ -81,5 +84,11 @@ class SynchronizationFacade @Inject constructor(
         synchronizationDao.deleteFeedsAndArticles(feeds)
     }
 
+    override suspend fun getAccountInfo(username: String, apiUrl: String): AccountInfo? {
+        return accountInfoDao.getAccountInfo(username, apiUrl)
+    }
 
+    override suspend fun insertAccountInfo(accountInfo: AccountInfo) {
+        accountInfoDao.insertAccountInfo(accountInfo)
+    }
 }
