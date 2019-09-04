@@ -20,12 +20,14 @@
  */
 package com.geekorum.ttrss.sync
 
+import android.accounts.Account
 import android.content.OperationApplicationException
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.RemoteException
 import android.security.NetworkSecurityPolicy
 import com.geekorum.geekdroid.accounts.CancellableSyncAdapter
+import com.geekorum.ttrss.data.AccountInfo
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.htmlparsers.ImageUrlExtractor
@@ -46,6 +48,9 @@ import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import timber.log.Timber
 import java.io.IOException
+import com.geekorum.ttrss.accounts.ServerInformation as AccountServerInformation
+import com.geekorum.ttrss.data.Account as DataAccount
+import com.geekorum.ttrss.network.ServerInfo as ServerInfoResult
 
 private const val PREF_LATEST_ARTICLE_SYNCED_ID = "latest_article_sync_id"
 
@@ -55,6 +60,8 @@ private const val PREF_LATEST_ARTICLE_SYNCED_ID = "latest_article_sync_id"
 class ArticleSynchronizer @AssistedInject constructor(
     private val apiService: ApiService,
     @Assisted params: Bundle,
+    private val account: Account,
+    private val serverInformation: AccountServerInformation,
     private val backgroundDataUsageManager: BackgroundDataUsageManager,
     private val accountPreferences: SharedPreferences,
     private val databaseService: DatabaseService,
@@ -80,6 +87,7 @@ class ArticleSynchronizer @AssistedInject constructor(
 
     override suspend fun sync() {
         try {
+            updateAccountInfo()
             sendTransactions()
             synchronizeFeeds()
             collectNewArticles()
@@ -93,6 +101,24 @@ class ArticleSynchronizer @AssistedInject constructor(
         } catch (e: RuntimeException) {
             Timber.e(e, "unable to synchronize articles")
         }
+    }
+
+    private suspend fun updateAccountInfo() {
+        val serverInfoResult = apiService.getServerInfo()
+        val accountInfo = databaseService.getAccountInfo(account.name, serverInformation.apiUrl)
+                ?:  AccountInfo(DataAccount(account.name, serverInformation.apiUrl),
+                    "", 0)
+        val updatedInfo = makeUpdatedAccountInfo(accountInfo, serverInfoResult, serverInformation)
+        databaseService.insertAccountInfo(updatedInfo)
+    }
+
+    private fun makeUpdatedAccountInfo(
+        currentInfo: AccountInfo, serverInfoResult: ServerInfoResult,
+        serverInformation: AccountServerInformation
+    ): AccountInfo {
+        return currentInfo.copy(
+            serverVersion = serverInfoResult.serverVersion ?: currentInfo.serverVersion,
+            apiLevel = serverInfoResult.apiLevel ?: currentInfo.apiLevel)
     }
 
     override fun onSyncCancelled() {
