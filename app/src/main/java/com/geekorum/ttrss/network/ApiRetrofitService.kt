@@ -20,6 +20,7 @@
  */
 package com.geekorum.ttrss.network
 
+import com.geekorum.ttrss.accounts.ServerInformation
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleContentIndexed
 import com.geekorum.ttrss.data.Category
@@ -50,7 +51,8 @@ import kotlinx.coroutines.supervisorScope
  */
 class ApiRetrofitService(
     tokenRetriever: TokenRetriever,
-    private val tinyrssApi: TinyRssApi
+    private val tinyrssApi: TinyRssApi,
+    private val serverInformation: ServerInformation
 ) : ApiService {
 
     private val helper = RetrofitServiceHelper(tokenRetriever)
@@ -100,11 +102,18 @@ class ApiRetrofitService(
     override suspend fun getFeeds(): List<Feed> {
         val payload = GetFeedsRequestPayload(true, false,
                     GetFeedsRequestPayload.CATEGORY_ID_ALL_EXCLUDE_VIRTUALS)
+        val getConfigResponsePayload = executeOrFail("Unable to get feeds icons url") {
+            tinyrssApi.getConfig(GetConfigRequestPayload())
+        }
+        val baseFeedsIconsUrl = "${serverInformation.apiUrl}${getConfigResponsePayload.iconsUrl}"
         val response = executeOrFail("Unable to get feeds") {
             tinyrssApi.getFeeds(payload)
         }
         val feedlist = response.result
         return feedlist.map { it.toDataType() }
+            .map {
+                it.copy(feedIconUrl = "$baseFeedsIconsUrl/${it.id}.ico")
+            }
     }
 
     @Throws(ApiCallException::class)

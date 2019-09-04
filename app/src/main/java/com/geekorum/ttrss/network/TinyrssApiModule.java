@@ -49,8 +49,8 @@ public abstract class TinyrssApiModule {
     abstract LoggedRequestInterceptorFactory bindLoggedRequestInterceptorFactory();
 
     @Provides
-    static ApiService provideApiService(TokenRetriever tokenRetriever, TinyRssApi tinyRssApi) {
-        return new ApiRetrofitService(tokenRetriever, tinyRssApi);
+    static ApiService provideApiService(TokenRetriever tokenRetriever, TinyRssApi tinyRssApi, ServerInformation serverInformation) {
+        return new ApiRetrofitService(tokenRetriever, tinyRssApi, serverInformation);
     }
 
     @Provides
