@@ -316,6 +316,27 @@ class ArticlesDatabaseMigrationTest {
         }
     }
 
+    @Test
+    fun migrate9To10() {
+        helper.createDatabase(TEST_DB, 9).use {
+            // db has schema version 8. insert some contentData using SQL queries.
+            // You cannot use DAO classes because they expect the latest schema.
+            // as our schema for this migration doesn't change much from the previous
+            // we can reuse the same function
+            createSomeArticlesFromVersion8(it)
+        }
+
+        helper.runMigrationsAndValidate(TEST_DB, 9, true,
+            MigrationFrom1To2, MigrationFrom2To3, MigrationFrom3To4, MigrationFrom4To5,
+            MigrationFrom5To6, MigrationFrom6To7, MigrationFrom7To8, MigrationFrom8To9,
+            MigrationFrom9To10).use {
+            // MigrationTestHelper automatically verifies the schema changes,
+            // but you need to validate that the contentData was migrated properly.
+            assertMigration7To8DataIntegrity(it)
+        }
+    }
+
+
     private inline fun <reified T> Cursor.getValue(columnName: String) : T {
         val index = getColumnIndexOrThrow(columnName)
         @Suppress("IMPLICIT_CAST_TO_ANY")

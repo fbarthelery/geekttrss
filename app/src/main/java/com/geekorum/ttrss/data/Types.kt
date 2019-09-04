@@ -202,9 +202,12 @@ data class Feed(
     val unreadCount: Int = 0,
 
     @ColumnInfo(name = "is_subscribed")
-    val isSubscribed: Boolean = true
+    val isSubscribed: Boolean = true,
 
-    ) {
+    @ColumnInfo(name = "feed_icon_url")
+    val feedIconUrl: String = ""
+
+) {
 
     val isFreshFeed
         get() = id == FEED_ID_FRESH

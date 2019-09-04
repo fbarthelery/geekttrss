@@ -107,7 +107,8 @@ class ArticleFullTextSearchTest {
             ArticlesContract.Feed.UNREAD_COUNT to 2,
             ArticlesContract.Feed.LAST_TIME_UPDATE to 0,
             ArticlesContract.Feed.DISPLAY_TITLE to "display title",
-            ArticlesContract.Feed.IS_SUBSCRIBED to 1
+            ArticlesContract.Feed.IS_SUBSCRIBED to 1,
+            ArticlesContract.Feed.ICON_URL to "http://exemple.com/1.ico"
         )
         db.insert(DbHelper.TABLE_FEEDS, SQLiteDatabase.CONFLICT_NONE, values)
 

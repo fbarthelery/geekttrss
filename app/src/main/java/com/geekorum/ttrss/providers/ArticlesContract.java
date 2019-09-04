@@ -79,6 +79,7 @@ public class ArticlesContract {
         public static final String DISPLAY_TITLE = "display_title";
         public static final String UNREAD_COUNT = "unread_count";
         public static final String IS_SUBSCRIBED = "is_subscribed";
+        public static final String ICON_URL = "feed_icon_url";
 
 
         private Feed() {

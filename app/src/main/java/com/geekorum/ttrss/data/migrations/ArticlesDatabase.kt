@@ -424,3 +424,38 @@ object MigrationFrom8To9 : Migration(8, 9) {
     }
 }
 
+/**
+ * This migration adds the Feed.feed_icon_url column
+ */
+object MigrationFrom9To10 : Migration(9, 10) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        migrateFeedsTable(database)
+    }
+
+    private fun migrateFeedsTable(database: SupportSQLiteDatabase) {
+        with(database) {
+            execSQL(
+                """CREATE TABLE IF NOT EXISTS `feeds_new` (
+                    |`_id` INTEGER NOT NULL,
+                    |`url` TEXT NOT NULL,
+                    |`title` TEXT NOT NULL,
+                    |`cat_id` INTEGER NOT NULL,
+                    |`display_title` TEXT NOT NULL,
+                    |`last_time_update` INTEGER NOT NULL,
+                    |`unread_count` INTEGER NOT NULL,
+                    |`is_subscribed` INTEGER NOT NULL,
+                    |`feed_icon_url` TEXT NOT NULL,
+                    |PRIMARY KEY(`_id`),
+                    |FOREIGN KEY(`cat_id`) REFERENCES `categories`(`_id`)
+                    |ON UPDATE NO ACTION ON DELETE NO ACTION DEFERRABLE INITIALLY DEFERRED
+                    |)""".trimMargin())
+
+            execSQL("DROP INDEX IF EXISTS `index_feeds_cat_id`;")
+            execSQL("CREATE  INDEX `index_feeds_cat_id` ON `feeds_new` (`cat_id`);")
+
+            execSQL("INSERT INTO feeds_new SELECT *, '' FROM feeds;")
+            execSQL("DROP TABLE feeds;")
+            execSQL("ALTER TABLE feeds_new RENAME TO feeds;")
+        }
+    }
+}

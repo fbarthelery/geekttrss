@@ -29,7 +29,7 @@ import androidx.room.Query
 interface AccountInfoDao {
 
     @Query("SELECT * FROM account_info WHERE account_username=:username AND account_url=:url")
-    suspend fun getAccountInfo(username: String, url: String): AccountInfo
+    suspend fun getAccountInfo(username: String, url: String): AccountInfo?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAccountInfo(accountInfo: AccountInfo)
