@@ -263,10 +263,7 @@ constructor(
         val category = feedsViewModel.categories.value?.find { it.id == item.itemId.toLong() }
         category?.let {
             if (browseCatsLikeFeeds && false) { //TODO make this work but for now just disable this option
-                val feed = Feed().apply {
-                    id = it.id
-                    title = it.title
-                }
+                val feed = Feed(id = it.id, title = it.title)
                 // TODO is cat = true);
                 // activityViewModel.setSelectedFeed(feed);
             } else {

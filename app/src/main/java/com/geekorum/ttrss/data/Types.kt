@@ -184,25 +184,25 @@ data class Feed(
 
     @PrimaryKey
     @ColumnInfo(name = BaseColumns._ID)
-    var id: Long = 0,
+    val id: Long = 0,
 
-    var url: String = "",
-    var title: String = "",
+    val url: String = "",
+    val title: String = "",
 
     @ColumnInfo(name = "cat_id", index = true)
-    var catId: Long = 0,
+    val catId: Long = 0,
 
     @ColumnInfo(name = "display_title")
-    var displayTitle: String = "",
+    val displayTitle: String = "",
 
     @ColumnInfo(name = "last_time_update")
-    var lastTimeUpdate: Long = 0,
+    val lastTimeUpdate: Long = 0,
 
     @ColumnInfo(name = "unread_count")
-    var unreadCount: Int = 0,
+    val unreadCount: Int = 0,
 
     @ColumnInfo(name = "is_subscribed")
-    var isSubscribed: Boolean = true
+    val isSubscribed: Boolean = true
 
     ) {
 
@@ -238,19 +238,19 @@ data class Feed(
         fun isVirtualFeed(id: Long) = id in virtualFeedsIds
 
         @JvmStatic
-        fun createVirtualFeedForId(id: Long): Feed {
+        fun createVirtualFeedForId(id: Long, unreadCount: Int = 0): Feed {
             return when (id) {
-                FEED_ID_ARCHIVED -> createVirtualFeed(FEED_ID_ARCHIVED, "Archives")
-                FEED_ID_STARRED -> createVirtualFeed(FEED_ID_STARRED, "Starred articles")
-                FEED_ID_PUBLISHED -> createVirtualFeed(FEED_ID_PUBLISHED, "Published articles")
-                FEED_ID_FRESH -> createVirtualFeed(FEED_ID_FRESH, "Fresh articles")
-                FEED_ID_ALL_ARTICLES -> createVirtualFeed(FEED_ID_ALL_ARTICLES, "All articles")
+                FEED_ID_ARCHIVED -> createVirtualFeed(FEED_ID_ARCHIVED, "Archives", unreadCount)
+                FEED_ID_STARRED -> createVirtualFeed(FEED_ID_STARRED, "Starred articles", unreadCount)
+                FEED_ID_PUBLISHED -> createVirtualFeed(FEED_ID_PUBLISHED, "Published articles", unreadCount)
+                FEED_ID_FRESH -> createVirtualFeed(FEED_ID_FRESH, "Fresh articles", unreadCount)
+                FEED_ID_ALL_ARTICLES -> createVirtualFeed(FEED_ID_ALL_ARTICLES, "All articles", unreadCount)
                 else -> throw IllegalArgumentException("Unknown virtual Feed id $id")
             }
         }
 
-        private fun createVirtualFeed(feedId: Long, title: String): Feed {
-            return Feed(id = feedId, title = title)
+        private fun createVirtualFeed(feedId: Long, title: String, unreadCount: Int): Feed {
+            return Feed(id = feedId, title = title, unreadCount = unreadCount)
         }
     }
 }
