@@ -76,4 +76,10 @@ class FeedsRepository
         feedsDao.setFeedsAndCategories(feeds, categories)
     }
 
+    suspend fun updateFeedsAndCategoriesUnreadCount(
+        feeds: Collection<Feed>, categories: Collection<Category>
+    ) {
+        feedsDao.updateFeedsAndCategoriesUnreadCount(feeds, categories)
+    }
+
 }

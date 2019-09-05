@@ -105,4 +105,72 @@ abstract class FeedsDao {
         deleteCategories(toDelete)
         insertCategories(categories)
     }
+
+    @Query("UPDATE feeds SET unread_count=:unreadCount WHERE _id=:id")
+    abstract suspend fun updateFeedUnreadCount(id: Long, unreadCount: Int)
+
+    @Query("UPDATE categories SET unread_count=:unreadCount WHERE _id=:id")
+    abstract suspend fun updateCategoryUnreadCount(id: Long, unreadCount: Int)
+
+
+    @Transaction
+    open suspend fun updateFeedsAndCategoriesUnreadCount(
+        feeds: Collection<Feed>, categories: Collection<Category>
+    ) {
+        internalUpdateCategoriesUnreadCount(categories)
+        internalUpdateFeedsUnreadCount(feeds)
+    }
+
+    private suspend fun internalUpdateFeedsUnreadCount(feeds: Collection<Feed>) {
+        val feedsIds: List<Long> = feeds.map { it.id }
+        val currentFeeds = getAllFeedsList()
+        val currentFeedsIds = currentFeeds.map { it.id }
+        val (toDelete, toUpdate) = currentFeeds.partition { it.id !in feedsIds }
+        val toInsert = feeds.filter {
+            it.id !in currentFeedsIds
+        }
+        // will be delete on next sync
+        setFeedsUnreadCountTo0(toDelete)
+        updateFeedsUnreadCount(toUpdate)
+        insertFeeds(toInsert)
+    }
+
+    private suspend fun updateFeedsUnreadCount(feeds: Collection<Feed>) {
+        feeds.forEach {
+            updateFeedUnreadCount(it.id, it.unreadCount)
+        }
+    }
+
+    private suspend fun setFeedsUnreadCountTo0(feeds: List<Feed>) {
+        feeds.forEach {
+            updateFeedUnreadCount(it.id, 0)
+        }
+    }
+
+    private suspend fun internalUpdateCategoriesUnreadCount(categories: Collection<Category>) {
+        val categoriesIds: List<Long> = categories.map { it.id }
+        val currentCategories = getAllCategoriesList()
+        val currentCategoriesIds = currentCategories.map { it.id }
+        val (toDelete, toUpdate) = currentCategories.partition { it.id !in categoriesIds }
+        val toInsert = categories.filter {
+            it.id !in currentCategoriesIds
+        }
+
+        // will be delete on next sync
+        setCategoriesUnreadCountTo0(toDelete)
+        updateCategoriesUnreadCount(toUpdate)
+        insertCategories(toInsert)
+    }
+
+    private suspend fun updateCategoriesUnreadCount(categories: Collection<Category>) {
+        categories.forEach {
+            updateCategoryUnreadCount(it.id, it.unreadCount)
+        }
+    }
+
+    private suspend fun setCategoriesUnreadCountTo0(categories: Collection<Category>) {
+        categories.forEach {
+            updateCategoryUnreadCount(it.id, 0)
+        }
+    }
 }

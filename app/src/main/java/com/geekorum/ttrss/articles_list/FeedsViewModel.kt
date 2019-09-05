@@ -83,7 +83,7 @@ class FeedsViewModel @Inject constructor(
         withContext(Dispatchers.IO){
             val feeds = async { apiService.getFeeds() }
             val categories = async { apiService.getCategories() }
-            feedsRepository.setFeedsAndCategories(feeds.await(), categories.await())
+            feedsRepository.updateFeedsAndCategoriesUnreadCount(feeds.await(), categories.await())
         }
     }
 
