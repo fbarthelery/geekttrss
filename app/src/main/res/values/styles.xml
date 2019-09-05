@@ -119,11 +119,11 @@
     </style>
 
     <style name="TextAppearance.AppTheme.CollapsingToolbar.Expanded.Surface" parent="TextAppearance.Design.CollapsingToolbar.Expanded">
-        <item name="android:textColor">@color/mtrl_on_surface_emphasis_high_type</item>
+        <item name="android:textColor">@color/material_on_surface_emphasis_high_type</item>
     </style>
 
     <style name="TextAppearance.AppTheme.CollapsingToolbar.Collapsed.Surface" parent="TextAppearance.AppCompat.Widget.ActionBar.Title">
-        <item name="android:textColor">@color/mtrl_on_surface_emphasis_high_type</item>
+        <item name="android:textColor">@color/material_on_surface_emphasis_high_type</item>
     </style>
 
 
