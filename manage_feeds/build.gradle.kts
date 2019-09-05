@@ -64,15 +64,15 @@ dependencies {
     val geekdroidExt = GEEKDROID_PROJECT_DIR?.let { "" } ?: "aar"
     implementation(group = "com.geekorum", name = "geekdroid", version = "0.0.1", ext = geekdroidExt)
 
-    implementation("androidx.activity:activity-ktx:1.0.0-beta01")
+    implementation("androidx.activity:activity-ktx:1.0.0")
 
     // androidx UI
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")
     implementation("androidx.recyclerview:recyclerview:1.0.0")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.0.0")
-    implementation("com.google.android.material:material:1.1.0-alpha07")
+    implementation("com.google.android.material:material:1.1.0-alpha10")
 
-    implementation("androidx.core:core-ktx:1.0.2")
+    implementation("androidx.core:core-ktx:1.1.0")
 
     val lifecycleVersion: String by rootProject.extra
     implementation("androidx.lifecycle:lifecycle-livedata-core-ktx:$lifecycleVersion")
@@ -83,14 +83,14 @@ dependencies {
     implementation(project(":webapi"))
 
     androidTestImplementation("androidx.work:work-testing:2.2.0")
-    dualTestImplementation("androidx.arch.core:core-testing:2.0.1")
+    dualTestImplementation("androidx.arch.core:core-testing:2.1.0")
 
-    implementation("androidx.navigation:navigation-fragment-ktx:2.1.0-alpha06")
-    debugImplementation("androidx.fragment:fragment-testing:1.2.0-alpha01")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.1.0")
+    debugImplementation("androidx.fragment:fragment-testing:1.2.0-alpha02")
 
     // the test apk need these dependencies because they provide some of its resources
     // likely due to manifest merging with :app manifest
-    androidTestImplementation("androidx.fragment:fragment-testing:1.2.0-alpha01")
+    androidTestImplementation("androidx.fragment:fragment-testing:1.2.0-alpha02")
     androidTestImplementation("com.squareup.leakcanary:leakcanary-android:2.0-beta-2")
     androidTestImplementation("com.google.android.gms:play-services-oss-licenses:17.0.0")
 

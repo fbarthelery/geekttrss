@@ -112,12 +112,12 @@ android {
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.0.2")
+    implementation("androidx.core:core-ktx:1.1.0")
     implementation("androidx.fragment:fragment-ktx:1.2.0-alpha02")
     implementation("androidx.activity:activity-ktx:1.1.0-alpha02")
 
     // androidx ui
-    implementation("androidx.drawerlayout:drawerlayout:1.1.0-alpha02")
+    implementation("androidx.drawerlayout:drawerlayout:1.1.0-alpha03")
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")
     implementation("androidx.recyclerview:recyclerview:1.0.0")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.0.0")
@@ -152,7 +152,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
-    dualTestImplementation("androidx.arch.core:core-testing:2.0.1")
+    dualTestImplementation("androidx.arch.core:core-testing:2.1.0")
 
     // dagger
     val daggerVersion: String by rootProject.extra
@@ -193,7 +193,7 @@ dependencies {
     add("googleImplementation", "com.google.android.play:core:1.5.0")
 
     // api dependencies for features modules
-    api("androidx.appcompat:appcompat:1.1.0-rc01")
+    api("androidx.appcompat:appcompat:1.1.0")
     api("androidx.work:work-runtime-ktx:$workVersion")
     api("androidx.room:room-runtime:$roomVersion")
     api("androidx.room:room-ktx:$roomVersion")
