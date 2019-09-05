@@ -21,7 +21,6 @@
 package com.geekorum.ttrss.settings
 
 import android.annotation.TargetApi
-import android.app.Activity
 import android.os.Build
 import android.os.Bundle
 import android.os.StrictMode
@@ -33,7 +32,6 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import com.geekorum.geekdroid.preferences.PreferenceSummaryBinder
 import com.geekorum.ttrss.BaseActivity
 import com.geekorum.ttrss.BuildConfig
 import com.geekorum.ttrss.R
@@ -78,22 +76,21 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     class SettingsFragment : PreferenceFragmentCompat() {
-        private val summaryBinder = PreferenceSummaryBinder()
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             withStrictMode(StrictMode.allowThreadDiskReads()) {
                 addPreferencesFromResource(R.xml.pref_general)
             }
 
-            findPreference(KEY_THEME).apply {
-                summaryBinder.bindPreferenceSummaryToValue(this)
-                onPreferenceChangeListener = ThemePreferenceListener(onPreferenceChangeListener)
+            findPreference<Preference>(KEY_THEME)!!.apply {
+                summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
+                onPreferenceChangeListener = ThemePreferenceListener()
             }
             displayVersion()
         }
 
         private fun displayVersion() {
-            findPreference(KEY_ABOUT_VERSION).apply {
+            findPreference<Preference>(KEY_ABOUT_VERSION)!!.apply {
                 title = getString(R.string.pref_title_about_version, BuildConfig.VERSION_NAME)
                 summary = getString(R.string.pref_summary_about_version,
                     BuildConfig.REPOSITORY_CHANGESET,
@@ -103,18 +100,15 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 
     }
 
-    private class ThemePreferenceListener(
-        private val wrapped: Preference.OnPreferenceChangeListener
-    ) : Preference.OnPreferenceChangeListener {
+    private class ThemePreferenceListener : Preference.OnPreferenceChangeListener {
 
         override fun onPreferenceChange(preference: Preference, newValue: Any): Boolean {
-            val result = wrapped.onPreferenceChange(preference, newValue)
             val oldValue = (preference as ListPreference).value
             if (newValue != oldValue) {
                 val nighMode = Integer.valueOf(newValue as String)
                 AppCompatDelegate.setDefaultNightMode(nighMode)
             }
-            return result
+            return true
         }
     }
 
