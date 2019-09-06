@@ -152,7 +152,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
-    dualTestImplementation("androidx.arch.core:core-testing:2.1.0")
+    dualTestImplementation("androidx.arch.core:core-testing:2.0.1")
 
     // dagger
     val daggerVersion: String by rootProject.extra
