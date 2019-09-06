@@ -57,6 +57,7 @@ include(":app")
 include(":manage_feeds")
 include(":htmlparsers")
 include(":webapi")
+include(":faviKonSnoop")
 
 val GEEKDROID_PROJECT_DIR: String? by settings
 GEEKDROID_PROJECT_DIR?.let {
