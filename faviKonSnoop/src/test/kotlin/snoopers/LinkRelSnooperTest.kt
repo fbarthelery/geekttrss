@@ -79,7 +79,7 @@ class LinkRelSnooperTest {
 
     @BeforeTest
     fun setUp() {
-        subject = LinkRelSnooper()
+        subject = LinkRelSnooper("icon")
     }
 
     @Test

@@ -31,7 +31,9 @@ import java.io.InputStream
 /**
  * https://html.spec.whatwg.org/#rel-icon
  */
-class LinkRelSnooper : Snooper() {
+class LinkRelSnooper(
+    val relValue: String
+) : Snooper() {
 
     override fun snoop(baseUrl: String, content: InputStream): Collection<FaviconInfo> {
         val document = Jsoup.parse(content, null, baseUrl)
@@ -39,7 +41,7 @@ class LinkRelSnooper : Snooper() {
         val linksRel = document.head()?.let { head ->
             head.getElementsByTag("link")
                 .filter {
-                    it.attr("rel") == "icon"
+                    it.attr("rel") == relValue
                 }
                 .flatMap {
                     val url = it.attr("abs:href")
