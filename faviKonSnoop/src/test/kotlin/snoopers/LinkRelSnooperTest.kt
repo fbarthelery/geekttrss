@@ -48,7 +48,7 @@ private val MULTISIZE_LINK_HTML =
     """
         <html>
             <head>
-                <link rel=icon href=mac.icns sizes="128x128 512x512 8192x8192 32768x32768">
+                <link rel="icon shortcut truc" href=mac.icns sizes="128x128 512x512 8192x8192 32768x32768">
               </head>
         </html>
     """.trimIndent()
