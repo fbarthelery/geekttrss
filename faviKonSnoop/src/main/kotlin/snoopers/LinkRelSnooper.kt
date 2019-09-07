@@ -28,17 +28,14 @@ import com.geekorum.favikonsnoop.Snooper
 import org.jsoup.Jsoup
 import java.io.InputStream
 
-/**
- * https://html.spec.whatwg.org/#rel-icon
- */
-class LinkRelSnooper(
+open class LinkRelSnooper(
     val relValue: String
 ) : Snooper() {
 
     override fun snoop(baseUrl: String, content: InputStream): Collection<FaviconInfo> {
         val document = Jsoup.parse(content, null, baseUrl)
 
-        val linksRel = document.head()?.let { head ->
+        return document.head()?.let { head ->
             head.getElementsByTag("link")
                 .filter {
                     it.attr("rel") == relValue
@@ -54,9 +51,6 @@ class LinkRelSnooper(
                     }
                 }
         } ?: emptyList()
-        val faviconLegacyUrl = "$baseUrl/favicon.ico"
-        val legacy = FaviconInfo(faviconLegacyUrl)
-        return linksRel + legacy
     }
 
     internal fun parseSizes(size: String): Collection<Dimension> {

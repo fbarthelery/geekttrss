@@ -27,32 +27,6 @@ import com.google.common.truth.Truth.assertThat
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-
-private val SIMPLE_LINK_HTML =
-    """
-        <html>
-            <head>
-                <link rel=icon href=favicon.png sizes="16x16" type="image/png">
-              </head>
-        </html>
-    """.trimIndent()
-
-private val NO_LINK_HTML =
-    """
-        <html>
-            <head></head>
-        </html>
-    """.trimIndent()
-
-private val MULTISIZE_LINK_HTML =
-    """
-        <html>
-            <head>
-                <link rel=icon href=mac.icns sizes="128x128 512x512 8192x8192 32768x32768">
-              </head>
-        </html>
-    """.trimIndent()
-
 private val MANY_HTML =
     """
     <html lang="en">
@@ -73,100 +47,21 @@ private val MANY_HTML =
 private val INVALID_HTML =
     """fw""".trimIndent()
 
-
-class LinkRelSnooperTest {
+class WhatWgSnooperTest {
     lateinit var subject: LinkRelSnooper
 
     @BeforeTest
     fun setUp() {
-        subject = LinkRelSnooper("icon")
+        subject = WhatWgSnooper()
     }
 
     @Test
-    fun testParsingOfSizes() {
-        var result = subject.parseSizes("any")
-        assertThat(result).containsExactly(AdaptiveDimension)
-
-        result = subject.parseSizes("14x14")
-        assertThat(result).containsExactly(FixedDimension(14, 14))
-
-        result = subject.parseSizes("14X14")
-        assertThat(result).containsExactly(FixedDimension(14, 14))
-
-        result = subject.parseSizes("invalid")
-        assertThat(result).isEmpty()
-
-        result = subject.parseSizes("")
-        assertThat(result).isEmpty()
-
-        result = subject.parseSizes("14x14 12X12 any")
-        assertThat(result).containsExactly(
-            FixedDimension(14, 14),
-            FixedDimension(12, 12),
-            AdaptiveDimension
-        )
-
-        result = subject.parseSizes("invalid 14x14 12X12 any -32")
-        assertThat(result).containsExactly(
-            FixedDimension(14, 14),
-            FixedDimension(12, 12),
-            AdaptiveDimension
-        )
-
-    }
-
-    @Test
-    fun testInvalidReturnsEmpty() {
+    fun testInvalidReturnsFallbackFavicon() {
         val result = INVALID_HTML.byteInputStream().use {
             subject.snoop("http://exemple.com", it)
         }
 
-        assertThat(result).isEmpty()
-    }
-
-    @Test
-    fun testNoLinkReturnsEmpty() {
-        val result = NO_LINK_HTML.byteInputStream().use {
-            subject.snoop("http://exemple.com", it)
-        }
-
-        assertThat(result).isEmpty()
-    }
-
-    @Test
-    fun testSimpleLinkReturnsCorrectResult() {
-        val result = SIMPLE_LINK_HTML.byteInputStream().use {
-            subject.snoop("http://exemple.com", it)
-        }
-
-        assertThat(result).containsExactly(
-            FaviconInfo("http://exemple.com/favicon.png",
-                mimeType = "image/png",
-                dimension = FixedDimension(16, 16)
-            )
-        )
-    }
-
-    @Test
-    fun testMultiSizeLinkReturnsCorrectResult() {
-        val result = MULTISIZE_LINK_HTML.byteInputStream().use {
-            subject.snoop("http://exemple.com", it)
-        }
-
-        assertThat(result).containsExactly(
-            FaviconInfo("http://exemple.com/mac.icns",
-                dimension = FixedDimension(128, 128)
-            ),
-            FaviconInfo("http://exemple.com/mac.icns",
-                dimension = FixedDimension(512, 512)
-            ),
-            FaviconInfo("http://exemple.com/mac.icns",
-                dimension = FixedDimension(8192, 8192)
-            ),
-            FaviconInfo("http://exemple.com/mac.icns",
-                dimension = FixedDimension(32768, 32768)
-            )
-        )
+        assertThat(result).containsExactly(FaviconInfo("http://exemple.com/favicon.ico"))
     }
 
     @Test
@@ -176,6 +71,7 @@ class LinkRelSnooperTest {
         }
 
         assertThat(result).containsExactly(
+            FaviconInfo("http://exemple.com/favicon.ico"),
             FaviconInfo("http://exemple.com/favicon.png",
                 mimeType = "image/png",
                 dimension = FixedDimension(16, 16)
