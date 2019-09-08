@@ -20,6 +20,7 @@
  */
 plugins {
     kotlin("jvm")
+    id("kotlinx-serialization")
     id("com.geekorum.build.source-license-checker")
 }
 
@@ -29,6 +30,7 @@ dependencies {
 
     implementation("javax.inject:javax.inject:1")
     implementation("org.jsoup:jsoup:1.10.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.11.0")
 
     testImplementation("com.google.truth:truth:1.0")
     testImplementation(kotlin("test-junit"))
