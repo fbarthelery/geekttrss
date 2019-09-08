@@ -20,16 +20,13 @@
  */
 package com.geekorum.favikonsnoop.snoopers
 
-import com.geekorum.favikonsnoop.AdaptiveDimension
 import com.geekorum.favikonsnoop.FaviconInfo
-import com.geekorum.favikonsnoop.FixedDimension
-import com.geekorum.favikonsnoop.Dimension
 import com.geekorum.favikonsnoop.Snooper
 import org.jsoup.Jsoup
 import java.io.InputStream
 
 open class LinkRelSnooper(
-    val relValue: String
+    private val relValue: String
 ) : Snooper() {
 
     override fun snoop(baseUrl: String, content: InputStream): Collection<FaviconInfo> {
@@ -52,19 +49,4 @@ open class LinkRelSnooper(
                 }
         } ?: emptyList()
     }
-
-    internal fun parseSizes(size: String): Collection<Dimension> {
-        return size.splitToSequence(" ").mapNotNull { word ->
-            when (word) {
-                "any" -> AdaptiveDimension
-                else -> {
-                    runCatching {
-                        val (widthStr, heightStr) = word.split("x",ignoreCase = true, limit = 2)
-                        FixedDimension(widthStr.toInt(), heightStr.toInt())
-                    }.getOrNull()
-                }
-            }
-        }.toList()
-    }
-
 }

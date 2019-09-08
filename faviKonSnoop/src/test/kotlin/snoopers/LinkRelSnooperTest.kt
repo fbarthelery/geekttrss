@@ -82,38 +82,6 @@ class LinkRelSnooperTest {
         subject = LinkRelSnooper("icon")
     }
 
-    @Test
-    fun testParsingOfSizes() {
-        var result = subject.parseSizes("any")
-        assertThat(result).containsExactly(AdaptiveDimension)
-
-        result = subject.parseSizes("14x14")
-        assertThat(result).containsExactly(FixedDimension(14, 14))
-
-        result = subject.parseSizes("14X14")
-        assertThat(result).containsExactly(FixedDimension(14, 14))
-
-        result = subject.parseSizes("invalid")
-        assertThat(result).isEmpty()
-
-        result = subject.parseSizes("")
-        assertThat(result).isEmpty()
-
-        result = subject.parseSizes("14x14 12X12 any")
-        assertThat(result).containsExactly(
-            FixedDimension(14, 14),
-            FixedDimension(12, 12),
-            AdaptiveDimension
-        )
-
-        result = subject.parseSizes("invalid 14x14 12X12 any -32")
-        assertThat(result).containsExactly(
-            FixedDimension(14, 14),
-            FixedDimension(12, 12),
-            AdaptiveDimension
-        )
-
-    }
 
     @Test
     fun testInvalidReturnsEmpty() {
