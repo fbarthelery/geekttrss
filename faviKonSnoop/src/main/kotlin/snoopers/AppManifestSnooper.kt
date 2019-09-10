@@ -29,8 +29,61 @@ import kotlinx.serialization.json.JsonConfiguration
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonParsingException
 import kotlinx.serialization.parse
+import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.Request
 import org.jsoup.Jsoup
 import java.io.InputStream
+
+/**
+ * https://www.w3.org/TR/appmanifest/
+ */
+class AppManifestSnooper internal constructor(
+    private val webAppManifestParser: WebAppManifestParser
+) : Snooper() {
+
+    constructor() : this(WebAppManifestParser())
+
+    override fun snoop(baseUrl: String, content: InputStream): Collection<FaviconInfo> {
+        val document = Jsoup.parse(content, null, baseUrl)
+
+        val manifestUrl = document.head()?.let { head ->
+            val manifestLinkElem = head.getElementsByTag("link").firstOrNull {
+                "manifest" in it.attr("rel").split("\\s".toRegex())
+            }
+            manifestLinkElem?.attr("abs:href")?.toHttpUrl()
+        }
+
+        val appManifest = manifestUrl?.let {
+            getAppManifest(it)
+        }
+
+        return appManifest?.icons?.flatMap {
+            val url = manifestUrl.resolve(it.src) ?: return@flatMap emptyList<FaviconInfo>()
+            parseSizes(it.sizes ?: "").map { dimension ->
+                FaviconInfo(url.toString(),
+                    mimeType = it.type,
+                    dimension = dimension
+                )
+            }
+        } ?: emptyList()
+    }
+
+    private fun getAppManifest(url: HttpUrl): WebAppManifest? {
+        val request = Request.Builder()
+            .url(url)
+            .get()
+            .build()
+        val response = okHttpClient.newCall(request).execute()
+        return response.use { response ->
+            if (response.isSuccessful) {
+                response.body?.string()?.let {
+                    webAppManifestParser.parseManifest(it)
+                }
+            } else null
+        }
+    }
+}
 
 /**
  * Only encode the fields that we care about

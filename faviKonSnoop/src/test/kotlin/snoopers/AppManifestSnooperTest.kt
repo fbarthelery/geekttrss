@@ -20,7 +20,17 @@
  */
 package com.geekorum.favikonsnoop.snoopers
 
+import com.geekorum.favikonsnoop.FaviconInfo
+import com.geekorum.favikonsnoop.FixedDimension
 import com.google.common.truth.Truth.assertThat
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.slot
+import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.Protocol.HTTP_1_1
+import okhttp3.Request
+import okhttp3.Response
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Test
 import kotlin.test.BeforeTest
 
@@ -77,6 +87,103 @@ private val TYPICAL_MANIFEST = """
 """.trimIndent()
 
 private const val INVALID_MANIFEST = "{"
+
+private val INVALID_HTML =
+    """fw""".trimIndent()
+
+private val NO_MANIFEST_HTML = """
+    <html lang="en">
+     <head>
+      <title>lsForums — Inbox</title>
+      <link rel=icon href=favicon.png sizes="16x16" type="image/png">
+      <script src=lsforums.js></script>
+      <meta name=application-name content="lsForums">
+     </head>
+    </html>
+""".trimIndent()
+
+private val WITH_MANIFEST_HTML = """
+    <html lang="en">
+     <head>
+      <title>lsForums — Inbox</title>
+      <link rel="manifest" href=/static/manifest.json >
+      <link rel=icon href=favicon.png sizes="16x16" type="image/png">
+     </head>
+    </html>
+""".trimIndent()
+
+
+class AppManifestSnooperTest {
+    lateinit var subject: AppManifestSnooper
+
+    @BeforeTest
+    fun setUp() {
+        subject = AppManifestSnooper()
+    }
+
+    @Test
+    fun testInvalidHtmlReturnsEmpty() {
+        val result = INVALID_HTML.byteInputStream().use {
+            subject.snoop("http://exemple.com", it)
+        }
+
+        assertThat(result).isEmpty()
+    }
+
+    @Test
+    fun testHtmlWithoutManifestReturnsEmpty() {
+        val result = NO_MANIFEST_HTML.byteInputStream().use {
+            subject.snoop("http://exemple.com", it)
+        }
+
+        assertThat(result).isEmpty()
+    }
+
+    @Test
+    fun testHtmlWithInvalidManifestReturnsEmpty() {
+        subject.okHttpClient = mockk()
+        val requestSlot = slot<Request>()
+        every { subject.okHttpClient.newCall(capture(requestSlot)).execute() } answers {
+            Response.Builder()
+                .code(200)
+                .request(requestSlot.captured)
+                .protocol(HTTP_1_1)
+                .message("ok")
+                .body(INVALID_MANIFEST.toResponseBody())
+                .build()
+        }
+
+        val result = WITH_MANIFEST_HTML.byteInputStream().use {
+            subject.snoop("http://exemple.com", it)
+        }
+        assertThat(requestSlot.captured.url).isEqualTo("http://exemple.com/static/manifest.json".toHttpUrl())
+        assertThat(result).isEmpty()
+    }
+
+    @Test
+    fun testHtmlWithSimpleManifestReturnsSimpleResult() {
+        subject.okHttpClient = mockk()
+        val requestSlot = slot<Request>()
+        every { subject.okHttpClient.newCall(capture(requestSlot)).execute() } answers {
+            Response.Builder()
+                .code(200)
+                .request(requestSlot.captured)
+                .protocol(HTTP_1_1)
+                .message("ok")
+                .body(SIMPLE_MANIFEST.toResponseBody())
+                .build()
+        }
+        val result = WITH_MANIFEST_HTML.byteInputStream().use {
+            subject.snoop("http://exemple.com", it)
+        }
+        assertThat(requestSlot.captured.url).isEqualTo("http://exemple.com/static/manifest.json".toHttpUrl())
+        assertThat(result).containsExactly(
+            FaviconInfo("http://exemple.com/static/images/icon.png",
+                dimension = FixedDimension(192, 192))
+        )
+    }
+
+}
 
 class WebAppManifestParserTest {
     private lateinit var subject: WebAppManifestParser

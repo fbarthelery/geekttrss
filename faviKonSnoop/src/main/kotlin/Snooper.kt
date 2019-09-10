@@ -20,12 +20,15 @@
  */
 package com.geekorum.favikonsnoop
 
+import okhttp3.OkHttpClient
 import java.io.InputStream
 
 /**
  * A Snooper knows how to lookup for a favicon
  */
 abstract class Snooper {
+
+    internal lateinit var okHttpClient: OkHttpClient
 
     /**
      * Find favicon for this url and optional information like size and mime types
