@@ -21,7 +21,7 @@
 package com.geekorum.favikonsnoop
 
 import okhttp3.OkHttpClient
-import java.io.InputStream
+import okio.BufferedSource
 
 /**
  * A Snooper knows how to lookup for a favicon
@@ -33,5 +33,5 @@ abstract class Snooper {
     /**
      * Find favicon for this url and optional information like size and mime types
      */
-    abstract fun snoop(baseUrl: String, content: InputStream) : Collection<FaviconInfo>
+    abstract fun snoop(baseUrl: String, content: BufferedSource) : Collection<FaviconInfo>
 }

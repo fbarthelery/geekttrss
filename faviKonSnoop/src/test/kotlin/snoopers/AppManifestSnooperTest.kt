@@ -21,7 +21,7 @@
 package com.geekorum.favikonsnoop.snoopers
 
 import com.geekorum.favikonsnoop.FaviconInfo
-import com.geekorum.favikonsnoop.FixedDimension
+import com.geekorum.favikonsnoop.source
 import com.google.common.truth.Truth.assertThat
 import io.mockk.every
 import io.mockk.mockk
@@ -122,7 +122,7 @@ class AppManifestSnooperTest {
 
     @Test
     fun testInvalidHtmlReturnsEmpty() {
-        val result = INVALID_HTML.byteInputStream().use {
+        val result = INVALID_HTML.source().use {
             subject.snoop("http://exemple.com", it)
         }
 
@@ -131,7 +131,7 @@ class AppManifestSnooperTest {
 
     @Test
     fun testHtmlWithoutManifestReturnsEmpty() {
-        val result = NO_MANIFEST_HTML.byteInputStream().use {
+        val result = NO_MANIFEST_HTML.source().use {
             subject.snoop("http://exemple.com", it)
         }
 
@@ -152,7 +152,7 @@ class AppManifestSnooperTest {
                 .build()
         }
 
-        val result = WITH_MANIFEST_HTML.byteInputStream().use {
+        val result = WITH_MANIFEST_HTML.source().use {
             subject.snoop("http://exemple.com", it)
         }
         assertThat(requestSlot.captured.url).isEqualTo("http://exemple.com/static/manifest.json".toHttpUrl())
@@ -172,7 +172,7 @@ class AppManifestSnooperTest {
                 .body(SIMPLE_MANIFEST.toResponseBody())
                 .build()
         }
-        val result = WITH_MANIFEST_HTML.byteInputStream().use {
+        val result = WITH_MANIFEST_HTML.source().use {
             subject.snoop("http://exemple.com", it)
         }
         assertThat(requestSlot.captured.url).isEqualTo("http://exemple.com/static/manifest.json".toHttpUrl())

@@ -18,23 +18,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-plugins {
-    kotlin("jvm")
-    id("kotlinx-serialization")
-    id("com.geekorum.build.source-license-checker")
-}
+package com.geekorum.favikonsnoop
 
-dependencies {
-    implementation(kotlin("stdlib-jdk8"))
-    implementation(enforcedPlatform(kotlin("bom")))
+import okio.BufferedSource
+import okio.buffer
+import okio.source
 
-    api("com.squareup.okhttp3:okhttp:4.1.0")
-    api("com.squareup.okio:okio:2.4.0")
-    implementation("javax.inject:javax.inject:1")
-    implementation("org.jsoup:jsoup:1.10.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.11.0")
-
-    testImplementation("com.google.truth:truth:1.0")
-    testImplementation(kotlin("test-junit"))
-    testImplementation("io.mockk:mockk:1.9")
-}
+fun String.source(): BufferedSource = byteInputStream().source().buffer()

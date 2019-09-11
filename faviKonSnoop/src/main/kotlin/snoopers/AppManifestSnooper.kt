@@ -32,8 +32,8 @@ import kotlinx.serialization.parse
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Request
+import okio.BufferedSource
 import org.jsoup.Jsoup
-import java.io.InputStream
 
 /**
  * https://www.w3.org/TR/appmanifest/
@@ -44,8 +44,8 @@ class AppManifestSnooper internal constructor(
 
     constructor() : this(WebAppManifestParser())
 
-    override fun snoop(baseUrl: String, content: InputStream): Collection<FaviconInfo> {
-        val document = Jsoup.parse(content, null, baseUrl)
+    override fun snoop(baseUrl: String, content: BufferedSource): Collection<FaviconInfo> {
+        val document = Jsoup.parse(content.inputStream() , null, baseUrl)
 
         val manifestUrl = document.head()?.let { head ->
             val manifestLinkElem = head.getElementsByTag("link").firstOrNull {

@@ -23,6 +23,7 @@ package com.geekorum.favikonsnoop.snoopers
 import com.geekorum.favikonsnoop.AdaptiveDimension
 import com.geekorum.favikonsnoop.FaviconInfo
 import com.geekorum.favikonsnoop.FixedDimension
+import com.geekorum.favikonsnoop.source
 import com.google.common.truth.Truth.assertThat
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -85,7 +86,7 @@ class LinkRelSnooperTest {
 
     @Test
     fun testInvalidReturnsEmpty() {
-        val result = INVALID_HTML.byteInputStream().use {
+        val result = INVALID_HTML.source().use {
             subject.snoop("http://exemple.com", it)
         }
 
@@ -94,7 +95,7 @@ class LinkRelSnooperTest {
 
     @Test
     fun testNoLinkReturnsEmpty() {
-        val result = NO_LINK_HTML.byteInputStream().use {
+        val result = NO_LINK_HTML.source().use {
             subject.snoop("http://exemple.com", it)
         }
 
@@ -103,7 +104,7 @@ class LinkRelSnooperTest {
 
     @Test
     fun testSimpleLinkReturnsCorrectResult() {
-        val result = SIMPLE_LINK_HTML.byteInputStream().use {
+        val result = SIMPLE_LINK_HTML.source().use {
             subject.snoop("http://exemple.com", it)
         }
 
@@ -116,7 +117,7 @@ class LinkRelSnooperTest {
 
     @Test
     fun testMultiSizeLinkReturnsCorrectResult() {
-        val result = MULTISIZE_LINK_HTML.byteInputStream().use {
+        val result = MULTISIZE_LINK_HTML.source().use {
             subject.snoop("http://exemple.com", it)
         }
 
@@ -138,7 +139,7 @@ class LinkRelSnooperTest {
 
     @Test
     fun testManyLinkReturnsCorrectResult() {
-        val result = MANY_HTML.byteInputStream().use {
+        val result = MANY_HTML.source().use {
             subject.snoop("http://exemple.com", it)
         }
 

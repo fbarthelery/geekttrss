@@ -23,6 +23,7 @@ package com.geekorum.favikonsnoop.snoopers
 import com.geekorum.favikonsnoop.AdaptiveDimension
 import com.geekorum.favikonsnoop.FaviconInfo
 import com.geekorum.favikonsnoop.FixedDimension
+import com.geekorum.favikonsnoop.source
 import com.google.common.truth.Truth.assertThat
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -57,7 +58,7 @@ class WhatWgSnooperTest {
 
     @Test
     fun testInvalidReturnsFallbackFavicon() {
-        val result = INVALID_HTML.byteInputStream().use {
+        val result = INVALID_HTML.source().use {
             subject.snoop("http://exemple.com", it)
         }
 
@@ -66,7 +67,7 @@ class WhatWgSnooperTest {
 
     @Test
     fun testManyLinkReturnsCorrectResult() {
-        val result = MANY_HTML.byteInputStream().use {
+        val result = MANY_HTML.source().use {
             subject.snoop("http://exemple.com", it)
         }
 
