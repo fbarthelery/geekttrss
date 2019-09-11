@@ -32,7 +32,7 @@ private val SIMPLE_LINK_HTML =
     """
         <html>
             <head>
-                <link rel=icon href=favicon.png sizes="16x16" type="image/png">
+                <link rel=icon href=favicon.png type="image/png">
               </head>
         </html>
     """.trimIndent()
@@ -109,8 +109,7 @@ class LinkRelSnooperTest {
 
         assertThat(result).containsExactly(
             FaviconInfo("http://exemple.com/favicon.png",
-                mimeType = "image/png",
-                dimension = FixedDimension(16, 16)
+                mimeType = "image/png"
             )
         )
     }

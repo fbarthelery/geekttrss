@@ -39,8 +39,7 @@ private val SIMPLE_MANIFEST = """
   "name": "Donate App",
   "description": "This app helps you donate to worthy causes.",
   "icons": [{
-    "src": "images/icon.png",
-    "sizes": "192x192"
+    "src": "images/icon.png"
   }]
 }
 """.trimIndent()
@@ -86,7 +85,7 @@ private val TYPICAL_MANIFEST = """
 }    
 """.trimIndent()
 
-private const val INVALID_MANIFEST = "{"
+private const val INVALID_MANIFEST = "{}"
 
 private val INVALID_HTML =
     """fw""".trimIndent()
@@ -178,8 +177,7 @@ class AppManifestSnooperTest {
         }
         assertThat(requestSlot.captured.url).isEqualTo("http://exemple.com/static/manifest.json".toHttpUrl())
         assertThat(result).containsExactly(
-            FaviconInfo("http://exemple.com/static/images/icon.png",
-                dimension = FixedDimension(192, 192))
+            FaviconInfo("http://exemple.com/static/images/icon.png")
         )
     }
 
@@ -197,8 +195,7 @@ class WebAppManifestParserTest {
     fun parseSimpleWebAppManifest() {
         val result = subject.parseManifest(SIMPLE_MANIFEST)
         assertThat(result!!.icons).containsExactly(
-            ImageResource("images/icon.png",
-                sizes = "192x192")
+            ImageResource("images/icon.png")
         )
     }
 

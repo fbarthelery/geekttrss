@@ -24,10 +24,10 @@ import com.geekorum.favikonsnoop.FaviconInfo
 import com.geekorum.favikonsnoop.Snooper
 import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonParsingException
 import kotlinx.serialization.parse
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
@@ -60,11 +60,18 @@ class AppManifestSnooper internal constructor(
 
         return appManifest?.icons?.flatMap {
             val url = manifestUrl.resolve(it.src) ?: return@flatMap emptyList<FaviconInfo>()
-            parseSizes(it.sizes ?: "").map { dimension ->
-                FaviconInfo(url.toString(),
-                    mimeType = it.type,
-                    dimension = dimension
+            val sizes = parseSizes(it.sizes ?: "")
+            if (sizes.isEmpty()) {
+                listOf(FaviconInfo(url.toString(),
+                    mimeType = it.type)
                 )
+            } else {
+                sizes.map { dimension ->
+                    FaviconInfo(url.toString(),
+                        mimeType = it.type,
+                        dimension = dimension
+                    )
+                }
             }
         } ?: emptyList()
     }
@@ -92,11 +99,13 @@ class AppManifestSnooper internal constructor(
 data class WebAppManifest(
     val dir: JsonElement? = null,
     val lang: JsonElement? = null,
-    val name: JsonElement? = null,
+    // name is required
+    val name: JsonElement,
     val short_name: JsonElement? = null,
     val description: JsonElement? = null,
     val scope: JsonElement? = null,
-    val icons: Collection<ImageResource> = emptyList(),
+    // icons is required
+    val icons: Collection<ImageResource>,
     val display: JsonElement? = null,
     val orientation: JsonElement? = null,
     val start_url: JsonElement? = null,
@@ -126,7 +135,7 @@ internal class WebAppManifestParser(
     fun parseManifest(content: String): WebAppManifest? {
         return try {
             json.parse(content)
-        } catch (e: JsonParsingException) {
+        } catch (e: SerializationException) {
             null
         }
     }

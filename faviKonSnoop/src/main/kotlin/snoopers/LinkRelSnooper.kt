@@ -40,11 +40,17 @@ open class LinkRelSnooper(
                 .flatMap {
                     val url = it.attr("abs:href")
                     val type = it.attr("type").ifEmpty { null }
-                    parseSizes(it.attr("sizes")).map { dimension ->
-                        FaviconInfo(url,
-                            mimeType = type,
-                            dimension = dimension
+
+                    val sizes = parseSizes(it.attr("sizes"))
+                    if (sizes.isEmpty()) {
+                        listOf(FaviconInfo(url, mimeType = type))
+                    } else {
+                        sizes.map { dimension ->
+                            FaviconInfo(url,
+                                mimeType = type,
+                                dimension = dimension
                             )
+                        }
                     }
                 }
         } ?: emptyList()
