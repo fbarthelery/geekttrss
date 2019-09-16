@@ -137,6 +137,7 @@ dependencies {
     }
     implementation(project(":htmlparsers"))
     implementation(project(":webapi"))
+    implementation(project(":faviKonSnoop"))
 
     implementation("com.google.android.material:material:1.1.0-alpha10")
     implementation("com.squareup.okhttp3:logging-interceptor:4.1.0")

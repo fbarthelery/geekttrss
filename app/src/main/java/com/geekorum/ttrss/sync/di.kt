@@ -23,6 +23,10 @@ package com.geekorum.ttrss.sync
 import android.accounts.Account
 import android.content.Context
 import android.content.SharedPreferences
+import com.geekorum.favikonsnoop.FaviKonSnoop
+import com.geekorum.favikonsnoop.snoopers.AppManifestSnooper
+import com.geekorum.favikonsnoop.snoopers.AppleTouchIconSnooper
+import com.geekorum.favikonsnoop.snoopers.WhatWgSnooper
 import com.geekorum.ttrss.accounts.NetworkLoginModule
 import com.geekorum.ttrss.accounts.PerAccount
 import com.geekorum.ttrss.data.plugins.SynchronizationFacade
@@ -34,6 +38,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.Subcomponent
 import dagger.android.ContributesAndroidInjector
+import okhttp3.OkHttpClient
 
 /**
  * Dependency injection pieces for the Sync functionality.
@@ -82,6 +87,15 @@ internal class SyncServiceModule {
     @Provides
     fun providesContext(service: ArticleSyncService): Context {
         return service
+    }
+
+    @Provides
+    fun providesFaviKonSnoop(okHttpClient: OkHttpClient): FaviKonSnoop {
+        val snoopers = listOf(
+            AppManifestSnooper(),
+            WhatWgSnooper(),
+            AppleTouchIconSnooper())
+        return FaviKonSnoop(snoopers, okHttpClient)
     }
 }
 
