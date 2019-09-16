@@ -59,7 +59,7 @@ class WhatWgSnooperTest {
     @Test
     fun testInvalidReturnsFallbackFavicon() {
         val result = INVALID_HTML.source().use {
-            subject.snoop("http://exemple.com", it)
+            subject.snoop("http://exemple.com/crazy/story.html", it)
         }
 
         assertThat(result).containsExactly(FaviconInfo("http://exemple.com/favicon.ico"))
