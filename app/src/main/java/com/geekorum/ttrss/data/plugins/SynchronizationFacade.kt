@@ -64,6 +64,10 @@ class SynchronizationFacade @Inject constructor(
 
     override suspend fun getFeeds(): List<Feed> = synchronizationDao.getAllFeeds()
 
+    override suspend fun updateFeedIconUrl(feedId: Long, url: String) {
+        synchronizationDao.updateFeedIconUrl(feedId, url)
+    }
+
     override suspend fun deleteCategories(categories: List<Category>) {
         synchronizationDao.deleteCategories(categories)
     }

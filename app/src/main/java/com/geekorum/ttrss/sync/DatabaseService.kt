@@ -35,6 +35,7 @@ interface DatabaseService {
     suspend fun insertFeeds(feeds: List<Feed>)
     suspend fun deleteFeedsAndArticles(feeds: List<Feed>)
     suspend fun getFeeds(): List<Feed>
+    suspend fun updateFeedIconUrl(feedId: Long, url: String)
 
     suspend fun insertCategories(categories: List<Category>)
     suspend fun deleteCategories(categories: List<Category>)

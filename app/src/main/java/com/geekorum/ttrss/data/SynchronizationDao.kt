@@ -65,6 +65,9 @@ abstract class SynchronizationDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertFeeds(feeds: List<Feed>)
 
+    @Query("UPDATE feeds SET feed_icon_url=:url WHERE _id=:id")
+    abstract suspend fun updateFeedIconUrl(id: Long, url: String)
+
     @Delete
     internal abstract suspend fun deleteFeeds(toBeDelete: List<Feed>)
 
