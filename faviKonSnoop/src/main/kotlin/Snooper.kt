@@ -20,6 +20,8 @@
  */
 package com.geekorum.favikonsnoop
 
+import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import okio.BufferedSource
 
@@ -30,8 +32,12 @@ abstract class Snooper {
 
     internal lateinit var okHttpClient: OkHttpClient
 
+    internal fun snoop(baseUrl: String, content: BufferedSource): Collection<FaviconInfo> {
+        return snoop(baseUrl.toHttpUrl(), content)
+    }
+
     /**
      * Find favicon for this url and optional information like size and mime types
      */
-    abstract fun snoop(baseUrl: String, content: BufferedSource) : Collection<FaviconInfo>
+    abstract fun snoop(baseUrl: HttpUrl, content: BufferedSource) : Collection<FaviconInfo>
 }

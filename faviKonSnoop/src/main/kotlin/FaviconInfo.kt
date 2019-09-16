@@ -20,12 +20,22 @@
  */
 package com.geekorum.favikonsnoop
 
+import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrl
+
 data class FaviconInfo(
-    val url: String,
+    val url: HttpUrl,
     val dimension: Dimension? = null,
     val mimeType: String? = null,
     val size: Int? = null
-)
+) {
+    // to ease usage in tests
+    internal constructor(url: String,
+                         dimension: Dimension? = null,
+                         mimeType: String? = null,
+                         size: Int? = null
+    ) : this(url.toHttpUrl(), dimension, mimeType, size)
+}
 
 
 sealed class Dimension

@@ -44,8 +44,8 @@ class AppManifestSnooper internal constructor(
 
     constructor() : this(WebAppManifestParser())
 
-    override fun snoop(baseUrl: String, content: BufferedSource): Collection<FaviconInfo> {
-        val document = Jsoup.parse(content.inputStream() , null, baseUrl)
+    override fun snoop(baseUrl: HttpUrl, content: BufferedSource): Collection<FaviconInfo> {
+        val document = Jsoup.parse(content.inputStream() , null, baseUrl.toString())
 
         val manifestUrl = document.head()?.let { head ->
             val manifestLinkElem = head.getElementsByTag("link").firstOrNull {

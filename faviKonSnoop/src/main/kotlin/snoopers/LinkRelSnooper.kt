@@ -22,15 +22,16 @@ package com.geekorum.favikonsnoop.snoopers
 
 import com.geekorum.favikonsnoop.FaviconInfo
 import com.geekorum.favikonsnoop.Snooper
+import okhttp3.HttpUrl
 import okio.BufferedSource
 import org.jsoup.Jsoup
 
-open class LinkRelSnooper(
+open class LinkRelSnooper internal constructor(
     private val relValue: String
 ) : Snooper() {
 
-    override fun snoop(baseUrl: String, content: BufferedSource): Collection<FaviconInfo> {
-        val document = Jsoup.parse(content.inputStream(), null, baseUrl)
+    override fun snoop(baseUrl: HttpUrl, content: BufferedSource): Collection<FaviconInfo> {
+        val document = Jsoup.parse(content.inputStream(), null, baseUrl.toString())
 
         return document.head()?.let { head ->
             head.getElementsByTag("link")

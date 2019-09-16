@@ -20,9 +20,10 @@
  */
 package com.geekorum.favikonsnoop
 
+import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import java.net.URL
+import java.io.IOException
 
 class FaviKonSnoop(
     private val snoopers: Collection<Snooper>,
@@ -35,7 +36,8 @@ class FaviKonSnoop(
         }
     }
 
-    fun findFavicons(url: URL): Collection<FaviconInfo> {
+    @Throws(IOException::class)
+    fun findFavicons(url: HttpUrl): Collection<FaviconInfo> {
         val request = Request.Builder()
             .url(url)
             .get()
@@ -43,7 +45,7 @@ class FaviKonSnoop(
         val response = okHttpClient.newCall(request).execute()
         return response.body?.source()?.use { content ->
             snoopers.flatMap {
-                it.snoop(url.toString(), content.peek())
+                it.snoop(url, content.peek())
             }
         } ?: emptyList()
     }
