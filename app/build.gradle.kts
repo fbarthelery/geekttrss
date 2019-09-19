@@ -191,7 +191,7 @@ dependencies {
     // ensure that the free flavor don't get any firebase dependencies
     configurations["freeImplementation"].exclude(group = "com.google.firebase")
 
-    add("googleImplementation", "com.google.android.play:core:1.5.0")
+    add("googleImplementation", "com.google.android.play:core:1.6.1")
 
     // api dependencies for features modules
     api("androidx.appcompat:appcompat:1.1.0")
