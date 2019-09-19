@@ -68,7 +68,8 @@ class ArticleSynchronizer @AssistedInject constructor(
     private val accountPreferences: SharedPreferences,
     private val databaseService: DatabaseService,
     private val httpCacher: HttpCacher,
-    private val imageUrlExtractor: ImageUrlExtractor
+    private val imageUrlExtractor: ImageUrlExtractor,
+    private val feedIconSynchronizer: FeedIconSynchronizer
 ) : CancellableSyncAdapter.CancellableSync() {
 
     @AssistedInject.Factory
@@ -94,6 +95,7 @@ class ArticleSynchronizer @AssistedInject constructor(
             synchronizeFeeds()
             collectNewArticles()
             updateArticlesStatus()
+            feedIconSynchronizer.synchronizeFeedIcons()
         } catch (e: ApiCallException) {
             Timber.w(e, "unable to synchronize articles")
         } catch (e: RemoteException) {
@@ -111,13 +113,12 @@ class ArticleSynchronizer @AssistedInject constructor(
         val accountInfo = databaseService.getAccountInfo(account.name, serverInformation.apiUrl)
                 ?:  AccountInfo(DataAccount(account.name, serverInformation.apiUrl),
                     "", 0)
-        val updatedInfo = makeUpdatedAccountInfo(accountInfo, serverInfoResult, serverInformation)
+        val updatedInfo = makeUpdatedAccountInfo(accountInfo, serverInfoResult)
         databaseService.insertAccountInfo(updatedInfo)
     }
 
     private fun makeUpdatedAccountInfo(
-        currentInfo: AccountInfo, serverInfoResult: ServerInfoResult,
-        serverInformation: AccountServerInformation
+        currentInfo: AccountInfo, serverInfoResult: ServerInfoResult
     ): AccountInfo {
         return currentInfo.copy(
             serverVersion = serverInfoResult.serverVersion ?: currentInfo.serverVersion,
