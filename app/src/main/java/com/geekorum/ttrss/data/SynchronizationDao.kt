@@ -50,6 +50,9 @@ abstract class SynchronizationDao {
     @Query("SELECT * FROM articles WHERE _id=:id")
     abstract suspend fun getArticleById(id: Long): Article?
 
+    @Query("SELECT * FROM articles WHERE feed_id=:feedId LIMIT 1")
+    abstract fun getArticleFromFeed(feedId: Long): Article?
+
     @Update
     abstract suspend fun updateArticle(article: Article)
 
