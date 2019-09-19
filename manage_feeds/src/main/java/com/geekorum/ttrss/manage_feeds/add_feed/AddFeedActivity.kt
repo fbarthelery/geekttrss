@@ -42,7 +42,7 @@ import com.geekorum.ttrss.manage_feeds.DaggerManageFeedComponent
 import com.geekorum.ttrss.manage_feeds.R
 import com.geekorum.ttrss.manage_feeds.databinding.ActivityAddFeedBinding
 import kotlinx.coroutines.delay
-import okhttp3.HttpUrl.Companion.toHttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import com.geekorum.ttrss.R as appR
@@ -72,7 +72,7 @@ class AddFeedActivity : BottomSheetDialogActivity() {
 
         val urlString = intent.data?.toString() ?: intent.extras?.getString(Intent.EXTRA_TEXT)
 
-        val url = urlString?.toHttpUrl()
+        val url = urlString?.toHttpUrlOrNull()
         viewModel.init(url)
 
         binding.viewModel = viewModel
