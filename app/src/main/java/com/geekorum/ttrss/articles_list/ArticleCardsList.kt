@@ -33,12 +33,12 @@ import androidx.core.app.ShareCompat
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import coil.api.load
 import com.geekorum.geekdroid.views.recyclerview.SpacingItemDecoration
 import com.geekorum.ttrss.BR
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.databinding.HeadlinesRowBinding
-import com.squareup.picasso.Picasso
 import kotlin.math.roundToInt
 
 
@@ -104,11 +104,9 @@ internal class HeadlinesBindingViewHolder(val binding: HeadlinesRowBinding) :
                 val width: Float = parent.width.takeIf { it != 0 }?.toFloat() ?: return true
                 val height = width * 9 / 16
                 val finalUrl = url.takeUnless { it.isNullOrEmpty() }
-                Picasso.with(view.context)
-                    .load(finalUrl)
-                    .resize(0, height.roundToInt())
-                    .onlyScaleDown()
-                    .into(view)
+                view.load(finalUrl) {
+                    size(width.roundToInt(), height.roundToInt())
+                }
 
                 parent.viewTreeObserver.removeOnPreDrawListener(this)
                 return true

@@ -21,29 +21,29 @@
 package com.geekorum.ttrss.di
 
 import android.app.Application
+import coil.Coil
+import coil.ImageLoader
 import com.geekorum.geekdroid.dagger.AppInitializer
 import com.geekorum.geekdroid.dagger.AppInitializersModule
-import com.geekorum.geekdroid.network.PicassoOkHttp3Downloader
 import com.geekorum.geekdroid.network.TaggedSocketFactory
 import com.geekorum.ttrss.logging.RetrofitInvocationLogger
-import com.squareup.picasso.Picasso
+import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-
 import java.io.File
-
-import javax.inject.Inject
 import javax.inject.Singleton
 import javax.net.SocketFactory
 
 private const val DEBUG_REQUEST = false
 private const val DEBUG_RETROFIT_CALL = true
 private const val TAG_OKHTTP = 1
+@Deprecated("Picasso is not used anymore")
 private const val TAG_PICASSO = 2
+private const val TAG_COIL = 3
 
 @Module(includes = [AppInitializersModule::class])
 class NetworkModule {
@@ -92,30 +92,28 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    internal fun providesPicasso(application: Application, okHttpClient: OkHttpClient): Picasso {
-        val socketFactory = TaggedSocketFactory(okHttpClient.socketFactory, TAG_PICASSO)
-        val okHttpBuilder = okHttpClient.newBuilder()
-            .socketFactory(socketFactory)
-
-        return Picasso.Builder(application)
-            .downloader(PicassoOkHttp3Downloader(okHttpBuilder.build()))
-            .indicatorsEnabled(DEBUG_REQUEST)
-            .build()
+    internal fun providesImageLoader(application: Application, okHttpClient: OkHttpClient): ImageLoader {
+        return ImageLoader(application) {
+            val socketFactory = TaggedSocketFactory(okHttpClient.socketFactory, TAG_COIL)
+            val okHttpBuilder = okHttpClient.newBuilder()
+                .socketFactory(socketFactory)
+            okHttpClient(okHttpBuilder.build())
+        }
     }
 
     @Provides
     @IntoSet
-    internal fun providesPicassoInitializer(picasso: Picasso): AppInitializer {
-        return PicassoInitializer(picasso)
+    internal fun providesCoilInitializer(imageLoader: Lazy<ImageLoader>): AppInitializer {
+        return CoilInitializer(imageLoader)
     }
 
 }
 
-private class PicassoInitializer @Inject constructor(
-    private val picasso: Picasso
-) : AppInitializer {
+private class CoilInitializer(
+    private val imageLoader: Lazy<ImageLoader>
+): AppInitializer {
 
-    override fun initialize(application: Application) {
-        Picasso.setSingletonInstance(picasso)
+    override fun initialize(app: Application) {
+        Coil.setDefaultImageLoader { imageLoader.get() }
     }
 }
