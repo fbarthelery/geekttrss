@@ -21,11 +21,13 @@
 package com.geekorum.ttrss.di
 
 import android.app.Application
+import android.os.StrictMode.allowThreadDiskWrites
 import coil.Coil
 import coil.ImageLoader
 import com.geekorum.geekdroid.dagger.AppInitializer
 import com.geekorum.geekdroid.dagger.AppInitializersModule
 import com.geekorum.geekdroid.network.TaggedSocketFactory
+import com.geekorum.ttrss.debugtools.withStrictMode
 import com.geekorum.ttrss.logging.RetrofitInvocationLogger
 import dagger.Lazy
 import dagger.Module
@@ -84,10 +86,12 @@ class NetworkModule {
 
     @Provides
     internal fun providesCache(application: Application): Cache {
-        // Enable caching for OkHttp
-        val cacheSize = 50 * 1024 * 1024 // 50 MiB
-        val cacheDir = File(application.cacheDir, "httpCache")
-        return Cache(cacheDir, cacheSize.toLong())
+        return withStrictMode(allowThreadDiskWrites()) {
+            // Enable caching for OkHttp
+            val cacheSize = 50 * 1024 * 1024 // 50 MiB
+            val cacheDir = File(application.cacheDir, "httpCache")
+            Cache(cacheDir, cacheSize.toLong())
+        }
     }
 
     @Provides
