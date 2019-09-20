@@ -36,6 +36,7 @@ import androidx.navigation.fragment.navArgs
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import coil.api.load
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
 import com.geekorum.ttrss.BaseDialogFragment
@@ -128,11 +129,22 @@ class ManageFeedsFragment @Inject constructor(
         }
     }
 
-    class FeedViewHolder(val binding: ViewDataBinding) : RecyclerView.ViewHolder(binding.root) {
+    class FeedViewHolder(val binding: ItemFeedBinding) : RecyclerView.ViewHolder(binding.root) {
         fun setFeed(feed: Feed?) {
             val title = feed?.displayTitle?.takeIf { it.isNotEmpty() } ?: feed?.title
             binding.setVariable(BR.name, title)
             binding.setVariable(BR.feed, feed)
+            with(binding.feedIcon) {
+                // set the tint for errors and place holder drawable
+                imageTintList = resources.getColorStateList(R.color.rss_feed_orange, null)
+                load(feed?.feedIconUrl) {
+                    error(R.drawable.ic_rss_feed_black_24dp)
+                    placeholder(R.drawable.ic_rss_feed_black_24dp)
+                    listener { _, _ ->
+                        binding.feedIcon.imageTintList = null
+                    }
+                }
+            }
         }
 
         fun setViewModel(viewModel: ManageFeedViewModel) {
@@ -157,7 +169,7 @@ class ConfirmUnsubscribeFragment @Inject constructor(
 ) : BaseDialogFragment(savedStateVmFactoryCreator) {
 
     private val viewModel: ManageFeedViewModel by activityViewModels()
-    private val args:ConfirmUnsubscribeFragmentArgs by navArgs()
+    private val args: ConfirmUnsubscribeFragmentArgs by navArgs()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val inflater = requireActivity().layoutInflater

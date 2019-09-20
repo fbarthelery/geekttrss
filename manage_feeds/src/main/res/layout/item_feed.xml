@@ -46,8 +46,8 @@
                    app:layout_constraintStart_toStartOf="parent"
                    app:layout_constraintTop_toTopOf="parent"
                    app:layout_constraintBottom_toBottomOf="parent"
-                   app:srcCompat="@drawable/ic_rss_feed_black_24dp"
-                   android:tint="@color/rss_feed_orange"
+                   tools:srcCompat="@drawable/ic_rss_feed_black_24dp"
+                   tools:tint="@color/rss_feed_orange"
                 />
 
         <TextView
