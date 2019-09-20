@@ -27,9 +27,9 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewTreeObserver
 import android.widget.PopupMenu
 import androidx.core.app.ShareCompat
+import androidx.core.view.doOnPreDraw
 import androidx.paging.PagedListAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -97,21 +97,20 @@ internal class HeadlinesBindingViewHolder(val binding: HeadlinesRowBinding) :
     private fun setArticleFlavorImage(url: String?) {
         val view = binding.flavorImage
         val parent = view.parent as View
-        parent.viewTreeObserver.addOnPreDrawListener(object: ViewTreeObserver.OnPreDrawListener {
+        val finalUrl = url.takeUnless { it.isNullOrEmpty() }
+        // just to be sure that we will load an image. run it without size info
+        view.load(finalUrl)
 
-            override fun onPreDraw(): Boolean {
-                // wait for the parent to be laid out
-                val width: Float = parent.width.takeIf { it != 0 }?.toFloat() ?: return true
-                val height = width * 9 / 16
-                val finalUrl = url.takeUnless { it.isNullOrEmpty() }
-                view.load(finalUrl) {
-                    size(width.roundToInt(), height.roundToInt())
-                }
-
-                parent.viewTreeObserver.removeOnPreDrawListener(this)
-                return true
+        // reload with size info to resize bitmap
+        // this is important to not load big bitmap into memory
+        parent.doOnPreDraw {
+            val width = parent.width.takeIf { it != 0 } ?: return@doOnPreDraw
+            val height = (width.toFloat() * 9 / 16).roundToInt()
+            view.maxHeight = height
+            view.load(finalUrl) {
+                size(width, height)
             }
-        })
+        }
     }
 }
 
