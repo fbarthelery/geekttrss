@@ -67,7 +67,10 @@
         <item name="android:statusBarColor">@android:color/transparent</item>
     </style>
 
-    <style name="AppTheme.ArticleDetailActivity" parent="AppTheme.NoActionBar"/>
+    <style name="AppTheme.ArticleDetailActivity" parent="AppTheme.NoActionBar">
+        <item name="android:statusBarColor">?android:windowBackground</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
 
 
     <!-- Theme overlays -->
