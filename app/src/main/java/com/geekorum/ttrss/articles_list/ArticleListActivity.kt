@@ -30,8 +30,13 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.SearchView
+import androidx.core.graphics.drawable.IconCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.GravityCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.doOnNextLayout
+import androidx.core.view.updatePadding
 import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
@@ -40,6 +45,8 @@ import androidx.fragment.app.replace
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
+import com.geekorum.geekdroid.views.banners.BannerSpec
+import com.geekorum.geekdroid.views.banners.buildBanner
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.article_details.ArticleDetailActivity
 import com.geekorum.ttrss.articles_list.search.ArticlesSearchFragment
@@ -50,7 +57,7 @@ import com.geekorum.ttrss.in_app_update.InAppUpdateViewModel
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.session.SessionActivity
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import timber.log.Timber
 
 /**
@@ -115,24 +122,38 @@ class ArticleListActivity : SessionActivity() {
         inAppUpdateViewModel.isUpdateAvailable.observe(this) {
             if (it) {
                 Timber.d("Update available")
-                val snackbar = Snackbar.make(binding.middlePaneLayout, "There is a new update",
-                    Snackbar.LENGTH_INDEFINITE)
-                snackbar.setAction("Install") {
-                    inAppUpdateViewModel.startUpdateFlow(this, CODE_START_IN_APP_UPDATE)
+                val banner = buildBanner(this) {
+                    messageId = R.string.banner_update_msg
+                    icon = IconCompat.createWithResource(this@ArticleListActivity,
+                        R.mipmap.ic_launcher)
+                    setPositiveButton(R.string.banner_update_btn) {
+                        inAppUpdateViewModel.startUpdateFlow(this@ArticleListActivity,
+                            CODE_START_IN_APP_UPDATE)
+                        hideBanner()
+                    }
+                    setNegativeButton(R.string.banner_dismiss_btn) {
+                        hideBanner()
+                    }
                 }
-                snackbar.show()
+
+                showBanner(banner)
             }
         }
 
         inAppUpdateViewModel.isUpdateReadyToInstall.observe(this) {
             if (it) {
                 Timber.d("Update ready to install")
-                val snackbar = Snackbar.make(binding.middlePaneLayout, "Update is ready to install",
-                    Snackbar.LENGTH_INDEFINITE)
-                snackbar.setAction("Restart") {
-                    inAppUpdateViewModel.completeUpdate()
+                val banner = buildBanner(this) {
+                    message = "Update ready to install"
+                    icon = IconCompat.createWithResource(this@ArticleListActivity,
+                        R.mipmap.ic_launcher)
+                    setPositiveButton("Restart") {
+                        hideBanner()
+                        inAppUpdateViewModel.completeUpdate()
+                    }
                 }
-                snackbar.show()
+
+                showBanner(banner)
             }
         }
 
@@ -160,6 +181,18 @@ class ArticleListActivity : SessionActivity() {
             AppBarLayout.OnOffsetChangedListener { _, _ ->
                 binding.appBar.invalidate()
             })
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.bannerContainer) { view, insets ->
+            // consume top padding since we are not on top of screen
+            val noTopInsets = insets.replaceSystemWindowInsets(insets.systemWindowInsetLeft,
+                0,
+                insets.systemWindowInsetRight,
+                insets.systemWindowInsetBottom
+            )
+            WindowInsetsCompat.toWindowInsetsCompat(
+                view.onApplyWindowInsets(noTopInsets.toWindowInsets())
+            )
+        }
     }
 
     private fun setupToolbar() {
@@ -279,5 +312,36 @@ class ArticleListActivity : SessionActivity() {
         } else {
             super.onBackPressed()
         }
+    }
+
+    private fun showBanner(bannerSpec: BannerSpec) {
+        binding.bannerContainer.show(bannerSpec)
+        val behavior = BottomSheetBehavior.from(binding.bannerContainer)
+        behavior.state = BottomSheetBehavior.STATE_EXPANDED
+
+        // wait for expanded state to set non hideable
+        behavior.bottomSheetCallback = object : BottomSheetBehavior.BottomSheetCallback() {
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                // nothing to do
+            }
+
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
+                    behavior.isHideable = false
+                    behavior.bottomSheetCallback = null
+                }
+            }
+        }
+
+        binding.root.doOnNextLayout {
+            binding.middlePaneLayout.updatePadding(bottom = binding.bannerContainer.height)
+        }
+    }
+
+    private fun hideBanner() {
+        val behavior = BottomSheetBehavior.from(binding.bannerContainer)
+        behavior.isHideable = true
+        behavior.state = BottomSheetBehavior.STATE_HIDDEN
+        binding.middlePaneLayout.updatePadding(bottom = 0)
     }
 }
