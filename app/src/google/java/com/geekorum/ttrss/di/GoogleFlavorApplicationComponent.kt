@@ -21,7 +21,7 @@
 package com.geekorum.ttrss.di
 
 import com.geekorum.ttrss.GmsSecurityProviderModule
-import com.geekorum.ttrss.in_app_update.NoInAppUpdateModule
+import com.geekorum.ttrss.in_app_update.PlayStoreInAppUpdateModule
 import com.geekorum.ttrss.logging.CrashlyticsLoggingModule
 import com.geekorum.ttrss.on_demand_modules.PlayStoreInstallModule
 import dagger.Component
@@ -35,9 +35,7 @@ import javax.inject.Singleton
     FlavorLessModule::class,
     CrashlyticsLoggingModule::class,
     PlayStoreInstallModule::class,
-//    TODO Reenable PlayStoreInAppUpdateModule
-//    PlayStoreInAppUpdateModule::class,
-    NoInAppUpdateModule::class,
+    PlayStoreInAppUpdateModule::class,
     GmsSecurityProviderModule::class
 ])
 @Singleton
