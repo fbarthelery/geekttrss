@@ -45,6 +45,13 @@
         <!-- This style needs to be applied manually in layout to have the correct theme overlay -->
         <item name="appBarToolbarStyle">@style/Widget.AppTheme.AppBar.Toolbar</item>
         <item name="appBarCollapsingToolbarStyle">@style/Widget.AppTheme.AppBar.CollapsingToolbar</item>
+
+        <item name="floatingActionButtonStyle">@style/Widget.AppTheme.FloatingActionButton</item>
+        <item name="bottomSheetStyle">@style/Widget.MaterialComponents.BottomSheet</item>
+        <!-- Shapes-->
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.AppTheme.SmallComponent</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.AppTheme.MediumComponent</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.AppTheme.LargeComponent</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -112,6 +119,10 @@
         <item name="collapsedTitleTextAppearance">@style/TextAppearance.AppTheme.CollapsingToolbar.Collapsed</item>
     </style>
 
+    <style name="Widget.AppTheme.FloatingActionButton" parent="Widget.MaterialComponents.FloatingActionButton">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay.AppTheme.FloatingActionButton</item>
+    </style>
+
 
     <!-- Text appearances -->
 
@@ -131,6 +142,33 @@
         <item name="android:textColor">@color/material_on_surface_emphasis_high_type</item>
     </style>
 
+    <!-- Shapes-->
+    <style name="ShapeAppearance.AppTheme" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">0dp</item>
+    </style>
+
+    <style name="ShapeAppearance.AppTheme.SmallComponent" parent="ShapeAppearance.AppTheme">
+        <item name="cornerSizeTopRight">8dp</item>
+        <item name="cornerSizeBottomLeft">8dp</item>
+    </style>
+
+    <style name="ShapeAppearance.AppTheme.MediumComponent" parent="ShapeAppearance.AppTheme">
+        <item name="cornerSizeTopRight">16dp</item>
+        <item name="cornerSizeBottomLeft">16dp</item>
+    </style>
+
+    <style name="ShapeAppearance.AppTheme.LargeComponent" parent="ShapeAppearance.AppTheme">
+        <item name="cornerSizeTopRight">20dp</item>
+        <item name="cornerSizeBottomLeft">20dp</item>
+    </style>
+
+    <style name="ShapeAppearanceOverlay.AppTheme.FloatingActionButton" parent="">
+        <!-- use @null to change to 50% programmatically. -->
+        <item name="cornerSize">@null</item>
+        <item name="cornerSizeTopRight">@null</item>
+        <item name="cornerSizeBottomLeft">@null</item>
+    </style>
 
     <!-- other very specific styles -->
 
