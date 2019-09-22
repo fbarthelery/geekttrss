@@ -59,6 +59,7 @@ import kotlinx.coroutines.delay
 import okhttp3.OkHttpClient
 import java.util.Locale
 import javax.inject.Inject
+import kotlin.math.max
 
 /**
  * A fragment representing a single Article detail screen.
@@ -350,7 +351,7 @@ class ArticleDetailFragment @Inject constructor(
             val lp = child.layoutParams as ViewGroup.MarginLayoutParams
             val childSize = child.height + lp.topMargin + lp.bottomMargin
             val parentSpace = height - paddingTop - paddingBottom
-            Math.max(0, childSize - parentSpace)
+            max(0, childSize - parentSpace)
         } ?: 0
 
     private val NestedScrollView.isAtEndOfArticle: Boolean

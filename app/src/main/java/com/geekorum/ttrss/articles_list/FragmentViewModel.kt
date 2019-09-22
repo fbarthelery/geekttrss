@@ -31,6 +31,7 @@ import androidx.lifecycle.switchMap
 import androidx.paging.DataSource
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
+import androidx.paging.toLiveData
 import com.geekorum.geekdroid.dagger.ViewModelAssistedFactory
 import com.geekorum.ttrss.background_job.BackgroundJobManager
 import com.geekorum.ttrss.data.Article
@@ -119,8 +120,9 @@ class FragmentViewModel @AssistedInject constructor(
                 else
                     articlesRepository.getAllArticlesForFeed(feed.id)
             }
-            LivePagedListBuilder(factory, 50)
-                .setBoundaryCallback(PageBoundaryCallback()).build()
+
+            factory.toLiveData(pageSize = 50,
+                boundaryCallback = PageBoundaryCallback())
         }
     }
 
