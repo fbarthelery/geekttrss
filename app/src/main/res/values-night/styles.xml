@@ -25,6 +25,10 @@
     <style name="ThemeOverlay.AppTheme.DayNight" parent="@style/ThemeOverlay.MaterialComponents.Dark"/>
     <style name="ThemeOverlay.AppTheme.DayNight.Inverse" parent="@style/ThemeOverlay.MaterialComponents.Light" />
 
+    <style name="ThemeOverlay.AppTheme.BottomSheet" parent="ThemeOverlay.MaterialComponents.Dark">
+        <item name="colorPrimary">@color/secondary</item>
+    </style>
+
     <style name="AppTheme.ArticleDetailActivity" parent="AppTheme.NoActionBar">
         <item name="android:statusBarColor">?android:windowBackground</item>
         <item name="android:windowLightStatusBar">false</item>

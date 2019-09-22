@@ -90,6 +90,11 @@
         <item name="materialAlertDialogTitleTextStyle">@style/AlertDialogTitleTextStyle</item>
     </style>
 
+    <style name="ThemeOverlay.AppTheme.BottomSheet" parent="ThemeOverlay.MaterialComponents.Light">
+        <item name="colorSurface">@color/material_blue_grey_100</item>
+        <item name="colorPrimary">@color/secondary</item>
+    </style>
+
 
     <!-- Widget styles -->
 

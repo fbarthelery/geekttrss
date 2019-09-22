@@ -85,6 +85,14 @@
     <string name="fragment_articles_list_no_articles_lbl">No articles</string>
     <string name="fragment_articles_list_no_articles_and_sync_lbl">No articles.\nFirst synchronization may take a while…</string>
 
+    <!-- banners -->
+    <string name="banner_update_msg">A new update is available</string>
+    <string name="banner_update_btn">Install</string>
+    <string name="banner_dismiss_btn">Dismiss</string>
+    <string name="banner_update_install_msg">Update ready to install</string>
+    <string name="banner_install_btn">Restart</string>
+
+
     <!-- activity add feed -->
     <string name="activity_add_feed_title">Subscribe to feed</string>
 
