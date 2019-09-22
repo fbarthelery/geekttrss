@@ -91,8 +91,20 @@ class InAppUpdateViewModelTest {
     }
 
     @Test
+    fun testAnUpdateIsAlreadyReadyToInstall() = runBlockingTest {
+        val observer: Observer<Boolean> = mockObserver()
+        coEvery {updateManager.getUpdateState() } returns UpdateState(UpdateState.Status.DOWNLOADED)
+        subject.isUpdateReadyToInstall.observeForever(observer)
+
+        subject.isUpdateReadyToInstall.waitForValue(numberOfChanged = 1)
+        subject.waitForChildrenCoroutines()
+        verify { observer.onChanged(true) }
+    }
+
+    @Test
     fun testAnUpdateFlowGoingToReadyToInstall() = runBlockingTest {
         val observer: Observer<Boolean> = mockObserver()
+        coEvery {updateManager.getUpdateState() } returns UpdateState(UpdateState.Status.UNKNOWN)
         coEvery { updateManager.startUpdate(any(), any()) } returns flowOf(
             UpdateState(UpdateState.Status.UNKNOWN),
             UpdateState(UpdateState.Status.PENDING),

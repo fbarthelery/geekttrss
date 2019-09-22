@@ -54,6 +54,12 @@ class PlayStoreInAppUpdateManager(
         }
     }
 
+    override suspend fun getUpdateState(): UpdateState {
+        val updateInfo = appUpdateManager.appUpdateInfo.await()
+        val status = PlayInstallStatus(updateInfo.installStatus()).toUpdateStateStatus()
+        return UpdateState(status)
+    }
+
     @UseExperimental(ExperimentalCoroutinesApi::class)
     override suspend fun startUpdate(activity: Activity, requestCode: Int): Flow<UpdateState> {
         val updateInfo = appUpdateManager.appUpdateInfo.await()
@@ -81,20 +87,26 @@ class PlayStoreInAppUpdateManager(
 }
 
 private fun InstallState.toUpdateState(): UpdateState {
-    val status = when (installStatus()) {
-        InstallStatus.DOWNLOADING -> UpdateState.Status.DOWNLOADING
-        InstallStatus.DOWNLOADED -> UpdateState.Status.DOWNLOADED
-        InstallStatus.INSTALLING -> UpdateState.Status.INSTALLING
-        InstallStatus.INSTALLED -> UpdateState.Status.INSTALLED
-        InstallStatus.FAILED -> UpdateState.Status.FAILED
-        InstallStatus.CANCELED -> UpdateState.Status.CANCELED
-        InstallStatus.REQUIRES_UI_INTENT,
-        InstallStatus.PENDING -> UpdateState.Status.PENDING
-        InstallStatus.UNKNOWN -> UpdateState.Status.UNKNOWN
-        else -> UpdateState.Status.UNKNOWN
-    }
-
+    val status = PlayInstallStatus(installStatus()).toUpdateStateStatus()
     return UpdateState(status, installErrorCode())
+}
+
+inline class PlayInstallStatus(private val value: Int) {
+
+    fun toUpdateStateStatus(): UpdateState.Status {
+        return when (value) {
+            InstallStatus.DOWNLOADING -> UpdateState.Status.DOWNLOADING
+            InstallStatus.DOWNLOADED -> UpdateState.Status.DOWNLOADED
+            InstallStatus.INSTALLING -> UpdateState.Status.INSTALLING
+            InstallStatus.INSTALLED -> UpdateState.Status.INSTALLED
+            InstallStatus.FAILED -> UpdateState.Status.FAILED
+            InstallStatus.CANCELED -> UpdateState.Status.CANCELED
+            InstallStatus.REQUIRES_UI_INTENT,
+            InstallStatus.PENDING -> UpdateState.Status.PENDING
+            InstallStatus.UNKNOWN -> UpdateState.Status.UNKNOWN
+            else -> UpdateState.Status.UNKNOWN
+        }
+    }
 }
 
 private fun InstallState.isTerminal(): Boolean = when (installStatus()) {

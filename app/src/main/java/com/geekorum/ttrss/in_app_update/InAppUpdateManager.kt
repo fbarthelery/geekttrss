@@ -33,6 +33,8 @@ interface InAppUpdateManager {
 
     suspend fun getUpdateAvailability(): UpdateAvailability
 
+    suspend fun getUpdateState(): UpdateState
+
     /**
      * Start the update process.
      */

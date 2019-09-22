@@ -22,13 +22,13 @@ package com.geekorum.ttrss.in_app_update
 
 import android.app.Activity
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -44,8 +44,13 @@ class InAppUpdateViewModel @Inject constructor(
         emit(result == UpdateAvailability.UPDATE_AVAILABLE)
     }
 
-    private val updateState: MutableLiveData<UpdateState> = MutableLiveData<UpdateState>().apply {
-        value = UpdateState(UpdateState.Status.UNKNOWN)
+    private val updateStateChannel = Channel<UpdateState>()
+
+    private val updateState: LiveData<UpdateState> = liveData {
+        emit(updateManager.getUpdateState())
+        for (state in updateStateChannel) {
+            emit(state)
+        }
     }
 
     val isUpdateReadyToInstall = updateState.map {
@@ -61,7 +66,7 @@ class InAppUpdateViewModel @Inject constructor(
 
         updateJob = viewModelScope.launch {
             updateManager.startUpdate(activity, requestCode).collect {
-                updateState.value = it
+                updateStateChannel.send(it)
             }
         }
     }
@@ -73,6 +78,10 @@ class InAppUpdateViewModel @Inject constructor(
 
     fun completeUpdate() {
         updateManager.completeUpdate()
+    }
+
+    override fun onCleared() {
+        updateStateChannel.close()
     }
 }
 
