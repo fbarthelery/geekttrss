@@ -29,8 +29,10 @@
     <!-- We use the same value -->
     <color name="material_blue_grey_800" tools:override="true">#37474F</color>
     <color name="material_blue_grey_900" tools:override="true">#263238</color>
+    <color name="material_grey_300" tools:override="true">#ffe0e0e0</color>
     <color name="material_green_a200">#69f0ae</color>
     <color name="material_green_a700">#00C853</color>
+    <color name="material_light_green_200">#c5e1a5</color>
 
     <!-- Theme colors -->
     <color name="primary">@color/material_blue_grey_500</color>

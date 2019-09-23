@@ -26,7 +26,7 @@
           android:height="36dp"
           android:width="36dp">
         <shape android:shape="oval">
-            <solid android:color="#E0E0E0" />
+            <solid android:color="@color/app_icon_flavor_background" />
         </shape>
     </item>
 

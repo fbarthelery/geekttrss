@@ -25,5 +25,6 @@
     <!-- Must be kept in sync with packageId in build.gradle.kts -->
     <string name="package_name">com.geekorum.ttrss.free</string>
     <string name="sync_adapter_content_authority">com.geekorum.ttrss.free.providers.articles</string>
+    <color name="app_icon_flavor_background">@color/material_light_green_200</color>
 
 </resources>
