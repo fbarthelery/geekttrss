@@ -52,12 +52,6 @@ android {
         versionName = "$major.$minor.$patch"
         buildConfigField("String", "REPOSITORY_CHANGESET", "\"${getChangeSet()}\"")
 
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments = mapOf(
-                    "room.schemaLocation" to "$projectDir/schemas")
-            }
-        }
         sourceSets {
             named("androidTest") {
                 assets.srcDir(files("$projectDir/schemas"))
@@ -109,6 +103,13 @@ android {
     dynamicFeatures = mutableSetOf(":manage_feeds")
 }
 
+kapt {
+    arguments {
+        arg("room.schemaLocation", "$projectDir/schemas")
+        // better in 2.2.0-rc01
+        arg("room.incremental", true)
+    }
+}
 
 dependencies {
 
