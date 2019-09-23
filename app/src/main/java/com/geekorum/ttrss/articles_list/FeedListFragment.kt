@@ -33,7 +33,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
-import androidx.core.app.ActivityOptionsCompat
 import androidx.core.view.get
 import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
@@ -54,7 +53,6 @@ import com.geekorum.ttrss.settings.SettingsActivity
 import com.geekorum.ttrss.settings.manage_features.InstallFeatureActivity
 import com.google.android.material.navigation.NavigationView
 import timber.log.Timber
-
 import javax.inject.Inject
 
 /**
@@ -88,7 +86,6 @@ constructor(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.navigationView.setNavigationItemSelectedListener(this)
-        setupHeader()
         setUpEdgeToEdge()
         setupViewModels()
     }
@@ -140,16 +137,9 @@ constructor(
         }
     }
 
-    private fun setupHeader() {
-        val header = binding.navigationView.getHeaderView(0)
-        val settings = header.findViewById<View>(R.id.drawer_settings_btn)
-
-        settings.setOnClickListener { v ->
-            val intent = Intent(requireActivity(), SettingsActivity::class.java)
-            val options =
-                ActivityOptionsCompat.makeScaleUpAnimation(v, 0, 0, v.width, v.height)
-            ActivityCompat.startActivity(requireActivity(), intent, options.toBundle())
-        }
+    private fun navigateToSettings() {
+        val intent = Intent(requireActivity(), SettingsActivity::class.java)
+        ActivityCompat.startActivity(requireActivity(), intent, null)
     }
 
     private fun transformFeedsInMenuEntry(menu: Menu, feeds: List<Feed>) {
@@ -225,6 +215,10 @@ constructor(
                 true
             }
             categoriesDisplayed -> onCategoriesSelected(item)
+            item.itemId == R.id.settings -> {
+                navigateToSettings()
+                true
+            }
             else -> onFeedSelected(item)
         }
     }

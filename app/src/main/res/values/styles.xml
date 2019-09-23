@@ -85,10 +85,6 @@
     <style name="ThemeOverlay.AppTheme.DayNight" parent="@style/ThemeOverlay.MaterialComponents.Light"/>
     <style name="ThemeOverlay.AppTheme.DayNight.Inverse" parent="@style/ThemeOverlay.MaterialComponents.Dark" />
 
-    <style name="ThemeOverlay.AppTheme.TranslucentButton" parent="ThemeOverlay.AppTheme.DayNight">
-        <item name="colorButtonNormal">@android:color/transparent</item>
-    </style>
-
     <style name="ThemeOverlay.AppTheme.LoginForm" parent="ThemeOverlay.AppTheme.DayNight">
         <item name="textInputStyle">@style/LoginForm.TextInputStyle</item>
     </style>

@@ -29,5 +29,10 @@
               android:title="@string/title_manage_feeds"
               android:icon="@drawable/ic_tune_black_24dp" />
     </group>
+    <group android:id="@+id/general_settings">
+        <item android:id="@+id/settings"
+                android:title="@string/activity_settings_title"
+                android:icon="@drawable/ic_settings_black_24dp" />
+    </group>
 
 </menu>
