@@ -87,10 +87,10 @@ constructor(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val designNavigationView = binding.navigationView
-        designNavigationView.setNavigationItemSelectedListener(this)
+        binding.navigationView.setNavigationItemSelectedListener(this)
         setupHeader()
         setUpEdgeToEdge()
+        setupViewModels()
     }
 
     private fun setUpEdgeToEdge() {
@@ -103,38 +103,37 @@ constructor(
         }
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    private fun setupViewModels() {
         val showUnreadOnly = preferences.getBoolean("show_unread_only", true)
         feedsViewModel.setOnlyUnread(showUnreadOnly)
 
         categoriesDisplayed = preferences.getBoolean("enable_cats", false)
         //        categoriesDisplayed = true;
         if (categoriesDisplayed) {
-            feedsViewModel.categories.observe(this) { categories ->
+            feedsViewModel.categories.observe(viewLifecycleOwner) { categories ->
                 transformCategoriesInMenuEntry(binding.navigationView.menu, categories)
                 binding.navigationView.inflateMenu(R.menu.fragment_feed_list)
             }
         } else {
-            feedsViewModel.allFeeds.observe(this) { feeds ->
+            feedsViewModel.allFeeds.observe(viewLifecycleOwner) { feeds ->
                 currentFeeds = feeds
                 transformFeedsInMenuEntry(binding.navigationView.menu, feeds)
                 binding.navigationView.inflateMenu(R.menu.fragment_feed_list)
             }
         }
-        activityViewModel.selectedFeed.observe(this) { feed ->
+        activityViewModel.selectedFeed.observe(viewLifecycleOwner) { feed ->
             val menu = binding.navigationView.menu
             val item = feed?.let { menu.findItem(it.id.toInt()) }
             item?.isChecked = true
         }
 
-        accountViewModel.selectedAccount.observe(this) { account ->
+        accountViewModel.selectedAccount.observe(viewLifecycleOwner) { account ->
             val headerView = binding.navigationView.getHeaderView(0)
             val login = headerView.findViewById<TextView>(R.id.drawer_header_login)
             login.text = account.name
         }
 
-        accountViewModel.selectedAccountHost.observe(this) { host ->
+        accountViewModel.selectedAccountHost.observe(viewLifecycleOwner) { host ->
             val headerView = binding.navigationView.getHeaderView(0)
             val server = headerView.findViewById<TextView>(R.id.drawer_header_server)
             server.text = host
@@ -248,7 +247,7 @@ constructor(
         feedsViewModel.setSelectedCategory(category.id)
         if (feedsForCategory == null) {
             feedsForCategory = feedsViewModel.feedsForCategory
-            feedsForCategory!!.observe(this) { feeds ->
+            feedsForCategory!!.observe(viewLifecycleOwner) { feeds ->
                 currentFeeds = feeds
                 transformFeedsInMenuEntry(binding.navigationView.menu, feeds)
             }
