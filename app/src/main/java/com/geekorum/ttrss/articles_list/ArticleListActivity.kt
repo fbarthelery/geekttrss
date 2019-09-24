@@ -32,6 +32,7 @@ import androidx.core.graphics.drawable.IconCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnNextLayout
+import androidx.core.view.updatePadding
 import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.commit
@@ -284,8 +285,8 @@ class ArticleListActivity : SessionActivity() {
         }
 
         binding.root.doOnNextLayout {
-//            binding.middlePaneLayout. updatePadding(bottom = binding.bannerContainer.height)
-
+            val fragmentContainerView = supportFragmentManager.findFragmentById(R.id.middle_pane_layout)!!.requireView()
+            fragmentContainerView.updatePadding(bottom = binding.bannerContainer.height)
         }
     }
 
@@ -293,6 +294,7 @@ class ArticleListActivity : SessionActivity() {
         val behavior = BottomSheetBehavior.from(binding.bannerContainer)
         behavior.isHideable = true
         behavior.state = BottomSheetBehavior.STATE_HIDDEN
-//        binding.middlePaneLayout.updatePadding(bottom = 0)
+        val fragmentContainerView = supportFragmentManager.findFragmentById(R.id.middle_pane_layout)!!.requireView()
+        fragmentContainerView.updatePadding(bottom = 0)
     }
 }
