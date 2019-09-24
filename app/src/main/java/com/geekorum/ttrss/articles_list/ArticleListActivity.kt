@@ -148,7 +148,7 @@ class ArticleListActivity : SessionActivity() {
         binding = DataBindingUtil.setContentView<ActivityArticleListBinding>(this,
             R.layout.activity_article_list).apply {
             lifecycleOwner = this@ArticleListActivity
-            this.activityViewModel = activityViewModel
+            activityViewModel = this@ArticleListActivity.activityViewModel
         }
 
         navController = findNavController(R.id.middle_pane_layout).apply {
