@@ -36,6 +36,7 @@ plugins {
     id("com.geekorum.build.android-release-universal-apk")
     id("com.geekorum.build.source-license-checker")
     id("com.geekorum.build.play-store-publish")
+    id("androidx.navigation.safeargs.kotlin")
 }
 
 android {
@@ -174,6 +175,10 @@ dependencies {
     val roomVersion = "2.1.0"
     kapt("androidx.room:room-compiler:$roomVersion")
     androidTestImplementation("androidx.room:room-testing:$roomVersion")
+
+    val navigationVersion = "2.1.0"
+    implementation("androidx.navigation:navigation-fragment-ktx:2.1.0")
+    implementation("androidx.navigation:navigation-ui-ktx:2.1.0")
 
     val workVersion = "2.2.0"
     androidTestImplementation("androidx.work:work-testing:$workVersion")

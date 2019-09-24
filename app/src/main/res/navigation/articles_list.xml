@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+
+    Geekttrss is a RSS feed reader application on the Android Platform.
+
+    Copyright (C) 2017-2019 by Frederic-Charles Barthelery.
+
+    This file is part of Geekttrss.
+
+    Geekttrss is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Geekttrss is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/articles_list"
+        app:startDestination="@id/articlesListFragment">
+
+    <fragment android:id="@+id/articlesListFragment"
+            android:name="com.geekorum.ttrss.articles_list.ArticlesListFragment"
+            android:label="@string/label_feed_name" tools:layout="@layout/fragment_article_list" >
+        <argument android:name="feed_id" android:defaultValue="-4L" app:argType="long" />
+        <argument android:name="feed_name" android:defaultValue="All articles" app:argType="string" />
+
+        <action android:id="@+id/action_search_article"
+                app:destination="@id/articlesSearchFragment" />
+    </fragment>
+
+    <fragment android:id="@+id/articlesSearchFragment"
+            android:name="com.geekorum.ttrss.articles_list.search.ArticlesSearchFragment"
+            android:label="@string/title_article_search"
+            tools:layout="@layout/fragment_articles_search" />
+
+    <action android:id="@+id/action_show_feed"
+            app:destination="@id/articlesListFragment"
+            app:popUpTo="@id/articlesListFragment"
+            app:popUpToInclusive="true"/>
+
+</navigation>
