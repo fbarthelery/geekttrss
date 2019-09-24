@@ -23,33 +23,30 @@ package com.geekorum.ttrss.articles_list
 import android.app.Activity
 import android.content.ContentUris
 import android.content.Intent
-import android.content.res.Configuration
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
-import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.SearchView
 import androidx.core.graphics.drawable.IconCompat
-import androidx.core.os.bundleOf
-import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnNextLayout
-import androidx.core.view.updatePadding
 import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import androidx.fragment.app.commit
 import androidx.fragment.app.replace
 import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
+import androidx.navigation.ui.setupWithNavController
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.geekdroid.views.banners.BannerSpec
 import com.geekorum.geekdroid.views.banners.buildBanner
+import com.geekorum.ttrss.ArticlesListDirections
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.article_details.ArticleDetailActivity
-import com.geekorum.ttrss.articles_list.search.ArticlesSearchFragment
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.databinding.ActivityArticleListBinding
@@ -70,19 +67,16 @@ import timber.log.Timber
  */
 class ArticleListActivity : SessionActivity() {
     companion object {
-        private const val FRAGMENT_ARTICLES_LIST = "articles_list"
-        private const val FRAGMENT_BACKSTACK_SEARCH = "search"
         private const val FRAGMENT_FEEDS_LIST = "feeds_list"
         private const val CODE_START_IN_APP_UPDATE = 1
     }
-
-    private var actionBarDrawerToggle: ActionBarDrawerToggle? = null
 
     private lateinit var binding: ActivityArticleListBinding
     private val drawerLayout: DrawerLayout
         get() = binding.headlinesDrawer
 
 
+    private lateinit var navController: NavController
     private val activityViewModel: ActivityViewModel by viewModels()
     private val accountViewModel: TtrssAccountViewModel by viewModels()
     private val inAppUpdateViewModel: InAppUpdateViewModel by viewModels()
@@ -157,16 +151,33 @@ class ArticleListActivity : SessionActivity() {
             }
         }
 
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_article_list)
+        binding = DataBindingUtil.setContentView<ActivityArticleListBinding>(this,
+            R.layout.activity_article_list).apply {
+            lifecycleOwner = this@ArticleListActivity
+            this.activityViewModel = activityViewModel
+        }
 
-        binding.lifecycleOwner = this
-        binding.activityViewModel = activityViewModel
+        navController = findNavController(R.id.middle_pane_layout).apply {
+            addOnDestinationChangedListener { controller, destination, arguments ->
+                when (destination.id) {
+                    R.id.articlesListFragment -> {
+                        binding.appBar.setExpanded(true)
+                        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+                        binding.fab.show()
+                    }
+                    R.id.articlesSearchFragment -> {
+                        binding.appBar.setExpanded(true)
+                        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+                        //TODO hide fab. but fab has scrollaware behavior that get it shown back when scrolling
+                    }
+                }
+            }
+        }
 
         if (savedInstanceState == null) {
             supportFragmentManager.commit {
                 replace<FeedListFragment>(R.id.start_pane_layout, FRAGMENT_FEEDS_LIST)
             }
-            activityViewModel.setSelectedFeed(Feed.createVirtualFeedForId(Feed.FEED_ID_ALL_ARTICLES))
         }
         setupToolbar()
         setUpEdgeToEdge()
@@ -196,13 +207,8 @@ class ArticleListActivity : SessionActivity() {
     }
 
     private fun setupToolbar() {
-        val toolbar = binding.toolbar
         setupSearch()
-
-        actionBarDrawerToggle = ActionBarDrawerToggle(this, binding.headlinesDrawer, toolbar,
-            R.string.drawer_open, R.string.drawer_close).also {
-            binding.headlinesDrawer.addDrawerListener(it)
-        }
+        binding.toolbar.setupWithNavController(navController, drawerLayout)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -217,6 +223,12 @@ class ArticleListActivity : SessionActivity() {
         val searchItem = with(binding.toolbar) {
             inflateMenu(R.menu.activity_articles_list)
             menu.findItem(R.id.articles_search)
+        }
+
+        navController.addOnDestinationChangedListener { controller, destination, arguments ->
+            when (destination.id) {
+                R.id.articlesListFragment -> if (searchItem.isActionViewExpanded) searchItem.collapseActionView()
+            }
         }
 
         searchItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
@@ -243,31 +255,7 @@ class ArticleListActivity : SessionActivity() {
                 return true
             }
         })
-
-        supportFragmentManager.addOnBackStackChangedListener {
-            val isOnSearchFragment = supportFragmentManager.run {
-                if (backStackEntryCount > 0) {
-                    val backStackEntry = getBackStackEntryAt(backStackEntryCount - 1)
-                    return@run backStackEntry.name == FRAGMENT_BACKSTACK_SEARCH
-                }
-                false
-            }
-            if (!isOnSearchFragment) {
-                searchItem.collapseActionView()
-            }
-        }
     }
-
-    public override fun onPostCreate(savedInstanceState: Bundle?) {
-        super.onPostCreate(savedInstanceState)
-        actionBarDrawerToggle?.syncState()
-    }
-
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        actionBarDrawerToggle?.onConfigurationChanged(newConfig)
-    }
-
 
     private fun onArticleSelected(position: Int, item: Article) {
         val articleUri = ContentUris.withAppendedId(ArticlesContract.Article.CONTENT_URI, item.id)
@@ -280,39 +268,20 @@ class ArticleListActivity : SessionActivity() {
 
     private fun bindFeedInformation(feed: Feed?) {
         title = feed?.title ?: ""
-        binding.toolbar.title = title
     }
 
     private fun onFeedSelected(feed: Feed) {
-        val feedId =  feed.id
-        navigateUpToList()
-        supportFragmentManager.commit {
-            replace<ArticlesListFragment>(R.id.middle_pane_layout, FRAGMENT_FEEDS_LIST, bundleOf(
-                ArticlesListFragment.ARG_FEED_ID to feedId
-            ))
-        }
+        navController.navigate(ArticlesListDirections.actionShowFeed(feed.id, feed.title))
         drawerLayout.closeDrawers()
     }
 
     private fun navigateToSearch() {
-        supportFragmentManager.commit {
-            replace<ArticlesSearchFragment>(R.id.middle_pane_layout, FRAGMENT_ARTICLES_LIST)
-            addToBackStack(FRAGMENT_BACKSTACK_SEARCH)
-        }
-        drawerLayout.closeDrawers()
+        navController.navigate(ArticlesListFragmentDirections.actionSearchArticle())
     }
 
     private fun navigateUpToList() {
-        supportFragmentManager.popBackStack(FRAGMENT_BACKSTACK_SEARCH, POP_BACK_STACK_INCLUSIVE)
-        binding.appBar.setExpanded(true)
-    }
-
-    override fun onBackPressed() {
-        if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-            drawerLayout.closeDrawers()
-        } else {
-            super.onBackPressed()
-        }
+        if (navController.currentDestination?.id == R.id.articlesSearchFragment)
+            navController.popBackStack()
     }
 
     private fun showBanner(bannerSpec: BannerSpec) {
@@ -335,7 +304,8 @@ class ArticleListActivity : SessionActivity() {
         }
 
         binding.root.doOnNextLayout {
-            binding.middlePaneLayout.updatePadding(bottom = binding.bannerContainer.height)
+//            binding.middlePaneLayout. updatePadding(bottom = binding.bannerContainer.height)
+
         }
     }
 
@@ -343,6 +313,6 @@ class ArticleListActivity : SessionActivity() {
         val behavior = BottomSheetBehavior.from(binding.bannerContainer)
         behavior.isHideable = true
         behavior.state = BottomSheetBehavior.STATE_HIDDEN
-        binding.middlePaneLayout.updatePadding(bottom = 0)
+//        binding.middlePaneLayout.updatePadding(bottom = 0)
     }
 }
