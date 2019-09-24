@@ -68,12 +68,6 @@ class ActivityViewModel @AssistedInject constructor(
     private val _articleSelectedEvent = MutableLiveData<Event<ArticleSelectedParameters>>()
     val articleSelectedEvent: LiveData<Event<ArticleSelectedParameters>> = _articleSelectedEvent
 
-    private val _searchOpenedEvent = MutableLiveData<EmptyEvent>()
-    val searchOpenedEvent: LiveData<EmptyEvent> = _searchOpenedEvent
-
-    private val _searchClosedEvent = MutableLiveData<EmptyEvent>()
-    val searchClosedEvent: LiveData<EmptyEvent> = _searchClosedEvent
-
     private val _searchQuery = MutableLiveData<String>()
     val searchQuery: LiveData<String> = _searchQuery
 
@@ -111,14 +105,6 @@ class ActivityViewModel @AssistedInject constructor(
 
     fun displayArticleInBrowser(context: Context, article: Article) {
         browserLauncher.launchUrl(context, article.link.toUri())
-    }
-
-    fun onSearchOpened() {
-        _searchOpenedEvent.value = SearchOpenedEvent()
-    }
-
-    fun onSearchClosed() {
-        _searchClosedEvent.value = SearchClosedEvent()
     }
 
     fun setSearchQuery(query: String) {

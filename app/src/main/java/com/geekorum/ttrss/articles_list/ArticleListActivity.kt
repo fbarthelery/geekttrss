@@ -86,19 +86,12 @@ class ArticleListActivity : SessionActivity() {
 
         activityViewModel.selectedFeed.observe(this) { bindFeedInformation(it) }
         activityViewModel.feedSelectedEvent.observe(this, EventObserver {
-            onFeedSelected(it)
+            navController.navigate(ArticlesListDirections.actionShowFeed(it.id, it.title))
+            drawerLayout.closeDrawers()
         })
 
         activityViewModel.articleSelectedEvent.observe(this, EventObserver { (position, article) ->
             onArticleSelected(position, article)
-        })
-
-        activityViewModel.searchOpenedEvent.observe(this, EventObserver {
-            navigateToSearch()
-        })
-
-        activityViewModel.searchClosedEvent.observe(this, EventObserver {
-            navigateUpToList()
         })
 
         accountViewModel.selectedAccount.observe(this, Observer { account ->
@@ -233,12 +226,13 @@ class ArticleListActivity : SessionActivity() {
 
         searchItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
             override fun onMenuItemActionExpand(item: MenuItem): Boolean {
-                activityViewModel.onSearchOpened()
+                navController.navigate(ArticlesListFragmentDirections.actionSearchArticle())
                 return true
             }
 
             override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
-                activityViewModel.onSearchClosed()
+                if (navController.currentDestination?.id == R.id.articlesSearchFragment)
+                    navController.popBackStack()
                 return true
             }
         })
@@ -268,20 +262,6 @@ class ArticleListActivity : SessionActivity() {
 
     private fun bindFeedInformation(feed: Feed?) {
         title = feed?.title ?: ""
-    }
-
-    private fun onFeedSelected(feed: Feed) {
-        navController.navigate(ArticlesListDirections.actionShowFeed(feed.id, feed.title))
-        drawerLayout.closeDrawers()
-    }
-
-    private fun navigateToSearch() {
-        navController.navigate(ArticlesListFragmentDirections.actionSearchArticle())
-    }
-
-    private fun navigateUpToList() {
-        if (navController.currentDestination?.id == R.id.articlesSearchFragment)
-            navController.popBackStack()
     }
 
     private fun showBanner(bannerSpec: BannerSpec) {

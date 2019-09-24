@@ -24,9 +24,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.FragmentFactory
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
+import androidx.lifecycle.observe
 import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
 import com.geekorum.ttrss.BaseFragment
 import com.geekorum.ttrss.activityViewModels
@@ -68,12 +67,12 @@ class ArticlesSearchFragment @Inject constructor(
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        activityViewModel.searchQuery.observe(this, Observer {
+        activityViewModel.searchQuery.observe(this) {
             searchViewModel.setSearchQuery(it)
-        })
-        searchViewModel.articles.observe(this, Observer {
+        }
+        searchViewModel.articles.observe(this) {
             adapter.submitList(it)
-        })
+        }
     }
 
     inner class EventHandler : CardEventHandler(requireContext()) {
