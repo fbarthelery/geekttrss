@@ -48,7 +48,6 @@ import com.geekorum.geekdroid.views.banners.buildBanner
 import com.geekorum.ttrss.ArticlesListDirections
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.article_details.ArticleDetailActivity
-import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.databinding.ActivityArticleListBinding
 import com.geekorum.ttrss.in_app_update.InAppUpdateViewModel
@@ -92,7 +91,8 @@ class ArticleListActivity : SessionActivity() {
         })
 
         activityViewModel.articleSelectedEvent.observe(this, EventObserver { (position, article) ->
-            onArticleSelected(position, article)
+            val articleUri = ContentUris.withAppendedId(ArticlesContract.Article.CONTENT_URI, article.id)
+            navController.navigate(ArticlesListFragmentDirections.actionShowArticle(articleUri))
         })
 
         accountViewModel.selectedAccount.observe(this, Observer { account ->
@@ -250,15 +250,6 @@ class ArticleListActivity : SessionActivity() {
                 return true
             }
         })
-    }
-
-    private fun onArticleSelected(position: Int, item: Article) {
-        val articleUri = ContentUris.withAppendedId(ArticlesContract.Article.CONTENT_URI, item.id)
-        val intent = Intent(this, ArticleDetailActivity::class.java).apply {
-            action = Intent.ACTION_VIEW
-            data = articleUri
-        }
-        startActivity(intent)
     }
 
     private fun bindFeedInformation(feed: Feed?) {
