@@ -166,7 +166,7 @@ class ArticleListActivity : SessionActivity() {
             supportFragmentManager.commit {
                 replace<FeedListFragment>(R.id.start_pane_layout, FRAGMENT_FEEDS_LIST)
             }
-            activityViewModel.setSelectedFeed(Feed.FEED_ID_ALL_ARTICLES)
+            activityViewModel.setSelectedFeed(Feed.createVirtualFeedForId(Feed.FEED_ID_ALL_ARTICLES))
         }
         setupToolbar()
         setUpEdgeToEdge()
@@ -283,7 +283,8 @@ class ArticleListActivity : SessionActivity() {
         binding.toolbar.title = title
     }
 
-    private fun onFeedSelected(feedId: Long) {
+    private fun onFeedSelected(feed: Feed) {
+        val feedId =  feed.id
         navigateUpToList()
         supportFragmentManager.commit {
             replace<ArticlesListFragment>(R.id.middle_pane_layout, FRAGMENT_FEEDS_LIST, bundleOf(

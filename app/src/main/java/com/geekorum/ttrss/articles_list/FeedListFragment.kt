@@ -229,7 +229,7 @@ constructor(
         // find feed
         val feedFound = currentFeeds?.find { it.id == item.itemId.toLong() }
         feedFound?.let {
-            activityViewModel.setSelectedFeed(it.id)
+            activityViewModel.setSelectedFeed(it)
             return true
         }
         return false
