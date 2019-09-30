@@ -28,4 +28,5 @@
     <color name="app_icon_flavor_background">@color/material_grey_300</color>
 
     <bool name="dev_show_manage_features">false</bool>
+    <string name="article_details_data_pattern">content://com.geekorum.ttrss.providers.articles/{article_id}</string>
 </resources>

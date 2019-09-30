@@ -41,8 +41,10 @@
 
     <string name="title_article_list">Articles</string>
     <string name="title_article_search">Search</string>
-    <string name="title_article_detail">Articles detail</string>
     <string name="label_feed_name">{feed_name}</string>
+
+    <!-- activity article details -->
+    <string name="title_article_details">Article details</string>
 
     <string name="drawer_open">Open drawer</string>
     <string name="drawer_close">Close drawer</string>

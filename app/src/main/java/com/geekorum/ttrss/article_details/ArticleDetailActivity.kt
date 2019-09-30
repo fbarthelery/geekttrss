@@ -31,7 +31,6 @@ import androidx.core.view.marginBottom
 import androidx.core.view.updateLayoutParams
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.commit
-import androidx.navigation.navArgs
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.articles_list.ArticleListActivity
 import com.geekorum.ttrss.databinding.ActivityArticleDetailBinding
@@ -50,7 +49,6 @@ class ArticleDetailActivity : SessionActivity() {
     private lateinit var binding: ActivityArticleDetailBinding
 
     private val articleDetailsViewModel: ArticleDetailsViewModel by viewModels()
-    private val args: ArticleDetailActivityArgs by navArgs()
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,7 +64,7 @@ class ArticleDetailActivity : SessionActivity() {
         actionBar.setDisplayShowTitleEnabled(false)
         actionBar.setDisplayHomeAsUpEnabled(true)
 
-        val articleUri = intent.data ?: args.articleUri
+        val articleUri = intent.data
 
         if (savedInstanceState == null) {
             supportFragmentManager.commit {

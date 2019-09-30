@@ -46,10 +46,11 @@
 
     <activity android:id="@+id/articleDetailActivity"
             android:name="com.geekorum.ttrss.article_details.ArticleDetailActivity"
-            android:label="@string/title_article_detail"
+            android:label="@string/title_article_details"
             app:action="android.intent.action.VIEW"
+            app:dataPattern="@string/article_details_data_pattern"
             tools:layout="@layout/activity_article_detail" >
-        <argument android:name="article_uri" app:argType="android.net.Uri" />
+        <argument android:name="article_id" app:argType="long" />
     </activity>
 
     <action android:id="@+id/action_show_feed"

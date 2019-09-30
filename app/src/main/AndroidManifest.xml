@@ -59,7 +59,7 @@
 
         <activity
             android:name="com.geekorum.ttrss.article_details.ArticleDetailActivity"
-            android:label="@string/title_article_detail"
+            android:label="@string/title_article_details"
             android:parentActivityName="com.geekorum.ttrss.articles_list.ArticleListActivity"
             android:theme="@style/AppTheme.ArticleDetailActivity">
             <intent-filter tools:ignore="AppLinkUrlError">

@@ -91,8 +91,7 @@ class ArticleListActivity : SessionActivity() {
         })
 
         activityViewModel.articleSelectedEvent.observe(this, EventObserver { (position, article) ->
-            val articleUri = ContentUris.withAppendedId(ArticlesContract.Article.CONTENT_URI, article.id)
-            navController.navigate(ArticlesListFragmentDirections.actionShowArticle(articleUri))
+            navController.navigate(ArticlesListFragmentDirections.actionShowArticle(article.id))
         })
 
         accountViewModel.selectedAccount.observe(this, Observer { account ->

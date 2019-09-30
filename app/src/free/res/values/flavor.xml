@@ -27,4 +27,5 @@
     <string name="sync_adapter_content_authority">com.geekorum.ttrss.free.providers.articles</string>
     <color name="app_icon_flavor_background">@color/material_light_green_200</color>
 
+    <string name="article_details_data_pattern">content://com.geekorum.ttrss.free.providers.articles/{article_id}</string>
 </resources>
