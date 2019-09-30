@@ -22,35 +22,42 @@ package com.geekorum.ttrss.articles_list
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.switchMap
+import com.geekorum.geekdroid.dagger.ViewModelAssistedFactory
 import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.webapi.ApiCallException
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
+
+private const val STATE_ONLY_UNREAD = "only_unread"
+private const val STATE_SELECTED_CATEGORY_ID = "selected_category_id"
 
 /**
  * [ViewModel] for [FeedListFragment]
  */
-class FeedsViewModel @Inject constructor(
+class FeedsViewModel @AssistedInject constructor(
+    @Assisted private val state: SavedStateHandle,
     private val feedsRepository: FeedsRepository,
     private val apiService: ApiService
 ) : ViewModel() {
 
-    private val onlyUnread = MutableLiveData<Boolean>().apply { value = true }
+    private val onlyUnread = state.getLiveData(STATE_ONLY_UNREAD, true)
 
     private val feedLiveData = onlyUnread.switchMap { onlyUnread ->
         if (onlyUnread) feedsRepository.allUnreadFeeds else feedsRepository.allFeeds
     }.refreshed()
 
-    private val selectedCategory = MutableLiveData<Long>()
+    private val selectedCategory = state.getLiveData<Long>(STATE_SELECTED_CATEGORY_ID)
 
     val allFeeds: LiveData<List<Feed>> = feedLiveData
 
@@ -71,11 +78,11 @@ class FeedsViewModel @Inject constructor(
     }.refreshed()
 
     fun setOnlyUnread(onlyUnread: Boolean) {
-        this.onlyUnread.value = onlyUnread
+        state[STATE_ONLY_UNREAD] = onlyUnread
     }
 
     fun setSelectedCategory(selectedCategoryId: Long) {
-        selectedCategory.value = selectedCategoryId
+        state[STATE_SELECTED_CATEGORY_ID] = selectedCategoryId
     }
 
     @Throws(ApiCallException::class)
@@ -100,4 +107,8 @@ class FeedsViewModel @Inject constructor(
         }
     }
 
+    @AssistedInject.Factory
+    interface Factory : ViewModelAssistedFactory<FeedsViewModel> {
+        override fun create(state: SavedStateHandle): FeedsViewModel
+    }
 }

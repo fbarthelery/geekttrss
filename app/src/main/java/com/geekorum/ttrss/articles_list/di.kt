@@ -95,7 +95,7 @@ private abstract class ArticlesListModule {
     @Binds
     @IntoMap
     @ViewModelKey(FeedsViewModel::class)
-    abstract fun getFeedsViewModel(feedsViewModel: FeedsViewModel): ViewModel
+    abstract fun getFeedsViewModel(feedsViewModel: FeedsViewModel.Factory): ViewModelAssistedFactory<out ViewModel>
 
     @Binds
     @IntoMap
