@@ -25,6 +25,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
+import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import com.geekorum.geekdroid.dagger.ViewModelAssistedFactory
 import com.geekorum.ttrss.data.Category
@@ -41,6 +42,7 @@ import timber.log.Timber
 
 private const val STATE_ONLY_UNREAD = "only_unread"
 private const val STATE_SELECTED_CATEGORY_ID = "selected_category_id"
+private const val STATE_SELECTED_FEED_ID = "selected_category_id"
 
 /**
  * [ViewModel] for [FeedListFragment]
@@ -61,6 +63,16 @@ class FeedsViewModel @AssistedInject constructor(
 
     val allFeeds: LiveData<List<Feed>> = feedLiveData
 
+    val feeds: LiveData<List<FeedView>> = onlyUnread.switchMap { onlyUnread ->
+        if (onlyUnread) feedsRepository.allUnreadFeeds else feedsRepository.allFeeds
+    }.map { feeds ->
+        // should be reactive on STATE_SELECTED_FEED_ID ?
+        feeds.map {
+            FeedView(it, it.id == state[STATE_SELECTED_FEED_ID])
+        }
+    }.refreshed()
+
+
     val feedsForCategory = selectedCategory.switchMap(this::getFeedsForCategory)
 
     private fun getFeedsForCategory(catId: Long) = onlyUnread.switchMap { onlyUnread ->
@@ -79,6 +91,10 @@ class FeedsViewModel @AssistedInject constructor(
 
     fun setOnlyUnread(onlyUnread: Boolean) {
         state[STATE_ONLY_UNREAD] = onlyUnread
+    }
+
+    fun setSelectedFeed(selectedFeedId: Long) {
+        state[STATE_SELECTED_FEED_ID] = selectedFeedId
     }
 
     fun setSelectedCategory(selectedCategoryId: Long) {
@@ -106,6 +122,8 @@ class FeedsViewModel @AssistedInject constructor(
             Timber.w(e, "Unable to refresh feeds and categories")
         }
     }
+
+    data class FeedView(val feed: Feed, val isSelected: Boolean)
 
     @AssistedInject.Factory
     interface Factory : ViewModelAssistedFactory<FeedsViewModel> {

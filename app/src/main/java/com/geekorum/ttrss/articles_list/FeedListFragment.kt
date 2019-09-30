@@ -66,7 +66,6 @@ constructor(
 ) : BaseFragment(savedStateVmFactoryCreator), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var binding: FragmentFeedsBinding
-    private var currentFeeds: List<Feed>? = null
     private var categoriesDisplayed: Boolean = false
     private val feedsViewModel: FeedsViewModel by viewModels()
     private val activityViewModel: ActivityViewModel by activityViewModels()
@@ -112,16 +111,13 @@ constructor(
                 binding.navigationView.inflateMenu(R.menu.fragment_feed_list)
             }
         } else {
-            feedsViewModel.allFeeds.observe(viewLifecycleOwner) { feeds ->
-                currentFeeds = feeds
-                transformFeedsInMenuEntry(binding.navigationView.menu, feeds)
+            feedsViewModel.feeds.observe(viewLifecycleOwner) { feeds ->
+                transformFeedViewsInMenuEntry(binding.navigationView.menu, feeds)
                 binding.navigationView.inflateMenu(R.menu.fragment_feed_list)
             }
         }
         activityViewModel.selectedFeed.observe(viewLifecycleOwner) { feed ->
-            val menu = binding.navigationView.menu
-            val item = feed?.let { menu.findItem(it.id.toInt()) }
-            item?.isChecked = true
+            feed?.let { feedsViewModel.setSelectedFeed(it.id) }
         }
 
         accountViewModel.selectedAccount.observe(viewLifecycleOwner) { account ->
@@ -157,9 +153,34 @@ constructor(
             setMenuItemUnreadCount(it, menuItem)
             menuItem.isCheckable = true
             menuItem.isChecked = currentFeed?.id == it.id
+            menuItem.feed = it
         }
         categoriesDisplayed = false
     }
+
+    private fun transformFeedViewsInMenuEntry(menu: Menu, feeds: List<FeedsViewModel.FeedView>) {
+        menu.clear()
+        feeds.forEach {
+            val title = if (it.feed.displayTitle.isEmpty()) it.feed.title else it.feed.displayTitle
+            val feedId = it.feed.id.toInt()
+            val menuItem = if (feedId < 0) {
+                menu.add(Menu.NONE, feedId, 0, title)
+            } else {
+                menu.add(MENU_GROUP_ID_SPECIAL, feedId, 0, title)
+            }
+            setMenuItemIcon(it.feed, menuItem)
+            setMenuItemUnreadCount(it.feed, menuItem)
+            menuItem.isCheckable = true
+            menuItem.isChecked = it.isSelected
+            menuItem.feed = it.feed
+        }
+        categoriesDisplayed = false
+    }
+
+    private var MenuItem.feed: Feed?
+        get() = actionView?.tag as? Feed
+        set(value) { actionView.tag = value }
+
 
     private fun transformCategoriesInMenuEntry(menu: Menu, categories: List<Category>) {
         menu.clear()
@@ -224,11 +245,7 @@ constructor(
     }
 
     private fun onFeedSelected(item: MenuItem): Boolean {
-        val browseCatsLikeFeeds = preferences.getBoolean("browse_cats_like_feeds", false)
-
-        // find feed
-        val feedFound = currentFeeds?.find { it.id == item.itemId.toLong() }
-        feedFound?.let {
+        item.feed?.let {
             activityViewModel.setSelectedFeed(it)
             return true
         }
@@ -242,7 +259,6 @@ constructor(
         if (feedsForCategory == null) {
             feedsForCategory = feedsViewModel.feedsForCategory
             feedsForCategory!!.observe(viewLifecycleOwner) { feeds ->
-                currentFeeds = feeds
                 transformFeedsInMenuEntry(binding.navigationView.menu, feeds)
             }
         }
