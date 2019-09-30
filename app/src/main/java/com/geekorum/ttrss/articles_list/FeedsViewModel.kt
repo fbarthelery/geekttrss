@@ -55,13 +55,7 @@ class FeedsViewModel @AssistedInject constructor(
 
     private val onlyUnread = state.getLiveData(STATE_ONLY_UNREAD, true)
 
-    private val feedLiveData = onlyUnread.switchMap { onlyUnread ->
-        if (onlyUnread) feedsRepository.allUnreadFeeds else feedsRepository.allFeeds
-    }.refreshed()
-
     private val selectedCategory = state.getLiveData<Long>(STATE_SELECTED_CATEGORY_ID)
-
-    val allFeeds: LiveData<List<Feed>> = feedLiveData
 
     val feeds: LiveData<List<FeedView>> = onlyUnread.switchMap { onlyUnread ->
         if (onlyUnread) feedsRepository.allUnreadFeeds else feedsRepository.allFeeds

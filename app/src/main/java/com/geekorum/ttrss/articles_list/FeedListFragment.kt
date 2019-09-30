@@ -36,14 +36,12 @@ import androidx.core.app.ActivityCompat
 import androidx.core.view.get
 import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.observe
 import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
 import com.geekorum.ttrss.BaseFragment
 import com.geekorum.ttrss.Features
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.activityViewModels
-import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.databinding.FragmentFeedsBinding
 import com.geekorum.ttrss.databinding.MenuFeedActionViewBinding
@@ -66,10 +64,8 @@ constructor(
 ) : BaseFragment(savedStateVmFactoryCreator), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var binding: FragmentFeedsBinding
-    private var categoriesDisplayed: Boolean = false
     private val feedsViewModel: FeedsViewModel by viewModels()
     private val activityViewModel: ActivityViewModel by activityViewModels()
-    private var feedsForCategory: LiveData<List<Feed>>? = null
     private val accountViewModel: TtrssAccountViewModel by activityViewModels()
 
     private val isManageFeedInstalled: Boolean
@@ -102,20 +98,11 @@ constructor(
     private fun setupViewModels() {
         val showUnreadOnly = preferences.getBoolean("show_unread_only", true)
         feedsViewModel.setOnlyUnread(showUnreadOnly)
-
-        categoriesDisplayed = preferences.getBoolean("enable_cats", false)
-        //        categoriesDisplayed = true;
-        if (categoriesDisplayed) {
-            feedsViewModel.categories.observe(viewLifecycleOwner) { categories ->
-                transformCategoriesInMenuEntry(binding.navigationView.menu, categories)
-                binding.navigationView.inflateMenu(R.menu.fragment_feed_list)
-            }
-        } else {
-            feedsViewModel.feeds.observe(viewLifecycleOwner) { feeds ->
-                transformFeedViewsInMenuEntry(binding.navigationView.menu, feeds)
-                binding.navigationView.inflateMenu(R.menu.fragment_feed_list)
-            }
+        feedsViewModel.feeds.observe(viewLifecycleOwner) { feeds ->
+            transformFeedViewsInMenuEntry(binding.navigationView.menu, feeds)
+            binding.navigationView.inflateMenu(R.menu.fragment_feed_list)
         }
+
         activityViewModel.selectedFeed.observe(viewLifecycleOwner) { feed ->
             feed?.let { feedsViewModel.setSelectedFeed(it.id) }
         }
@@ -155,7 +142,6 @@ constructor(
             menuItem.isChecked = currentFeed?.id == it.id
             menuItem.feed = it
         }
-        categoriesDisplayed = false
     }
 
     private fun transformFeedViewsInMenuEntry(menu: Menu, feeds: List<FeedsViewModel.FeedView>) {
@@ -174,7 +160,6 @@ constructor(
             menuItem.isChecked = it.isSelected
             menuItem.feed = it.feed
         }
-        categoriesDisplayed = false
     }
 
     private var MenuItem.feed: Feed?
@@ -182,33 +167,12 @@ constructor(
         set(value) { actionView.tag = value }
 
 
-    private fun transformCategoriesInMenuEntry(menu: Menu, categories: List<Category>) {
-        menu.clear()
-        categories.forEach {
-            val menuItem = menu.add(Menu.NONE, it.id.toInt(), Menu.NONE, it.title)
-            setMenuItemIcon(it, menuItem)
-            setMenuItemUnreadCount(it, menuItem)
-            menuItem.isCheckable = true
-        }
-        categoriesDisplayed = true
-    }
-
     private fun setMenuItemUnreadCount(feed: Feed, menuItem: MenuItem) {
         val layoutInflater = LayoutInflater.from(context)
         val menuView = MenuFeedActionViewBinding.inflate(layoutInflater,
             null, false).apply {
             unreadCounter.text = feed.unreadCount.toString()
             unreadCounter.visibility = if (feed.unreadCount > 0) View.VISIBLE else View.INVISIBLE
-        }
-        menuItem.actionView = menuView.root
-    }
-
-    private fun setMenuItemUnreadCount(category: Category, menuItem: MenuItem) {
-        //TODO
-        val layoutInflater = LayoutInflater.from(context)
-        val menuView = MenuFeedActionViewBinding.inflate(layoutInflater, null, false).apply {
-            unreadCounter.text = category.unreadCount.toString()
-            unreadCounter.visibility = if (category.unreadCount > 0) View.VISIBLE else View.INVISIBLE
         }
         menuItem.actionView = menuView.root
     }
@@ -225,17 +189,12 @@ constructor(
         menuItem.setIcon(iconRes)
     }
 
-    private fun setMenuItemIcon(category: Category, menuItem: MenuItem) {
-        menuItem.setIcon(R.drawable.ic_folder_outline)
-    }
-
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         return when {
             item.itemId == R.id.manage_feeds -> {
                 installOrStartManageFeed()
                 true
             }
-            categoriesDisplayed -> onCategoriesSelected(item)
             item.itemId == R.id.settings -> {
                 navigateToSettings()
                 true
@@ -247,37 +206,6 @@ constructor(
     private fun onFeedSelected(item: MenuItem): Boolean {
         item.feed?.let {
             activityViewModel.setSelectedFeed(it)
-            return true
-        }
-        return false
-    }
-
-    private fun displayFeedCategory(category: Category) {
-        categoriesDisplayed = false
-
-        feedsViewModel.setSelectedCategory(category.id)
-        if (feedsForCategory == null) {
-            feedsForCategory = feedsViewModel.feedsForCategory
-            feedsForCategory!!.observe(viewLifecycleOwner) { feeds ->
-                transformFeedsInMenuEntry(binding.navigationView.menu, feeds)
-            }
-        }
-    }
-
-    private fun onCategoriesSelected(item: MenuItem): Boolean {
-        val browseCatsLikeFeeds = preferences.getBoolean("browse_cats_like_feeds", false)
-
-        // find categories
-        //TODO
-        val category = feedsViewModel.categories.value?.find { it.id == item.itemId.toLong() }
-        category?.let {
-            if (browseCatsLikeFeeds && false) { //TODO make this work but for now just disable this option
-                val feed = Feed(id = it.id, title = it.title)
-                // TODO is cat = true);
-                // activityViewModel.setSelectedFeed(feed);
-            } else {
-                displayFeedCategory(category)
-            }
             return true
         }
         return false
