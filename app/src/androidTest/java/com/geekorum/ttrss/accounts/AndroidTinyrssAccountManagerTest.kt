@@ -99,6 +99,7 @@ class AndroidTinyrssAccountManagerTest {
 
         val fullExtra = Bundle().apply {
             putInt(SyncContract.EXTRA_NUMBER_OF_LATEST_ARTICLES_TO_REFRESH, -1)
+            putBoolean(SyncContract.EXTRA_UPDATE_FEED_ICONS, true)
         }
         val periodicFullRefreshSync = PeriodicSync(androidAccount, ArticlesContract.AUTHORITY, fullExtra,
             BackgroundJobManager.PERIODIC_FULL_REFRESH_JOB_INTERVAL_S)
