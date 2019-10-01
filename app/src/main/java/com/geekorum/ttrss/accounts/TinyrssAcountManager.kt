@@ -98,6 +98,7 @@ class AndroidTinyrssAccountManager @Inject constructor(
     override fun initializeAccountSync(account: Account) {
         val extras = Bundle()
         extras.putInt(SyncContract.EXTRA_NUMBER_OF_LATEST_ARTICLES_TO_REFRESH, -1)
+        extras.putBoolean(SyncContract.EXTRA_UPDATE_FEED_ICONS, true)
         android.accounts.Account(account.username, ACCOUNT_TYPE).also {
             ContentResolver.setSyncAutomatically(it, ArticlesContract.AUTHORITY, true)
             ContentResolver.addPeriodicSync(it, ArticlesContract.AUTHORITY, Bundle(),

@@ -36,6 +36,7 @@ import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.sync.SyncContract.EXTRA_FEED_ID
 import com.geekorum.ttrss.sync.SyncContract.EXTRA_NUMBER_OF_LATEST_ARTICLES_TO_REFRESH
+import com.geekorum.ttrss.sync.SyncContract.EXTRA_UPDATE_FEED_ICONS
 import com.geekorum.ttrss.webapi.ApiCallException
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
@@ -78,6 +79,7 @@ class ArticleSynchronizer @AssistedInject constructor(
     }
 
     private val numberOfLatestArticlesToRefresh = params.getInt(EXTRA_NUMBER_OF_LATEST_ARTICLES_TO_REFRESH, 500)
+    private val updateFeedIcons = params.getBoolean(EXTRA_UPDATE_FEED_ICONS, false)
     private val feedId = params.getLong(EXTRA_FEED_ID, ApiService.ALL_ARTICLES_FEED_ID)
 
     private suspend fun getLatestArticleId(): Long {
@@ -95,7 +97,9 @@ class ArticleSynchronizer @AssistedInject constructor(
             synchronizeFeeds()
             collectNewArticles()
             updateArticlesStatus()
-            feedIconSynchronizer.synchronizeFeedIcons()
+            if (updateFeedIcons) {
+                feedIconSynchronizer.synchronizeFeedIcons()
+            }
         } catch (e: ApiCallException) {
             Timber.w(e, "unable to synchronize articles")
         } catch (e: RemoteException) {

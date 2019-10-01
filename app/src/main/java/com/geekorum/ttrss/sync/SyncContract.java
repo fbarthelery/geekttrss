@@ -41,4 +41,9 @@ public final class SyncContract {
      */
     public static final String EXTRA_FEED_ID = "feedId";
 
+    /**
+     * Should synchronization also update Feed icon. default: no
+     * Type: Boolean
+     */
+    public static final String EXTRA_UPDATE_FEED_ICONS = "updateFeedIcons";
 }
