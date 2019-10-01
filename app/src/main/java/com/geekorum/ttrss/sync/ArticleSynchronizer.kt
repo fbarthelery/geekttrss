@@ -43,6 +43,7 @@ import com.squareup.inject.assisted.AssistedInject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -92,13 +93,15 @@ class ArticleSynchronizer @AssistedInject constructor(
 
     override suspend fun sync() {
         try {
-            updateAccountInfo()
-            sendTransactions()
-            synchronizeFeeds()
-            collectNewArticles()
-            updateArticlesStatus()
-            if (updateFeedIcons) {
-                feedIconSynchronizer.synchronizeFeedIcons()
+            coroutineScope {
+                updateAccountInfo()
+                sendTransactions()
+                synchronizeFeeds()
+                if (updateFeedIcons) {
+                    launch { feedIconSynchronizer.synchronizeFeedIcons() }
+                }
+                collectNewArticles()
+                updateArticlesStatus()
             }
         } catch (e: ApiCallException) {
             Timber.w(e, "unable to synchronize articles")
@@ -293,20 +296,46 @@ class ArticleSynchronizer @AssistedInject constructor(
     }
 
     @Throws(ApiCallException::class)
-    private suspend fun updateArticlesStatus() {
+    private suspend fun updateArticlesStatus() = coroutineScope {
         Timber.i("Updating old articles status")
-        var offset = 0
-        fun shouldGetMore(): Boolean {
-            return if (numberOfLatestArticlesToRefresh < 0) true
-            else offset < numberOfLatestArticlesToRefresh
+        val capacity = 5
+        val newRequestChannel = Channel<Int>(capacity)
+        val orchestratorChannel = Channel<Int>()
+
+        launch {
+            var offset = 0
+            fun shouldGetMore(): Boolean {
+                return if (numberOfLatestArticlesToRefresh < 0) true
+                else offset < numberOfLatestArticlesToRefresh
+            }
+
+            while (newRequestChannel.offer(offset)) {
+                offset += 50
+            }
+
+            for (articlesFetched in orchestratorChannel) {
+                if (articlesFetched == 0 || !shouldGetMore()) {
+                    newRequestChannel.close()
+                } else {
+                    newRequestChannel.send(offset)
+                    offset += 50
+                }
+            }
         }
 
-        var articles = getArticles(feedId, 0, offset, showExcerpt = false, showContent = false)
-        while (articles.isNotEmpty() && shouldGetMore()) {
-            updateArticleMetadata(articles)
-            offset += articles.size
-            articles = getArticles(feedId, 0, offset, showExcerpt = false, showContent = false)
+        coroutineScope {
+            repeat(capacity) {
+                launch(Dispatchers.IO) {
+                    for (offsetForRequest in newRequestChannel) {
+                        val articles = getArticles(feedId, 0, offsetForRequest, showExcerpt = false,
+                            showContent = false)
+                        updateArticleMetadata(articles)
+                        orchestratorChannel.send(articles.size)
+                    }
+                }
+            }
         }
+        orchestratorChannel.close()
     }
 
     @Throws(ApiCallException::class)
