@@ -27,7 +27,6 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
@@ -42,9 +41,7 @@ import com.geekorum.ttrss.BaseFragment
 import com.geekorum.ttrss.Features
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.activityViewModels
-import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.databinding.FragmentFeedsBinding
-import com.geekorum.ttrss.databinding.MenuFeedActionViewBinding
 import com.geekorum.ttrss.doOnApplyWindowInsets
 import com.geekorum.ttrss.on_demand_modules.OnDemandModuleManager
 import com.geekorum.ttrss.settings.SettingsActivity
@@ -64,6 +61,8 @@ constructor(
 ) : BaseFragment(savedStateVmFactoryCreator), NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var binding: FragmentFeedsBinding
+    private lateinit var feedNavigationPresenter: FeedsNavigationMenuPresenter
+
     private val feedsViewModel: FeedsViewModel by viewModels()
     private val activityViewModel: ActivityViewModel by activityViewModels()
     private val accountViewModel: TtrssAccountViewModel by activityViewModels()
@@ -80,9 +79,19 @@ constructor(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        binding.navigationView.setNavigationItemSelectedListener(this)
+        setUpNavigationView()
         setUpEdgeToEdge()
         setupViewModels()
+    }
+
+    private fun setUpNavigationView() {
+        binding.navigationView.setNavigationItemSelectedListener(this)
+        val feedsMenu = binding.navigationView.menu.addSubMenu(R.string.title_feeds_menu)
+        binding.navigationView.inflateMenu(R.menu.fragment_feed_list)
+
+        feedNavigationPresenter =
+            FeedsNavigationMenuPresenter(viewLifecycleOwner, binding.navigationView, feedsViewModel,
+                activityViewModel, feedsMenu)
     }
 
     private fun setUpEdgeToEdge() {
@@ -98,10 +107,6 @@ constructor(
     private fun setupViewModels() {
         val showUnreadOnly = preferences.getBoolean("show_unread_only", true)
         feedsViewModel.setOnlyUnread(showUnreadOnly)
-        feedsViewModel.feeds.observe(viewLifecycleOwner) { feeds ->
-            transformFeedViewsInMenuEntry(binding.navigationView.menu, feeds)
-            binding.navigationView.inflateMenu(R.menu.fragment_feed_list)
-        }
 
         activityViewModel.selectedFeed.observe(viewLifecycleOwner) { feed ->
             feed?.let { feedsViewModel.setSelectedFeed(it.id) }
@@ -125,70 +130,6 @@ constructor(
         ActivityCompat.startActivity(requireActivity(), intent, null)
     }
 
-    private fun transformFeedsInMenuEntry(menu: Menu, feeds: List<Feed>) {
-        menu.clear()
-        val currentFeed = activityViewModel.selectedFeed.value
-        feeds.forEach {
-            val title = if (it.displayTitle.isEmpty()) it.title else it.displayTitle
-            val feedId = it.id.toInt()
-            val menuItem = if (feedId < 0) {
-                menu.add(Menu.NONE, feedId, 0, title)
-            } else {
-                menu.add(MENU_GROUP_ID_SPECIAL, feedId, 0, title)
-            }
-            setMenuItemIcon(it, menuItem)
-            setMenuItemUnreadCount(it, menuItem)
-            menuItem.isCheckable = true
-            menuItem.isChecked = currentFeed?.id == it.id
-            menuItem.feed = it
-        }
-    }
-
-    private fun transformFeedViewsInMenuEntry(menu: Menu, feeds: List<FeedsViewModel.FeedView>) {
-        menu.clear()
-        feeds.forEach {
-            val title = if (it.feed.displayTitle.isEmpty()) it.feed.title else it.feed.displayTitle
-            val feedId = it.feed.id.toInt()
-            val menuItem = if (feedId < 0) {
-                menu.add(Menu.NONE, feedId, 0, title)
-            } else {
-                menu.add(MENU_GROUP_ID_SPECIAL, feedId, 0, title)
-            }
-            setMenuItemIcon(it.feed, menuItem)
-            setMenuItemUnreadCount(it.feed, menuItem)
-            menuItem.isCheckable = true
-            menuItem.isChecked = it.isSelected
-            menuItem.feed = it.feed
-        }
-    }
-
-    private var MenuItem.feed: Feed?
-        get() = actionView?.tag as? Feed
-        set(value) { actionView.tag = value }
-
-
-    private fun setMenuItemUnreadCount(feed: Feed, menuItem: MenuItem) {
-        val layoutInflater = LayoutInflater.from(context)
-        val menuView = MenuFeedActionViewBinding.inflate(layoutInflater,
-            null, false).apply {
-            unreadCounter.text = feed.unreadCount.toString()
-            unreadCounter.visibility = if (feed.unreadCount > 0) View.VISIBLE else View.INVISIBLE
-        }
-        menuItem.actionView = menuView.root
-    }
-
-    private fun setMenuItemIcon(feed: Feed, menuItem: MenuItem) {
-        val iconRes = when {
-            feed.isArchivedFeed -> R.drawable.ic_archive
-            feed.isStarredFeed -> R.drawable.ic_star
-            feed.isPublishedFeed -> R.drawable.ic_checkbox_marked
-            feed.isFreshFeed -> R.drawable.ic_coffee
-            feed.isAllArticlesFeed -> R.drawable.ic_folder_outline
-            else -> R.drawable.ic_rss_box
-        }
-        menuItem.setIcon(iconRes)
-    }
-
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         return when {
             item.itemId == R.id.manage_feeds -> {
@@ -199,16 +140,8 @@ constructor(
                 navigateToSettings()
                 true
             }
-            else -> onFeedSelected(item)
+            else -> feedNavigationPresenter.onFeedSelected(item)
         }
-    }
-
-    private fun onFeedSelected(item: MenuItem): Boolean {
-        item.feed?.let {
-            activityViewModel.setSelectedFeed(it)
-            return true
-        }
-        return false
     }
 
     private fun installOrStartManageFeed() {
@@ -242,7 +175,6 @@ constructor(
     }
 
     companion object {
-        private const val MENU_GROUP_ID_SPECIAL = 1
         private const val CODE_INSTALL_MANAGE_FEED = 1
     }
 

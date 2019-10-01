@@ -45,6 +45,7 @@
 
     <!-- activity article details -->
     <string name="title_article_details">Article details</string>
+    <string name="title_feeds_menu">Feeds</string>
 
     <string name="drawer_open">Open drawer</string>
     <string name="drawer_close">Close drawer</string>
