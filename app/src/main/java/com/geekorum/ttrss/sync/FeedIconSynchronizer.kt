@@ -25,6 +25,16 @@ import com.geekorum.favikonsnoop.FaviKonSnoop
 import com.geekorum.favikonsnoop.FaviconInfo
 import com.geekorum.favikonsnoop.FixedDimension
 import com.geekorum.ttrss.data.Feed
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.Call
 import okhttp3.Callback
@@ -38,9 +48,12 @@ import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
+private const val NB_LOOKUP_COROUTINES = 5
+
 /**
  * Update icon's url for every feed.
  */
+@UseExperimental(ExperimentalCoroutinesApi::class)
 class FeedIconSynchronizer @Inject constructor(
     private val databaseService: DatabaseService,
     private val faviKonSnoop: FaviKonSnoop,
@@ -49,16 +62,33 @@ class FeedIconSynchronizer @Inject constructor(
 ) {
 
     suspend fun synchronizeFeedIcons() {
-        databaseService.getFeeds().forEach {
-            try {
-                updateFeedIcon(it)
-            } catch (e: IOException) {
-                Timber.w(e,"Unable to update feed icon for feed ${it.title}")
-            }
+        coroutineScope {
+            val feedChannel = Channel<Feed>()
+            databaseService.getFeeds().asFlow()
+                .onEach { feedChannel.send(it) }
+                .onCompletion { feedChannel.close() }
+                .launchIn(this)
+
+            dispatchUpdateFeedIcons(feedChannel)
         }
+
         // now update cache
         databaseService.getFeeds().forEach {
             httpCacher.cacheHttpRequest(it.feedIconUrl)
+        }
+    }
+
+    private fun CoroutineScope.dispatchUpdateFeedIcons(feedChannel: Channel<Feed>) {
+        repeat(NB_LOOKUP_COROUTINES) {
+            launch(Dispatchers.IO) {
+                for (feed in feedChannel) {
+                    try {
+                        updateFeedIcon(feed)
+                    } catch (e: IOException) {
+                        Timber.w(e, "Unable to update feed icon for feed ${feed.title}")
+                    }
+                }
+            }
         }
     }
 
