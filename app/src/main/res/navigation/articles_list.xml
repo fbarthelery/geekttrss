@@ -42,7 +42,10 @@
     <fragment android:id="@+id/articlesSearchFragment"
             android:name="com.geekorum.ttrss.articles_list.search.ArticlesSearchFragment"
             android:label="@string/title_article_search"
-            tools:layout="@layout/fragment_articles_search" />
+            tools:layout="@layout/fragment_articles_search" >
+        <action android:id="@+id/action_show_article"
+                app:destination="@id/articleDetailActivity"/>
+    </fragment>
 
     <activity android:id="@+id/articleDetailActivity"
             android:name="com.geekorum.ttrss.article_details.ArticleDetailActivity"
