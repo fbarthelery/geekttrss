@@ -38,11 +38,11 @@ private const val MENU_GROUP_ID_SPECIAL = 1
  * Display the feeds in a NavigationView menu.
  */
 class FeedsNavigationMenuPresenter(
-    private val lifeCycleOwner: LifecycleOwner,
     view: NavigationView,
+    private val menu: Menu,
+    private val lifeCycleOwner: LifecycleOwner,
     private val feedsViewModel: FeedsViewModel,
-    private val activityViewModel: ActivityViewModel,
-    private val menu: Menu
+    private val activityViewModel: ActivityViewModel
 ) {
 
     private val layoutInflater = LayoutInflater.from(view.context)

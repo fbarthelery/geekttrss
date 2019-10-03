@@ -30,7 +30,6 @@ import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.core.view.get
 import androidx.core.view.updatePadding
@@ -62,6 +61,7 @@ constructor(
 
     private lateinit var binding: FragmentFeedsBinding
     private lateinit var feedNavigationPresenter: FeedsNavigationMenuPresenter
+    private lateinit var accountHeaderPresenter: AccountHeaderPresenter
 
     private val feedsViewModel: FeedsViewModel by viewModels()
     private val activityViewModel: ActivityViewModel by activityViewModels()
@@ -90,8 +90,12 @@ constructor(
         binding.navigationView.inflateMenu(R.menu.fragment_feed_list)
 
         feedNavigationPresenter =
-            FeedsNavigationMenuPresenter(viewLifecycleOwner, binding.navigationView, feedsViewModel,
-                activityViewModel, feedsMenu)
+            FeedsNavigationMenuPresenter(binding.navigationView, feedsMenu, viewLifecycleOwner, feedsViewModel,
+                activityViewModel)
+
+        val headerView = binding.navigationView.getHeaderView(0)
+        accountHeaderPresenter = AccountHeaderPresenter(headerView, viewLifecycleOwner,
+            accountViewModel)
     }
 
     private fun setUpEdgeToEdge() {
@@ -110,18 +114,6 @@ constructor(
 
         activityViewModel.selectedFeed.observe(viewLifecycleOwner) { feed ->
             feed?.let { feedsViewModel.setSelectedFeed(it.id) }
-        }
-
-        accountViewModel.selectedAccount.observe(viewLifecycleOwner) { account ->
-            val headerView = binding.navigationView.getHeaderView(0)
-            val login = headerView.findViewById<TextView>(R.id.drawer_header_login)
-            login.text = account.name
-        }
-
-        accountViewModel.selectedAccountHost.observe(viewLifecycleOwner) { host ->
-            val headerView = binding.navigationView.getHeaderView(0)
-            val server = headerView.findViewById<TextView>(R.id.drawer_header_server)
-            server.text = host
         }
     }
 
