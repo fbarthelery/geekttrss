@@ -20,19 +20,14 @@
  */
 package com.geekorum.ttrss.articles_list
 
-import android.app.Activity
-import android.content.ContentUris
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.widget.SearchView
-import androidx.core.graphics.drawable.IconCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.doOnNextLayout
-import androidx.core.view.updatePadding
 import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.commit
@@ -43,18 +38,14 @@ import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
-import com.geekorum.geekdroid.views.banners.BannerSpec
-import com.geekorum.geekdroid.views.banners.buildBanner
 import com.geekorum.ttrss.ArticlesListDirections
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.article_details.ArticleDetailActivity
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.databinding.ActivityArticleListBinding
 import com.geekorum.ttrss.in_app_update.InAppUpdateViewModel
-import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.session.SessionActivity
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import timber.log.Timber
 
 /**
@@ -68,7 +59,7 @@ import timber.log.Timber
 class ArticleListActivity : SessionActivity() {
     companion object {
         private const val FRAGMENT_FEEDS_LIST = "feeds_list"
-        private const val CODE_START_IN_APP_UPDATE = 1
+        internal const val CODE_START_IN_APP_UPDATE = 1
     }
 
     private lateinit var binding: ActivityArticleListBinding
@@ -80,6 +71,7 @@ class ArticleListActivity : SessionActivity() {
     private val activityViewModel: ActivityViewModel by viewModels()
     private val accountViewModel: TtrssAccountViewModel by viewModels()
     private val inAppUpdateViewModel: InAppUpdateViewModel by viewModels()
+    private lateinit var inAppUpdatePresenter: InAppUpdatePresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -106,49 +98,13 @@ class ArticleListActivity : SessionActivity() {
             finish()
         })
 
-        inAppUpdateViewModel.isUpdateAvailable.observe(this) {
-            if (it) {
-                Timber.d("Update available")
-                val banner = buildBanner(this) {
-                    messageId = R.string.banner_update_msg
-                    icon = IconCompat.createWithResource(this@ArticleListActivity,
-                        R.mipmap.ic_launcher)
-                    setPositiveButton(R.string.banner_update_btn) {
-                        inAppUpdateViewModel.startUpdateFlow(this@ArticleListActivity,
-                            CODE_START_IN_APP_UPDATE)
-                        hideBanner()
-                    }
-                    setNegativeButton(R.string.banner_dismiss_btn) {
-                        hideBanner()
-                    }
-                }
-
-                showBanner(banner)
-            }
-        }
-
-        inAppUpdateViewModel.isUpdateReadyToInstall.observe(this) {
-            if (it) {
-                Timber.d("Update ready to install")
-                val banner = buildBanner(this) {
-                    message = "Update ready to install"
-                    icon = IconCompat.createWithResource(this@ArticleListActivity,
-                        R.mipmap.ic_launcher)
-                    setPositiveButton("Restart") {
-                        hideBanner()
-                        inAppUpdateViewModel.completeUpdate()
-                    }
-                }
-
-                showBanner(banner)
-            }
-        }
-
         binding = DataBindingUtil.setContentView<ActivityArticleListBinding>(this,
             R.layout.activity_article_list).apply {
             lifecycleOwner = this@ArticleListActivity
             activityViewModel = this@ArticleListActivity.activityViewModel
         }
+
+        inAppUpdatePresenter = InAppUpdatePresenter(binding.bannerContainer, this, inAppUpdateViewModel)
 
         navController = findNavController(R.id.middle_pane_layout).apply {
             addOnDestinationChangedListener { controller, destination, arguments ->
@@ -207,9 +163,7 @@ class ArticleListActivity : SessionActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         Timber.d("activity result $requestCode result $resultCode")
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == CODE_START_IN_APP_UPDATE && resultCode != Activity.RESULT_OK) {
-            inAppUpdateViewModel.cancelUpdateFlow()
-        }
+        inAppUpdatePresenter.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun setupSearch() {
@@ -255,36 +209,4 @@ class ArticleListActivity : SessionActivity() {
         title = feed?.title ?: ""
     }
 
-    private fun showBanner(bannerSpec: BannerSpec) {
-        binding.bannerContainer.show(bannerSpec)
-        val behavior = BottomSheetBehavior.from(binding.bannerContainer)
-        behavior.state = BottomSheetBehavior.STATE_EXPANDED
-
-        // wait for expanded state to set non hideable
-        behavior.bottomSheetCallback = object : BottomSheetBehavior.BottomSheetCallback() {
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                // nothing to do
-            }
-
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-                    behavior.isHideable = false
-                    behavior.bottomSheetCallback = null
-                }
-            }
-        }
-
-        binding.root.doOnNextLayout {
-            val fragmentContainerView = supportFragmentManager.findFragmentById(R.id.middle_pane_layout)!!.requireView()
-            fragmentContainerView.updatePadding(bottom = binding.bannerContainer.height)
-        }
-    }
-
-    private fun hideBanner() {
-        val behavior = BottomSheetBehavior.from(binding.bannerContainer)
-        behavior.isHideable = true
-        behavior.state = BottomSheetBehavior.STATE_HIDDEN
-        val fragmentContainerView = supportFragmentManager.findFragmentById(R.id.middle_pane_layout)!!.requireView()
-        fragmentContainerView.updatePadding(bottom = 0)
-    }
 }
