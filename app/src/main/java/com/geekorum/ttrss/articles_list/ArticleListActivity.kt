@@ -22,10 +22,8 @@ package com.geekorum.ttrss.articles_list
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
-import androidx.appcompat.widget.SearchView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.databinding.DataBindingUtil
@@ -72,6 +70,7 @@ class ArticleListActivity : SessionActivity() {
     private val accountViewModel: TtrssAccountViewModel by viewModels()
     private val inAppUpdateViewModel: InAppUpdateViewModel by viewModels()
     private lateinit var inAppUpdatePresenter: InAppUpdatePresenter
+    private lateinit var searchToolbarPresenter: SearchToolbarPresenter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -171,38 +170,7 @@ class ArticleListActivity : SessionActivity() {
             inflateMenu(R.menu.activity_articles_list)
             menu.findItem(R.id.articles_search)
         }
-
-        navController.addOnDestinationChangedListener { controller, destination, arguments ->
-            when (destination.id) {
-                R.id.articlesListFragment -> if (searchItem.isActionViewExpanded) searchItem.collapseActionView()
-            }
-        }
-
-        searchItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
-            override fun onMenuItemActionExpand(item: MenuItem): Boolean {
-                navController.navigate(ArticlesListFragmentDirections.actionSearchArticle())
-                return true
-            }
-
-            override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
-                if (navController.currentDestination?.id == R.id.articlesSearchFragment)
-                    navController.popBackStack()
-                return true
-            }
-        })
-
-        val searchView = searchItem.actionView as SearchView
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String): Boolean {
-                activityViewModel.setSearchQuery(query)
-                return true
-            }
-
-            override fun onQueryTextChange(query: String): Boolean {
-                activityViewModel.setSearchQuery(query)
-                return true
-            }
-        })
+        searchToolbarPresenter = SearchToolbarPresenter(searchItem, navController, activityViewModel)
     }
 
     private fun bindFeedInformation(feed: Feed?) {
