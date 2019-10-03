@@ -37,6 +37,8 @@
                 app:destination="@id/articlesSearchFragment" />
         <action android:id="@+id/action_show_article"
                 app:destination="@id/articleDetailActivity"/>
+        <action android:id="@+id/action_show_settings"
+                app:destination="@id/settingsActivity" />
     </fragment>
 
     <fragment android:id="@+id/articlesSearchFragment"
@@ -55,6 +57,11 @@
             tools:layout="@layout/activity_article_detail" >
         <argument android:name="article_id" app:argType="long" />
     </activity>
+
+    <activity android:id="@+id/settingsActivity"
+            android:name="com.geekorum.ttrss.settings.SettingsActivity"
+            android:label="@string/activity_settings_title"
+            tools:layout="@layout/activity_settings" />
 
     <action android:id="@+id/action_show_feed"
             app:destination="@id/articlesListFragment"

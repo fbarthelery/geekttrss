@@ -27,7 +27,6 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
-import androidx.core.app.ActivityCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.get
@@ -44,13 +43,11 @@ import com.geekorum.ttrss.ArticlesListDirections
 import com.geekorum.ttrss.Features
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.article_details.ArticleDetailActivity
-import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.databinding.ActivityArticleListBinding
 import com.geekorum.ttrss.doOnApplyWindowInsets
 import com.geekorum.ttrss.in_app_update.InAppUpdateViewModel
 import com.geekorum.ttrss.on_demand_modules.OnDemandModuleManager
 import com.geekorum.ttrss.session.SessionActivity
-import com.geekorum.ttrss.settings.SettingsActivity
 import com.geekorum.ttrss.settings.manage_features.InstallFeatureActivity
 import com.google.android.material.appbar.AppBarLayout
 import timber.log.Timber
@@ -98,7 +95,7 @@ class ArticleListActivity : SessionActivity() {
 
         activityViewModel.selectedFeed.observe(this) {
             it?.let { feedsViewModel.setSelectedFeed(it.id) }
-            bindFeedInformation(it)
+            title = it?.title ?: ""
         }
         activityViewModel.feedSelectedEvent.observe(this, EventObserver {
             navController.navigate(ArticlesListDirections.actionShowFeed(it.id, it.title))
@@ -201,7 +198,7 @@ class ArticleListActivity : SessionActivity() {
                     true
                 }
                 it.itemId == R.id.settings -> {
-                    navigateToSettings()
+                    navController.navigate(ArticlesListFragmentDirections.actionShowSettings())
                     true
                 }
                 else -> feedNavigationPresenter.onFeedSelected(it)
@@ -234,15 +231,6 @@ class ArticleListActivity : SessionActivity() {
             menu.findItem(R.id.articles_search)
         }
         searchToolbarPresenter = SearchToolbarPresenter(searchItem, navController, activityViewModel)
-    }
-
-    private fun bindFeedInformation(feed: Feed?) {
-        title = feed?.title ?: ""
-    }
-
-    private fun navigateToSettings() {
-        val intent = Intent(this, SettingsActivity::class.java)
-        ActivityCompat.startActivity(this, intent, null)
     }
 
     private fun installOrStartManageFeed() {
