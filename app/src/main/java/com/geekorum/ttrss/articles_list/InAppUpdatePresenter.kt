@@ -115,7 +115,7 @@ class InAppUpdatePresenter(
         }
 
         (bannerContainer.parent as? View)?.doOnNextLayout {
-            val fragmentContainerView = activity.supportFragmentManager.findFragmentById(R.id.middle_pane_layout)!!.requireView()
+            val fragmentContainerView = activity.findViewById<View>(R.id.middle_pane_layout)
             fragmentContainerView.updatePadding(bottom = bannerContainer.height)
         }
     }
@@ -124,7 +124,7 @@ class InAppUpdatePresenter(
         val behavior = BottomSheetBehavior.from(bannerContainer)
         behavior.isHideable = true
         behavior.state = BottomSheetBehavior.STATE_HIDDEN
-        val fragmentContainerView = activity.supportFragmentManager.findFragmentById(R.id.middle_pane_layout)!!.requireView()
-        fragmentContainerView.updatePadding(bottom = 0)
+        val fragmentContainerView = activity.findViewById<View>(R.id.middle_pane_layout)
+        fragmentContainerView?.updatePadding(bottom = 0)
     }
 }
