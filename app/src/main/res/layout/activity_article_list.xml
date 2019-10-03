@@ -98,13 +98,13 @@
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-    <androidx.fragment.app.FragmentContainerView
-            android:id="@+id/start_pane_layout"
-            android:layout_width="300dp"
+    <com.google.android.material.navigation.NavigationView
+            android:id="@+id/navigation_view"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            app:headerLayout="@layout/drawer_header"
             android:layout_gravity="start"
-            android:fitsSystemWindows="true"
-    />
+            />
 
 </androidx.drawerlayout.widget.DrawerLayout>
 </layout>
