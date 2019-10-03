@@ -45,7 +45,7 @@ private const val STATE_SELECTED_CATEGORY_ID = "selected_category_id"
 private const val STATE_SELECTED_FEED_ID = "selected_category_id"
 
 /**
- * [ViewModel] for [FeedListFragment]
+ * [ViewModel] for to display the list of feeds
  */
 class FeedsViewModel @AssistedInject constructor(
     @Assisted private val state: SavedStateHandle,
