@@ -38,7 +38,7 @@ private const val MENU_GROUP_ID_SPECIAL = 1
  * Display the feeds in a NavigationView menu.
  */
 class FeedsNavigationMenuPresenter(
-    view: NavigationView,
+    private val view: NavigationView,
     private val menu: Menu,
     private val lifeCycleOwner: LifecycleOwner,
     private val feedsViewModel: FeedsViewModel,
@@ -67,6 +67,7 @@ class FeedsNavigationMenuPresenter(
 
     private fun transformFeedViewsInMenuEntry(menu: Menu, feeds: List<FeedsViewModel.FeedView>) {
         menu.clear()
+        var selectedItem: MenuItem? = null
         feeds.forEach { (feed, isSelected) ->
             val title = if (feed.displayTitle.isEmpty()) feed.title else feed.displayTitle
             val feedId = feed.id.toInt()
@@ -78,9 +79,11 @@ class FeedsNavigationMenuPresenter(
             setMenuItemIcon(feed, menuItem)
             setMenuItemUnreadCount(feed, menuItem)
             menuItem.isCheckable = true
-            menuItem.isChecked = isSelected
             menuItem.feed = feed
+            if (isSelected)
+                selectedItem = menuItem
         }
+        selectedItem?.let { view.setCheckedItem(it) }
     }
 
     private fun setMenuItemUnreadCount(feed: Feed, menuItem: MenuItem) {
