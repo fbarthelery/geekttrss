@@ -24,7 +24,7 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="120dp"
+    android:layout_height="128dp"
     android:orientation="vertical"
     android:weightSum="1"
     android:clickable="false">

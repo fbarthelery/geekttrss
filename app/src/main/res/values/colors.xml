@@ -54,4 +54,6 @@
     <color name="image_scrim">#ccffffff</color>
     <color name="article_text_color">?android:textColorTertiary</color>
 
+    <!-- Article list activity -->
+    <color name="article_list_header">@color/primary_lighter</color>
 </resources>

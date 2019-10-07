@@ -68,7 +68,7 @@ class ArticleListActivity : SessionActivity() {
     }
 
     private lateinit var binding: ActivityArticleListBinding
-    private val drawerLayout: DrawerLayout
+    private val drawerLayout: DrawerLayout?
         get() = binding.headlinesDrawer
 
 
@@ -99,7 +99,7 @@ class ArticleListActivity : SessionActivity() {
         }
         activityViewModel.feedSelectedEvent.observe(this, EventObserver {
             navController.navigate(ArticlesListDirections.actionShowFeed(it.id, it.title))
-            drawerLayout.closeDrawers()
+            drawerLayout?.closeDrawers()
         })
 
         activityViewModel.articleSelectedEvent.observe(this, EventObserver { (position, article) ->
@@ -134,12 +134,12 @@ class ArticleListActivity : SessionActivity() {
                 when (destination.id) {
                     R.id.articlesListFragment -> {
                         binding.appBar.setExpanded(true)
-                        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+                        drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
                         binding.fab.show()
                     }
                     R.id.articlesSearchFragment -> {
                         binding.appBar.setExpanded(true)
-                        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+                        drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
                         //TODO hide fab. but fab has scrollaware behavior that get it shown back when scrolling
                     }
                 }

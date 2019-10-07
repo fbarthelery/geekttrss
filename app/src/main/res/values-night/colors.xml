@@ -35,4 +35,6 @@
 
     <color name="image_scrim">#88000000</color>
 
+    <!-- Article list activity -->
+    <color name="article_list_header">@color/dark_color_primary_surface</color>
 </resources>
