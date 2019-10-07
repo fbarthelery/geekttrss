@@ -31,9 +31,9 @@ open class LinkRelSnooper internal constructor(
 ) : Snooper() {
 
     override fun snoop(baseUrl: HttpUrl, content: BufferedSource): Collection<FaviconInfo> {
-        val document = Jsoup.parse(content.inputStream(), null, baseUrl.toString())
+        val document = runCatching { Jsoup.parse(content.inputStream() , null, baseUrl.toString()) }
 
-        return document.head()?.let { head ->
+        return document.getOrNull()?.head()?.let { head ->
             head.getElementsByTag("link")
                 .filter {
                     relValue in it.attr("rel").split("\\s".toRegex())
