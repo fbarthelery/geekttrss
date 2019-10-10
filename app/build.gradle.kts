@@ -142,7 +142,7 @@ dependencies {
     implementation(project(":webapi"))
     implementation(project(":faviKonSnoop"))
 
-    implementation("com.google.android.material:material:1.1.0-alpha10")
+    implementation("com.google.android.material:material:1.1.0-beta01")
     implementation("com.squareup.okhttp3:logging-interceptor:4.1.0")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.1.0")
     implementation("io.coil-kt:coil:0.7.0")

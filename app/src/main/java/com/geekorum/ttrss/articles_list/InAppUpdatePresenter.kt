@@ -101,7 +101,7 @@ class InAppUpdatePresenter(
         behavior.state = BottomSheetBehavior.STATE_EXPANDED
 
         // wait for expanded state to set non hideable
-        behavior.bottomSheetCallback = object : BottomSheetBehavior.BottomSheetCallback() {
+        behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
             override fun onSlide(bottomSheet: View, slideOffset: Float) {
                 // nothing to do
             }
@@ -109,10 +109,10 @@ class InAppUpdatePresenter(
             override fun onStateChanged(bottomSheet: View, newState: Int) {
                 if (newState == BottomSheetBehavior.STATE_EXPANDED) {
                     behavior.isHideable = false
-                    behavior.bottomSheetCallback = null
+                    behavior.removeBottomSheetCallback(this)
                 }
             }
-        }
+        })
 
         (bannerContainer.parent as? View)?.doOnNextLayout {
             val fragmentContainerView = activity.findViewById<View>(R.id.middle_pane_layout)
