@@ -107,7 +107,6 @@ class FeedsViewModel @AssistedInject constructor(
     /**
      * Refresh feeds and categories when observing this livedata for the first time
      */
-    // cause bug https://issuetracker.google.com/issues/140249349
     private fun <T> LiveData<T>.refreshed(): LiveData<T> = liveData {
         emitSource(this@refreshed)
         try {
