@@ -32,7 +32,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import com.geekorum.ttrss.BaseActivity
+import com.geekorum.ttrss.core.BaseActivity
 import com.geekorum.ttrss.BuildConfig
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.databinding.ActivitySettingsBinding

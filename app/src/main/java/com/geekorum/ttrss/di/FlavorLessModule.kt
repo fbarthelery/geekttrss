@@ -22,7 +22,7 @@ package com.geekorum.ttrss.di
 
 import com.geekorum.geekdroid.dagger.AndroidFrameworkModule
 import com.geekorum.geekdroid.dagger.FragmentFactoriesModule
-import com.geekorum.ttrss.CoreFactoriesModule
+import com.geekorum.ttrss.core.CoreFactoriesModule
 import com.geekorum.ttrss.background_job.BackgroundJobsModule
 import com.geekorum.ttrss.DefaultNightModeModule
 import com.geekorum.ttrss.accounts.AndroidTinyrssAccountManagerModule

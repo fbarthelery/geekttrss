@@ -28,8 +28,8 @@ import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
-import com.geekorum.ttrss.BaseFragment
-import com.geekorum.ttrss.activityViewModels
+import com.geekorum.ttrss.core.BaseFragment
+import com.geekorum.ttrss.core.activityViewModels
 import com.geekorum.ttrss.manage_feeds.R
 import com.geekorum.ttrss.manage_feeds.databinding.FragmentAddFeedEnterUrlBinding
 import javax.inject.Inject

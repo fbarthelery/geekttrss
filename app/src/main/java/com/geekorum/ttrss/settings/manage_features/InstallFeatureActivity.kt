@@ -26,7 +26,7 @@ import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
-import com.geekorum.ttrss.BaseActivity
+import com.geekorum.ttrss.core.BaseActivity
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.databinding.ActivityInstallFeatureBinding
 import com.geekorum.ttrss.on_demand_modules.InstallModuleViewModel

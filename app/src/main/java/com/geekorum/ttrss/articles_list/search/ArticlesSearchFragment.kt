@@ -27,8 +27,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
-import com.geekorum.ttrss.BaseFragment
-import com.geekorum.ttrss.activityViewModels
+import com.geekorum.ttrss.core.BaseFragment
+import com.geekorum.ttrss.core.activityViewModels
 import com.geekorum.ttrss.articles_list.ActivityViewModel
 import com.geekorum.ttrss.articles_list.ArticlesListAdapter
 import com.geekorum.ttrss.articles_list.CardEventHandler

@@ -35,9 +35,9 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
 import com.geekorum.geekdroid.views.recyclerview.ItemSwiper
 import com.geekorum.geekdroid.views.recyclerview.ScrollFromBottomAppearanceItemAnimator
-import com.geekorum.ttrss.BaseFragment
+import com.geekorum.ttrss.core.BaseFragment
 import com.geekorum.ttrss.R
-import com.geekorum.ttrss.activityViewModels
+import com.geekorum.ttrss.core.activityViewModels
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.databinding.FragmentArticleListBinding
 import com.google.android.material.snackbar.BaseTransientBottomBar

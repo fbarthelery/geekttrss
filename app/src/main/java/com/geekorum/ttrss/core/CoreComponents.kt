@@ -18,10 +18,9 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.geekorum.ttrss
+package com.geekorum.ttrss.core
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
@@ -31,6 +30,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.geekorum.geekdroid.dagger.DaggerDelegateFragmentFactory
 import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
+import com.geekorum.ttrss.BatteryFriendlyActivity
 import dagger.Binds
 import dagger.Module
 import dagger.android.AndroidInjection

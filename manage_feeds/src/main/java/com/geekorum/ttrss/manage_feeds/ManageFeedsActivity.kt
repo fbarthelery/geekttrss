@@ -38,9 +38,9 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.api.load
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
-import com.geekorum.ttrss.BaseDialogFragment
-import com.geekorum.ttrss.BaseFragment
-import com.geekorum.ttrss.activityViewModels
+import com.geekorum.ttrss.core.BaseDialogFragment
+import com.geekorum.ttrss.core.BaseFragment
+import com.geekorum.ttrss.core.activityViewModels
 import com.geekorum.ttrss.applicationComponent
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.manage_feeds.databinding.ActivityManageFeedsBinding

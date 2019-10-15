@@ -30,7 +30,7 @@ import androidx.work.WorkerFactory
 import com.geekorum.geekdroid.dagger.FragmentFactoriesModule
 import com.geekorum.geekdroid.dagger.FragmentKey
 import com.geekorum.geekdroid.dagger.ViewModelKey
-import com.geekorum.ttrss.CoreFactoriesModule
+import com.geekorum.ttrss.core.CoreFactoriesModule
 import com.geekorum.ttrss.accounts.PerAccount
 import com.geekorum.ttrss.data.ArticlesDatabase
 import com.geekorum.ttrss.di.FeatureScope

@@ -25,7 +25,7 @@ import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import com.geekorum.ttrss.BaseActivity
+import com.geekorum.ttrss.core.BaseActivity
 import com.geekorum.ttrss.Features
 import com.geekorum.ttrss.on_demand_modules.OnDemandModuleManager
 import com.geekorum.ttrss.settings.manage_features.InstallFeatureActivity

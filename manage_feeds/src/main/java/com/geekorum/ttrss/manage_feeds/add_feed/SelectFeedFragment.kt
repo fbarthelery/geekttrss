@@ -26,8 +26,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.observe
 import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
-import com.geekorum.ttrss.BaseFragment
-import com.geekorum.ttrss.activityViewModels
+import com.geekorum.ttrss.core.BaseFragment
+import com.geekorum.ttrss.core.activityViewModels
 import com.geekorum.ttrss.manage_feeds.R
 import com.geekorum.ttrss.manage_feeds.databinding.FragmentAddFeedSelectFeedBinding
 import javax.inject.Inject

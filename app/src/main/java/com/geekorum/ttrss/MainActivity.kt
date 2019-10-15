@@ -27,6 +27,7 @@ import androidx.lifecycle.Observer
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.articles_list.ArticleListActivity
 import com.geekorum.ttrss.articles_list.TtrssAccountViewModel
+import com.geekorum.ttrss.core.BaseActivity
 
 class MainActivity : BaseActivity() {
 

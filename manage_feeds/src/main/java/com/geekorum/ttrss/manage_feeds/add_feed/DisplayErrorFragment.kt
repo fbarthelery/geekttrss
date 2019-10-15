@@ -26,7 +26,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.navArgs
 import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
-import com.geekorum.ttrss.BaseFragment
+import com.geekorum.ttrss.core.BaseFragment
 import com.geekorum.ttrss.manage_feeds.databinding.FragmentAddFeedDisplayErrorBinding
 import javax.inject.Inject
 

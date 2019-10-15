@@ -27,6 +27,7 @@ import com.geekorum.geekdroid.dagger.AppInitializersModule
 import com.geekorum.geekdroid.dagger.FragmentFactoriesModule
 import com.geekorum.geekdroid.dagger.WorkerInjectionModule
 import com.geekorum.ttrss.accounts.LoginActivityTestModule
+import com.geekorum.ttrss.core.CoreFactoriesModule
 import com.geekorum.ttrss.data.ArticlesDatabase
 import com.geekorum.ttrss.data.migrations.MigrationFrom1To2
 import com.geekorum.ttrss.data.migrations.MigrationFrom2To3

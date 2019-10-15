@@ -24,7 +24,7 @@ import android.accounts.Account
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
-import com.geekorum.ttrss.BaseActivity
+import com.geekorum.ttrss.core.BaseActivity
 import com.geekorum.ttrss.MainActivity
 import com.geekorum.ttrss.articles_list.TtrssAccountViewModel
 
