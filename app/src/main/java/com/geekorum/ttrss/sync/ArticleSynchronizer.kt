@@ -31,6 +31,7 @@ import com.geekorum.geekdroid.accounts.CancellableSyncAdapter
 import com.geekorum.ttrss.data.AccountInfo
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.Category
+import com.geekorum.ttrss.data.Metadata
 import com.geekorum.ttrss.htmlparsers.ImageUrlExtractor
 import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.providers.ArticlesContract
@@ -287,12 +288,8 @@ class ArticleSynchronizer @AssistedInject constructor(
     }
 
     private suspend fun updateArticleMetadata(articles: List<Article>) {
-        databaseService.runInTransaction {
-            articles.forEach {
-                databaseService.updateArticleMetadata(it.id, it.isUnread, it.isUnread, it.isStarred,
-                    it.isPublished, it.lastTimeUpdate, it.isUpdated)
-            }
-        }
+        val metadatas = articles.map { Metadata.fromArticle(it) }
+        databaseService.updateArticlesMetadata(metadatas)
     }
 
     @Throws(ApiCallException::class)

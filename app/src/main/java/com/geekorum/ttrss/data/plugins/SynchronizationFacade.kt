@@ -30,6 +30,7 @@ import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.data.SynchronizationDao
 import com.geekorum.ttrss.data.Transaction
 import com.geekorum.ttrss.sync.DatabaseService
+import com.geekorum.ttrss.data.Metadata
 import javax.inject.Inject
 
 /**
@@ -41,11 +42,8 @@ class SynchronizationFacade @Inject constructor(
     private val accountInfoDao: AccountInfoDao
 ) : DatabaseService {
 
-    override suspend fun updateArticleMetadata(
-        id: Long, unread: Boolean, transientUnread: Boolean, starred: Boolean, published: Boolean,
-        lastTimeUpdated: Long, isUpdated: Boolean
-    ) {
-      synchronizationDao.updateArticleMetadata(id, unread, transientUnread, starred, published, lastTimeUpdated, isUpdated)
+    override suspend fun updateArticlesMetadata(metadata: List<Metadata>) {
+        synchronizationDao.updateArticlesMetadata(metadata)
     }
 
     override suspend fun getTransactions(): List<Transaction> = synchronizationDao.getAllTransactions()

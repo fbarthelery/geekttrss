@@ -161,6 +161,38 @@ data class ArticleFTS(
     val content: ArticleContentIndexed
 )
 
+/**
+ * Convenient POJO, grouping Metadata of an [Article]
+ */
+data class Metadata(
+    @ColumnInfo(name = BaseColumns._ID)
+    val id: Long,
+    @ColumnInfo(name = "unread")
+    val isUnread: Boolean,
+    @ColumnInfo(name = "transiant_unread")
+    val isTransientUnread: Boolean,
+    @ColumnInfo(name = "marked")
+    val isStarred: Boolean,
+    @ColumnInfo(name = "published")
+    val isPublished: Boolean,
+    @ColumnInfo(name = "last_time_update")
+    val lastTimeUpdated: Long,
+    @ColumnInfo(name = "is_updated")
+    val isUpdated: Boolean
+) {
+    companion object {
+        fun fromArticle(article: Article): Metadata {
+            return with(article) {
+                Metadata(id,
+                    isUnread, isTransientUnread,
+                    isStarred, isPublished,
+                    lastTimeUpdate, isUpdated)
+            }
+        }
+    }
+}
+
+
 @Entity(tableName = "categories")
 data class Category(
     @PrimaryKey

@@ -20,6 +20,7 @@
  */
 package com.geekorum.ttrss.data
 
+import com.geekorum.ttrss.data.Metadata
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -85,12 +86,6 @@ abstract class SynchronizationDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertArticles(dataArticles: List<Article>)
 
-    @Query(
-        "UPDATE articles SET unread=:unread, transiant_unread=:transientUnread, marked=:starred, published=:published,"
-                + " last_time_update=:lastTimeUpdated, is_updated=:isUpdated"
-                + " WHERE _id=:id")
-    abstract suspend fun updateArticleMetadata(
-        id: Long, unread: Boolean, transientUnread: Boolean, starred: Boolean,
-        published: Boolean, lastTimeUpdated: Long, isUpdated: Boolean
-    )
+    @Update(entity = Article::class)
+    abstract suspend fun updateArticlesMetadata(metadata: List<Metadata>)
 }
