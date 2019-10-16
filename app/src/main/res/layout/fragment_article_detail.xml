@@ -37,7 +37,7 @@
     <androidx.core.widget.NestedScrollView
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="?android:attr/actionBarSize"
+    android:paddingBottom="72dp"
     android:clipToPadding="false"
     >
 

@@ -63,6 +63,7 @@
                 android:layout_height="match_parent"
                 app:layout_behavior="@string/appbar_scrolling_view_behavior"
                 app:navGraph="@navigation/manage_feeds"
+                app:defaultNavHost="true"
                 />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
