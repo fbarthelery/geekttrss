@@ -26,6 +26,7 @@ import androidx.lifecycle.Observer
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import com.geekorum.geekdroid.app.lifecycle.Event
+import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.htmlparsers.FeedExtractor
 import com.geekorum.ttrss.htmlparsers.FeedInformation
 import com.google.common.truth.Truth.assertThat
@@ -34,12 +35,16 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestCoroutineDispatcher
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import org.junit.Rule
 import org.junit.Test
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 
+@UseExperimental(ExperimentalCoroutinesApi::class)
 class SubscribeToFeedViewModelTest {
     @get:Rule
     val archRule = InstantTaskExecutorRule()
@@ -49,6 +54,8 @@ class SubscribeToFeedViewModelTest {
     private lateinit var feedExtractor: FeedExtractor
     private lateinit var workManager: WorkManager
     private lateinit var feedsFinder: FeedsFinder
+    private lateinit var testDispatcher: TestCoroutineDispatcher
+
 
     @BeforeTest
     fun setup() {
@@ -57,9 +64,16 @@ class SubscribeToFeedViewModelTest {
         feedExtractor = mockk()
         workManager = mockk(relaxed = true)
         val account: Account = mockk()
-        subject = SubscribeToFeedViewModel(feedsFinder, workManager, account)
+        testDispatcher = TestCoroutineDispatcher()
+        val dispatchers = CoroutineDispatchersProvider(testDispatcher, testDispatcher, testDispatcher)
+        subject = SubscribeToFeedViewModel(dispatchers, feedsFinder, workManager, account)
+
     }
 
+    @AfterTest
+    fun tearDown() {
+        testDispatcher.cleanupTestCoroutines()
+    }
 
     @Test
     fun testThatWhenUrlIsInvalidInvalidUrlEventIsRaised() {

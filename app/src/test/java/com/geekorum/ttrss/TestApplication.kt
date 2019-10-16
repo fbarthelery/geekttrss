@@ -28,6 +28,7 @@ import com.geekorum.geekdroid.dagger.FragmentFactoriesModule
 import com.geekorum.geekdroid.dagger.WorkerInjectionModule
 import com.geekorum.ttrss.accounts.LoginActivityTestModule
 import com.geekorum.ttrss.core.CoreFactoriesModule
+import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.data.ArticlesDatabase
 import com.geekorum.ttrss.data.migrations.MigrationFrom1To2
 import com.geekorum.ttrss.data.migrations.MigrationFrom2To3
@@ -44,6 +45,8 @@ import dagger.Component
 import dagger.Module
 import dagger.Provides
 import io.mockk.mockk
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.TestCoroutineDispatcher
 import okhttp3.OkHttpClient
 import javax.inject.Singleton
 
@@ -63,6 +66,7 @@ class TestGoogleFlavorApplication : TestApplication()
 
 @Singleton
 @Component(modules = [AppInitializersModule::class,
+    TestCoroutineDispatchersProviderModule::class,
     AndroidFrameworkModule::class,
     AndroidBindingsModule::class,
     CoreFactoriesModule::class,
@@ -111,6 +115,17 @@ private class WorkManagerConfigurationModule {
     @Provides
     fun provideWorkManagerConfiguration(): Configuration {
         return Configuration.Builder().build()
+    }
+
+}
+
+@Module
+@UseExperimental(ExperimentalCoroutinesApi::class)
+private class TestCoroutineDispatchersProviderModule {
+    @Provides
+    fun provideCoroutineDispatchersProvider(): CoroutineDispatchersProvider {
+        val testDispatcher = TestCoroutineDispatcher()
+        return CoroutineDispatchersProvider(testDispatcher, testDispatcher, testDispatcher)
     }
 
 }

@@ -36,9 +36,9 @@ import androidx.work.WorkManager
 import com.geekorum.geekdroid.accounts.AccountsLiveData
 import com.geekorum.geekdroid.app.lifecycle.EmptyEvent
 import com.geekorum.ttrss.accounts.AccountAuthenticator
+import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.manage_feeds.add_feed.FeedsFinder.FeedResult
 import com.geekorum.ttrss.manage_feeds.workers.SubscribeWorker
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
@@ -50,6 +50,7 @@ import com.geekorum.geekdroid.app.lifecycle.EmptyEvent.Companion.makeEmptyEvent 
  * [ViewModel] to subscribe to a Feed
  */
 class AddFeedViewModel @Inject constructor(
+    private val dispatchers: CoroutineDispatchersProvider,
     private val feedsFinder: FeedsFinder,
     private val workManager: WorkManager,
     accountManager: AccountManager
@@ -100,7 +101,7 @@ class AddFeedViewModel @Inject constructor(
     @VisibleForTesting
     internal suspend fun initWithUrl(documentUrl: HttpUrl) {
         try {
-            val feeds = withContext(Dispatchers.IO) {
+            val feeds = withContext(dispatchers.io) {
                 feedsFinder.findFeeds(documentUrl)
             }
 

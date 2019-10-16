@@ -22,6 +22,7 @@ package com.geekorum.ttrss.features_api
 
 import android.accounts.AccountManager
 import android.os.PowerManager
+import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.data.ArticlesDatabase
 import okhttp3.OkHttpClient
 
@@ -41,4 +42,6 @@ interface ManageFeedsDependencies {
     fun getArticlesDatabase(): ArticlesDatabase
 
     fun getOkHttpClient(): OkHttpClient
+
+    fun getCoroutineDispatchersProvider(): CoroutineDispatchersProvider
 }

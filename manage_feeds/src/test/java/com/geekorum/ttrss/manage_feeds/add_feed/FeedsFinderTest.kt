@@ -20,6 +20,7 @@
  */
 package com.geekorum.ttrss.manage_feeds.add_feed
 
+import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.htmlparsers.FeedExtractor
 import com.geekorum.ttrss.htmlparsers.FeedInformation
 import com.geekorum.ttrss.manage_feeds.add_feed.FeedsFinder.FeedResult
@@ -27,7 +28,9 @@ import com.geekorum.ttrss.manage_feeds.add_feed.FeedsFinder.Source
 import com.google.common.truth.Truth
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestCoroutineDispatcher
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -35,21 +38,30 @@ import okhttp3.Protocol
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.ResponseBody.Companion.toResponseBody
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-
+@UseExperimental(ExperimentalCoroutinesApi::class)
 class FeedsFinderTest {
 
     private lateinit var subject: FeedsFinder
     private lateinit var okHttpClient: OkHttpClient
     private lateinit var feedExtractor: FeedExtractor
+    private lateinit var testDispatcher: TestCoroutineDispatcher
 
     @BeforeTest
     fun setup() {
         okHttpClient = mockk()
         feedExtractor = mockk()
-        subject = FeedsFinder(okHttpClient, feedExtractor)
+        testDispatcher = TestCoroutineDispatcher()
+        val dispatchers = CoroutineDispatchersProvider(testDispatcher, testDispatcher, testDispatcher)
+        subject = FeedsFinder(dispatchers, okHttpClient, feedExtractor)
+    }
+
+    @AfterTest
+    fun tearDown() {
+        testDispatcher.cleanupTestCoroutines()
     }
 
     @Test

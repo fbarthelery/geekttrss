@@ -28,6 +28,7 @@ import android.os.RemoteException
 import android.security.NetworkSecurityPolicy
 import android.util.Log
 import com.geekorum.geekdroid.accounts.CancellableSyncAdapter
+import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.data.AccountInfo
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.Category
@@ -43,7 +44,6 @@ import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -63,6 +63,7 @@ private const val PREF_LATEST_ARTICLE_SYNCED_ID = "latest_article_sync_id"
  * Synchronize Articles from the network.
  */
 class ArticleSynchronizer @AssistedInject constructor(
+    private val dispatchers: CoroutineDispatchersProvider,
     private val apiService: ApiService,
     @Assisted params: Bundle,
     private val account: Account,
@@ -269,7 +270,7 @@ class ArticleSynchronizer @AssistedInject constructor(
             .mapNotNull { it.toHttpUrlOrNull() }
             .filter { it.canBeCache() }
             .forEach {
-                launch(Dispatchers.IO) {
+                launch(dispatchers.io) {
                     try {
                         httpCacher.cacheHttpRequest(it)
                     } catch (e: IOException) {
@@ -322,7 +323,7 @@ class ArticleSynchronizer @AssistedInject constructor(
 
         coroutineScope {
             repeat(capacity) {
-                launch(Dispatchers.IO) {
+                launch(dispatchers.io) {
                     for (offsetForRequest in newRequestChannel) {
                         val articles = getArticles(feedId, 0, offsetForRequest, showExcerpt = false,
                             showContent = false)

@@ -23,8 +23,8 @@ package com.geekorum.ttrss.accounts
 import android.accounts.Account
 import android.accounts.AccountManager
 import com.geekorum.geekdroid.accounts.AccountTokenRetriever
+import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.webapi.TokenRetriever
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 
 /**
@@ -32,6 +32,7 @@ import kotlinx.coroutines.runBlocking
  * It ensures that [AccountTokenRetriever.getToken] is run on an IO thread.
  */
 internal class TinyrssAccountTokenRetriever(
+    private val dispatchers: CoroutineDispatchersProvider,
     accountManager: AccountManager,
     account: Account
 ) : AccountTokenRetriever(
@@ -40,7 +41,7 @@ internal class TinyrssAccountTokenRetriever(
     account,
     true), TokenRetriever {
 
-    override fun getToken(): String = runBlocking(Dispatchers.IO) {
+    override fun getToken(): String = runBlocking(dispatchers.io) {
         try {
             super.getToken()
         } catch (e: com.geekorum.geekdroid.network.TokenRetriever.RetrieverException) {

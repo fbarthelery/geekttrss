@@ -23,6 +23,7 @@ package com.geekorum.ttrss.articles_list
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.distinctUntilChanged
 import androidx.paging.DataSource
+import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleDao
 import com.geekorum.ttrss.data.Transaction
@@ -32,7 +33,6 @@ import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.session.Action
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
@@ -96,6 +96,7 @@ class ArticlesRepository
 
 
 open class SetArticleFieldAction(
+    private val dispatchers: CoroutineDispatchersProvider,
     private val transactionsDao: TransactionsDao,
     private val apiService: ApiService,
     private val articleId: Long,
@@ -106,13 +107,13 @@ open class SetArticleFieldAction(
     private var executionJob: Job? = null
 
     override fun execute() {
-        executionJob = GlobalScope.launch(Dispatchers.IO) {
+        executionJob = GlobalScope.launch(dispatchers.io) {
             updateArticleField(newValue)
         }
     }
 
     override fun undo() {
-        GlobalScope.launch(Dispatchers.IO) {
+        GlobalScope.launch(dispatchers.io) {
             // wait for the request to be cancelled and done
             // to be sure that the new one happens after
             executionJob?.cancelAndJoin()
@@ -136,6 +137,7 @@ open class SetArticleFieldAction(
     }
 
     class Factory @Inject internal constructor(
+        private val dispatchers: CoroutineDispatchersProvider,
         private val setUnreadActionFactory: SetUnreadAction.Factory,
         private val setStarredActionFactory: SetStarredAction.Factory
     ) : SetUnreadAction.Factory by setUnreadActionFactory, SetStarredAction.Factory by setStarredActionFactory
@@ -147,12 +149,13 @@ open class SetArticleFieldAction(
  * Action to set the unread field value of an article.
  */
 internal class SetUnreadAction @AssistedInject internal constructor(
+    dispatchers: CoroutineDispatchersProvider,
     private val articleDao: ArticleDao,
     transactionsDao: TransactionsDao,
     apiService: ApiService,
     @Assisted private val articleId: Long,
     @Assisted newValue: Boolean
-) : SetArticleFieldAction(transactionsDao, apiService, articleId,
+) : SetArticleFieldAction(dispatchers, transactionsDao, apiService, articleId,
     ArticlesContract.Transaction.Field.UNREAD, newValue) {
 
     override suspend fun updateArticleField(value: Boolean) {
@@ -172,13 +175,14 @@ internal class SetUnreadAction @AssistedInject internal constructor(
  * Action to set the starred field value of an article.
  */
 internal class SetStarredAction @AssistedInject internal constructor(
+     dispatchers: CoroutineDispatchersProvider,
     private val articleDao: ArticleDao,
     transactionsDao: TransactionsDao,
     val apiService: ApiService,
     @Assisted val articleId: Long,
     @Assisted newValue: Boolean
-) : SetArticleFieldAction(transactionsDao, apiService, articleId, ArticlesContract.Transaction.Field.STARRED,
-    newValue) {
+) : SetArticleFieldAction(dispatchers, transactionsDao, apiService, articleId,
+        ArticlesContract.Transaction.Field.STARRED, newValue) {
 
     override suspend fun updateArticleField(value: Boolean) {
         val changed = articleDao.updateArticleMarked(articleId, value)

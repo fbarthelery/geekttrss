@@ -1,4 +1,5 @@
 import com.geekorum.build.dualTestImplementation
+import com.geekorum.build.enforcedCoroutinesPlatform
 import com.geekorum.build.enforcedDaggerPlatform
 
 plugins {
@@ -64,6 +65,11 @@ dependencies {
     val geekdroidExt = GEEKDROID_PROJECT_DIR?.let { "" } ?: "aar"
     implementation(group = "com.geekorum", name = "geekdroid", version = "0.0.1", ext = geekdroidExt)
 
+    val coroutinesVersion = "1.3.0"
+    implementation(enforcedCoroutinesPlatform(coroutinesVersion))
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
+
     implementation("androidx.activity:activity-ktx:1.0.0")
 
     // androidx UI
@@ -74,7 +80,7 @@ dependencies {
 
     implementation("androidx.core:core-ktx:1.1.0")
 
-    val lifecycleVersion: String by rootProject.extra
+    val lifecycleVersion = "2.2.0-beta01"
     implementation("androidx.lifecycle:lifecycle-livedata-core-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")

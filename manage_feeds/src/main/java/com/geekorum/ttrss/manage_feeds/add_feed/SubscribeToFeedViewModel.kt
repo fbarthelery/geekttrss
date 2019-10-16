@@ -30,6 +30,7 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.geekorum.geekdroid.app.lifecycle.Event
+import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.htmlparsers.FeedInformation
 import com.geekorum.ttrss.manage_feeds.add_feed.FeedsFinder.FeedResult
 import com.geekorum.ttrss.manage_feeds.workers.SubscribeWorker
@@ -45,6 +46,7 @@ import javax.inject.Inject
 
 // open for mocking in androidTests
 open class SubscribeToFeedViewModel @Inject constructor(
+    private val dispatchers: CoroutineDispatchersProvider,
     private val feedsFinder: FeedsFinder,
     private val workManager: WorkManager,
     private val account: Account
@@ -67,7 +69,7 @@ open class SubscribeToFeedViewModel @Inject constructor(
         val url = checkUrl(urlString) ?: return@launch
 
         try {
-            val feeds = withContext(Dispatchers.IO) {
+            val feeds = withContext(dispatchers.io) {
                 feedsFinder.findFeeds(url)
             }
             _feedsFound.value = feeds.toList()

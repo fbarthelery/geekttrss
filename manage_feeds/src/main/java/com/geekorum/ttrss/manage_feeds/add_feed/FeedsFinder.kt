@@ -20,9 +20,9 @@
  */
 package com.geekorum.ttrss.manage_feeds.add_feed
 
+import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.htmlparsers.FeedExtractor
 import com.geekorum.ttrss.htmlparsers.FeedInformation
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
 import okhttp3.MediaType.Companion.toMediaType
@@ -42,6 +42,7 @@ private val FEED_MIMETYPES = listOf(
 
 
 class FeedsFinder @Inject constructor(
+    private val dispatchers: CoroutineDispatchersProvider,
     private val okHttpClient: OkHttpClient,
     private val feedExtractor: FeedExtractor
 ){
@@ -80,7 +81,7 @@ class FeedsFinder @Inject constructor(
     }
 
 
-    private suspend fun getHttpResponse(url: HttpUrl) = withContext(Dispatchers.IO) {
+    private suspend fun getHttpResponse(url: HttpUrl) = withContext(dispatchers.io) {
         val request = Request.Builder().url(url).get().build()
         okHttpClient.newCall(request).execute()
     }

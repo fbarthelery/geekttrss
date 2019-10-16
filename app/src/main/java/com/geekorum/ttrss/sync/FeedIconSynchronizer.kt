@@ -24,9 +24,9 @@ import com.geekorum.favikonsnoop.AdaptiveDimension
 import com.geekorum.favikonsnoop.FaviKonSnoop
 import com.geekorum.favikonsnoop.FaviconInfo
 import com.geekorum.favikonsnoop.FixedDimension
+import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.data.Feed
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
@@ -55,6 +55,7 @@ private const val NB_LOOKUP_COROUTINES = 5
  */
 @UseExperimental(ExperimentalCoroutinesApi::class)
 class FeedIconSynchronizer @Inject constructor(
+    private val dispatchers: CoroutineDispatchersProvider,
     private val databaseService: DatabaseService,
     private val faviKonSnoop: FaviKonSnoop,
     private val okHttpClient: OkHttpClient,
@@ -80,7 +81,7 @@ class FeedIconSynchronizer @Inject constructor(
 
     private fun CoroutineScope.dispatchUpdateFeedIcons(feedChannel: Channel<Feed>) {
         repeat(NB_LOOKUP_COROUTINES) {
-            launch(Dispatchers.IO) {
+            launch(dispatchers.io) {
                 for (feed in feedChannel) {
                     try {
                         updateFeedIcon(feed)

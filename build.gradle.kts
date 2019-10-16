@@ -40,7 +40,6 @@ plugins {
 // some extra properties
 extra["compileSdkVersion"] = "android-29"
 extra["daggerVersion"] = "2.24"
-extra["lifecycleVersion"] = "2.2.0-alpha03"
 
 
 allprojects {

@@ -27,20 +27,24 @@ import androidx.lifecycle.Observer
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
+import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.manage_feeds.add_feed.FeedsFinder.FeedResult
 import com.geekorum.ttrss.manage_feeds.add_feed.FeedsFinder.Source.HTML
 import com.google.common.truth.Truth.assertThat
 import io.mockk.coEvery
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestCoroutineDispatcher
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.junit.Rule
 import java.io.IOException
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-
+@UseExperimental(ExperimentalCoroutinesApi::class)
 class AddFeedViewModelTest {
 
     @get:Rule
@@ -51,6 +55,7 @@ class AddFeedViewModelTest {
     private lateinit var workManager: WorkManager
     private lateinit var accountManager: AccountManager
     private lateinit var feedsFinder: FeedsFinder
+    private lateinit var testDispatcher: TestCoroutineDispatcher
 
 
     @BeforeTest
@@ -58,7 +63,14 @@ class AddFeedViewModelTest {
         workManager = mockk(relaxed = true)
         accountManager = mockk(relaxed = true)
         feedsFinder = mockk()
-        target = AddFeedViewModel(feedsFinder, workManager, accountManager)
+        testDispatcher = TestCoroutineDispatcher()
+        val dispatchers = CoroutineDispatchersProvider(testDispatcher, testDispatcher, testDispatcher)
+        target = AddFeedViewModel(dispatchers, feedsFinder, workManager, accountManager)
+    }
+
+    @AfterTest
+    fun tearDown() {
+        testDispatcher.cleanupTestCoroutines()
     }
 
     @Test

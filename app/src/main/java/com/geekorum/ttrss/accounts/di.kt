@@ -27,6 +27,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.geekorum.geekdroid.dagger.ViewModelKey
 import com.geekorum.geekdroid.security.SecretEncryption
+import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.network.TinyrssApiModule
 import com.geekorum.ttrss.webapi.LoggedRequestInterceptorFactory
 import com.geekorum.ttrss.webapi.TinyRssApi
@@ -94,8 +95,9 @@ class NetworkLoginModule {
 
     @Provides
     @PerAccount
-    fun providesTokenRetriever(accountManager: AccountManager, account: Account): TokenRetriever {
-        return TinyrssAccountTokenRetriever(accountManager, account)
+    fun providesTokenRetriever(dispatchers: CoroutineDispatchersProvider,
+                               accountManager: AccountManager, account: Account): TokenRetriever {
+        return TinyrssAccountTokenRetriever(dispatchers, accountManager, account)
     }
 
     @Provides

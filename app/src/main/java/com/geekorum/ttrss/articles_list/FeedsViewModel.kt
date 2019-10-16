@@ -21,20 +21,19 @@
 package com.geekorum.ttrss.articles_list
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import com.geekorum.geekdroid.dagger.ViewModelAssistedFactory
+import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.webapi.ApiCallException
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
@@ -49,6 +48,7 @@ private const val STATE_SELECTED_FEED_ID = "selected_category_id"
  */
 class FeedsViewModel @AssistedInject constructor(
     @Assisted private val state: SavedStateHandle,
+    private val dispatchers: CoroutineDispatchersProvider,
     private val feedsRepository: FeedsRepository,
     private val apiService: ApiService
 ) : ViewModel() {
@@ -97,7 +97,7 @@ class FeedsViewModel @AssistedInject constructor(
 
     @Throws(ApiCallException::class)
     private suspend fun refreshFeeds() = coroutineScope {
-        withContext(Dispatchers.IO){
+        withContext(dispatchers.io) {
             val feeds = async { apiService.getFeeds() }
             val categories = async { apiService.getCategories() }
             feedsRepository.updateFeedsAndCategoriesUnreadCount(feeds.await(), categories.await())

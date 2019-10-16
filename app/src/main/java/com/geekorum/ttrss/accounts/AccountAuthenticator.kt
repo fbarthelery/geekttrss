@@ -32,11 +32,11 @@ import android.util.Log
 import androidx.core.os.bundleOf
 import com.geekorum.ttrss.BuildConfig
 import com.geekorum.ttrss.R
+import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.webapi.ApiCallException
 import com.geekorum.ttrss.webapi.checkStatus
 import com.geekorum.ttrss.webapi.model.LoginRequestPayload
 import com.geekorum.ttrss.webapi.model.LoginResponsePayload
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -49,6 +49,7 @@ import javax.inject.Inject
 class AccountAuthenticator @Inject
 internal constructor(
     private val context: Context,
+    private val dispatchers: CoroutineDispatchersProvider,
     private val accountManager: AndroidTinyrssAccountManager,
     private val authenticatorBuilder: AuthenticatorNetworkComponent.Builder
 ) : AbstractAccountAuthenticator(context) {
@@ -133,7 +134,7 @@ internal constructor(
     @Throws(ExecutionException::class, InterruptedException::class)
     private suspend fun login(
         user: String, password: String?, serverInformation: ServerInformation
-    ): LoginResponsePayload = withContext(Dispatchers.IO) {
+    ): LoginResponsePayload = withContext(dispatchers.io) {
         val urlModule = TinyRssServerInformationModule(serverInformation)
         val authenticatorNetworkComponent = authenticatorBuilder
             .tinyRssServerInformationModule(urlModule)
