@@ -31,10 +31,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.geekorum.geekdroid.app.lifecycle.Event
 import com.geekorum.ttrss.R
+import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.webapi.ApiCallException
 import com.geekorum.ttrss.webapi.checkStatus
 import com.geekorum.ttrss.webapi.model.LoginRequestPayload
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
@@ -48,7 +48,8 @@ import javax.inject.Inject
  */
 internal class LoginViewModel @Inject constructor(
     private val accountManager: TinyrssAccountManager,
-    private val networkComponentBuilder: AuthenticatorNetworkComponent.Builder
+    private val networkComponentBuilder: AuthenticatorNetworkComponent.Builder,
+    private val dispatchers: CoroutineDispatchersProvider
 ) : ViewModel() {
 
     var username = ""
@@ -200,7 +201,7 @@ internal class LoginViewModel @Inject constructor(
     }
 
     private suspend fun addAccount(): Account? {
-        return withContext(Dispatchers.IO) {
+        return withContext(dispatchers.io) {
             val account = Account(username, httpUrl!!.toString())
             val success = accountManager.addAccount(account, password)
             if (success) {

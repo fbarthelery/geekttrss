@@ -150,7 +150,7 @@ dependencies {
 
     implementation("org.jsoup:jsoup:1.10.2")
 
-    val lifecycleVersion: String by rootProject.extra
+    val lifecycleVersion = "2.2.0-beta01"
     implementation("androidx.lifecycle:lifecycle-extensions:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-livedata-core-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
