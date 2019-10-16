@@ -21,16 +21,14 @@
 package com.geekorum.ttrss.accounts
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.geekorum.geekdroid.app.lifecycle.Event
+import androidx.lifecycle.asFlow
 import com.geekorum.ttrss.R
-import com.geekorum.ttrss.waitForChildrenCoroutines
+import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.webapi.TinyRssApi
 import com.geekorum.ttrss.webapi.model.Error
 import com.geekorum.ttrss.webapi.model.LoginResponsePayload
 import com.geekorum.ttrss.webapi.model.ResponsePayload
+import com.google.common.truth.Truth.assertThat
 import dagger.Component
 import dagger.Module
 import dagger.Provides
@@ -39,20 +37,21 @@ import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
-import io.mockk.verify
-import io.mockk.verifySequence
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.setMain
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.util.concurrent.Executors
 
 @UseExperimental(ExperimentalCoroutinesApi::class)
 class LoginViewModelTest {
@@ -60,9 +59,7 @@ class LoginViewModelTest {
     @get:Rule
     val archRule = InstantTaskExecutorRule()
 
-    private val mainThreadSurrogate =  Executors.newSingleThreadExecutor {
-        Thread(it, "UI Thread")
-    }.asCoroutineDispatcher()
+    private val testCoroutineDispatcher = TestCoroutineDispatcher()
 
     lateinit var accountManager: TinyrssAccountManager
 
@@ -83,105 +80,92 @@ class LoginViewModelTest {
 
     @Before
     fun setup() {
-        Dispatchers.setMain(mainThreadSurrogate)
+        Dispatchers.setMain(testCoroutineDispatcher)
         tinyRssApi = mockk()
         accountManager = mockk()
         networkBuilder = DaggerTestAuthenticatorNetworkComponent.builder()
             .fakeTinyrssApiModule(FakeTinyrssApiModule(tinyRssApi))
 
-        viewModel = LoginViewModel(accountManager, networkBuilder)
+        val dispatchersProvider = CoroutineDispatchersProvider(testCoroutineDispatcher,
+                testCoroutineDispatcher,
+                testCoroutineDispatcher)
+        viewModel = LoginViewModel(accountManager, networkBuilder, dispatchersProvider)
     }
 
 
     @After
     fun tearDown() {
         Dispatchers.resetMain()
-        mainThreadSurrogate.close()
+        testCoroutineDispatcher.cleanupTestCoroutines()
     }
 
     @Test
-    fun testCheckEmptyPasswordSendEventWhenNonEmpty() {
-        val observer: Observer<LoginViewModel.FieldErrorStatus> = mockObserver()
-        viewModel.fieldErrors.observeForever(observer)
+    fun testCheckEmptyPasswordSendEventWhenNonEmpty() = runBlockingTest {
         viewModel.checkNonEmptyPassword("")
-        verify { observer.onChanged(match { it.invalidPasswordMsgId == R.string.error_field_required }) }
+
+        val error = viewModel.fieldErrors.asFlow().first()
+        assertThat(error.invalidPasswordMsgId).isEqualTo(R.string.error_field_required)
     }
 
     @Test
-    fun testCheckEmptyUsernameSendEventWhenNonEmpty() {
-        val observer: Observer<LoginViewModel.FieldErrorStatus> = mockObserver()
-        viewModel.fieldErrors.observeForever(observer)
+    fun testCheckEmptyUsernameSendEventWhenNonEmpty() = runBlockingTest {
         viewModel.checkNonEmptyUsername("")
-        verify { observer.onChanged(match { it.invalidNameMsgId == R.string.error_field_required }) }
+        val error = viewModel.fieldErrors.asFlow().first()
+        assertThat(error.invalidNameMsgId).isEqualTo(R.string.error_field_required)
     }
 
     @Test
-    fun checkDoLoginSendProgressEvent() {
-        val observer: Observer<Boolean> = mockObserver()
+    fun checkDoLoginSendProgressEvent(): Unit = runBlockingTest {
         coEvery { tinyRssApi.login(any()) } returns successLoginResponse
         every { accountManager.addAccount(any(), any()) } returns false
 
         viewModel.initialize(LoginActivity.ACTION_ADD_ACCOUNT)
-        viewModel.loginInProgress.observeForever(observer)
         viewModel.httpUrl = "http://localhost".toHttpUrl()
 
-        runBlocking {
-            viewModel.doLogin()
+        val progressEvents = async {
+            viewModel.loginInProgress.asFlow()
+                    .take(2)
+                    .toList()
         }
 
-        verifySequence {
-            observer.onChanged(true)
-            observer.onChanged(false)
-        }
+        viewModel.doLogin()
+
+        assertThat(progressEvents.await()).containsExactly(true, false)
     }
 
     @Test
-    fun checkDoLoginWithSuccessSendCompleteEvent() {
-        val observer: Observer<Event<LoginViewModel.ActionCompleteEvent>> = mockObserver()
+    fun checkDoLoginWithSuccessSendCompleteEvent() = runBlockingTest {
         every { accountManager.addAccount(any(), any()) } returns true
         every { accountManager.initializeAccountSync(any()) } just Runs
         coEvery { tinyRssApi.login(any()) } returns successLoginResponse
 
         viewModel.initialize(LoginActivity.ACTION_ADD_ACCOUNT)
-        viewModel.actionCompleteEvent.observeForever(observer)
         viewModel.username = "fred"
         viewModel.password = "password"
         viewModel.httpUrl = "http://localhost".toHttpUrl()
 
-        runBlocking {
-            viewModel.doLogin()
-            viewModel.waitForChildrenCoroutines()
-        }
-        verify {
-            observer.onChanged(match {
-                val content = it.peekContent() as LoginViewModel.ActionCompleteEvent.Success
-                content.account == Account(viewModel.username, viewModel.httpUrl.toString())
-            })
-        }
+        viewModel.doLogin()
+
+        val completeEvent = viewModel.actionCompleteEvent.asFlow().first()
+        val content = completeEvent.peekContent() as LoginViewModel.ActionCompleteEvent.Success
+
+        val expectedAccount = Account(viewModel.username, viewModel.httpUrl.toString())
+        assertThat(content.account).isEqualTo(expectedAccount)
     }
 
     @Test
-    fun checkDoLoginWithFailSendLoginFailedEvent() {
-        val observer: Observer<Event<LoginViewModel.LoginFailedError>> = mockObserver()
+    fun checkDoLoginWithFailSendLoginFailedEvent(): Unit = runBlockingTest {
         coEvery { tinyRssApi.login(any()) } returns failedLoginResponse
 
         viewModel.initialize(LoginActivity.ACTION_ADD_ACCOUNT)
-        viewModel.loginFailedEvent.observeForever(observer)
         viewModel.username = "fred"
         viewModel.password = "password"
         viewModel.httpUrl = "http://localhost".toHttpUrl()
 
-        runBlocking {
-            viewModel.doLogin()
-        }
-        verify { observer.onChanged(any()) }
-    }
+        viewModel.doLogin()
 
-
-    private inline fun <reified T : Observer<K>, reified K : Any> mockObserver(): T {
-        val observer: T = mockk()
-        every { observer.onChanged(any()) } just Runs
-        return observer
+        val failedEvent = viewModel.loginFailedEvent.asFlow().first()
+        assertThat(failedEvent.peekContent()).isNotNull()
     }
 }
 

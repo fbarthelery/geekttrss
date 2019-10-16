@@ -31,6 +31,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.geekorum.geekdroid.dagger.ViewModelKey
 import com.geekorum.ttrss.R
+import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import dagger.Module
 import dagger.Provides
 import dagger.android.ContributesAndroidInjector
@@ -91,6 +92,8 @@ internal class MocksModule {
     @Provides
     @IntoMap
     @ViewModelKey(LoginViewModel::class)
-    fun getLoginViewModel(accountManager: TinyrssAccountManager): ViewModel = LoginViewModel(accountManager, mockk(relaxed = true))
+    fun getLoginViewModel(accountManager: TinyrssAccountManager): ViewModel {
+        return LoginViewModel(accountManager, mockk(relaxed = true), mockk(relaxed = true))
+    }
 
 }
