@@ -45,6 +45,7 @@ android {
 
 
 dependencies {
+    // it seems that app is not added in classpath when running tests from gradle
     implementation(project(":app"))
 
     implementation(enforcedPlatform(kotlin("bom")))

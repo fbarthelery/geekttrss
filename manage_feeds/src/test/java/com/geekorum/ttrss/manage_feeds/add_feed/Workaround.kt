@@ -20,13 +20,11 @@
  */
 package com.geekorum.ttrss.core
 
-import dagger.Module
-import dagger.Provides
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import javax.inject.Singleton
 
 /**
+ * Workaround for :app not added in classpath for tests run from gradle
+ *
  * Provider for main [CoroutineDispatcher]s.
  * Allow CoroutineDispatchers to be injected.
  */
@@ -35,16 +33,3 @@ data class CoroutineDispatchersProvider(
         val io: CoroutineDispatcher,
         val computation: CoroutineDispatcher
 )
-
-@Module
-class ActualCoroutineDispatchersModule {
-
-    @Provides
-    @Singleton
-    fun providesCoroutineDispatchersProvider(): CoroutineDispatchersProvider =
-            CoroutineDispatchersProvider(
-                    Dispatchers.Main,
-                    Dispatchers.IO,
-                    Dispatchers.Default
-            )
-}
