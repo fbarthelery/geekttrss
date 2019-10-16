@@ -29,12 +29,14 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.WorkManager
 import com.geekorum.geekdroid.app.lifecycle.Event
 import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
+import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.manage_feeds.R
 import com.google.android.material.textfield.TextInputLayout
 import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify
 import junit.framework.AssertionFailedError
+import kotlinx.coroutines.Dispatchers
 import org.junit.runner.RunWith
 import java.io.IOException
 import kotlin.test.BeforeTest
@@ -52,7 +54,8 @@ class EnterFeedUrlFragmentTest {
     @BeforeTest
     fun setUp() {
         workManager = mockk(relaxed = true)
-        subscribeToFeedViewModel = spyk(SubscribeToFeedViewModel(mockk(), workManager, mockk()))
+        val dispatchers = CoroutineDispatchersProvider(Dispatchers.Main, Dispatchers.IO, Dispatchers.Default)
+        subscribeToFeedViewModel = spyk(SubscribeToFeedViewModel(dispatchers, mockk(), workManager, mockk()))
         navController = mockk(relaxed = true)
         viewModelFactoryCreator =
             createDaggerDelegateSavedStateVMFactoryCreator(subscribeToFeedViewModel, SubscribeToFeedViewModel::class.java)

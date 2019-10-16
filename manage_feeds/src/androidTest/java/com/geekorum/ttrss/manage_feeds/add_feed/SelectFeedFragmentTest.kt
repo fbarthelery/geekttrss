@@ -33,9 +33,11 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.WorkManager
 import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
+import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.manage_feeds.R
 import com.geekorum.ttrss.manage_feeds.add_feed.FeedsFinder.FeedResult
 import io.mockk.mockk
+import kotlinx.coroutines.Dispatchers
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.Matchers.anything
 import org.hamcrest.Matchers.not
@@ -54,7 +56,8 @@ class SelectFeedFragmentTest {
     @BeforeTest
     fun setUp() {
         workManager = mockk(relaxed = true)
-        subscribeToFeedViewModel = SubscribeToFeedViewModel(mockk(), workManager, mockk())
+        val dispatchers = CoroutineDispatchersProvider(Dispatchers.Main, Dispatchers.IO, Dispatchers.Default)
+        subscribeToFeedViewModel = SubscribeToFeedViewModel(dispatchers, mockk(), workManager, mockk())
         navController = mockk(relaxed = true)
         viewModelFactoryCreator =
             createDaggerDelegateSavedStateVMFactoryCreator(subscribeToFeedViewModel)
