@@ -21,7 +21,6 @@
 plugins {
     kotlin("jvm")
     id("kotlinx-serialization")
-    id("com.geekorum.build.source-license-checker")
 }
 
 dependencies {

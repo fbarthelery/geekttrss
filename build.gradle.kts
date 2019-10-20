@@ -19,6 +19,7 @@
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
 import com.android.build.gradle.BaseExtension
+import com.geekorum.build.SourceLicenseCheckerPlugin
 import com.geekorum.build.configureJavaVersion
 import com.geekorum.build.createComponentsPlatforms
 import com.geekorum.build.setupGoogleContent
@@ -56,6 +57,8 @@ allprojects {
     dependencies {
         createComponentsPlatforms()
     }
+
+    apply<SourceLicenseCheckerPlugin>()
 
     tasks.withType<KotlinCompile> {
         kotlinOptions {

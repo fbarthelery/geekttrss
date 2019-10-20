@@ -20,7 +20,6 @@
  */
 plugins {
     kotlin("jvm")
-    id("com.geekorum.build.source-license-checker")
 }
 
 dependencies {

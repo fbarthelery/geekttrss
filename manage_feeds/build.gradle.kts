@@ -8,7 +8,6 @@ plugins {
     kotlin("kapt")
     id("com.geekorum.build.android-tests")
     id("com.geekorum.build.android-genymotion")
-    id("com.geekorum.build.source-license-checker")
     id("androidx.navigation.safeargs.kotlin")
 }
 
