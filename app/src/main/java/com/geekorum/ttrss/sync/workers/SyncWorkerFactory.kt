@@ -35,10 +35,15 @@ abstract class SyncWorkerFactory(
         private val syncWorkerComponentBuilder: SyncWorkerComponent.Builder
 ) : WorkerFactory() {
 
+    companion object {
+        const val PARAM_ACCOUNT_NAME = "account_name"
+        const val PARAM_ACCOUNT_TYPE = "account_type"
+    }
+
     protected fun createSyncWorkerComponent(workerParameters: WorkerParameters): SyncWorkerComponent {
         val account = with(workerParameters.inputData) {
-            val accountName = getString("account_name")
-            val accountType = getString("account_type")
+            val accountName = getString(PARAM_ACCOUNT_NAME)
+            val accountType = getString(PARAM_ACCOUNT_TYPE)
             Account(accountName, accountType)
         }
         return syncWorkerComponentBuilder

@@ -32,6 +32,7 @@ import com.geekorum.ttrss.accounts.PerAccount
 import com.geekorum.ttrss.data.plugins.SynchronizationFacade
 import com.geekorum.ttrss.di.AssistedFactoriesModule
 import com.geekorum.ttrss.network.TinyrssApiModule
+import com.geekorum.ttrss.sync.workers.WorkersModule
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Module
@@ -56,6 +57,8 @@ abstract class ServiceInjectorModule {
 
 }
 
+@Module(includes = [WorkersModule::class])
+abstract class SyncWorkersModule
 
 @Module(subcomponents = [SyncComponent::class])
 private abstract class SyncComponentModule

@@ -31,6 +31,7 @@ import com.geekorum.ttrss.data.ArticlesDatabaseModule
 import com.geekorum.ttrss.debugtools.StrictModeModule
 import com.geekorum.ttrss.logging.LogcatLoggingModule
 import com.geekorum.ttrss.settings.SettingsModule
+import com.geekorum.ttrss.sync.SyncWorkersModule
 import dagger.Module
 
 /**
@@ -54,6 +55,7 @@ import dagger.Module
     com.geekorum.ttrss.article_details.ActivitiesInjectorModule::class,
     com.geekorum.ttrss.articles_list.ActivitiesInjectorModule::class,
     com.geekorum.ttrss.sync.ServiceInjectorModule::class,
+    SyncWorkersModule::class,
     com.geekorum.ttrss.accounts.ServicesInjectorModule::class,
     com.geekorum.ttrss.add_feed.AndroidInjectorsModule::class,
     com.geekorum.ttrss.providers.AndroidInjectorsModule::class

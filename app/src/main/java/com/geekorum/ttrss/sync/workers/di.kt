@@ -39,6 +39,17 @@ import dagger.Subcomponent
 import dagger.multibindings.IntoMap
 
 
+@Module(includes = [WorkerInjectionModule::class], subcomponents = [SyncWorkerComponent::class])
+abstract class WorkersModule {
+
+    @Binds
+    @IntoMap
+    @WorkerKey(UpdateAccountInfoWorker::class)
+    abstract fun providesUpdateAccountInfoWorkerFactory(
+            workerFactory: UpdateAccountInfoWorker.WorkerFactory): WorkerFactory
+
+}
+
 @Subcomponent(modules = [
     NetworkLoginModule::class,
     TinyrssApiModule::class,

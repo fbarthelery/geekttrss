@@ -21,15 +21,22 @@
 package com.geekorum.ttrss.sync
 
 import android.accounts.Account
+import android.app.Application
 import android.content.OperationApplicationException
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.RemoteException
 import android.security.NetworkSecurityPolicy
 import android.util.Log
+import androidx.lifecycle.asFlow
+import androidx.work.Constraints
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.await
+import androidx.work.workDataOf
 import com.geekorum.geekdroid.accounts.CancellableSyncAdapter
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
-import com.geekorum.ttrss.data.AccountInfo
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Metadata
@@ -39,6 +46,8 @@ import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.sync.SyncContract.EXTRA_FEED_ID
 import com.geekorum.ttrss.sync.SyncContract.EXTRA_NUMBER_OF_LATEST_ARTICLES_TO_REFRESH
 import com.geekorum.ttrss.sync.SyncContract.EXTRA_UPDATE_FEED_ICONS
+import com.geekorum.ttrss.sync.workers.SyncWorkerFactory
+import com.geekorum.ttrss.sync.workers.UpdateAccountInfoWorker
 import com.geekorum.ttrss.webapi.ApiCallException
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
@@ -46,6 +55,8 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.yield
@@ -53,9 +64,6 @@ import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import timber.log.Timber
 import java.io.IOException
-import com.geekorum.ttrss.accounts.ServerInformation as AccountServerInformation
-import com.geekorum.ttrss.data.Account as DataAccount
-import com.geekorum.ttrss.network.ServerInfo as ServerInfoResult
 
 private const val PREF_LATEST_ARTICLE_SYNCED_ID = "latest_article_sync_id"
 
@@ -63,11 +71,11 @@ private const val PREF_LATEST_ARTICLE_SYNCED_ID = "latest_article_sync_id"
  * Synchronize Articles from the network.
  */
 class ArticleSynchronizer @AssistedInject constructor(
+    private val application: Application,
     private val dispatchers: CoroutineDispatchersProvider,
     private val apiService: ApiService,
     @Assisted params: Bundle,
     private val account: Account,
-    private val serverInformation: AccountServerInformation,
     private val backgroundDataUsageManager: BackgroundDataUsageManager,
     private val accountPreferences: SharedPreferences,
     private val databaseService: DatabaseService,
@@ -118,20 +126,21 @@ class ArticleSynchronizer @AssistedInject constructor(
     }
 
     private suspend fun updateAccountInfo() {
-        val serverInfoResult = apiService.getServerInfo()
-        val accountInfo = databaseService.getAccountInfo(account.name, serverInformation.apiUrl)
-                ?:  AccountInfo(DataAccount(account.name, serverInformation.apiUrl),
-                    "", 0)
-        val updatedInfo = makeUpdatedAccountInfo(accountInfo, serverInfoResult)
-        databaseService.insertAccountInfo(updatedInfo)
-    }
+        val workManager = WorkManager.getInstance(application)
+        val request = OneTimeWorkRequestBuilder<UpdateAccountInfoWorker>()
+                .setConstraints(Constraints.Builder()
+                        .setRequiredNetworkType(NetworkType.CONNECTED)
+                        .build())
+                .setInputData(workDataOf(
+                        SyncWorkerFactory.PARAM_ACCOUNT_NAME to account.name,
+                        SyncWorkerFactory.PARAM_ACCOUNT_TYPE to account.type
+                ))
+                .build()
 
-    private fun makeUpdatedAccountInfo(
-        currentInfo: AccountInfo, serverInfoResult: ServerInfoResult
-    ): AccountInfo {
-        return currentInfo.copy(
-            serverVersion = serverInfoResult.serverVersion ?: currentInfo.serverVersion,
-            apiLevel = serverInfoResult.apiLevel ?: currentInfo.apiLevel)
+        workManager.enqueue(request).result.await()
+        workManager.getWorkInfoByIdLiveData(request.id).asFlow()
+                .takeWhile { !it.state.isFinished }
+                .collect()
     }
 
     override fun onSyncCancelled() {
