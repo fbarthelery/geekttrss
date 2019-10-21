@@ -38,11 +38,9 @@ import androidx.work.workDataOf
 import com.geekorum.geekdroid.accounts.CancellableSyncAdapter
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.data.Article
-import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Metadata
 import com.geekorum.ttrss.htmlparsers.ImageUrlExtractor
 import com.geekorum.ttrss.network.ApiService
-import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.sync.SyncContract.EXTRA_FEED_ID
 import com.geekorum.ttrss.sync.SyncContract.EXTRA_NUMBER_OF_LATEST_ARTICLES_TO_REFRESH
 import com.geekorum.ttrss.sync.SyncContract.EXTRA_UPDATE_FEED_ICONS
@@ -61,12 +59,11 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.yield
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import timber.log.Timber
 import java.io.IOException
+import java.util.UUID
 
 private const val PREF_LATEST_ARTICLE_SYNCED_ID = "latest_article_sync_id"
 
@@ -83,8 +80,7 @@ class ArticleSynchronizer @AssistedInject constructor(
     private val accountPreferences: SharedPreferences,
     private val databaseService: DatabaseService,
     private val httpCacher: HttpCacher,
-    private val imageUrlExtractor: ImageUrlExtractor,
-    private val feedIconSynchronizer: FeedIconSynchronizer
+    private val imageUrlExtractor: ImageUrlExtractor
 ) : CancellableSyncAdapter.CancellableSync() {
 
     @AssistedInject.Factory
@@ -98,6 +94,8 @@ class ArticleSynchronizer @AssistedInject constructor(
     private val updateFeedIcons = params.getBoolean(EXTRA_UPDATE_FEED_ICONS, false)
     private val feedId = params.getLong(EXTRA_FEED_ID, ApiService.ALL_ARTICLES_FEED_ID)
 
+    private var syncInfoAndFeedWorkId: UUID? = null
+
     private suspend fun getLatestArticleId(): Long {
         var result = accountPreferences.getLong(PREF_LATEST_ARTICLE_SYNCED_ID, 0)
         if (result == 0L) {
@@ -108,16 +106,9 @@ class ArticleSynchronizer @AssistedInject constructor(
 
     override suspend fun sync() {
         try {
-            coroutineScope {
-                updateAccountInfo()
-                sendTransactions()
-                synchronizeFeeds()
-                if (updateFeedIcons) {
-                    synchronizeFeedIcons()
-                }
-                collectNewArticles()
-                updateArticlesStatus()
-            }
+            syncInfoAndFeeds()
+            collectNewArticles()
+            updateArticlesStatus()
         } catch (e: ApiCallException) {
             Timber.w(e, "unable to synchronize articles")
         } catch (e: RemoteException) {
@@ -130,58 +121,59 @@ class ArticleSynchronizer @AssistedInject constructor(
         }
     }
 
-    private fun synchronizeFeedIcons() {
-        val request = OneTimeWorkRequestBuilder<SyncFeedsIconWorker>()
-                .setConstraints(Constraints.Builder()
-                        .setRequiredNetworkType(NetworkType.CONNECTED)
-                        .build())
-                .setInputData(workDataOf(
-                        SyncWorkerFactory.PARAM_ACCOUNT_NAME to account.name,
-                        SyncWorkerFactory.PARAM_ACCOUNT_TYPE to account.type
-                ))
+    private suspend fun syncInfoAndFeeds() {
+        val constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
+        val inputData = workDataOf(
+                SyncWorkerFactory.PARAM_ACCOUNT_NAME to account.name,
+                SyncWorkerFactory.PARAM_ACCOUNT_TYPE to account.type
+        )
+
+        val updateAccountInfo = OneTimeWorkRequestBuilder<UpdateAccountInfoWorker>()
+                .setConstraints(constraints)
+                .setInputData(inputData)
+                .build()
+        syncInfoAndFeedWorkId = updateAccountInfo.id
+        val tag = updateAccountInfo.stringId
+
+        val sendTransactions = OneTimeWorkRequestBuilder<SendTransactionsWorker>()
+                .setConstraints(constraints)
+                .setInputData(inputData)
                 .build()
 
-        workManager.enqueue(request)
-    }
-
-    private suspend fun updateAccountInfo() {
-        val request = OneTimeWorkRequestBuilder<UpdateAccountInfoWorker>()
-                .setConstraints(Constraints.Builder()
-                        .setRequiredNetworkType(NetworkType.CONNECTED)
-                        .build())
-                .setInputData(workDataOf(
-                        SyncWorkerFactory.PARAM_ACCOUNT_NAME to account.name,
-                        SyncWorkerFactory.PARAM_ACCOUNT_TYPE to account.type
-                ))
+        val syncFeeds = OneTimeWorkRequestBuilder<SyncFeedsWorker>()
+                .setConstraints(constraints)
+                .setInputData(inputData)
                 .build()
 
-        workManager.enqueue(request).result.await()
-        workManager.getWorkInfoByIdLiveData(request.id).asFlow()
-                .takeWhile { !it.state.isFinished }
+        val syncFeedsIcons = OneTimeWorkRequestBuilder<SyncFeedsIconWorker>()
+                .setConstraints(constraints)
+                .setInputData(inputData)
+                .build()
+
+        val work = workManager.beginWith(listOf(updateAccountInfo, sendTransactions))
+                .then(syncFeeds)
+                .apply {
+                    if (updateFeedIcons)
+                      then(syncFeedsIcons)
+                }
+
+        work.enqueue().result.await()
+
+        work.workInfosLiveData.asFlow()
+                .takeWhile { workInfos ->
+                    workInfos.any { !it.state.isFinished }
+                }
                 .collect()
     }
 
     override fun onSyncCancelled() {
         super.onSyncCancelled()
+        syncInfoAndFeedWorkId?.let {
+            workManager.cancelWorkById(it)
+        }
         Timber.i("Synchronization was cancelled")
-    }
-
-    @Throws(ApiCallException::class, RemoteException::class, OperationApplicationException::class)
-    private suspend fun sendTransactions() {
-        val request = OneTimeWorkRequestBuilder<SendTransactionsWorker>()
-                .setConstraints(Constraints.Builder()
-                        .setRequiredNetworkType(NetworkType.CONNECTED)
-                        .build())
-                .setInputData(workDataOf(
-                        SyncWorkerFactory.PARAM_ACCOUNT_NAME to account.name,
-                        SyncWorkerFactory.PARAM_ACCOUNT_TYPE to account.type
-                ))
-                .build()
-
-        workManager.enqueue(request).result.await()
-        workManager.getWorkInfoByIdLiveData(request.id).asFlow()
-                .takeWhile { !it.state.isFinished }
-                .collect()
     }
 
     @Throws(ApiCallException::class, RemoteException::class, OperationApplicationException::class)
@@ -381,24 +373,6 @@ class ArticleSynchronizer @AssistedInject constructor(
         article.contentExcerpt = augmenter.getContentExcerpt()
         article.flavorImageUri = augmenter.getFlavorImageUri()
         return article
-    }
-
-    @Throws(ApiCallException::class, RemoteException::class, OperationApplicationException::class)
-    private suspend fun synchronizeFeeds() {
-        val request = OneTimeWorkRequestBuilder<SyncFeedsWorker>()
-                .setConstraints(Constraints.Builder()
-                        .setRequiredNetworkType(NetworkType.CONNECTED)
-                        .build())
-                .setInputData(workDataOf(
-                        SyncWorkerFactory.PARAM_ACCOUNT_NAME to account.name,
-                        SyncWorkerFactory.PARAM_ACCOUNT_TYPE to account.type
-                ))
-                .build()
-
-        workManager.enqueue(request).result.await()
-        workManager.getWorkInfoByIdLiveData(request.id).asFlow()
-                .takeWhile { !it.state.isFinished }
-                .collect()
     }
 
 }
