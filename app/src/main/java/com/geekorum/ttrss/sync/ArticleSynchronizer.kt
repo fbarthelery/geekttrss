@@ -47,6 +47,7 @@ import com.geekorum.ttrss.sync.SyncContract.EXTRA_FEED_ID
 import com.geekorum.ttrss.sync.SyncContract.EXTRA_NUMBER_OF_LATEST_ARTICLES_TO_REFRESH
 import com.geekorum.ttrss.sync.SyncContract.EXTRA_UPDATE_FEED_ICONS
 import com.geekorum.ttrss.sync.workers.SendTransactionsWorker
+import com.geekorum.ttrss.sync.workers.SyncFeedsWorker
 import com.geekorum.ttrss.sync.workers.SyncWorkerFactory
 import com.geekorum.ttrss.sync.workers.UpdateAccountInfoWorker
 import com.geekorum.ttrss.webapi.ApiCallException
@@ -72,7 +73,7 @@ private const val PREF_LATEST_ARTICLE_SYNCED_ID = "latest_article_sync_id"
  * Synchronize Articles from the network.
  */
 class ArticleSynchronizer @AssistedInject constructor(
-    private val application: Application,
+    application: Application,
     private val dispatchers: CoroutineDispatchersProvider,
     private val apiService: ApiService,
     @Assisted params: Bundle,
@@ -369,43 +370,20 @@ class ArticleSynchronizer @AssistedInject constructor(
 
     @Throws(ApiCallException::class, RemoteException::class, OperationApplicationException::class)
     private suspend fun synchronizeFeeds() {
-        Timber.i("Synchronizing feeds list")
-        val categories = apiService.getCategories()
-        val feeds = apiService.getFeeds()
-        databaseService.runInTransaction {
-            insertCategories(categories)
-            deleteOldCategories(categories)
-            insertFeeds(feeds)
-            deleteOldFeeds(feeds)
-        }
-    }
+        val request = OneTimeWorkRequestBuilder<SyncFeedsWorker>()
+                .setConstraints(Constraints.Builder()
+                        .setRequiredNetworkType(NetworkType.CONNECTED)
+                        .build())
+                .setInputData(workDataOf(
+                        SyncWorkerFactory.PARAM_ACCOUNT_NAME to account.name,
+                        SyncWorkerFactory.PARAM_ACCOUNT_TYPE to account.type
+                ))
+                .build()
 
-    @Throws(RemoteException::class, OperationApplicationException::class)
-    private suspend fun deleteOldFeeds(feeds: List<com.geekorum.ttrss.data.Feed>) {
-        val feedsIds: List<Long> = feeds.map { it.id }
-        val toBeDelete = databaseService.getFeeds().filter { it.id !in feedsIds }
-
-        databaseService.deleteFeedsAndArticles(toBeDelete)
-    }
-
-    @Throws(RemoteException::class, OperationApplicationException::class)
-    private suspend fun deleteOldCategories(categories: List<Category>) {
-        val feedCategoriesId: List<Long> = categories.map { category -> category.id }
-        val toDelete = databaseService.getCategories().filter { it.id !in feedCategoriesId }
-
-        databaseService.deleteCategories(toDelete)
-    }
-
-    @Throws(RemoteException::class, OperationApplicationException::class)
-    private suspend fun insertFeeds(feeds: List<com.geekorum.ttrss.data.Feed>) {
-        databaseService.insertFeeds(feeds)
-    }
-
-    @Throws(RemoteException::class, OperationApplicationException::class)
-    private suspend fun insertCategories(categories: List<Category>) {
-        // remove virtual categories
-        val realCategories = categories.filter { it.id >= 0 }
-        databaseService.insertCategories(realCategories)
+        workManager.enqueue(request).result.await()
+        workManager.getWorkInfoByIdLiveData(request.id).asFlow()
+                .takeWhile { !it.state.isFinished }
+                .collect()
     }
 
 }

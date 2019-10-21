@@ -54,6 +54,12 @@ abstract class WorkersModule {
     abstract fun providesSendTransactionsWorkerFactory(
             workerFactory: SendTransactionsWorker.WorkerFactory): WorkerFactory
 
+    @Binds
+    @IntoMap
+    @WorkerKey(SyncFeedsWorker::class)
+    abstract fun providesSyncFeedsWorkerFactory(
+            workerFactory: SyncFeedsWorker.WorkerFactory): WorkerFactory
+
 }
 
 @Subcomponent(modules = [
