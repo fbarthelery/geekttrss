@@ -48,6 +48,12 @@ abstract class WorkersModule {
     abstract fun providesUpdateAccountInfoWorkerFactory(
             workerFactory: UpdateAccountInfoWorker.WorkerFactory): WorkerFactory
 
+    @Binds
+    @IntoMap
+    @WorkerKey(SendTransactionsWorker::class)
+    abstract fun providesSendTransactionsWorkerFactory(
+            workerFactory: SendTransactionsWorker.WorkerFactory): WorkerFactory
+
 }
 
 @Subcomponent(modules = [

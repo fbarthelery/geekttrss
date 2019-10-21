@@ -46,6 +46,7 @@ import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.sync.SyncContract.EXTRA_FEED_ID
 import com.geekorum.ttrss.sync.SyncContract.EXTRA_NUMBER_OF_LATEST_ARTICLES_TO_REFRESH
 import com.geekorum.ttrss.sync.SyncContract.EXTRA_UPDATE_FEED_ICONS
+import com.geekorum.ttrss.sync.workers.SendTransactionsWorker
 import com.geekorum.ttrss.sync.workers.SyncWorkerFactory
 import com.geekorum.ttrss.sync.workers.UpdateAccountInfoWorker
 import com.geekorum.ttrss.webapi.ApiCallException
@@ -89,6 +90,8 @@ class ArticleSynchronizer @AssistedInject constructor(
         fun create(params: Bundle): ArticleSynchronizer
     }
 
+    private val workManager = WorkManager.getInstance(application)
+
     private val numberOfLatestArticlesToRefresh = params.getInt(EXTRA_NUMBER_OF_LATEST_ARTICLES_TO_REFRESH, 500)
     private val updateFeedIcons = params.getBoolean(EXTRA_UPDATE_FEED_ICONS, false)
     private val feedId = params.getLong(EXTRA_FEED_ID, ApiService.ALL_ARTICLES_FEED_ID)
@@ -126,7 +129,6 @@ class ArticleSynchronizer @AssistedInject constructor(
     }
 
     private suspend fun updateAccountInfo() {
-        val workManager = WorkManager.getInstance(application)
         val request = OneTimeWorkRequestBuilder<UpdateAccountInfoWorker>()
                 .setConstraints(Constraints.Builder()
                         .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -150,30 +152,20 @@ class ArticleSynchronizer @AssistedInject constructor(
 
     @Throws(ApiCallException::class, RemoteException::class, OperationApplicationException::class)
     private suspend fun sendTransactions() {
-        val transactions = databaseService.getTransactions()
-        Timber.i("Sending ${transactions.size} pending transactions")
-        transactions.forEach { transaction ->
-            databaseService.runInTransaction {
-                val field = ArticlesContract.Transaction.Field.valueOf(transaction.field)
-                val article = checkNotNull(databaseService.getArticle(transaction.articleId)) {
-                    "article ${transaction.articleId} does not exists"
-                }
-                val value = transaction.value
-                updateArticleField(transaction.articleId, field, value)
-                when (field) {
-                    ArticlesContract.Transaction.Field.PUBLISHED -> article.isPublished = value
-                    ArticlesContract.Transaction.Field.UNREAD -> {
-                        article.isUnread = value
-                        article.isTransientUnread = value
-                    }
-                    ArticlesContract.Transaction.Field.STARRED -> article.isStarred = value
-                    else -> throw IllegalArgumentException("Unknown field type")
-                }
-                databaseService.updateArticle(article)
-                databaseService.deleteTransaction(transaction)
-            }
-            yield()
-        }
+        val request = OneTimeWorkRequestBuilder<SendTransactionsWorker>()
+                .setConstraints(Constraints.Builder()
+                        .setRequiredNetworkType(NetworkType.CONNECTED)
+                        .build())
+                .setInputData(workDataOf(
+                        SyncWorkerFactory.PARAM_ACCOUNT_NAME to account.name,
+                        SyncWorkerFactory.PARAM_ACCOUNT_TYPE to account.type
+                ))
+                .build()
+
+        workManager.enqueue(request).result.await()
+        workManager.getWorkInfoByIdLiveData(request.id).asFlow()
+                .takeWhile { !it.state.isFinished }
+                .collect()
     }
 
     @Throws(ApiCallException::class, RemoteException::class, OperationApplicationException::class)
@@ -414,11 +406,6 @@ class ArticleSynchronizer @AssistedInject constructor(
         // remove virtual categories
         val realCategories = categories.filter { it.id >= 0 }
         databaseService.insertCategories(realCategories)
-    }
-
-    @Throws(ApiCallException::class)
-    private fun updateArticleField(id: Long, field: ArticlesContract.Transaction.Field, value: Boolean) = runBlocking {
-        apiService.updateArticleField(id, field, value)
     }
 
 }
