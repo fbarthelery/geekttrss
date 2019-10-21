@@ -22,6 +22,10 @@ package com.geekorum.ttrss.sync.workers
 
 import android.accounts.Account
 import androidx.work.WorkerFactory
+import com.geekorum.favikonsnoop.FaviKonSnoop
+import com.geekorum.favikonsnoop.snoopers.AppManifestSnooper
+import com.geekorum.favikonsnoop.snoopers.AppleTouchIconSnooper
+import com.geekorum.favikonsnoop.snoopers.WhatWgSnooper
 import com.geekorum.geekdroid.dagger.WorkerInjectionModule
 import com.geekorum.geekdroid.dagger.WorkerKey
 import com.geekorum.ttrss.accounts.NetworkLoginModule
@@ -32,11 +36,14 @@ import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.network.TinyrssApiModule
 import com.geekorum.ttrss.sync.DatabaseAccessModule
 import com.geekorum.ttrss.sync.DatabaseService
+import com.geekorum.ttrss.sync.FeedIconSynchronizer
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Module
+import dagger.Provides
 import dagger.Subcomponent
 import dagger.multibindings.IntoMap
+import okhttp3.OkHttpClient
 
 
 @Module(includes = [WorkerInjectionModule::class], subcomponents = [SyncWorkerComponent::class])
@@ -60,12 +67,19 @@ abstract class WorkersModule {
     abstract fun providesSyncFeedsWorkerFactory(
             workerFactory: SyncFeedsWorker.WorkerFactory): WorkerFactory
 
+    @Binds
+    @IntoMap
+    @WorkerKey(SyncFeedsIconWorker::class)
+    abstract fun providesSyncFeedsIconWorkerFactory(
+            workerFactory: SyncFeedsIconWorker.WorkerFactory): WorkerFactory
+
 }
 
 @Subcomponent(modules = [
     NetworkLoginModule::class,
     TinyrssApiModule::class,
-    DatabaseAccessModule::class
+    DatabaseAccessModule::class,
+    FaviKonModule::class
 ])
 @PerAccount
 interface SyncWorkerComponent {
@@ -75,6 +89,7 @@ interface SyncWorkerComponent {
     val serverInformation: ServerInformation
     val databaseService: DatabaseService
     val dispatchers: CoroutineDispatchersProvider
+    val feedIconSynchronizer: FeedIconSynchronizer
 
     @Subcomponent.Builder
     interface Builder {
@@ -83,5 +98,18 @@ interface SyncWorkerComponent {
         fun seedAccount(account: Account): Builder
 
         fun build(): SyncWorkerComponent
+    }
+}
+
+@Module
+internal class FaviKonModule {
+
+    @Provides
+    fun providesFaviKonSnoop(okHttpClient: OkHttpClient): FaviKonSnoop {
+        val snoopers = listOf(
+                AppManifestSnooper(),
+                WhatWgSnooper(),
+                AppleTouchIconSnooper())
+        return FaviKonSnoop(snoopers, okHttpClient)
     }
 }

@@ -47,6 +47,7 @@ import com.geekorum.ttrss.sync.SyncContract.EXTRA_FEED_ID
 import com.geekorum.ttrss.sync.SyncContract.EXTRA_NUMBER_OF_LATEST_ARTICLES_TO_REFRESH
 import com.geekorum.ttrss.sync.SyncContract.EXTRA_UPDATE_FEED_ICONS
 import com.geekorum.ttrss.sync.workers.SendTransactionsWorker
+import com.geekorum.ttrss.sync.workers.SyncFeedsIconWorker
 import com.geekorum.ttrss.sync.workers.SyncFeedsWorker
 import com.geekorum.ttrss.sync.workers.SyncWorkerFactory
 import com.geekorum.ttrss.sync.workers.UpdateAccountInfoWorker
@@ -112,7 +113,7 @@ class ArticleSynchronizer @AssistedInject constructor(
                 sendTransactions()
                 synchronizeFeeds()
                 if (updateFeedIcons) {
-                    launch { feedIconSynchronizer.synchronizeFeedIcons() }
+                    synchronizeFeedIcons()
                 }
                 collectNewArticles()
                 updateArticlesStatus()
@@ -127,6 +128,20 @@ class ArticleSynchronizer @AssistedInject constructor(
             Timber.log(if (e is CancellationException) Log.WARN else Log.ERROR,
                 e,"unable to synchronize articles")
         }
+    }
+
+    private fun synchronizeFeedIcons() {
+        val request = OneTimeWorkRequestBuilder<SyncFeedsIconWorker>()
+                .setConstraints(Constraints.Builder()
+                        .setRequiredNetworkType(NetworkType.CONNECTED)
+                        .build())
+                .setInputData(workDataOf(
+                        SyncWorkerFactory.PARAM_ACCOUNT_NAME to account.name,
+                        SyncWorkerFactory.PARAM_ACCOUNT_TYPE to account.type
+                ))
+                .build()
+
+        workManager.enqueue(request)
     }
 
     private suspend fun updateAccountInfo() {
