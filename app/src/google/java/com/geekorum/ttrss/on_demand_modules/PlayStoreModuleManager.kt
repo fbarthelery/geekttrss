@@ -21,34 +21,34 @@
 package com.geekorum.ttrss.on_demand_modules
 
 import android.app.Activity
-import com.geekorum.geekdroid.gms.await
+import com.google.android.play.core.ktx.bytesDownloaded
+import com.google.android.play.core.ktx.requestCancelInstall
+import com.google.android.play.core.ktx.requestDeferredInstall
+import com.google.android.play.core.ktx.requestDeferredUninstall
+import com.google.android.play.core.ktx.requestInstall
+import com.google.android.play.core.ktx.requestProgressFlow
+import com.google.android.play.core.ktx.requestSessionState
+import com.google.android.play.core.ktx.status
+import com.google.android.play.core.ktx.totalBytesToDownload
 import com.google.android.play.core.splitinstall.SplitInstallException
 import com.google.android.play.core.splitinstall.SplitInstallManager
 import com.google.android.play.core.splitinstall.SplitInstallManagerFactory
-import com.google.android.play.core.splitinstall.SplitInstallRequest
 import com.google.android.play.core.splitinstall.SplitInstallSessionState
-import com.google.android.play.core.splitinstall.SplitInstallStateUpdatedListener
 import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus
-import com.google.android.play.core.tasks.Task
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.runBlocking
 
+@UseExperimental(ExperimentalCoroutinesApi::class)
 class PlayStoreModuleManager constructor(
     private val splitInstallManager: SplitInstallManager
 ) : OnDemandModuleManager {
     override suspend fun startInstallModule(vararg modules: String): InstallSession {
-        val installRequest = SplitInstallRequest.newBuilder().apply {
-            modules.forEach {
-                addModule(it)
-            }
-        }.build()
-        val installTask: Task<Int> = splitInstallManager.startInstall(installRequest)
         try {
-            val id = installTask.await()
+            val id = splitInstallManager.requestInstall(modules = modules.toList())
             if (id == 0) {
                 // already installed so not a real session
                 return CompleteSession(id)
@@ -59,12 +59,12 @@ class PlayStoreModuleManager constructor(
         }
     }
 
-    override fun deferredInstall(vararg modules: String) {
-        splitInstallManager.deferredInstall(modules.toList())
+    override fun deferredInstall(vararg modules: String) = runBlocking {
+        splitInstallManager.requestDeferredInstall(modules.toList())
     }
 
-    override fun uninstall(vararg modules: String) {
-        splitInstallManager.deferredUninstall(modules.toList())
+    override fun uninstall(vararg modules: String) = runBlocking {
+        splitInstallManager.requestDeferredUninstall(modules.toList())
     }
 
     override val installedModules: Set<String>
@@ -79,40 +79,28 @@ private class SplitInstallSession(
 
     @ExperimentalCoroutinesApi
     override fun getSessionStates(): Flow<State> {
-        return callbackFlow {
-            val listener = SplitInstallStateUpdatedListener {
-                if (it.sessionId() != id) {
-                    return@SplitInstallStateUpdatedListener
-                }
-                val installState = it.toInstallSessionState()
-                channel.offer(installState)
-                if (it.isTerminal) {
-                    channel.close()
-                }
-            }
-            splitInstallManager.registerListener(listener)
-            awaitClose { splitInstallManager.unregisterListener(listener) }
-        }
+        return splitInstallManager.requestProgressFlow()
+                .map { it.toInstallSessionState() }
     }
 
     override suspend fun getSessionState(): State {
-        val splitInstallSessionState = splitInstallManager.getSessionState(id).await()
+        val splitInstallSessionState = splitInstallManager.requestSessionState(id)
         return splitInstallSessionState.toInstallSessionState()
     }
 
-    override fun cancel() {
-        splitInstallManager.cancelInstall(id)
+    override fun cancel() = runBlocking {
+        splitInstallManager.requestCancelInstall(id)
     }
 
     override suspend fun startUserConfirmationDialog(activity: Activity, code: Int) {
-        val state = splitInstallManager.getSessionState(id).await()
+        val state = splitInstallManager.requestSessionState(id)
         splitInstallManager.startConfirmationDialogForResult(state, activity, code)
     }
 
 }
 
 private fun SplitInstallSessionState.toInstallSessionState(): InstallSession.State {
-    val status = when (val status = status()) {
+    val status = when (status) {
         SplitInstallSessionStatus.PENDING -> InstallSession.State.Status.PENDING
         SplitInstallSessionStatus.DOWNLOADING -> InstallSession.State.Status.DOWNLOADING
         SplitInstallSessionStatus.DOWNLOADED, SplitInstallSessionStatus.INSTALLING -> InstallSession.State.Status.INSTALLING
@@ -123,19 +111,9 @@ private fun SplitInstallSessionState.toInstallSessionState(): InstallSession.Sta
         SplitInstallSessionStatus.CANCELED -> InstallSession.State.Status.CANCELED
         else -> throw IllegalArgumentException("unhandled status $status")
     }
-    return InstallSession.State(status, bytesDownloaded(), totalBytesToDownload())
+    return InstallSession.State(status, bytesDownloaded, totalBytesToDownload)
 }
 
-/**
- * Is this the last state that we will receive?
- */
-private val SplitInstallSessionState.isTerminal: Boolean
-    get() = when (status()) {
-        SplitInstallSessionStatus.INSTALLED,
-        SplitInstallSessionStatus.FAILED,
-        SplitInstallSessionStatus.CANCELED -> true
-        else -> false
-    }
 
 @Module
 class PlayStoreInstallModule {
