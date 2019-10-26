@@ -22,19 +22,22 @@ package com.geekorum.ttrss.in_app_update
 
 import android.app.Activity
 import android.app.Application
-import com.geekorum.geekdroid.gms.await
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.install.InstallState
-import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
+import com.google.android.play.core.install.model.InstallErrorCode
 import com.google.android.play.core.install.model.InstallStatus
+import com.google.android.play.core.ktx.AppUpdateResult
+import com.google.android.play.core.ktx.installErrorCode
+import com.google.android.play.core.ktx.installStatus
+import com.google.android.play.core.ktx.requestAppUpdateInfo
+import com.google.android.play.core.ktx.requestUpdateFlow
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.map
 import timber.log.Timber
 import com.google.android.play.core.install.model.UpdateAvailability as PlayUpdateAvailability
 
@@ -44,7 +47,7 @@ class PlayStoreInAppUpdateManager(
     private val appUpdateManager: AppUpdateManager
 ) : InAppUpdateManager {
     override suspend fun getUpdateAvailability(): UpdateAvailability {
-        val updateInfo = appUpdateManager.appUpdateInfo.await()
+        val updateInfo = appUpdateManager.requestAppUpdateInfo()
         return when (updateInfo.updateAvailability()) {
             PlayUpdateAvailability.UPDATE_AVAILABLE,
             PlayUpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS
@@ -55,30 +58,22 @@ class PlayStoreInAppUpdateManager(
     }
 
     override suspend fun getUpdateState(): UpdateState {
-        val updateInfo = appUpdateManager.appUpdateInfo.await()
-        val status = PlayInstallStatus(updateInfo.installStatus()).toUpdateStateStatus()
+        val updateInfo = appUpdateManager.requestAppUpdateInfo()
+        val status = PlayInstallStatus(updateInfo.installStatus).toUpdateStateStatus()
         return UpdateState(status)
     }
 
     @UseExperimental(ExperimentalCoroutinesApi::class)
     override suspend fun startUpdate(activity: Activity, requestCode: Int): Flow<UpdateState> {
-        val updateInfo = appUpdateManager.appUpdateInfo.await()
-
-        return callbackFlow {
-            val listener = InstallStateUpdatedListener {
-                Timber.tag(TAG).d("In app update state $it")
-                channel.offer(it.toUpdateState())
-                if (it.isTerminal()) {
-                    channel.close()
-                }
-            }
-            appUpdateManager.registerListener(listener)
-            appUpdateManager.startUpdateFlowForResult(updateInfo, AppUpdateType.FLEXIBLE,
+        val updateInfo = appUpdateManager.requestAppUpdateInfo()
+        appUpdateManager.startUpdateFlowForResult(updateInfo, AppUpdateType.FLEXIBLE,
                 activity, requestCode)
-            // set state to UNKNOWN, because user has not accepted the update yet
-            channel.offer(UpdateState(UpdateState.Status.UNKNOWN))
-            awaitClose { appUpdateManager.unregisterListener(listener) }
-        }
+        return appUpdateManager.requestUpdateFlow()
+                .map {
+                    it.toUpdateState().also {state ->
+                        Timber.tag(TAG).d("In app update state $state")
+                    }
+                }
     }
 
     override fun completeUpdate() {
@@ -86,37 +81,34 @@ class PlayStoreInAppUpdateManager(
     }
 }
 
+private fun AppUpdateResult.toUpdateState(): UpdateState {
+    return when(this) {
+        is AppUpdateResult.Available -> UpdateState(UpdateState.Status.UNKNOWN)
+        is AppUpdateResult.NotAvailable -> UpdateState(UpdateState.Status.UNKNOWN)
+        is AppUpdateResult.InProgress -> installState.toUpdateState()
+        is AppUpdateResult.Downloaded -> UpdateState(UpdateState.Status.DOWNLOADED, InstallErrorCode.NO_ERROR)
+    }
+}
+
 private fun InstallState.toUpdateState(): UpdateState {
-    val status = PlayInstallStatus(installStatus()).toUpdateStateStatus()
-    return UpdateState(status, installErrorCode())
+    val status = PlayInstallStatus(installStatus).toUpdateStateStatus()
+    return UpdateState(status, installErrorCode)
 }
 
 inline class PlayInstallStatus(private val value: Int) {
 
-    fun toUpdateStateStatus(): UpdateState.Status {
-        return when (value) {
-            InstallStatus.DOWNLOADING -> UpdateState.Status.DOWNLOADING
-            InstallStatus.DOWNLOADED -> UpdateState.Status.DOWNLOADED
-            InstallStatus.INSTALLING -> UpdateState.Status.INSTALLING
-            InstallStatus.INSTALLED -> UpdateState.Status.INSTALLED
-            InstallStatus.FAILED -> UpdateState.Status.FAILED
-            InstallStatus.CANCELED -> UpdateState.Status.CANCELED
-            InstallStatus.REQUIRES_UI_INTENT,
-            InstallStatus.PENDING -> UpdateState.Status.PENDING
-            InstallStatus.UNKNOWN -> UpdateState.Status.UNKNOWN
-            else -> UpdateState.Status.UNKNOWN
-        }
+    fun toUpdateStateStatus(): UpdateState.Status = when (value) {
+        InstallStatus.DOWNLOADING -> UpdateState.Status.DOWNLOADING
+        InstallStatus.DOWNLOADED -> UpdateState.Status.DOWNLOADED
+        InstallStatus.INSTALLING -> UpdateState.Status.INSTALLING
+        InstallStatus.INSTALLED -> UpdateState.Status.INSTALLED
+        InstallStatus.FAILED -> UpdateState.Status.FAILED
+        InstallStatus.CANCELED -> UpdateState.Status.CANCELED
+        InstallStatus.PENDING -> UpdateState.Status.PENDING
+        InstallStatus.UNKNOWN -> UpdateState.Status.UNKNOWN
+        else -> UpdateState.Status.UNKNOWN
     }
 }
-
-private fun InstallState.isTerminal(): Boolean = when (installStatus()) {
-    InstallStatus.CANCELED,
-    InstallStatus.INSTALLED,
-    InstallStatus.FAILED -> true
-
-    else -> false
-}
-
 
 @Module
 object PlayStoreInAppUpdateModule {

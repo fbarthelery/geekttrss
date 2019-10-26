@@ -25,8 +25,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.geekorum.ttrss.in_app_update.UpdateState.Status.DOWNLOADED
 import com.geekorum.ttrss.in_app_update.UpdateState.Status.DOWNLOADING
 import com.geekorum.ttrss.in_app_update.UpdateState.Status.FAILED
-import com.geekorum.ttrss.in_app_update.UpdateState.Status.INSTALLED
-import com.geekorum.ttrss.in_app_update.UpdateState.Status.INSTALLING
 import com.geekorum.ttrss.in_app_update.UpdateState.Status.PENDING
 import com.geekorum.ttrss.in_app_update.UpdateState.Status.UNKNOWN
 import com.google.android.play.core.appupdate.testing.FakeAppUpdateManager
@@ -95,8 +93,7 @@ class PlayStoreInAppUpdateManagerTest {
                 UNKNOWN -> fakeAppUpdateManager.userAcceptsUpdate()
                 PENDING -> fakeAppUpdateManager.downloadStarts()
                 DOWNLOADING -> fakeAppUpdateManager.downloadCompletes()
-                DOWNLOADED -> fakeAppUpdateManager.completeUpdate()
-                INSTALLING -> fakeAppUpdateManager.installCompletes()
+                // DOWNLOADED is now a final state. No other states after it
                 else -> fakeAppUpdateManager.installFails()
             }
         }
@@ -108,9 +105,7 @@ class PlayStoreInAppUpdateManagerTest {
             UpdateState(UNKNOWN),
             UpdateState(PENDING, InstallErrorCode.NO_ERROR),
             UpdateState(DOWNLOADING, InstallErrorCode.NO_ERROR),
-            UpdateState(DOWNLOADED, InstallErrorCode.NO_ERROR),
-            UpdateState(INSTALLING, InstallErrorCode.NO_ERROR),
-            UpdateState(INSTALLED, InstallErrorCode.NO_ERROR)
+            UpdateState(DOWNLOADED, InstallErrorCode.NO_ERROR)
         )
     }
 
@@ -122,12 +117,11 @@ class PlayStoreInAppUpdateManagerTest {
             when (it.status) { // triggers next step
                 UNKNOWN -> fakeAppUpdateManager.userAcceptsUpdate()
                 PENDING -> fakeAppUpdateManager.downloadStarts()
-                DOWNLOADING -> fakeAppUpdateManager.downloadCompletes()
-                DOWNLOADED -> fakeAppUpdateManager.completeUpdate()
-                INSTALLING -> {
+                DOWNLOADING -> {
                     fakeAppUpdateManager.setInstallErrorCode(InstallErrorCode.ERROR_INSTALL_NOT_ALLOWED)
-                    fakeAppUpdateManager.installFails()
+                    fakeAppUpdateManager.downloadFails()
                 }
+                // DOWNLOADED is now a final state. No other states after it
                 else -> fakeAppUpdateManager.installFails()
             }
         }
@@ -139,8 +133,6 @@ class PlayStoreInAppUpdateManagerTest {
             UpdateState(UNKNOWN),
             UpdateState(PENDING, InstallErrorCode.NO_ERROR),
             UpdateState(DOWNLOADING, InstallErrorCode.NO_ERROR),
-            UpdateState(DOWNLOADED, InstallErrorCode.NO_ERROR),
-            UpdateState(INSTALLING, InstallErrorCode.NO_ERROR),
             UpdateState(FAILED, InstallErrorCode.ERROR_INSTALL_NOT_ALLOWED)
         )
     }
