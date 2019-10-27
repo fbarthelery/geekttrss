@@ -65,7 +65,7 @@ dependencies {
     val geekdroidExt = GEEKDROID_PROJECT_DIR?.let { "" } ?: "aar"
     implementation(group = "com.geekorum", name = "geekdroid", version = "0.0.1", ext = geekdroidExt)
 
-    val coroutinesVersion = "1.3.0"
+    val coroutinesVersion = "1.3.2"
     implementation(enforcedCoroutinesPlatform(coroutinesVersion))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")

@@ -34,7 +34,7 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.6.1")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.11.0")
 
-    val coroutinesVersion = "1.3.0"
+    val coroutinesVersion = "1.3.2"
     implementation(enforcedCoroutinesPlatform(coroutinesVersion))
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
 
