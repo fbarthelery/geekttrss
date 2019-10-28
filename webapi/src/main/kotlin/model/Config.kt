@@ -77,13 +77,13 @@ data class GetConfigResponsePayload(
 
     companion object {
         fun serializer(): KSerializer<GetConfigResponsePayload> {
-            return GetConfigResponsePayload.GetConfigResponsePayloadSerializer()
+            return GetConfigResponsePayloadSerializer
         }
     }
 
 
     @Serializer(GetConfigResponsePayload::class)
-    class GetConfigResponsePayloadSerializer : KSerializer<GetConfigResponsePayload> {
+    object GetConfigResponsePayloadSerializer : KSerializer<GetConfigResponsePayload> {
         override fun serialize(encoder: Encoder, obj: GetConfigResponsePayload) {
             TODO("not implemented")
         }

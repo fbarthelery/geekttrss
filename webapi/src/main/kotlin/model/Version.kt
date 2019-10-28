@@ -62,13 +62,13 @@ data class GetVersionResponsePayload(
 
     companion object {
         fun serializer(): KSerializer<GetVersionResponsePayload> {
-            return GetVersionResponsePayload.GetVersionResponsePayloadSerializer()
+            return GetVersionResponsePayloadSerializer
         }
     }
 
 
     @Serializer(GetVersionResponsePayload::class)
-    class GetVersionResponsePayloadSerializer : KSerializer<GetVersionResponsePayload> {
+    object GetVersionResponsePayloadSerializer : KSerializer<GetVersionResponsePayload> {
         override fun serialize(encoder: Encoder, obj: GetVersionResponsePayload) {
             TODO("not implemented")
         }
@@ -133,13 +133,13 @@ data class GetApiLevelResponsePayload(
 
     companion object {
         fun serializer(): KSerializer<GetApiLevelResponsePayload> {
-            return GetApiLevelResponsePayload.GetApiLevelResponsePayloadSerializer()
+            return GetApiLevelResponsePayloadSerializer
         }
     }
 
 
     @Serializer(GetApiLevelResponsePayload::class)
-    class GetApiLevelResponsePayloadSerializer : KSerializer<GetApiLevelResponsePayload> {
+    object GetApiLevelResponsePayloadSerializer : KSerializer<GetApiLevelResponsePayload> {
         override fun serialize(encoder: Encoder, obj: GetApiLevelResponsePayload) {
             TODO("not implemented")
         }

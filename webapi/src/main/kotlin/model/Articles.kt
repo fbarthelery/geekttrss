@@ -132,12 +132,12 @@ data class UpdateArticleResponsePayload(
 
   companion object {
         fun serializer(): KSerializer<UpdateArticleResponsePayload> {
-            return UpdateArticleResponsePayloadSerializer()
+            return UpdateArticleResponsePayloadSerializer
         }
     }
 
     @Serializer(UpdateArticleResponsePayload::class)
-    class UpdateArticleResponsePayloadSerializer : KSerializer<UpdateArticleResponsePayload> {
+    object UpdateArticleResponsePayloadSerializer : KSerializer<UpdateArticleResponsePayload> {
         override fun serialize(encoder: Encoder, obj: UpdateArticleResponsePayload) {
             TODO("not implemented")
         }

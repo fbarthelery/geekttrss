@@ -89,12 +89,12 @@ data class SubscribeToFeedResponsePayload(
 
     companion object {
         fun serializer(): KSerializer<SubscribeToFeedResponsePayload> {
-            return SubscribeToFeedResponsePayloadSerializer()
+            return SubscribeToFeedResponsePayloadSerializer
         }
     }
 
     @Serializer(SubscribeToFeedResponsePayload::class)
-    class SubscribeToFeedResponsePayloadSerializer : KSerializer<SubscribeToFeedResponsePayload> {
+    object SubscribeToFeedResponsePayloadSerializer : KSerializer<SubscribeToFeedResponsePayload> {
         override fun serialize(encoder: Encoder, obj: SubscribeToFeedResponsePayload) {
             TODO("not implemented")
         }
@@ -178,12 +178,12 @@ data class UnsubscribeFeedResponsePayload(
 
     companion object {
         fun serializer(): KSerializer<UnsubscribeFeedResponsePayload> {
-            return UnsubscribeFeedResponsePayloadSerializer()
+            return UnsubscribeFeedResponsePayloadSerializer
         }
     }
 
     @Serializer(UnsubscribeFeedResponsePayload::class)
-    class UnsubscribeFeedResponsePayloadSerializer : KSerializer<UnsubscribeFeedResponsePayload> {
+    object UnsubscribeFeedResponsePayloadSerializer : KSerializer<UnsubscribeFeedResponsePayload> {
         override fun serialize(encoder: Encoder, obj: UnsubscribeFeedResponsePayload) {
             TODO("not implemented")
         }

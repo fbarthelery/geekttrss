@@ -82,12 +82,12 @@ data class LoginResponsePayload(
 // Workaround for kapt bug
     companion object {
         fun serializer(): KSerializer<LoginResponsePayload> {
-            return LoginResponsePayloadSerializer()
+            return LoginResponsePayloadSerializer
         }
     }
 
     @Serializer(LoginResponsePayload::class)
-    class LoginResponsePayloadSerializer : KSerializer<LoginResponsePayload> {
+    object LoginResponsePayloadSerializer : KSerializer<LoginResponsePayload> {
         override fun serialize(encoder: Encoder, obj: LoginResponsePayload) {
             TODO("not implemented")
         }
