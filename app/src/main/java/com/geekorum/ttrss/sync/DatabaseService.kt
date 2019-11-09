@@ -50,6 +50,7 @@ interface DatabaseService {
     suspend fun insertArticles(articles: List<Article>)
     suspend fun updateArticle(article: Article)
     suspend fun getLatestArticleId(): Long?
+    suspend fun getLatestArticleIdFromFeed(feedId: Long): Long?
 
     suspend fun updateArticlesMetadata(metadata: List<Metadata>)
 

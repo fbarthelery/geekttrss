@@ -39,6 +39,9 @@ abstract class SynchronizationDao {
     @Query("SELECT _id FROM articles ORDER BY _id DESC LIMIT 1")
     abstract suspend fun getLatestArticleId(): Long?
 
+    @Query("SELECT _id FROM articles WHERE feed_id=:feedId ORDER BY _id DESC LIMIT 1")
+    abstract suspend fun getLatestArticleIdFromFeed(feedId: Long): Long?
+
     @Query("SELECT * FROM categories")
     abstract suspend fun getAllCategories(): List<Category>
 
