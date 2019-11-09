@@ -32,11 +32,14 @@ import com.geekorum.ttrss.accounts.NetworkLoginModule
 import com.geekorum.ttrss.accounts.PerAccount
 import com.geekorum.ttrss.accounts.ServerInformation
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
+import com.geekorum.ttrss.htmlparsers.ImageUrlExtractor
 import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.network.TinyrssApiModule
+import com.geekorum.ttrss.sync.BackgroundDataUsageManager
 import com.geekorum.ttrss.sync.DatabaseAccessModule
 import com.geekorum.ttrss.sync.DatabaseService
 import com.geekorum.ttrss.sync.FeedIconSynchronizer
+import com.geekorum.ttrss.sync.HttpCacher
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Module
@@ -73,6 +76,12 @@ abstract class WorkersModule {
     abstract fun providesSyncFeedsIconWorkerFactory(
             workerFactory: SyncFeedsIconWorker.WorkerFactory): WorkerFactory
 
+    @Binds
+    @IntoMap
+    @WorkerKey(CollectNewArticlesWorker::class)
+    abstract fun providesCollectNewArticlesWorkerFactory(
+            workerFactory: CollectNewArticlesWorker.WorkerFactory): WorkerFactory
+
 }
 
 @Subcomponent(modules = [
@@ -90,6 +99,9 @@ interface SyncWorkerComponent {
     val databaseService: DatabaseService
     val dispatchers: CoroutineDispatchersProvider
     val feedIconSynchronizer: FeedIconSynchronizer
+    val backgroundDataUsageManager: BackgroundDataUsageManager
+    val imageUrlExtractor: ImageUrlExtractor
+    val httpCacher: HttpCacher
 
     @Subcomponent.Builder
     interface Builder {
