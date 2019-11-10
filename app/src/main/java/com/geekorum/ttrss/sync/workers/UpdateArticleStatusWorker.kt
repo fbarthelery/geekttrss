@@ -1,7 +1,26 @@
+/*
+ * Geekttrss is a RSS feed reader application on the Android Platform.
+ *
+ * Copyright (C) 2017-2019 by Frederic-Charles Barthelery.
+ *
+ * This file is part of Geekttrss.
+ *
+ * Geekttrss is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Geekttrss is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package com.geekorum.ttrss.sync.workers
 
 import android.content.Context
-import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
@@ -24,9 +43,9 @@ class UpdateArticleStatusWorker(
         context: Context,
         workerParams: WorkerParameters,
         private val dispatchers: CoroutineDispatchersProvider,
-        private val apiService: ApiService,
+        apiService: ApiService,
         private val databaseService: DatabaseService
-) : CoroutineWorker(context, workerParams) {
+) : FeedArticlesWorker(context, workerParams, apiService) {
 
     companion object {
         const val PARAM_FEED_ID = "feed_id"
@@ -79,7 +98,8 @@ class UpdateArticleStatusWorker(
             repeat(capacity) {
                 launch(dispatchers.io) {
                     for (offsetForRequest in newRequestChannel) {
-                        val articles = getArticles(feedId, 0, offsetForRequest, showExcerpt = false)
+                        val articles = getArticles(feedId, 0, offsetForRequest,
+                                showExcerpt = false, showContent = false)
                         updateArticleMetadata(articles)
                         orchestratorChannel.send(articles.size)
                     }
@@ -89,23 +109,6 @@ class UpdateArticleStatusWorker(
         orchestratorChannel.close()
     }
 
-
-    @Throws(ApiCallException::class)
-    private suspend fun getArticles(
-            feedId: Long, sinceId: Long, offset: Int,
-            showExcerpt: Boolean = true,
-            gradually: Boolean = false
-    ): List<Article> {
-        val showContent: Boolean = false
-
-        return if (gradually) {
-            apiService.getArticlesOrderByDateReverse(feedId,
-                    sinceId, offset, showExcerpt, showContent)
-        } else {
-            apiService.getArticles(feedId,
-                    sinceId, offset, showExcerpt, showContent)
-        }
-    }
 
     private suspend fun updateArticleMetadata(articles: List<Article>) {
         val metadatas = articles.map { Metadata.fromArticle(it) }
