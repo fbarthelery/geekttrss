@@ -31,14 +31,24 @@ import android.os.Build
 import android.os.Bundle
 import androidx.annotation.RequiresApi
 import androidx.core.content.getSystemService
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.map
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import androidx.work.await
+import androidx.work.workDataOf
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.providers.PurgeArticlesWorker
-import com.geekorum.ttrss.sync.SyncContract
+import com.geekorum.ttrss.sync.workers.CollectNewArticlesWorker
+import com.geekorum.ttrss.sync.workers.SyncWorkerFactory
+import com.geekorum.ttrss.sync.workers.UpdateArticleStatusWorker
 import timber.log.Timber
+import java.util.UUID
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -57,6 +67,17 @@ class BackgroundJobManager @Inject constructor(
 
     fun refreshFeed(account: Account, feedId: Long) {
         impl.refreshFeed(account, feedId)
+    }
+    /**
+     * Refresh a feed.
+     * @return workmanager job uuid
+     */
+    suspend fun refreshFeed(account: Account, feedId: Long): UUID {
+        return impl.refreshFeed(account, feedId)
+    }
+
+    fun isRefreshingStatus(jobId: UUID): LiveData<Boolean> {
+        return impl.isRefreshingStatus(jobId)
     }
 
     fun setupPeriodicJobs() {
@@ -115,6 +136,51 @@ private open class BackgroundJobManagerImpl internal constructor(
         val extras = Bundle()
         extras.putLong(SyncContract.EXTRA_FEED_ID, feedId)
         requestSync(account, extras)
+    }
+    suspend fun refreshFeed(account: Account, feedId: Long): UUID {
+        val constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
+
+        var inputData = workDataOf(
+                SyncWorkerFactory.PARAM_ACCOUNT_NAME to account.name,
+                SyncWorkerFactory.PARAM_ACCOUNT_TYPE to account.type,
+                CollectNewArticlesWorker.PARAM_FEED_ID to feedId
+        )
+        val collectNewArticleRequest = OneTimeWorkRequestBuilder<CollectNewArticlesWorker>()
+                .setConstraints(constraints)
+                .setInputData(inputData)
+                .build()
+        inputData = workDataOf(
+                SyncWorkerFactory.PARAM_ACCOUNT_NAME to account.name,
+                SyncWorkerFactory.PARAM_ACCOUNT_TYPE to account.type,
+                UpdateArticleStatusWorker.PARAM_FEED_ID to feedId
+        )
+        val updateStatusRequest = OneTimeWorkRequestBuilder<UpdateArticleStatusWorker>()
+                .setConstraints(constraints)
+                .setInputData(inputData)
+                .build()
+        WorkManager.getInstance(context)
+                .beginWith(collectNewArticleRequest)
+                .then(updateStatusRequest)
+                .enqueue().await()
+        return updateStatusRequest.id
+    }
+
+    /**
+     * Return a LiveData containing the running status of the job.
+     * True if the job is not finished
+     * False if the job is finished
+     */
+    fun isRefreshingStatus(jobId: UUID): LiveData<Boolean> {
+        return WorkManager.getInstance(context)
+                .getWorkInfoByIdLiveData(jobId).map { workInfo: WorkInfo? ->
+                    if (workInfo == null) {
+                        false
+                    } else {
+                        !workInfo.state.isFinished
+                    }
+                }
     }
 
     private fun requestSync(account: Account, extras: Bundle) {
