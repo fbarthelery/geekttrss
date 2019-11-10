@@ -28,18 +28,22 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
+import androidx.lifecycle.viewModelScope
 import androidx.paging.DataSource
-import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import androidx.paging.toLiveData
+import com.geekorum.geekdroid.accounts.SyncInProgressLiveData
 import com.geekorum.geekdroid.dagger.ViewModelAssistedFactory
 import com.geekorum.ttrss.background_job.BackgroundJobManager
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.Feed
+import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.session.Action
 import com.geekorum.ttrss.session.UndoManager
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
+import kotlinx.coroutines.launch
+import java.util.UUID
 
 private const val PREF_VIEW_MODE = "view_mode"
 private const val STATE_FEED_ID = "feed_id"
@@ -75,6 +79,17 @@ class FragmentViewModel @AssistedInject constructor(
     }.switchMap {
         checkNotNull(it)
         getArticlesForFeed(it)
+    }
+
+    private var refreshJobId: MutableLiveData<UUID> = MutableLiveData<UUID>().apply {
+        value = null
+    }
+
+    val isRefreshing: LiveData<Boolean> = refreshJobId.switchMap {
+        if (it == null)
+            SyncInProgressLiveData(account, ArticlesContract.AUTHORITY)
+        else
+            backgroundJobManager.isRefreshingStatus(it)
     }
 
     private val unreadActionUndoManager = UndoManager<Action>()
@@ -134,7 +149,14 @@ class FragmentViewModel @AssistedInject constructor(
     }
 
     fun refresh() {
-        backgroundJobManager.refreshFeed(account, state[STATE_FEED_ID]!!)
+        viewModelScope.launch {
+            val feedId: Long = state[STATE_FEED_ID]!!
+            if (Feed.isVirtualFeed(feedId)) {
+                backgroundJobManager.refresh(account)
+            } else {
+                refreshJobId.value = backgroundJobManager.refreshFeed(account, feedId)
+            }
+        }
     }
 
     fun setArticleUnread(articleId: Long, newValue: Boolean) {

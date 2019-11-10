@@ -28,7 +28,6 @@
 
     <data>
         <import type="android.view.View" />
-        <variable name="activityViewModel" type="com.geekorum.ttrss.articles_list.ActivityViewModel" />
         <variable name="fragmentViewModel" type="com.geekorum.ttrss.articles_list.FragmentViewModel" />
     </data>
 
@@ -36,7 +35,7 @@
             android:id="@+id/swipe_refresh_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:refreshing="@{safeUnbox(activityViewModel.refreshing)}">
+            app:refreshing="@{safeUnbox(fragmentViewModel.refreshing)}">
 
         <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -52,7 +51,7 @@
                       android:gravity="center"
                       android:textAppearance="?textAppearanceHeadline4"
                       android:padding="@dimen/activity_horizontal_margin"
-                      android:text="@{safeUnbox(activityViewModel.refreshing) ? @string/fragment_articles_list_no_articles_and_sync_lbl : @string/fragment_articles_list_no_articles_lbl}"
+                      android:text="@{safeUnbox(fragmentViewModel.refreshing) ? @string/fragment_articles_list_no_articles_and_sync_lbl : @string/fragment_articles_list_no_articles_lbl}"
                       android:visibility="@{safeUnbox(fragmentViewModel.haveZeroArticles) ? View.VISIBLE : View.GONE}"
                     />
 

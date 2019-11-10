@@ -28,19 +28,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.switchMap
-import com.geekorum.geekdroid.accounts.SyncInProgressLiveData
-import com.geekorum.geekdroid.app.lifecycle.EmptyEvent
 import com.geekorum.geekdroid.app.lifecycle.Event
 import com.geekorum.geekdroid.dagger.ViewModelAssistedFactory
 import com.geekorum.ttrss.background_job.BackgroundJobManager
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.network.TtRssBrowserLauncher
-import com.geekorum.ttrss.providers.ArticlesContract
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
-import com.geekorum.geekdroid.app.lifecycle.EmptyEvent.Companion.makeEmptyEvent as SearchClosedEvent
-import com.geekorum.geekdroid.app.lifecycle.EmptyEvent.Companion.makeEmptyEvent as SearchOpenedEvent
 
 private const val STATE_FEED_ID = "feed_id"
 private const val STATE_ACCOUNT = "account"
@@ -71,10 +66,8 @@ class ActivityViewModel @AssistedInject constructor(
     private val _searchQuery = MutableLiveData<String>()
     val searchQuery: LiveData<String> = _searchQuery
 
-    val isRefreshing: LiveData<Boolean> =
-        state.getLiveData<Account>(STATE_ACCOUNT).switchMap {
-            SyncInProgressLiveData(it, ArticlesContract.AUTHORITY)
-        }
+    private val _refreshClickedEvent = MutableLiveData<Event<Any>>()
+    val refreshClickedEvent: LiveData<Event<Any>> = _refreshClickedEvent
 
     init {
         browserLauncher.warmUp()
@@ -90,13 +83,7 @@ class ActivityViewModel @AssistedInject constructor(
     }
 
     fun refresh() {
-        val feedId: Long = state[STATE_FEED_ID]!!
-        val account: Account = state[STATE_ACCOUNT]!!
-        if (Feed.isVirtualFeed(feedId)) {
-            backgroundJobManager.refresh(account)
-        } else {
-            backgroundJobManager.refreshFeed(account, feedId)
-        }
+        _refreshClickedEvent.value = Event(Any())
     }
 
     fun displayArticle(position: Int, article: Article) {

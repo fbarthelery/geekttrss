@@ -32,6 +32,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
 import com.geekorum.geekdroid.views.recyclerview.ItemSwiper
 import com.geekorum.geekdroid.views.recyclerview.ScrollFromBottomAppearanceItemAnimator
@@ -93,7 +94,10 @@ class ArticlesListFragment @Inject constructor(
             }
         }
 
-        binding.activityViewModel = activityViewModel
+        activityViewModel.refreshClickedEvent.observe(this, EventObserver {
+            fragmentViewModel.refresh()
+        })
+
         binding.fragmentViewModel = fragmentViewModel
     }
 
@@ -110,13 +114,13 @@ class ArticlesListFragment @Inject constructor(
         recyclerView.setupCardSpacing()
 
         swipeRefresh.setOnRefreshListener {
-            activityViewModel.refresh()
+            fragmentViewModel.refresh()
             // leave the progress at least 1s, then refresh its value
             // So if the user trigger a refresh but no sync operation is launch (eg: because of no connectivity)
             // the SwipeRefreshLayout will come back to original status
             viewLifecycleOwner.lifecycleScope.launch {
                 delay(1000)
-                binding.swipeRefreshContainer.isRefreshing = activityViewModel.isRefreshing.value!!
+                binding.swipeRefreshContainer.isRefreshing = fragmentViewModel.isRefreshing.value!!
             }
         }
         recyclerView.itemAnimator = ScrollFromBottomAppearanceItemAnimator(recyclerView, DefaultItemAnimator())

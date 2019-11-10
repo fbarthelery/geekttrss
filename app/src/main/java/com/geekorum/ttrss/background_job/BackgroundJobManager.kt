@@ -65,9 +65,6 @@ class BackgroundJobManager @Inject constructor(
         impl.refresh(account)
     }
 
-    fun refreshFeed(account: Account, feedId: Long) {
-        impl.refreshFeed(account, feedId)
-    }
     /**
      * Refresh a feed.
      * @return workmanager job uuid
@@ -132,11 +129,6 @@ private open class BackgroundJobManagerImpl internal constructor(
         requestSync(account, extras)
     }
 
-    fun refreshFeed(account: Account, feedId: Long) {
-        val extras = Bundle()
-        extras.putLong(SyncContract.EXTRA_FEED_ID, feedId)
-        requestSync(account, extras)
-    }
     suspend fun refreshFeed(account: Account, feedId: Long): UUID {
         val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
