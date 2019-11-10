@@ -82,6 +82,12 @@ abstract class WorkersModule {
     abstract fun providesCollectNewArticlesWorkerFactory(
             workerFactory: CollectNewArticlesWorker.WorkerFactory): WorkerFactory
 
+    @Binds
+    @IntoMap
+    @WorkerKey(UpdateArticleStatusWorker::class)
+    abstract fun providesUpdateArticleStatusWorkerFactory(
+            workerFactory: UpdateArticleStatusWorker.WorkerFactory): WorkerFactory
+
 }
 
 @Subcomponent(modules = [
