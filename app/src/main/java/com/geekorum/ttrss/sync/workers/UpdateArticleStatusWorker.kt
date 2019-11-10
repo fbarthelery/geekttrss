@@ -29,6 +29,7 @@ import com.geekorum.ttrss.data.Metadata
 import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.sync.DatabaseService
 import com.geekorum.ttrss.webapi.ApiCallException
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -39,6 +40,7 @@ import javax.inject.Inject
 /**
  * Update the status of the latest articles of a Feed
  */
+@UseExperimental(ExperimentalCoroutinesApi::class)
 class UpdateArticleStatusWorker(
         context: Context,
         workerParams: WorkerParameters,

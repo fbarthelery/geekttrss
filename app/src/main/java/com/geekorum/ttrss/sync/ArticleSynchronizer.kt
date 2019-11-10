@@ -23,7 +23,6 @@ package com.geekorum.ttrss.sync
 import android.accounts.Account
 import android.app.Application
 import android.content.OperationApplicationException
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.RemoteException
 import android.util.Log
@@ -32,14 +31,9 @@ import androidx.work.Constraints
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import androidx.work.WorkRequest
 import androidx.work.await
 import androidx.work.workDataOf
 import com.geekorum.geekdroid.accounts.CancellableSyncAdapter
-import com.geekorum.ttrss.core.CoroutineDispatchersProvider
-import com.geekorum.ttrss.data.Article
-import com.geekorum.ttrss.data.Metadata
-import com.geekorum.ttrss.htmlparsers.ImageUrlExtractor
 import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.sync.SyncContract.EXTRA_FEED_ID
 import com.geekorum.ttrss.sync.SyncContract.EXTRA_NUMBER_OF_LATEST_ARTICLES_TO_REFRESH
@@ -50,33 +44,23 @@ import com.geekorum.ttrss.sync.workers.SyncFeedsIconWorker
 import com.geekorum.ttrss.sync.workers.SyncFeedsWorker
 import com.geekorum.ttrss.sync.workers.SyncWorkerFactory
 import com.geekorum.ttrss.sync.workers.UpdateAccountInfoWorker
+import com.geekorum.ttrss.sync.workers.UpdateArticleStatusWorker
 import com.geekorum.ttrss.webapi.ApiCallException
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.takeWhile
-import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.io.IOException
 import java.util.UUID
-
-private const val PREF_LATEST_ARTICLE_SYNCED_ID = "latest_article_sync_id"
 
 /**
  * Synchronize Articles from the network.
  */
 class ArticleSynchronizer @AssistedInject constructor(
         application: Application,
-        private val dispatchers: CoroutineDispatchersProvider,
-        private val apiService: ApiService,
         @Assisted params: Bundle,
         private val account: Account,
-        private val accountPreferences: SharedPreferences,
         private val databaseService: DatabaseService
 ) : CancellableSyncAdapter.CancellableSync() {
 
@@ -92,15 +76,8 @@ class ArticleSynchronizer @AssistedInject constructor(
     private val feedId = params.getLong(EXTRA_FEED_ID, ApiService.ALL_ARTICLES_FEED_ID)
 
     private var syncInfoAndFeedWorkId: UUID? = null
-    private var collectNewArticlesJobsIds: List<UUID> = emptyList()
-
-    private suspend fun getLatestArticleId(): Long {
-        var result = accountPreferences.getLong(PREF_LATEST_ARTICLE_SYNCED_ID, 0)
-        if (result == 0L) {
-            result = databaseService.getLatestArticleId() ?: 0
-        }
-        return result
-    }
+    private var collectNewArticlesJobsTag: String? = null
+    private var updateStatusJobsTag: String? = null
 
     override suspend fun sync() {
         try {
@@ -170,6 +147,7 @@ class ArticleSynchronizer @AssistedInject constructor(
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build()
 
+        val tag = UUID.randomUUID().toString()
         val jobRequests = databaseService.getFeeds().map { feed ->
             val inputData = workDataOf(
                     SyncWorkerFactory.PARAM_ACCOUNT_NAME to account.name,
@@ -179,115 +157,62 @@ class ArticleSynchronizer @AssistedInject constructor(
             OneTimeWorkRequestBuilder<CollectNewArticlesWorker>()
                     .setConstraints(constraints)
                     .setInputData(inputData)
+                    .addTag(tag)
                     .build()
         }
-
-        collectNewArticlesJobsIds = jobRequests.map { it.id }
+        collectNewArticlesJobsTag = tag
 
         workManager.enqueue(jobRequests).await()
 
-        jobRequests.asFlow()
-                .onEach { it.waitForCompletion() }
-                .collect()
-    }
-
-    private suspend fun WorkRequest.waitForCompletion() {
-        workManager.getWorkInfoByIdLiveData(id).asFlow()
-                .takeWhile {
-                    !it.state.isFinished
+        workManager.getWorkInfosByTagLiveData(tag).asFlow()
+                .takeWhile { workInfos ->
+                    workInfos.any { !it.state.isFinished }
                 }
                 .collect()
     }
 
+    private suspend fun updateArticlesStatus() {
+        val constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
+
+        val tag = UUID.randomUUID().toString()
+        val jobRequests = databaseService.getFeeds().map { feed ->
+            val inputData = workDataOf(
+                    SyncWorkerFactory.PARAM_ACCOUNT_NAME to account.name,
+                    SyncWorkerFactory.PARAM_ACCOUNT_TYPE to account.type,
+                    UpdateArticleStatusWorker.PARAM_FEED_ID to feed.id,
+                    UpdateArticleStatusWorker.PARAM_NUMBER_OF_LATEST_ARTICLES_TO_REFRESH to numberOfLatestArticlesToRefresh
+            )
+            OneTimeWorkRequestBuilder<UpdateArticleStatusWorker>()
+                    .setConstraints(constraints)
+                    .setInputData(inputData)
+                    .addTag(tag)
+                    .build()
+        }
+        updateStatusJobsTag = tag
+
+        workManager.enqueue(jobRequests).await()
+
+        workManager.getWorkInfosByTagLiveData(tag).asFlow()
+                .takeWhile { workInfos ->
+                    workInfos.any { !it.state.isFinished }
+                }
+                .collect()
+    }
 
     override fun onSyncCancelled() {
         super.onSyncCancelled()
         syncInfoAndFeedWorkId?.let {
             workManager.cancelWorkById(it)
         }
-        collectNewArticlesJobsIds.forEach {
-            workManager.cancelWorkById(it)
+        collectNewArticlesJobsTag?.let {
+            workManager.cancelAllWorkByTag(it)
+        }
+        updateStatusJobsTag?.let {
+            workManager.cancelAllWorkByTag(it)
         }
         Timber.i("Synchronization was cancelled")
-    }
-
-
-    private suspend fun updateArticleMetadata(articles: List<Article>) {
-        val metadatas = articles.map { Metadata.fromArticle(it) }
-        databaseService.updateArticlesMetadata(metadatas)
-    }
-
-    @Throws(ApiCallException::class)
-    private suspend fun updateArticlesStatus() = coroutineScope {
-        Timber.i("Updating old articles status")
-        val capacity = 5
-        val newRequestChannel = Channel<Int>(capacity)
-        val orchestratorChannel = Channel<Int>()
-
-        launch {
-            var offset = 0
-            fun shouldGetMore(): Boolean {
-                return if (numberOfLatestArticlesToRefresh < 0) true
-                else offset < numberOfLatestArticlesToRefresh
-            }
-
-            while (newRequestChannel.offer(offset)) {
-                offset += 50
-            }
-
-            for (articlesFetched in orchestratorChannel) {
-                if (articlesFetched == 0 || !shouldGetMore()) {
-                    newRequestChannel.close()
-                } else {
-                    newRequestChannel.send(offset)
-                    offset += 50
-                }
-            }
-        }
-
-        coroutineScope {
-            repeat(capacity) {
-                launch(dispatchers.io) {
-                    for (offsetForRequest in newRequestChannel) {
-                        val articles = getArticles(feedId, 0, offsetForRequest, showExcerpt = false,
-                            showContent = false)
-                        updateArticleMetadata(articles)
-                        orchestratorChannel.send(articles.size)
-                    }
-                }
-            }
-        }
-        orchestratorChannel.close()
-    }
-
-    @Throws(ApiCallException::class)
-    private suspend fun getArticles(
-        feedId: Long, sinceId: Long, offset: Int,
-        showExcerpt: Boolean = true,
-        showContent: Boolean = true,
-        gradually: Boolean = false
-    ): List<Article> {
-        val articles = if (gradually) {
-            apiService.getArticlesOrderByDateReverse(feedId,
-                sinceId, offset, showExcerpt, showContent)
-        } else {
-            apiService.getArticles(feedId,
-                sinceId, offset, showExcerpt, showContent)
-        }
-
-        if (showContent) {
-            articles.forEach {
-                augmentArticle(it)
-            }
-        }
-        return articles
-    }
-
-    private fun augmentArticle(article: Article): Article {
-        val augmenter = ArticleAugmenter(article)
-        article.contentExcerpt = augmenter.getContentExcerpt()
-        article.flavorImageUri = augmenter.getFlavorImageUri()
-        return article
     }
 
 }
