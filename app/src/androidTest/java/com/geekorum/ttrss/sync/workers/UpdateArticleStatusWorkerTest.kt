@@ -76,7 +76,7 @@ class UpdateArticleStatusWorkerTest {
 
 
     @Test
-    fun testThatArticleStatusChangeAfterRunningWorker() = runBlockingTest {
+    fun testThatArticleStatusChangeAfterRunningWorker() = testCoroutineDispatcher.runBlockingTest {
         val inputData = UpdateArticleStatusWorker.getInputData(
                 Account("account", "type"), 1)
 

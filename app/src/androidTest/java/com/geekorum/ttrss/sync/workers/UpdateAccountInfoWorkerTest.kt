@@ -86,7 +86,7 @@ class UpdateAccountInfoWorkerTest {
 
 
     @Test
-    fun testThatAccountInfoAreUpdatedAfterRunningWorker() = runBlockingTest {
+    fun testThatAccountInfoAreUpdatedAfterRunningWorker() = testCoroutineDispatcher.runBlockingTest {
         // previous accountInfo
         assertThat(databaseService.getAccountInfo("account", "https://test.exemple.com"))
                 .isNull()

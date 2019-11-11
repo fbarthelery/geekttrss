@@ -90,7 +90,7 @@ class CollectNewArticlesWorkerTest {
     }
 
     @Test
-    fun testThatNewArticlesArePresentAfterRunningWorker() = runBlockingTest {
+    fun testThatNewArticlesArePresentAfterRunningWorker() = testCoroutineDispatcher.runBlockingTest {
         val inputData = CollectNewArticlesWorker.getInputData(
                 Account("account", "type"), 1)
 

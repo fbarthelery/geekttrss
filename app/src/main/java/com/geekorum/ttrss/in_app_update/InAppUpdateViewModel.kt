@@ -23,6 +23,7 @@ package com.geekorum.ttrss.in_app_update
 import android.app.Activity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
@@ -55,7 +56,7 @@ class InAppUpdateViewModel @Inject constructor(
 
     val isUpdateReadyToInstall = updateState.map {
         it.status == UpdateState.Status.DOWNLOADED
-    }
+    }.distinctUntilChanged()
 
     private var updateJob: Job? = null
 

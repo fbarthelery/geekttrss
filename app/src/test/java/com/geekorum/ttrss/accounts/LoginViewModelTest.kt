@@ -100,7 +100,7 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun testCheckEmptyPasswordSendEventWhenNonEmpty() = runBlockingTest {
+    fun testCheckEmptyPasswordSendEventWhenNonEmpty() = testCoroutineDispatcher.runBlockingTest {
         viewModel.checkNonEmptyPassword("")
 
         val error = viewModel.fieldErrors.asFlow().first()
@@ -108,7 +108,7 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun testCheckEmptyUsernameSendEventWhenNonEmpty() = runBlockingTest {
+    fun testCheckEmptyUsernameSendEventWhenNonEmpty() = testCoroutineDispatcher.runBlockingTest {
         viewModel.checkNonEmptyUsername("")
         val error = viewModel.fieldErrors.asFlow().first()
         assertThat(error.invalidNameMsgId).isEqualTo(R.string.error_field_required)
@@ -134,7 +134,7 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun checkDoLoginWithSuccessSendCompleteEvent() = runBlockingTest {
+    fun checkDoLoginWithSuccessSendCompleteEvent() = testCoroutineDispatcher.runBlockingTest {
         every { accountManager.addAccount(any(), any()) } returns true
         every { accountManager.initializeAccountSync(any()) } just Runs
         coEvery { tinyRssApi.login(any()) } returns successLoginResponse
@@ -154,7 +154,7 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun checkDoLoginWithFailSendLoginFailedEvent(): Unit = runBlockingTest {
+    fun checkDoLoginWithFailSendLoginFailedEvent(): Unit = testCoroutineDispatcher.runBlockingTest {
         coEvery { tinyRssApi.login(any()) } returns failedLoginResponse
 
         viewModel.initialize(LoginActivity.ACTION_ADD_ACCOUNT)

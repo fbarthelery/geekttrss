@@ -21,25 +21,22 @@
 package com.geekorum.ttrss.in_app_update
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.Observer
-import com.geekorum.ttrss.waitForChildrenCoroutines
-import com.geekorum.ttrss.waitForValue
-import io.mockk.Runs
+import androidx.lifecycle.asFlow
+import com.google.common.truth.Truth.assertThat
 import io.mockk.coEvery
-import io.mockk.every
-import io.mockk.just
 import io.mockk.mockk
-import io.mockk.verify
-import io.mockk.verifyOrder
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.setMain
 import org.junit.Rule
-import java.util.concurrent.Executors
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -50,16 +47,14 @@ class InAppUpdateViewModelTest {
     @get:Rule
     val archRule = InstantTaskExecutorRule()
 
-    private val mainThreadSurrogate = Executors.newSingleThreadExecutor {
-        Thread(it, "UI Thread")
-    }.asCoroutineDispatcher()
+    private val testCoroutineDispatcher = TestCoroutineDispatcher()
 
     lateinit var subject: InAppUpdateViewModel
     lateinit var updateManager: InAppUpdateManager
 
     @BeforeTest
     fun setUp() {
-        Dispatchers.setMain(mainThreadSurrogate)
+        Dispatchers.setMain(testCoroutineDispatcher)
         updateManager = mockk()
         subject = InAppUpdateViewModel(updateManager)
     }
@@ -67,66 +62,58 @@ class InAppUpdateViewModelTest {
     @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
-        mainThreadSurrogate.close()
+//        mainThreadSurrogate.close()
+        testCoroutineDispatcher.cleanupTestCoroutines()
+
+
     }
 
     @Test
     fun testUpdateAvailable()= runBlockingTest {
-        val observer: Observer<Boolean> = mockObserver()
         coEvery { updateManager.getUpdateAvailability() } returns UpdateAvailability.UPDATE_AVAILABLE
-        subject.isUpdateAvailable.observeForever(observer)
-        subject.isUpdateAvailable.waitForValue()
-
-        verify { observer.onChanged(true) }
+        subject.isUpdateAvailable.asFlow()
+                .take(1)
+                .collect {
+                    assertThat(it).isTrue()
+                }
     }
 
     @Test
-    fun testNoUpdateAvailable() = runBlockingTest {
-        val observer: Observer<Boolean> = mockObserver()
+    fun testNoUpdateAvailable() = testCoroutineDispatcher.runBlockingTest {
         coEvery { updateManager.getUpdateAvailability() } returns UpdateAvailability.NO_UPDATE
-        subject.isUpdateAvailable.observeForever(observer)
-        subject.isUpdateAvailable.waitForValue()
-
-        verify { observer.onChanged(false) }
+        subject.isUpdateAvailable.asFlow()
+                .take(1)
+                .collect {
+                    assertThat(it).isFalse()
+                }
     }
 
     @Test
-    fun testAnUpdateIsAlreadyReadyToInstall() = runBlockingTest {
-        val observer: Observer<Boolean> = mockObserver()
-        coEvery {updateManager.getUpdateState() } returns UpdateState(UpdateState.Status.DOWNLOADED)
-        subject.isUpdateReadyToInstall.observeForever(observer)
-
-        subject.isUpdateReadyToInstall.waitForValue(numberOfChanged = 1)
-        subject.waitForChildrenCoroutines()
-        verify { observer.onChanged(true) }
+    fun testAnUpdateIsAlreadyReadyToInstall() = testCoroutineDispatcher.runBlockingTest {
+        coEvery { updateManager.getUpdateState() } returns UpdateState(UpdateState.Status.DOWNLOADED)
+        val updates = subject.isUpdateReadyToInstall.asFlow()
+                .take(1)
+                .toList()
+        assertThat(updates).containsExactly(true)
     }
 
     @Test
-    fun testAnUpdateFlowGoingToReadyToInstall() = runBlockingTest {
-        val observer: Observer<Boolean> = mockObserver()
-        coEvery {updateManager.getUpdateState() } returns UpdateState(UpdateState.Status.UNKNOWN)
+    fun testAnUpdateFlowGoingToReadyToInstall() = testCoroutineDispatcher.runBlockingTest {
+        coEvery { updateManager.getUpdateState() } returns UpdateState(UpdateState.Status.UNKNOWN)
         coEvery { updateManager.startUpdate(any(), any()) } returns flowOf(
             UpdateState(UpdateState.Status.UNKNOWN),
             UpdateState(UpdateState.Status.PENDING),
             UpdateState(UpdateState.Status.DOWNLOADING),
             UpdateState(UpdateState.Status.DOWNLOADED)
         )
-        subject.isUpdateReadyToInstall.observeForever(observer)
+        val results = async {
+            subject.isUpdateReadyToInstall.asFlow()
+                    .take(2)
+                    .toList()
+        }
 
         subject.startUpdateFlow(mockk(), 42)
-        subject.isUpdateReadyToInstall.waitForValue(numberOfChanged = 2)
-        subject.waitForChildrenCoroutines()
-
-        verifyOrder {
-            observer.onChanged(false)
-            observer.onChanged(true)
-        }
-    }
-
-    private inline fun <reified T : Observer<K>, reified K : Any> mockObserver(): T {
-        val observer: T = mockk()
-        every { observer.onChanged(any()) } just Runs
-        return observer
+        assertThat(results.await()).containsExactly(false, true)
     }
 
 }

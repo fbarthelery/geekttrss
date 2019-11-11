@@ -80,7 +80,7 @@ class SendTransactionsWorkerTest {
 
 
     @Test
-    fun testTransactionAreSendAndRemovedWhenRunningWorker() = runBlockingTest {
+    fun testTransactionAreSendAndRemovedWhenRunningWorker() = testCoroutineDispatcher.runBlockingTest {
         // insert some transactions On Article 1 and 2
         databaseService.insertArticles(listOf(
                 Article(id = 1, isUnread = false),
