@@ -43,7 +43,6 @@ import com.geekorum.ttrss.session.UndoManager
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import kotlinx.coroutines.launch
-import java.util.UUID
 
 private const val PREF_VIEW_MODE = "view_mode"
 private const val STATE_FEED_ID = "feed_id"
@@ -81,15 +80,15 @@ class FragmentViewModel @AssistedInject constructor(
         getArticlesForFeed(it)
     }
 
-    private var refreshJobId: MutableLiveData<UUID> = MutableLiveData<UUID>().apply {
+    private var refreshJobName: MutableLiveData<String?> = MutableLiveData<String?>().apply {
         value = null
     }
 
-    val isRefreshing: LiveData<Boolean> = refreshJobId.switchMap {
+    val isRefreshing: LiveData<Boolean> = refreshJobName.switchMap {
         if (it == null)
             SyncInProgressLiveData(account, ArticlesContract.AUTHORITY)
         else
-            backgroundJobManager.isRefreshingStatus(it)
+            backgroundJobManager.isRefreshingStatus(state.get<Long>(STATE_FEED_ID)!!)
     }
 
     private var shouldRefreshOnZeroItems = true
@@ -155,7 +154,7 @@ class FragmentViewModel @AssistedInject constructor(
             if (Feed.isVirtualFeed(feedId)) {
                 backgroundJobManager.refresh(account)
             } else {
-                refreshJobId.value = backgroundJobManager.refreshFeed(account, feedId)
+                refreshJobName.value = backgroundJobManager.refreshFeed(account, feedId)
             }
         }
     }

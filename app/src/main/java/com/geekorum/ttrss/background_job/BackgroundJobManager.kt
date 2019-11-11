@@ -35,6 +35,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
 import androidx.work.Constraints
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
@@ -49,7 +50,6 @@ import com.geekorum.ttrss.sync.workers.SendTransactionsWorker
 import com.geekorum.ttrss.sync.workers.SyncWorkerFactory
 import com.geekorum.ttrss.sync.workers.UpdateArticleStatusWorker
 import timber.log.Timber
-import java.util.UUID
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -68,14 +68,14 @@ class BackgroundJobManager @Inject constructor(
 
     /**
      * Refresh a feed.
-     * @return workmanager job uuid
+     * @return workmanager unique work name
      */
-    suspend fun refreshFeed(account: Account, feedId: Long): UUID {
+    suspend fun refreshFeed(account: Account, feedId: Long): String {
         return impl.refreshFeed(account, feedId)
     }
 
-    fun isRefreshingStatus(jobId: UUID): LiveData<Boolean> {
-        return impl.isRefreshingStatus(jobId)
+    fun isRefreshingStatus(feedId: Long): LiveData<Boolean> {
+        return impl.isRefreshingStatus(feedId)
     }
 
     fun setupPeriodicJobs() {
@@ -130,7 +130,7 @@ private open class BackgroundJobManagerImpl internal constructor(
         requestSync(account, extras)
     }
 
-    suspend fun refreshFeed(account: Account, feedId: Long): UUID {
+    suspend fun refreshFeed(account: Account, feedId: Long): String {
         val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
                 .build()
@@ -157,13 +157,13 @@ private open class BackgroundJobManagerImpl internal constructor(
                 .setInputData(inputData)
                 .build()
 
-        //TODO use unique work?
+        val workName = "refresh-feed-$feedId"
         WorkManager.getInstance(context)
-                .beginWith(sendTransactionsRequest)
+                .beginUniqueWork(workName, ExistingWorkPolicy.KEEP, sendTransactionsRequest)
                 .then(collectNewArticleRequest)
                 .then(updateStatusRequest)
                 .enqueue().await()
-        return updateStatusRequest.id
+        return workName
     }
 
     /**
@@ -171,13 +171,12 @@ private open class BackgroundJobManagerImpl internal constructor(
      * True if the job is not finished
      * False if the job is finished
      */
-    fun isRefreshingStatus(jobId: UUID): LiveData<Boolean> {
+    fun isRefreshingStatus(feedId: Long): LiveData<Boolean> {
+        val workName = "refresh-feed-$feedId"
         return WorkManager.getInstance(context)
-                .getWorkInfoByIdLiveData(jobId).map { workInfo: WorkInfo? ->
-                    if (workInfo == null) {
-                        false
-                    } else {
-                        !workInfo.state.isFinished
+                .getWorkInfosForUniqueWorkLiveData(workName).map { workInfos: List<WorkInfo> ->
+                    workInfos.any {
+                        !it.state.isFinished
                     }
                 }
     }
