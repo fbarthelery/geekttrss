@@ -101,7 +101,7 @@ class CollectNewArticlesWorker(
     }
 
     private suspend fun getLatestArticleId(): Long {
-        return databaseService.getLatestArticleId() ?: 0
+        return databaseService.getLatestArticleIdFromFeed(feedId) ?: 0
     }
 
     /**
