@@ -45,6 +45,7 @@ import androidx.work.workDataOf
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.providers.PurgeArticlesWorker
 import com.geekorum.ttrss.sync.workers.CollectNewArticlesWorker
+import com.geekorum.ttrss.sync.workers.SendTransactionsWorker
 import com.geekorum.ttrss.sync.workers.SyncWorkerFactory
 import com.geekorum.ttrss.sync.workers.UpdateArticleStatusWorker
 import timber.log.Timber
@@ -136,24 +137,30 @@ private open class BackgroundJobManagerImpl internal constructor(
 
         var inputData = workDataOf(
                 SyncWorkerFactory.PARAM_ACCOUNT_NAME to account.name,
-                SyncWorkerFactory.PARAM_ACCOUNT_TYPE to account.type,
-                CollectNewArticlesWorker.PARAM_FEED_ID to feedId
+                SyncWorkerFactory.PARAM_ACCOUNT_TYPE to account.type
         )
+
+        val sendTransactionsRequest = OneTimeWorkRequestBuilder<SendTransactionsWorker>()
+                .setConstraints(constraints)
+                .setInputData(inputData)
+                .build()
+
+        inputData = CollectNewArticlesWorker.getInputData(account, feedId)
         val collectNewArticleRequest = OneTimeWorkRequestBuilder<CollectNewArticlesWorker>()
                 .setConstraints(constraints)
                 .setInputData(inputData)
                 .build()
-        inputData = workDataOf(
-                SyncWorkerFactory.PARAM_ACCOUNT_NAME to account.name,
-                SyncWorkerFactory.PARAM_ACCOUNT_TYPE to account.type,
-                UpdateArticleStatusWorker.PARAM_FEED_ID to feedId
-        )
+
+        inputData = UpdateArticleStatusWorker.getInputData(account, feedId)
         val updateStatusRequest = OneTimeWorkRequestBuilder<UpdateArticleStatusWorker>()
                 .setConstraints(constraints)
                 .setInputData(inputData)
                 .build()
+
+        //TODO use unique work?
         WorkManager.getInstance(context)
-                .beginWith(collectNewArticleRequest)
+                .beginWith(sendTransactionsRequest)
+                .then(collectNewArticleRequest)
                 .then(updateStatusRequest)
                 .enqueue().await()
         return updateStatusRequest.id
