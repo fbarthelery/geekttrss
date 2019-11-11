@@ -20,12 +20,15 @@
  */
 package com.geekorum.ttrss.sync.workers
 
+import android.accounts.Account
 import android.content.Context
 import android.content.OperationApplicationException
 import android.os.RemoteException
 import android.security.NetworkSecurityPolicy
+import androidx.work.Data
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.htmlparsers.ImageUrlExtractor
@@ -61,6 +64,14 @@ class CollectNewArticlesWorker(
 
     companion object {
         const val PARAM_FEED_ID = "feed_id"
+
+        fun getInputData(account: Account, feedId: Long): Data {
+            return workDataOf(
+                    SyncWorkerFactory.PARAM_ACCOUNT_NAME to account.name,
+                    SyncWorkerFactory.PARAM_ACCOUNT_TYPE to account.type,
+                    PARAM_FEED_ID to feedId
+            )
+        }
     }
 
     private var feedId: Long = Long.MIN_VALUE

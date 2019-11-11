@@ -149,11 +149,7 @@ class ArticleSynchronizer @AssistedInject constructor(
 
         val tag = UUID.randomUUID().toString()
         val jobRequests = databaseService.getFeeds().map { feed ->
-            val inputData = workDataOf(
-                    SyncWorkerFactory.PARAM_ACCOUNT_NAME to account.name,
-                    SyncWorkerFactory.PARAM_ACCOUNT_TYPE to account.type,
-                    CollectNewArticlesWorker.PARAM_FEED_ID to feed.id
-            )
+            val inputData = CollectNewArticlesWorker.getInputData(account, feed.id)
             OneTimeWorkRequestBuilder<CollectNewArticlesWorker>()
                     .setConstraints(constraints)
                     .setInputData(inputData)
