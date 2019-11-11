@@ -20,9 +20,12 @@
  */
 package com.geekorum.ttrss.sync.workers
 
+import android.accounts.Account
 import android.content.Context
+import androidx.work.Data
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.Metadata
@@ -52,6 +55,15 @@ class UpdateArticleStatusWorker(
     companion object {
         const val PARAM_FEED_ID = "feed_id"
         const val PARAM_NUMBER_OF_LATEST_ARTICLES_TO_REFRESH = "number_of_articles_to_refresh"
+
+        fun getInputData(account: Account, feedId: Long, numberOfArticlesToRefresh: Int = 500): Data {
+            return workDataOf(
+                    SyncWorkerFactory.PARAM_ACCOUNT_NAME to account.name,
+                    SyncWorkerFactory.PARAM_ACCOUNT_TYPE to account.type,
+                    PARAM_FEED_ID to feedId,
+                    PARAM_NUMBER_OF_LATEST_ARTICLES_TO_REFRESH to numberOfArticlesToRefresh
+            )
+        }
     }
 
     private var feedId: Long = Long.MIN_VALUE

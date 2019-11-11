@@ -177,12 +177,9 @@ class ArticleSynchronizer @AssistedInject constructor(
                 .filter {
                     it.id == feedId || feedId == ApiService.ALL_ARTICLES_FEED_ID
                 }.map { feed ->
-                    val inputData = workDataOf(
-                            SyncWorkerFactory.PARAM_ACCOUNT_NAME to account.name,
-                            SyncWorkerFactory.PARAM_ACCOUNT_TYPE to account.type,
-                            UpdateArticleStatusWorker.PARAM_FEED_ID to feed.id,
-                            UpdateArticleStatusWorker.PARAM_NUMBER_OF_LATEST_ARTICLES_TO_REFRESH to numberOfLatestArticlesToRefresh
-                    )
+                    val inputData = UpdateArticleStatusWorker.getInputData(
+                            account, feed.id, numberOfLatestArticlesToRefresh)
+
                     OneTimeWorkRequestBuilder<UpdateArticleStatusWorker>()
                             .setConstraints(constraints)
                             .setInputData(inputData)
