@@ -92,6 +92,7 @@ class FragmentViewModel @AssistedInject constructor(
             backgroundJobManager.isRefreshingStatus(it)
     }
 
+    private var shouldRefreshOnZeroItems = true
     private val unreadActionUndoManager = UndoManager<Action>()
 
     // default value in databinding is False for boolean and 0 for int
@@ -190,18 +191,18 @@ class FragmentViewModel @AssistedInject constructor(
 
     private inner class PageBoundaryCallback<T> : PagedList.BoundaryCallback<T>() {
         override fun onZeroItemsLoaded() {
-            // we should use PagingRequestHelper to prevent calling refresh many times
-            // but as the SyncManager ensure the unicity of the synchronisation
-            // there is no need to.
-            refresh()
+            if (shouldRefreshOnZeroItems) {
+                shouldRefreshOnZeroItems = false
+                refresh()
+            }
         }
 
         override fun onItemAtFrontLoaded(itemAtFront: T) {
-            // nothing to do
+            shouldRefreshOnZeroItems = true
         }
 
         override fun onItemAtEndLoaded(itemAtEnd: T) {
-            // nothing to do
+            shouldRefreshOnZeroItems = true
         }
     }
 
