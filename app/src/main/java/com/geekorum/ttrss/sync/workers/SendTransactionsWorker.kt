@@ -80,7 +80,6 @@ class SendTransactionsWorker(
                 databaseService.updateArticle(article)
                 databaseService.deleteTransaction(transaction)
             }
-            yield()
         }
     }
 
