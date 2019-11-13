@@ -47,6 +47,7 @@ import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.providers.PurgeArticlesWorker
 import com.geekorum.ttrss.sync.workers.CollectNewArticlesWorker
 import com.geekorum.ttrss.sync.workers.SendTransactionsWorker
+import com.geekorum.ttrss.sync.workers.SyncFeedsWorker
 import com.geekorum.ttrss.sync.workers.SyncWorkerFactory
 import com.geekorum.ttrss.sync.workers.UpdateArticleStatusWorker
 import timber.log.Timber
@@ -145,6 +146,11 @@ private open class BackgroundJobManagerImpl internal constructor(
                 .setInputData(inputData)
                 .build()
 
+        val syncFeeds = OneTimeWorkRequestBuilder<SyncFeedsWorker>()
+                .setConstraints(constraints)
+                .setInputData(inputData)
+                .build()
+
         inputData = CollectNewArticlesWorker.getInputData(account, feedId)
         val collectNewArticleRequest = OneTimeWorkRequestBuilder<CollectNewArticlesWorker>()
                 .setConstraints(constraints)
@@ -159,7 +165,7 @@ private open class BackgroundJobManagerImpl internal constructor(
 
         val workName = "refresh-feed-$feedId"
         WorkManager.getInstance(context)
-                .beginUniqueWork(workName, ExistingWorkPolicy.KEEP, sendTransactionsRequest)
+                .beginUniqueWork(workName, ExistingWorkPolicy.KEEP, listOf(sendTransactionsRequest, syncFeeds))
                 .then(collectNewArticleRequest)
                 .then(updateStatusRequest)
                 .enqueue().await()

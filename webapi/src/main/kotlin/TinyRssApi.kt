@@ -44,7 +44,6 @@ import com.geekorum.ttrss.webapi.model.GetVersionRequestPayload
 import com.geekorum.ttrss.webapi.model.GetVersionResponsePayload
 import retrofit2.http.Body
 import retrofit2.http.POST
-import java.util.concurrent.CompletableFuture
 
 /**
  * Interface of the Tiny Tiny Rss api.
