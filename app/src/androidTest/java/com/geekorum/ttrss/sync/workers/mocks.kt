@@ -141,7 +141,7 @@ internal open class MockDatabaseService: DatabaseService {
     }
 
     override suspend fun getLatestArticleIdFromFeed(feedId: Long): Long? {
-        TODO("not implemented")
+        return articles.filter { it.feedId == feedId }.maxBy { it.id }?.id
     }
 
     override suspend fun updateArticlesMetadata(metadata: List<Metadata>) {
