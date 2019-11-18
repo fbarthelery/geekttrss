@@ -29,7 +29,7 @@ import java.net.URI
 
 plugins {
     id("com.google.android.gms.oss-licenses-plugin") version "0.9.5.1" apply false
-    id("com.google.gms.google-services") version "3.2.0" apply false
+    id("com.google.gms.google-services") version "4.3.3" apply false
     id("io.fabric") version "1.29.0" apply false
     kotlin("android") version "1.3.50" apply false
     kotlin("kapt") version "1.3.50" apply false

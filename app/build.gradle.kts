@@ -193,7 +193,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
     androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
 
-    implementation(enforcedPlatform("com.google.firebase:firebase-bom:20.1.0"))
+    implementation(enforcedPlatform("com.google.firebase:firebase-bom:24.1.0"))
     add("googleImplementation", "com.crashlytics.sdk.android:crashlytics")
     // ensure that the free flavor don't get any firebase dependencies
     configurations["freeImplementation"].exclude(group = "com.google.firebase")
