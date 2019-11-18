@@ -33,7 +33,7 @@ object Features {
 }
 
 @Module
-class AllFeaturesInstalledModule {
+object AllFeaturesInstalledModule {
     @Provides
     fun providesOnDemandModuleManager(): OnDemandModuleManager {
         return ImmutableModuleManager(Features.allFeatures)

@@ -120,7 +120,7 @@ interface SyncWorkerComponent {
 }
 
 @Module
-internal class FaviKonModule {
+internal object FaviKonModule {
 
     @Provides
     fun providesFaviKonSnoop(okHttpClient: OkHttpClient): FaviKonSnoop {

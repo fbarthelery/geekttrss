@@ -84,7 +84,7 @@ abstract class FragmentsInjectorModule {
 }
 
 @Module
-class SelectedAccountModule {
+object SelectedAccountModule {
 
     @Provides
     fun providesAccount(articleDetailActivity: ArticleDetailActivity) : Account = articleDetailActivity.account!!

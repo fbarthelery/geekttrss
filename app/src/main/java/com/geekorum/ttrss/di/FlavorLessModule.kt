@@ -60,4 +60,4 @@ import dagger.Module
     com.geekorum.ttrss.add_feed.AndroidInjectorsModule::class,
     com.geekorum.ttrss.providers.AndroidInjectorsModule::class
 ])
-abstract class FlavorLessModule
+object FlavorLessModule

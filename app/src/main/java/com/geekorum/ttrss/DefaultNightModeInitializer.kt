@@ -45,7 +45,7 @@ class DefaultNightModeInitializer : AppInitializer {
 }
 
 @Module(includes = [AppInitializersModule::class])
-class DefaultNightModeModule {
+object DefaultNightModeModule {
 
     @Provides
     @IntoSet

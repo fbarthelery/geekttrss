@@ -88,7 +88,7 @@ interface TestApplicationComponent : ApplicationComponent {
 
 
 @Module
-private class MockDatabaseModule {
+private object MockDatabaseModule {
     @Provides
     @Singleton
     internal fun providesAppDatabase(application: android.app.Application): ArticlesDatabase {
@@ -105,13 +105,13 @@ private class MockDatabaseModule {
 }
 
 @Module
-private class MockNetworkModule {
+private object MockNetworkModule {
     @Provides
     fun providesOkHttpClient(): OkHttpClient = mockk()
 }
 
 @Module
-private class WorkManagerConfigurationModule {
+private object WorkManagerConfigurationModule {
     @Provides
     fun provideWorkManagerConfiguration(): Configuration {
         return Configuration.Builder().build()
@@ -121,7 +121,7 @@ private class WorkManagerConfigurationModule {
 
 @Module
 @UseExperimental(ExperimentalCoroutinesApi::class)
-private class TestCoroutineDispatchersProviderModule {
+private object TestCoroutineDispatchersProviderModule {
     @Provides
     fun provideCoroutineDispatchersProvider(): CoroutineDispatchersProvider {
         val testDispatcher = TestCoroutineDispatcher()

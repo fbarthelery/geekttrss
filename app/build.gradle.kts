@@ -106,7 +106,6 @@ android {
 kapt {
     arguments {
         arg("room.schemaLocation", "$projectDir/schemas")
-        // better in 2.2.0-rc01
         arg("room.incremental", true)
     }
 }
@@ -159,7 +158,7 @@ dependencies {
     dualTestImplementation("androidx.arch.core:core-testing:2.1.0")
 
     // dagger
-    val daggerVersion: String by rootProject.extra
+    val daggerVersion = "2.25.2"
     implementation(enforcedDaggerPlatform(daggerVersion))
     kapt(enforcedDaggerPlatform(daggerVersion))
     implementation("com.google.dagger:dagger:$daggerVersion")

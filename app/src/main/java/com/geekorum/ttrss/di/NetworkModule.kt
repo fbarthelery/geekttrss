@@ -48,7 +48,7 @@ private const val TAG_PICASSO = 2
 private const val TAG_COIL = 3
 
 @Module(includes = [AppInitializersModule::class])
-class NetworkModule {
+object NetworkModule {
 
     @Provides
     @Singleton

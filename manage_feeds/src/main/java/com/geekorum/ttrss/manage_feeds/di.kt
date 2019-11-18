@@ -107,7 +107,7 @@ private abstract class ManageFeedModule {
 }
 
 @Module
-class WorkManagerModule {
+object WorkManagerModule {
     @Provides
     fun provideWorkManager(application: Application): WorkManager = WorkManager.getInstance(application)
 }

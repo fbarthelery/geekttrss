@@ -37,7 +37,7 @@ data class CoroutineDispatchersProvider(
 )
 
 @Module
-class ActualCoroutineDispatchersModule {
+object ActualCoroutineDispatchersModule {
 
     @Provides
     @Singleton

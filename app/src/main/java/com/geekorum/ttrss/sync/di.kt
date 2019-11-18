@@ -58,10 +58,10 @@ abstract class ServiceInjectorModule {
 }
 
 @Module(includes = [WorkersModule::class])
-abstract class SyncWorkersModule
+object SyncWorkersModule
 
 @Module(subcomponents = [SyncComponent::class])
-private abstract class SyncComponentModule
+private object SyncComponentModule
 
 
 @Subcomponent(modules = [
@@ -85,7 +85,7 @@ internal interface SyncComponent {
 }
 
 @Module
-internal class SyncServiceModule {
+internal object SyncServiceModule {
 
     @Provides
     fun providesContext(service: ArticleSyncService): Context {
@@ -103,7 +103,7 @@ internal class SyncServiceModule {
 }
 
 @Module
-internal class AccountPreferenceModule {
+internal object AccountPreferenceModule {
 
     @Provides
     fun providesAccountPreferences(context: Context, account: Account): SharedPreferences {

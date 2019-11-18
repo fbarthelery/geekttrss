@@ -50,7 +50,6 @@ private class NoInAppUpdateManager: InAppUpdateManager {
 object NoInAppUpdateModule {
 
     @Provides
-    @JvmStatic
     fun providesInAppUpdateManager(): InAppUpdateManager = NoInAppUpdateManager()
 
 }

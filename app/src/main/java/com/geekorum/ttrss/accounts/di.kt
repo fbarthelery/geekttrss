@@ -56,11 +56,9 @@ import com.geekorum.ttrss.webapi.TokenRetriever
 annotation class PerAccount
 
 @Module
-class AndroidTinyrssAccountManagerModule {
+object AndroidTinyrssAccountManagerModule {
 
-    companion object {
-        private const val KEY_ALIAS = "com.geekorum.geekttrss.accounts.AccountManagerKey"
-    }
+    private const val KEY_ALIAS = "com.geekorum.geekttrss.accounts.AccountManagerKey"
 
     @Provides
     fun providesAndroidTinyrssAccountManager(accountManager: AccountManager, secretEncryption: SecretEncryption): AndroidTinyrssAccountManager {
@@ -91,7 +89,7 @@ abstract class ServicesInjectorModule {
 
 
 @Module
-class NetworkLoginModule {
+object NetworkLoginModule {
 
     @Provides
     @PerAccount
@@ -118,7 +116,7 @@ class NetworkLoginModule {
 
 
 @Module(subcomponents = [AuthenticatorNetworkComponent::class])
-internal class AuthenticatorServiceModule {
+internal object AuthenticatorServiceModule {
 
     @Provides
     fun providesContext(service: AuthenticatorService): Context {
@@ -128,7 +126,7 @@ internal class AuthenticatorServiceModule {
 }
 
 @Module(subcomponents = [AuthenticatorNetworkComponent::class])
-internal class AuthenticatorActivityModule {
+internal object AuthenticatorActivityModule {
     @Provides
     fun providesContext(activity: Activity): Context {
         return activity

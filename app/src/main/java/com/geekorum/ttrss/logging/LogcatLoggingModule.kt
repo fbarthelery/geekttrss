@@ -29,7 +29,7 @@ import timber.log.Timber
  * Provides logging output to Logcat
  */
 @Module(includes = [TimberModule::class])
-class LogcatLoggingModule {
+object LogcatLoggingModule {
 
     @Provides @IntoSet
     fun provideLoggingTree(): Timber.Tree = Timber.DebugTree()

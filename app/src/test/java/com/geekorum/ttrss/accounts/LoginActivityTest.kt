@@ -80,7 +80,7 @@ internal abstract class LoginActivityTestModule {
 }
 
 @Module
-internal class MocksModule {
+internal object MocksModule {
     @Provides
     fun providesAndroidTinyrssAccountManager(): AndroidTinyrssAccountManager = mockk()
 
