@@ -62,14 +62,11 @@ class InAppUpdateViewModelTest {
     @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
-//        mainThreadSurrogate.close()
         testCoroutineDispatcher.cleanupTestCoroutines()
-
-
     }
 
     @Test
-    fun testUpdateAvailable()= runBlockingTest {
+    fun testUpdateAvailable()= testCoroutineDispatcher.runBlockingTest {
         coEvery { updateManager.getUpdateAvailability() } returns UpdateAvailability.UPDATE_AVAILABLE
         subject.isUpdateAvailable.asFlow()
                 .take(1)
