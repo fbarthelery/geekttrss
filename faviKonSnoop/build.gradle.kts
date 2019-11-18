@@ -28,10 +28,10 @@ dependencies {
     implementation(enforcedPlatform(kotlin("bom")))
 
     api("com.squareup.okhttp3:okhttp:4.1.0")
-    api("com.squareup.okio:okio:2.4.0")
+    api("com.squareup.okio:okio:2.4.1")
     implementation("javax.inject:javax.inject:1")
     implementation("org.jsoup:jsoup:1.10.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.11.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.13.0")
 
     testImplementation("com.google.truth:truth:1.0")
     testImplementation(kotlin("test-junit"))

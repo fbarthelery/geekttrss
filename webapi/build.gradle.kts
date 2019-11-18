@@ -1,5 +1,3 @@
-import com.geekorum.build.enforcedCoroutinesPlatform
-
 /*
  * Geekttrss is a RSS feed reader application on the Android Platform.
  *
@@ -20,6 +18,8 @@ import com.geekorum.build.enforcedCoroutinesPlatform
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
+import com.geekorum.build.enforcedCoroutinesPlatform
+
 plugins {
     kotlin("jvm")
     id("kotlinx-serialization")
@@ -32,7 +32,7 @@ dependencies {
     implementation("androidx.annotation:annotation:1.1.0")
     implementation("javax.inject:javax.inject:1")
     implementation("com.squareup.retrofit2:retrofit:2.6.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.11.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.13.0")
 
     val coroutinesVersion = "1.3.2"
     implementation(enforcedCoroutinesPlatform(coroutinesVersion))

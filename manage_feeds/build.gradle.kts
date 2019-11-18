@@ -1,3 +1,23 @@
+/*
+ * Geekttrss is a RSS feed reader application on the Android Platform.
+ *
+ * Copyright (C) 2017-2019 by Frederic-Charles Barthelery.
+ *
+ * This file is part of Geekttrss.
+ *
+ * Geekttrss is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Geekttrss is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
+ */
 import com.geekorum.build.dualTestImplementation
 import com.geekorum.build.enforcedCoroutinesPlatform
 import com.geekorum.build.enforcedDaggerPlatform
@@ -76,7 +96,7 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")
     implementation("androidx.recyclerview:recyclerview:1.0.0")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.0.0")
-    implementation("com.google.android.material:material:1.1.0-alpha10")
+    implementation("com.google.android.material:material:1.1.0-beta02")
 
     implementation("androidx.core:core-ktx:1.1.0")
 
@@ -88,21 +108,21 @@ dependencies {
     implementation(project(":htmlparsers"))
     implementation(project(":webapi"))
 
-    implementation("io.coil-kt:coil:0.7.0")
+    implementation("io.coil-kt:coil:0.8.0")
 
     androidTestImplementation("androidx.work:work-testing:2.2.0")
-    dualTestImplementation("androidx.arch.core:core-testing:2.0.1")
+    dualTestImplementation("androidx.arch.core:core-testing:2.1.0")
 
     implementation("androidx.navigation:navigation-fragment-ktx:2.1.0")
-    debugImplementation("androidx.fragment:fragment-testing:1.2.0-alpha02")
+    debugImplementation("androidx.fragment:fragment-testing:1.2.0-rc02")
 
     // the test apk need these dependencies because they provide some of its resources
     // likely due to manifest merging with :app manifest
-    androidTestImplementation("androidx.fragment:fragment-testing:1.2.0-alpha02")
+    androidTestImplementation("androidx.fragment:fragment-testing:1.2.0-rc02")
     androidTestImplementation("com.squareup.leakcanary:leakcanary-android:2.0-beta-2")
     androidTestImplementation("com.google.android.gms:play-services-oss-licenses:17.0.0")
 
     // used in test through geekdroid
-    androidTestImplementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:1.0.0-alpha03")
+    androidTestImplementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:1.0.0-rc02")
 
 }
