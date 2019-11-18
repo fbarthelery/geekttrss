@@ -114,8 +114,8 @@ kapt {
 dependencies {
 
     implementation("androidx.core:core-ktx:1.1.0")
-    implementation("androidx.fragment:fragment-ktx:1.2.0-alpha02")
-    implementation("androidx.activity:activity-ktx:1.1.0-alpha02")
+    implementation("androidx.fragment:fragment-ktx:1.2.0-rc02")
+    implementation("androidx.activity:activity-ktx:1.1.0-rc02")
 
     // androidx ui
     implementation("androidx.drawerlayout:drawerlayout:1.1.0-alpha03")
@@ -141,10 +141,10 @@ dependencies {
     implementation(project(":webapi"))
     implementation(project(":faviKonSnoop"))
 
-    implementation("com.google.android.material:material:1.1.0-beta01")
+    implementation("com.google.android.material:material:1.1.0-beta02")
     implementation("com.squareup.okhttp3:logging-interceptor:4.1.0")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.1.0")
-    implementation("io.coil-kt:coil:0.7.0")
+    implementation("io.coil-kt:coil:0.8.0")
     implementation("com.google.android.gms:play-services-oss-licenses:17.0.0")
 
     implementation("org.jsoup:jsoup:1.10.2")
@@ -155,8 +155,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:1.0.0-beta01")
-    dualTestImplementation("androidx.arch.core:core-testing:2.0.1")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:1.0.0-rc02")
+    dualTestImplementation("androidx.arch.core:core-testing:2.1.0")
 
     // dagger
     val daggerVersion: String by rootProject.extra
@@ -177,8 +177,8 @@ dependencies {
     androidTestImplementation("androidx.room:room-testing:$roomVersion")
 
     val navigationVersion = "2.1.0"
-    implementation("androidx.navigation:navigation-fragment-ktx:2.1.0")
-    implementation("androidx.navigation:navigation-ui-ktx:2.1.0")
+    implementation("androidx.navigation:navigation-fragment-ktx:$navigationVersion")
+    implementation("androidx.navigation:navigation-ui-ktx:$navigationVersion")
 
     val workVersion = "2.2.0"
     androidTestImplementation("androidx.work:work-testing:$workVersion")
@@ -213,7 +213,7 @@ dependencies {
 
     // fragment testing declare some activities and resources that needs to be in the apk
     // we don't use it. here but it is used in feature modules
-    debugImplementation("androidx.fragment:fragment-testing:1.2.0-alpha01")
+    debugImplementation("androidx.fragment:fragment-testing:1.2.0-rc02")
 
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.0-beta-2")
 }
