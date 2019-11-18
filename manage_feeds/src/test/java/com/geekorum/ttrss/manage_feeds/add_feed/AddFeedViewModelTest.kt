@@ -23,10 +23,9 @@ package com.geekorum.ttrss.manage_feeds.add_feed
 import android.accounts.Account
 import android.accounts.AccountManager
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.Observer
+import androidx.lifecycle.asFlow
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
-import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.manage_feeds.add_feed.FeedsFinder.FeedResult
 import com.geekorum.ttrss.manage_feeds.add_feed.FeedsFinder.Source.HTML
@@ -34,9 +33,14 @@ import com.google.common.truth.Truth.assertThat
 import io.mockk.coEvery
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.setMain
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.junit.Rule
 import java.io.IOException
@@ -64,50 +68,46 @@ class AddFeedViewModelTest {
         accountManager = mockk(relaxed = true)
         feedsFinder = mockk()
         testDispatcher = TestCoroutineDispatcher()
+        Dispatchers.setMain(testDispatcher)
         val dispatchers = CoroutineDispatchersProvider(testDispatcher, testDispatcher, testDispatcher)
         target = AddFeedViewModel(dispatchers, feedsFinder, workManager, accountManager)
     }
 
     @AfterTest
     fun tearDown() {
+        Dispatchers.resetMain()
         testDispatcher.cleanupTestCoroutines()
     }
 
     @Test
-    fun testThatInitUrlReturnsCorrectFeeds() {
+    fun testThatInitUrlReturnsCorrectFeeds() = testDispatcher.runBlockingTest {
         val feeds = listOf(
             FeedResult(HTML,"https://google.com", "type", "title"),
             FeedResult(HTML, "https://apple.com", "type2", "title2"))
         coEvery { feedsFinder.findFeeds(any()) }.returns( feeds)
 
-        var result: Collection<FeedResult>? = null
-        val observer = Observer<Collection<FeedResult>> {
-            result = it
+        val result = async {
+            target.availableFeeds.asFlow()
+                    .first()
         }
-        target.availableFeeds.observeForever(observer)
-        runBlocking {
-            target.initWithUrl("https://some.google.com/".toHttpUrl())
-        }
+        target.initWithUrl("https://some.google.com/".toHttpUrl())
 
         val expected = feeds
-        assertThat(result).isEqualTo(expected)
+        assertThat(result.await()).isEqualTo(expected)
     }
 
 
     @Test
-    fun testThatInitUrlWithExceptionReturnsEmptyFeeds() {
+    fun testThatInitUrlWithExceptionReturnsEmptyFeeds() = testDispatcher.runBlockingTest {
         coEvery { feedsFinder.findFeeds(any()) } throws IOException("No network")
 
-        var result: Collection<FeedResult>? = null
-        val observer = Observer<Collection<FeedResult>> {
-            result = it
+        val result = async {
+            target.availableFeeds.asFlow()
+                    .first()
         }
-        target.availableFeeds.observeForever(observer)
-        runBlocking {
-            target.initWithUrl("https://some.google.com/".toHttpUrl())
-        }
+        target.initWithUrl("https://some.google.com/".toHttpUrl())
 
-        assertThat(result).isEmpty()
+        assertThat(result.await()).isEmpty()
     }
 
     @Test
@@ -133,29 +133,27 @@ class AddFeedViewModelTest {
 
 
     @Test
-    fun testThatSubscribeEmitCompleteEvent() {
+    fun testThatSubscribeEmitCompleteEvent() = testDispatcher.runBlockingTest {
         target.selectedFeed = FeedResult(HTML,"https://google.com", "type", "title")
         target.selectedAccount = mockk()
 
-        var called = false
-        val observer = EventObserver<Any> {
-            called = true
+        val completeEvent = async {
+            target.complete.asFlow()
+                    .first()
         }
-        target.complete.observeForever(observer)
         target.subscribeToFeed()
 
-        assertThat(called).isTrue()
+        assertThat(completeEvent.await()).isNotNull()
     }
 
     @Test
-    fun testThatCancelEmitCompleteEvent() {
-        var called = false
-        val observer = EventObserver<Any> {
-            called = true
+    fun testThatCancelEmitCompleteEvent() = testDispatcher.runBlockingTest {
+        val completeEvent = async {
+            target.complete.asFlow()
+                    .first()
         }
-        target.complete.observeForever(observer)
         target.cancel()
 
-        assertThat(called).isTrue()
+        assertThat(completeEvent.await()).isNotNull()
     }
 }

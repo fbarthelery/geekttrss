@@ -22,21 +22,23 @@ package com.geekorum.ttrss.manage_feeds.add_feed
 
 import android.accounts.Account
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.Observer
+import androidx.lifecycle.asFlow
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
-import com.geekorum.geekdroid.app.lifecycle.Event
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.htmlparsers.FeedExtractor
 import com.geekorum.ttrss.htmlparsers.FeedInformation
 import com.google.common.truth.Truth.assertThat
-import io.mockk.Runs
-import io.mockk.every
-import io.mockk.just
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.setMain
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import org.junit.Rule
@@ -54,17 +56,17 @@ class SubscribeToFeedViewModelTest {
     private lateinit var feedExtractor: FeedExtractor
     private lateinit var workManager: WorkManager
     private lateinit var feedsFinder: FeedsFinder
-    private lateinit var testDispatcher: TestCoroutineDispatcher
+    private val testDispatcher = TestCoroutineDispatcher()
 
 
     @BeforeTest
     fun setup() {
+        Dispatchers.setMain(testDispatcher)
         feedsFinder = mockk()
         okHttpClient = mockk()
         feedExtractor = mockk()
         workManager = mockk(relaxed = true)
         val account: Account = mockk()
-        testDispatcher = TestCoroutineDispatcher()
         val dispatchers = CoroutineDispatchersProvider(testDispatcher, testDispatcher, testDispatcher)
         subject = SubscribeToFeedViewModel(dispatchers, feedsFinder, workManager, account)
 
@@ -72,25 +74,26 @@ class SubscribeToFeedViewModelTest {
 
     @AfterTest
     fun tearDown() {
+        Dispatchers.resetMain()
         testDispatcher.cleanupTestCoroutines()
     }
 
     @Test
-    fun testThatWhenUrlIsInvalidInvalidUrlEventIsRaised() {
-        val observer: Observer<Event<String>> = mockObserver()
-        subject.invalidUrlEvent.observeForever(observer)
+    fun testThatWhenUrlIsInvalidInvalidUrlEventIsRaised() = testDispatcher.runBlockingTest {
+        val invalidUrlEvent = async {
+            subject.invalidUrlEvent.asFlow().first()
+        }
         subject.checkUrl("u")
-        verify { observer.onChanged(any()) }
+        assertThat(invalidUrlEvent.await()).isNotNull()
     }
 
     @Test
     fun testThatWhenUrlIsValidCorrectHttpUrlIsReturned() {
-        val observer: Observer<Event<String>> = mockObserver()
-        subject.invalidUrlEvent.observeForever(observer)
         val result = subject.checkUrl("https://google.com")
+
         val expected = "https://google.com".toHttpUrl()
         assertThat(result).isEqualTo(expected)
-        verify(inverse = true) { observer.onChanged(any()) }
+        assertThat(subject.invalidUrlEvent.value).isNull()
     }
 
 
@@ -104,10 +107,4 @@ class SubscribeToFeedViewModelTest {
     }
 
 
-}
-
-private inline fun <reified T : Observer<K>, reified K : Any> mockObserver(): T {
-    val observer: T = mockk()
-    every { observer.onChanged(any()) } just Runs
-    return observer
 }
