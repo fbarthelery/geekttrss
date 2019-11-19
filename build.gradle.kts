@@ -31,9 +31,9 @@ plugins {
     id("com.google.android.gms.oss-licenses-plugin") version "0.9.5.1" apply false
     id("com.google.gms.google-services") version "4.3.3" apply false
     id("io.fabric") version "1.29.0" apply false
-    kotlin("android") version "1.3.50" apply false
-    kotlin("kapt") version "1.3.50" apply false
-    id("kotlinx-serialization") version "1.3.50" apply false
+    kotlin("android") version "1.3.60" apply false
+    kotlin("kapt") version "1.3.60" apply false
+    id("kotlinx-serialization") version "1.3.60" apply false
     id("androidx.navigation.safeargs.kotlin") version "2.1.0-alpha06" apply false
 }
 

@@ -49,6 +49,7 @@ import com.geekorum.ttrss.webapi.ApiCallException
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.takeWhile
 import timber.log.Timber
@@ -57,6 +58,7 @@ import java.util.UUID
 /**
  * Synchronize Articles from the network.
  */
+@UseExperimental(ExperimentalCoroutinesApi::class)
 class ArticleSynchronizer @AssistedInject constructor(
         application: Application,
         @Assisted params: Bundle,
