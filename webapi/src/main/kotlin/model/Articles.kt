@@ -29,7 +29,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Serializer
 import kotlinx.serialization.internal.IntSerializer
-import kotlinx.serialization.internal.makeNullable
+import kotlinx.serialization.internal.nullable
 
 /**
  * The payload gor a getHeadlines request.
@@ -151,7 +151,7 @@ data class UpdateArticleResponsePayload(
                 when(val i = contentDecoder.decodeElementIndex(descriptor)) {
                     CompositeDecoder.READ_DONE -> break@loop
                     0 -> seq = contentDecoder.decodeNullableSerializableElement(descriptor, i,
-                        makeNullable(IntSerializer))
+                        IntSerializer.nullable)
                     1 -> status = contentDecoder.decodeIntElement(descriptor, i)
                     2 -> {
                         val contentSerializer = Content.serializer()

@@ -30,7 +30,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Serializer
 import kotlinx.serialization.Transient
 import kotlinx.serialization.internal.IntSerializer
-import kotlinx.serialization.internal.makeNullable
+import kotlinx.serialization.internal.nullable
 
 /**
  * Request payload to log the user in.
@@ -100,8 +100,8 @@ data class LoginResponsePayload(
             loop@ while (true) {
                 when (val i = contentDecoder.decodeElementIndex(descriptor)) {
                     CompositeDecoder.READ_DONE -> break@loop
-                    0 -> seq = contentDecoder.decodeNullableSerializableElement(descriptor, i, makeNullable(
-                        IntSerializer))
+                    0 -> seq = contentDecoder.decodeNullableSerializableElement(descriptor, i,
+                        IntSerializer.nullable)
                     1 -> status = contentDecoder.decodeIntElement(descriptor, i)
                     2 -> {
                         val contentSerializer = Content.serializer()

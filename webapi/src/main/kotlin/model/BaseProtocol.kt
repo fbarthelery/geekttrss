@@ -33,8 +33,8 @@ import kotlinx.serialization.Transient
 import kotlinx.serialization.internal.EnumSerializer
 import kotlinx.serialization.internal.IntSerializer
 import kotlinx.serialization.internal.SerialClassDescImpl
-import kotlinx.serialization.internal.makeNullable
-import kotlinx.serialization.json.JsonParsingException
+import kotlinx.serialization.internal.nullable
+import kotlinx.serialization.json.JsonDecodingException
 import kotlinx.serialization.list
 
 /* Requests */
@@ -166,7 +166,7 @@ data class ListContent<T>(
                 when (val i = contentDecoder.decodeElementIndex(descriptor)) {
                     CompositeDecoder.READ_DONE -> break@loop
                     0 -> error = contentDecoder.decodeNullableSerializableElement(descriptor, i,
-                        makeNullable(Error.serializer()))
+                        Error.serializer().nullable)
                 }
             }
             contentDecoder.endStructure(descriptor)
@@ -178,7 +178,7 @@ data class ListContent<T>(
             return try {
                 val list = listSerializer.deserialize(input)
                 ListContent(list)
-            } catch (e: JsonParsingException) {
+            } catch (e: JsonDecodingException) {
                 null
             }
         }
@@ -236,8 +236,8 @@ data class ListResponsePayload<T>(
             loop@ while (true) {
                 when (val i = contentDecoder.decodeElementIndex(descriptor)) {
                     CompositeDecoder.READ_DONE -> break@loop
-                    0 -> seq = contentDecoder.decodeNullableSerializableElement(descriptor, i, makeNullable(
-                        IntSerializer))
+                    0 -> seq = contentDecoder.decodeNullableSerializableElement(descriptor, i,
+                        IntSerializer.nullable)
                     1 -> status = contentDecoder.decodeIntElement(descriptor, i)
                     2 -> {
                         val listContentDecoder = ListContent.serializer(contentSerializer)
