@@ -137,13 +137,60 @@ class GetArticlesJsonSerializationTest {
               "lang": "",
               "flavor_image":"https:\/\/discourse.tt-rss.org\/user_avatar\/discourse.tt-rss.org\/fox\/40\/889_2.png",
               "flavor_stream":""
+            },
+            {
+              "always_display_attachments" : false,
+              "attachments" : [
+                {
+                  "0" : 313085,
+                  "1" : "https://traffic.libsyn.com/rands/theimportantthing0024.mp3",
+                  "2" : "audio/mpeg",
+                  "3" : "",
+                  "4" : "0",
+                  "5" : 694227,
+                  "6" : 0,
+                  "7" : 0,
+                  "content_type" : "audio/mpeg",
+                  "content_url" : "https://traffic.libsyn.com/rands/theimportantthing0024.mp3",
+                  "duration" : "0",
+                  "height" : 0,
+                  "id" : 313085,
+                  "post_id" : 694227,
+                  "title" : "",
+                  "width" : 0
+                }
+              ],
+              "author" : "rands",
+              "comments_count" : 0,
+              "comments_link" : "https://randsinrepose.com/archives/the-one-about-disney/#respond",
+              "content" : "",
+              "feed_id" : 181,
+              "feed_title" : "Rands In Repose",
+              "flavor_image" : "https://i1.wp.com/randsinrepose.com/wp-content/uploads/2019/06/The-Important-Thing-Logo-250-1.png?resize=250%2C250&ssl=1",
+              "flavor_stream" : "",
+              "guid" : "SHA1:f92464de4b9031863776a256af9bf86c60eb4082",
+              "id" : 694227,
+              "is_updated" : false,
+              "labels" : [],
+              "lang" : "en",
+              "link" : "https://randsinrepose.com/archives/the-one-about-disney/",
+              "marked" : false,
+              "note" : null,
+              "published" : false,
+              "score" : 0,
+              "tags" : [
+                "the important thing"
+              ],
+              "title" : "The One About Disney",
+              "unread" : false,
+              "updated" : 1574440244
             }
           ]
         }
 """.trimIndent()
         val serializer = getSerializer<ListResponsePayload<Headline>>()
         val result = Json.parse(serializer, jsonString)
-        val expected = ListResponsePayload<Headline>(
+        val expected = ListResponsePayload(
             sequence = 2,
             status = 1,
             content = ListContent(listOf(
@@ -188,8 +235,38 @@ class GetArticlesJsonSerializationTest {
                     author = "anonymous",
                     score = 0, note = null, lang = "",
                     flavorImage = "https://discourse.tt-rss.org/user_avatar/discourse.tt-rss.org/fox/40/889_2.png",
-                    flavorStream = "")
-
+                    flavorStream = ""),
+                    Headline(id = 694227, unread = false, marked = false, published = false, lastUpdatedTimestamp = 1574440244,
+                            isUpdated = false, title = "The One About Disney",
+                            link = "https://randsinrepose.com/archives/the-one-about-disney/",
+                            feedId = 181, tags = listOf("the important thing"),
+                            excerpt = "",
+                            content = "",
+                            labels = emptyList(),
+                            feedTitle = "Rands In Repose",
+                            nbComments = 0,
+                            commentsLink = "https://randsinrepose.com/archives/the-one-about-disney/#respond",
+                            alwaysDisplayAttachment = false,
+                            author = "rands",
+                            score = 0, note = null, lang = "en",
+                            flavorImage = "https://i1.wp.com/randsinrepose.com/wp-content/uploads/2019/06/The-Important-Thing-Logo-250-1.png?resize=250%2C250&ssl=1",
+                            flavorStream = "",
+                            guid = "SHA1:f92464de4b9031863776a256af9bf86c60eb4082",
+                            attachments = listOf(
+                                    Attachment(id = 313085,
+                                            indexedId = 313085,
+                                            postId = 694227,
+                                            indexedPostId = 694227,
+                                            contentUrl = "https://traffic.libsyn.com/rands/theimportantthing0024.mp3",
+                                            indexedContentUrl = "https://traffic.libsyn.com/rands/theimportantthing0024.mp3",
+                                            contentType = "audio/mpeg", indexedContentType = "audio/mpeg",
+                                            title = "", indexedTitle = "",
+                                            duration = 0, indexedDuration = 0,
+                                            width = 0, indexedWidth = 0,
+                                            height = 0, indexedHeight = 0
+                                            )
+                            )
+                    )
             ))
         )
         assertThat(result.sequence).isEqualTo(expected.sequence)

@@ -124,10 +124,10 @@ data class Headline(
     var flavorImage: String? = "",
 
     @SerialName("flavor_stream")
-    var flavorStream: String? = "",
+    val flavorStream: String? = "",
+    val attachments: List<Attachment> = emptyList(),
 
     // unuseful
-    val attachments: List<JsonObject> = emptyList(),
     val labels: List<String> = emptyList(),
     val lang: String? = ""
 
@@ -139,3 +139,39 @@ data class Headline(
     }
 
 }
+
+/**
+ * An Attachment.
+ * This object seems to be an HashMap with some indexed keys.
+ * Not sure for the order of duration and width/heigh
+ */
+@Serializable
+data class Attachment(
+        val id: Long,
+        @SerialName("post_id")
+        val postId: Long,
+        @SerialName("content_url")
+        val contentUrl: String,
+        @SerialName("content_type")
+        val contentType: String = "",
+        val title: String = "",
+        val duration: Long = 0,
+        val width: Int = 0,
+        val height: Int = 0,
+        @SerialName("0")
+        private val indexedId: Long = 0,
+        @SerialName("1")
+        private val indexedContentUrl: String = "",
+        @SerialName("2")
+        private val indexedContentType: String = "",
+        @SerialName("3")
+        private val indexedTitle: String = "",
+        @SerialName("4")
+        private val indexedDuration: Long = 0,
+        @SerialName("5")
+        private val indexedPostId: Long = 0,
+        @SerialName("6")
+        private val indexedWidth: Int = 0,
+        @SerialName("7")
+        private val indexedHeight: Int = 0
+)
