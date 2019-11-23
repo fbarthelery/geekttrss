@@ -112,12 +112,12 @@ data class UpdateArticleRequestPayload(
  * The response of an update article request.
  */
 @Keep
-//@Serializable
+@Serializable(UpdateArticleResponsePayload.OwnSerializer::class)
 data class UpdateArticleResponsePayload(
     @SerialName("seq")
     override val sequence: Int? = null,
     override val status: Int = 0,
-    override val content: UpdateArticleResponsePayload.Content
+    override val content: Content
 ) : ResponsePayload<UpdateArticleResponsePayload.Content>() {
 
     @Transient
@@ -130,14 +130,8 @@ data class UpdateArticleResponsePayload(
         override var error: Error? = null
     ): BaseContent()
 
-  companion object {
-        fun serializer(): KSerializer<UpdateArticleResponsePayload> {
-            return UpdateArticleResponsePayloadSerializer
-        }
-    }
-
     @Serializer(UpdateArticleResponsePayload::class)
-    object UpdateArticleResponsePayloadSerializer : KSerializer<UpdateArticleResponsePayload> {
+    internal object OwnSerializer : KSerializer<UpdateArticleResponsePayload> {
         override fun serialize(encoder: Encoder, obj: UpdateArticleResponsePayload) {
             TODO("not implemented")
         }

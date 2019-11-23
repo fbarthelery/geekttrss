@@ -42,6 +42,7 @@ class GetVersionRequestPayload : LoggedRequestPayload() {
     override val operation = "getVersion"
 }
 
+@Serializable(GetVersionResponsePayload.OwnSerializer::class)
 data class GetVersionResponsePayload(
     @SerialName("seq")
     override val sequence: Int? = null,
@@ -60,15 +61,8 @@ data class GetVersionResponsePayload(
 
     ) : BaseContent()
 
-    companion object {
-        fun serializer(): KSerializer<GetVersionResponsePayload> {
-            return GetVersionResponsePayloadSerializer
-        }
-    }
-
-
     @Serializer(GetVersionResponsePayload::class)
-    object GetVersionResponsePayloadSerializer : KSerializer<GetVersionResponsePayload> {
+    internal object OwnSerializer : KSerializer<GetVersionResponsePayload> {
         override fun serialize(encoder: Encoder, obj: GetVersionResponsePayload) {
             TODO("not implemented")
         }
@@ -112,7 +106,7 @@ class GetApiLevelRequestPayload : LoggedRequestPayload() {
     override val operation = "getApiLevel"
 }
 
-
+@Serializable(GetApiLevelResponsePayload.OwnSerializer::class)
 data class GetApiLevelResponsePayload(
     @SerialName("seq")
     override val sequence: Int? = null,
@@ -131,15 +125,8 @@ data class GetApiLevelResponsePayload(
 
     ) : BaseContent()
 
-    companion object {
-        fun serializer(): KSerializer<GetApiLevelResponsePayload> {
-            return GetApiLevelResponsePayloadSerializer
-        }
-    }
-
-
     @Serializer(GetApiLevelResponsePayload::class)
-    object GetApiLevelResponsePayloadSerializer : KSerializer<GetApiLevelResponsePayload> {
+    internal object OwnSerializer : KSerializer<GetApiLevelResponsePayload> {
         override fun serialize(encoder: Encoder, obj: GetApiLevelResponsePayload) {
             TODO("not implemented")
         }

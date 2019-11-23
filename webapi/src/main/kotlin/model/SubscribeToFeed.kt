@@ -74,6 +74,7 @@ enum class SubscribeResultCode(val code: Int) {
  * Response payload of subscribe to feed request
  */
 @Keep
+@Serializable(SubscribeToFeedResponsePayload.OwnSerializer::class)
 data class SubscribeToFeedResponsePayload(
     @SerialName("seq")
     override val sequence: Int? = null,
@@ -87,14 +88,8 @@ data class SubscribeToFeedResponsePayload(
     val success: Boolean
         get() = (resultCode == SubscribeResultCode.FEED_ALREADY_EXIST || resultCode == SubscribeResultCode.FEED_ADDED)
 
-    companion object {
-        fun serializer(): KSerializer<SubscribeToFeedResponsePayload> {
-            return SubscribeToFeedResponsePayloadSerializer
-        }
-    }
-
     @Serializer(SubscribeToFeedResponsePayload::class)
-    object SubscribeToFeedResponsePayloadSerializer : KSerializer<SubscribeToFeedResponsePayload> {
+    object OwnSerializer : KSerializer<SubscribeToFeedResponsePayload> {
         override fun serialize(encoder: Encoder, obj: SubscribeToFeedResponsePayload) {
             TODO("not implemented")
         }
@@ -169,6 +164,7 @@ data class UnsubscribeFeedRequestPayload(
  * Response payload of unsubscribe from feed request
  */
 @Keep
+@Serializable(UnsubscribeFeedResponsePayload.OwnSerializer::class)
 data class UnsubscribeFeedResponsePayload(
     @SerialName("seq")
     override val sequence: Int? = null,
@@ -176,14 +172,8 @@ data class UnsubscribeFeedResponsePayload(
     override val content: Content
 ) : ResponsePayload<UnsubscribeFeedResponsePayload.Content>() {
 
-    companion object {
-        fun serializer(): KSerializer<UnsubscribeFeedResponsePayload> {
-            return UnsubscribeFeedResponsePayloadSerializer
-        }
-    }
-
     @Serializer(UnsubscribeFeedResponsePayload::class)
-    object UnsubscribeFeedResponsePayloadSerializer : KSerializer<UnsubscribeFeedResponsePayload> {
+    internal object OwnSerializer : KSerializer<UnsubscribeFeedResponsePayload> {
         override fun serialize(encoder: Encoder, obj: UnsubscribeFeedResponsePayload) {
             TODO("not implemented")
         }

@@ -51,7 +51,7 @@ data class LoginRequestPayload(
  * The response of a Login request.
  */
 @Keep
-//@Serializable
+@Serializable(LoginResponsePayload.OwnSerializer::class)
 data class LoginResponsePayload(
     @SerialName("seq")
     override val sequence: Int? = null,
@@ -79,15 +79,8 @@ data class LoginResponsePayload(
 
     ) : BaseContent()
 
-// Workaround for kapt bug
-    companion object {
-        fun serializer(): KSerializer<LoginResponsePayload> {
-            return LoginResponsePayloadSerializer
-        }
-    }
-
     @Serializer(LoginResponsePayload::class)
-    object LoginResponsePayloadSerializer : KSerializer<LoginResponsePayload> {
+    internal object OwnSerializer : KSerializer<LoginResponsePayload> {
         override fun serialize(encoder: Encoder, obj: LoginResponsePayload) {
             TODO("not implemented")
         }

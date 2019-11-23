@@ -87,6 +87,7 @@ abstract class ResponsePayload<T : BaseContent> {
 
 }
 
+@Serializable(EnumSerializer::class)
 enum class Error {
     NO_ERROR,
     API_DISABLED,
@@ -125,22 +126,16 @@ abstract class BaseContent {
  *
  * @param <T> the type of element in the list.
  */
-//@Serializable
+@Serializable(ListContent.OwnSerializer::class)
 data class ListContent<T>(
     @Transient
     val list: List<T> = emptyList(),
     override var error: Error? = null
 ) : BaseContent() {
 
-    companion object {
-        fun <E> serializer(typeSerializer: KSerializer<E>): KSerializer<ListContent<E>> {
-            return ListContentSerializer(typeSerializer)
-        }
-    }
-
     // Workaround for kapt bug
     @Serializer(ListContent::class)
-    class ListContentSerializer<E>(
+    internal class OwnSerializer<E>(
         val contentSerializer: KSerializer<E>
     ) : KSerializer<ListContent<E>> {
 
@@ -192,7 +187,7 @@ data class ListContent<T>(
  * @param <T> the type of element in the list.
  */
 @Keep
-//@Serializable
+@Serializable(ListResponsePayload.OwnSerializer::class)
 data class ListResponsePayload<T>(
     @SerialName("seq")
     override val sequence: Int? = null,
@@ -204,15 +199,8 @@ data class ListResponsePayload<T>(
     val result: List<T>
         get() = content.list
 
-    companion object {
-        fun <E> serializer(typeSerializer: KSerializer<E>): KSerializer<ListResponsePayload<E>> {
-            return ListResponsePayloadSerializer(typeSerializer)
-        }
-    }
-
-    // Workaround for kapt bug
     @Serializer(ListResponsePayload::class)
-    class ListResponsePayloadSerializer<E>(
+    internal class OwnSerializer<E>(
         val contentSerializer: KSerializer<E>
     ) : KSerializer<ListResponsePayload<E>> {
 

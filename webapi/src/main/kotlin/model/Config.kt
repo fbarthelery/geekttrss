@@ -42,6 +42,7 @@ class GetConfigRequestPayload : LoggedRequestPayload() {
     override val operation = "getConfig"
 }
 
+@Serializable(GetConfigResponsePayload.OwnSerializer::class)
 data class GetConfigResponsePayload(
     @SerialName("seq")
     override val sequence: Int? = null,
@@ -75,15 +76,8 @@ data class GetConfigResponsePayload(
 
     ) : BaseContent()
 
-    companion object {
-        fun serializer(): KSerializer<GetConfigResponsePayload> {
-            return GetConfigResponsePayloadSerializer
-        }
-    }
-
-
     @Serializer(GetConfigResponsePayload::class)
-    object GetConfigResponsePayloadSerializer : KSerializer<GetConfigResponsePayload> {
+    internal object OwnSerializer : KSerializer<GetConfigResponsePayload> {
         override fun serialize(encoder: Encoder, obj: GetConfigResponsePayload) {
             TODO("not implemented")
         }
