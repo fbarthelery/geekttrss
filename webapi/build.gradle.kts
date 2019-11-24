@@ -22,7 +22,7 @@ import com.geekorum.build.enforcedCoroutinesPlatform
 
 plugins {
     kotlin("jvm")
-    id("kotlinx-serialization")
+    kotlin("plugin.serialization")
 }
 
 dependencies {

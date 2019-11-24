@@ -19,35 +19,44 @@
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import org.gradle.api.internal.DynamicObjectAware
-import kotlin.reflect.KProperty
-import java.net.URI
-
 pluginManagement {
+    val kotlinVersion: String by settings
+    val androidxNavigationVersion: String by settings
+    val fabricVersion: String by settings
+    val googleServicesVersion: String by settings
+    val ossLicensesVersion: String by settings
+
+    plugins {
+        kotlin("android") version kotlinVersion
+        kotlin("jvm") version kotlinVersion
+        kotlin("kapt") version kotlinVersion
+        kotlin("plugin.serialization") version kotlinVersion
+        id("androidx.navigation.safeargs.kotlin") version androidxNavigationVersion
+        id("io.fabric") version fabricVersion
+        id("com.google.gms.google-services") version googleServicesVersion
+        id("com.google.android.gms.oss-licenses-plugin") version ossLicensesVersion
+    }
+
     repositories {
         gradlePluginPortal()
         jcenter()
         maven {
             // Workaround for bug https://github.com/gradle/kotlin-dsl/issues/1186
             // we publish oss-licenses-plugin 0.9.5.1
-            url = URI("https://raw.githubusercontent.com/fbarthelery/play-services-plugins/master/repo/")
+            url = uri("https://raw.githubusercontent.com/fbarthelery/play-services-plugins/master/repo/")
         }
         google()
         maven {
-            url = URI("https://maven.fabric.io/public")
+            url = uri("https://maven.fabric.io/public")
         }
     }
     resolutionStrategy {
         eachPlugin {
-            val id = requested.id.id
-            when {
-                id == "com.google.android.gms.oss-licenses-plugin" -> useModule("com.google.android.gms:oss-licenses-plugin:${requested.version}")
-                id == "com.google.gms.google-services" -> useModule("com.google.gms:google-services:${requested.version}")
-                id.startsWith("com.android.") -> useModule("com.android.tools.build:gradle:${requested.version}")
-                id == "com.github.triplet.play" -> useModule("com.github.triplet.gradle:play-publisher:${requested.version}")
-                id == "io.fabric" -> useModule("io.fabric.tools:gradle:${requested.version}")
-                id == "kotlinx-serialization" -> useModule("org.jetbrains.kotlin:kotlin-serialization:${requested.version}")
-                id == "androidx.navigation.safeargs.kotlin" -> useModule("androidx.navigation:navigation-safe-args-gradle-plugin:${requested.version}")
+            when (requested.id.id) {
+                "com.google.android.gms.oss-licenses-plugin" -> useModule("com.google.android.gms:oss-licenses-plugin:${ossLicensesVersion}")
+                "com.google.gms.google-services" -> useModule("com.google.gms:google-services:${googleServicesVersion}")
+                "io.fabric" -> useModule("io.fabric.tools:gradle:${fabricVersion}")
+                "androidx.navigation.safeargs.kotlin" -> useModule("androidx.navigation:navigation-safe-args-gradle-plugin:${androidxNavigationVersion}")
             }
         }
     }

@@ -18,8 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-import java.net.URI
-
 plugins {
     `kotlin-dsl`
 }
@@ -38,7 +36,7 @@ repositories {
     maven {
         // Workaround for genymotion plugin not working on gradle 5.0
         // we publish 1.4.2 version with fixes
-        url = URI("https://raw.githubusercontent.com/fbarthelery/genymotion-gradle-plugin/master/repo/")
+        url = uri("https://raw.githubusercontent.com/fbarthelery/genymotion-gradle-plugin/master/repo/")
     }
 }
 

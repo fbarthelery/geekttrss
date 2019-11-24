@@ -28,13 +28,14 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.net.URI
 
 plugins {
-    id("com.google.android.gms.oss-licenses-plugin") version "0.9.5.1" apply false
-    id("com.google.gms.google-services") version "4.3.3" apply false
-    id("io.fabric") version "1.29.0" apply false
-    kotlin("android") version "1.3.60" apply false
-    kotlin("kapt") version "1.3.60" apply false
-    id("kotlinx-serialization") version "1.3.60" apply false
-    id("androidx.navigation.safeargs.kotlin") version "2.1.0-alpha06" apply false
+    // these should not be needed but for an unknown reason they get applied
+    // with bad ordering if not there. or they can't be applied dynamically
+    // version used is in gradle.properties
+    kotlin("jvm") apply false
+    id("androidx.navigation.safeargs.kotlin")  apply false
+    id("io.fabric") apply false
+    id("com.google.gms.google-services") apply false
+    id("com.google.android.gms.oss-licenses-plugin") apply false
 }
 
 
