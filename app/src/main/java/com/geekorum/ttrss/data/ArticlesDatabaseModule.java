@@ -32,7 +32,7 @@ import com.geekorum.ttrss.data.migrations.MigrationFrom6To7;
 import com.geekorum.ttrss.data.migrations.MigrationFrom7To8;
 import com.geekorum.ttrss.data.migrations.MigrationFrom8To9;
 import com.geekorum.ttrss.data.migrations.MigrationFrom9To10;
-import com.geekorum.ttrss.providers.ArticlesProvidersDao;
+import com.geekorum.ttrss.providers.PurgeArticlesDao;
 import dagger.Module;
 import dagger.Provides;
 
@@ -72,7 +72,7 @@ public class ArticlesDatabaseModule {
     }
 
     @Provides
-    TransactionsDao providestransactionsDao(ArticlesDatabase database) {
+    TransactionsDao providesTransactionsDao(ArticlesDatabase database) {
         return database.transactionsDao();
     }
 
@@ -82,7 +82,7 @@ public class ArticlesDatabaseModule {
     }
 
     @Provides
-    ArticlesProvidersDao providesArticlesProvidersDao(ArticlesDatabase database) {
+    PurgeArticlesDao providesPurgeArticlesDao(ArticlesDatabase database) {
         return database.articlesProvidersDao();
     }
 

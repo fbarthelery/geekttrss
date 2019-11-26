@@ -33,7 +33,7 @@ import javax.inject.Inject
 class PurgeArticlesWorker(
     appContext: Context,
     params: WorkerParameters,
-    private val articlesProvidersDao: ArticlesProvidersDao
+    private val purgeArticlesDao: PurgeArticlesDao
 ) : Worker(appContext, params) {
     override fun doWork(): Result {
         purgeOldArticles()
@@ -44,12 +44,12 @@ class PurgeArticlesWorker(
         // older than 3 months
         val oldTimeSec = System.currentTimeMillis() / 1000 - TimeUnit.DAYS.toSeconds(90)
 
-        val deleted = articlesProvidersDao.deleteNonImportantArticlesBeforeTime(oldTimeSec)
+        val deleted = purgeArticlesDao.deleteNonImportantArticlesBeforeTime(oldTimeSec)
         Timber.i("Purge $deleted old articles")
     }
 
     class Factory @Inject constructor(
-        private val articlesProvidersDao: ArticlesProvidersDao
+        private val purgeArticlesDao: PurgeArticlesDao
     ) : WorkerFactory() {
         override fun createWorker(
             appContext: Context, workerClassName: String, workerParameters: WorkerParameters
@@ -57,7 +57,7 @@ class PurgeArticlesWorker(
             if (workerClassName != PurgeArticlesWorker::class.java.name) {
                 return null
             }
-            return PurgeArticlesWorker(appContext, workerParameters, articlesProvidersDao)
+            return PurgeArticlesWorker(appContext, workerParameters, purgeArticlesDao)
         }
     }
 }

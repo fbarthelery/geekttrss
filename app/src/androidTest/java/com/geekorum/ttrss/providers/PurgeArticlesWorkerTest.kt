@@ -46,12 +46,14 @@ class PurgeArticlesWorkerTest {
     fun setUp() {
         applicationContext = ApplicationProvider.getApplicationContext()
         executor = Executors.newSingleThreadExecutor()
-        val articlesProvidersDao = ArticlesProvidersDao { 0 }
+        val purgeArticlesDao = object : PurgeArticlesDao {
+            override fun deleteNonImportantArticlesBeforeTime(beforeTimeSec: Long) = 0
+        }
         workerBuilder = TestWorkerBuilder(applicationContext, executor)
         workerBuilder.setWorkerFactory(object: WorkerFactory() {
             override fun createWorker(
                 appContext: Context, workerClassName: String, workerParameters: WorkerParameters
-            ): ListenableWorker? = PurgeArticlesWorker(appContext, workerParameters, articlesProvidersDao)
+            ): ListenableWorker? = PurgeArticlesWorker(appContext, workerParameters, purgeArticlesDao)
         })
     }
 

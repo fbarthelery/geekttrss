@@ -18,16 +18,16 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.geekorum.ttrss.providers;
+package com.geekorum.ttrss.providers
 
-import androidx.room.Dao;
-import androidx.room.Query;
+import androidx.room.Dao
+import androidx.room.Query
 
 /**
- * Dao to access articles database when as the {@link ArticlesProvider}
+ * Dao to purge old articles from database
  */
 @Dao
-public interface ArticlesProvidersDao {
+interface PurgeArticlesDao {
     @Query("DELETE FROM articles WHERE unread=0 AND marked=0 AND published=0 and last_time_update<=:beforeTimeSec")
-    int deleteNonImportantArticlesBeforeTime(long beforeTimeSec);
+    fun deleteNonImportantArticlesBeforeTime(beforeTimeSec: Long): Int
 }

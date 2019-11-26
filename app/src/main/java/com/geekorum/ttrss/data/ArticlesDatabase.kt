@@ -22,7 +22,7 @@ package com.geekorum.ttrss.data
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.geekorum.ttrss.providers.ArticlesProvidersDao
+import com.geekorum.ttrss.providers.PurgeArticlesDao
 
 @Database(entities = [Article::class, ArticleFTS::class, Category::class,
     Feed::class, Transaction::class, AccountInfo::class],
@@ -32,7 +32,7 @@ abstract class ArticlesDatabase : RoomDatabase() {
     abstract fun accountInfoDao(): AccountInfoDao
     abstract fun transactionsDao(): TransactionsDao
     abstract fun synchronizationDao(): SynchronizationDao
-    abstract fun articlesProvidersDao(): ArticlesProvidersDao
+    abstract fun articlesProvidersDao(): PurgeArticlesDao
     abstract fun feedsDao(): FeedsDao
     abstract fun manageFeedsDao(): ManageFeedsDao
 
