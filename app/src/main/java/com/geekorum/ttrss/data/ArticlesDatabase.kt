@@ -18,30 +18,26 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.geekorum.ttrss.data;
+package com.geekorum.ttrss.data
 
-import androidx.room.Database;
-import androidx.room.RoomDatabase;
-import com.geekorum.ttrss.providers.ArticlesProvidersDao;
+import androidx.room.Database
+import androidx.room.RoomDatabase
+import com.geekorum.ttrss.providers.ArticlesProvidersDao
 
-@Database(entities = {Article.class, ArticleFTS.class,
-        Category.class, Feed.class, Transaction.class, AccountInfo.class},
-        version = 10)
-public abstract class ArticlesDatabase extends RoomDatabase {
+@Database(entities = [Article::class, ArticleFTS::class, Category::class,
+    Feed::class, Transaction::class, AccountInfo::class],
+        version = 11)
+abstract class ArticlesDatabase : RoomDatabase() {
+    abstract fun articleDao(): ArticleDao?
+    abstract fun accountInfoDao(): AccountInfoDao?
+    abstract fun transactionsDao(): TransactionsDao?
+    abstract fun synchronizationDao(): SynchronizationDao?
+    abstract fun articlesProvidersDao(): ArticlesProvidersDao?
+    abstract fun feedsDao(): FeedsDao?
+    abstract fun manageFeedsDao(): ManageFeedsDao?
 
-    public static final String DATABASE_NAME = "room_articles.db";
+    companion object {
+        const val DATABASE_NAME = "room_articles.db"
+    }
 
-    public abstract ArticleDao articleDao();
-
-    public abstract AccountInfoDao accountInfoDao();
-
-    public abstract TransactionsDao transactionsDao();
-
-    public abstract SynchronizationDao synchronizationDao();
-
-    public abstract ArticlesProvidersDao articlesProvidersDao();
-
-    public abstract FeedsDao feedsDao();
-
-    public abstract ManageFeedsDao manageFeedsDao();
 }
