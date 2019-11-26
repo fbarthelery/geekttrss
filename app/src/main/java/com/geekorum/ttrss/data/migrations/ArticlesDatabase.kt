@@ -459,3 +459,14 @@ object MigrationFrom9To10 : Migration(9, 10) {
         }
     }
 }
+
+
+val ALL_MIGRATIONS = listOf(MigrationFrom1To2,
+        MigrationFrom2To3,
+        MigrationFrom3To4,
+        MigrationFrom4To5,
+        MigrationFrom5To6,
+        MigrationFrom6To7,
+        MigrationFrom7To8,
+        MigrationFrom8To9,
+        MigrationFrom9To10)

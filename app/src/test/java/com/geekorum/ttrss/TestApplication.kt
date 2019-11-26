@@ -30,6 +30,7 @@ import com.geekorum.ttrss.accounts.LoginActivityTestModule
 import com.geekorum.ttrss.core.CoreFactoriesModule
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.data.ArticlesDatabase
+import com.geekorum.ttrss.data.migrations.ALL_MIGRATIONS
 import com.geekorum.ttrss.data.migrations.MigrationFrom1To2
 import com.geekorum.ttrss.data.migrations.MigrationFrom2To3
 import com.geekorum.ttrss.data.migrations.MigrationFrom3To4
@@ -93,13 +94,7 @@ private object MockDatabaseModule {
     @Singleton
     internal fun providesAppDatabase(application: android.app.Application): ArticlesDatabase {
         return Room.inMemoryDatabaseBuilder(application, ArticlesDatabase::class.java)
-            .addMigrations(MigrationFrom1To2,
-                MigrationFrom2To3,
-                MigrationFrom3To4,
-                MigrationFrom4To5,
-                MigrationFrom5To6,
-                MigrationFrom6To7,
-                MigrationFrom7To8)
+            .addMigrations(*ALL_MIGRATIONS.toTypedArray())
             .build()
     }
 }
