@@ -30,8 +30,8 @@ import androidx.room.Room
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.geekorum.ttrss.data.ArticlesDatabase.Tables
 import com.geekorum.ttrss.providers.ArticlesContract
-import com.geekorum.ttrss.providers.DbHelper
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.runner.RunWith
@@ -98,7 +98,7 @@ class ArticleFullTextSearchTest {
             ArticlesContract.Category.TITLE to "category",
             ArticlesContract.Category.UNREAD_COUNT to 2
         )
-        db.insert(DbHelper.TABLE_CATEGORIES, SQLiteDatabase.CONFLICT_NONE, values)
+        db.insert(Tables.CATEGORIES, SQLiteDatabase.CONFLICT_NONE, values)
 
         values = contentValuesOf(
             ArticlesContract.Feed.TITLE to "feed title",
@@ -110,7 +110,7 @@ class ArticleFullTextSearchTest {
             ArticlesContract.Feed.IS_SUBSCRIBED to 1,
             ArticlesContract.Feed.ICON_URL to "http://exemple.com/1.ico"
         )
-        db.insert(DbHelper.TABLE_FEEDS, SQLiteDatabase.CONFLICT_NONE, values)
+        db.insert(Tables.FEEDS, SQLiteDatabase.CONFLICT_NONE, values)
 
         values = contentValuesOf(
             ArticlesContract.Article._ID to 0,
@@ -130,7 +130,7 @@ class ArticleFullTextSearchTest {
             ArticlesContract.Article.FLAVOR_IMAGE_URI to "article flavor image uri",
             ArticlesContract.Article.CONTENT_EXCERPT to "a content excerpt"
         )
-        db.insert(DbHelper.TABLE_ARTICLES, SQLiteDatabase.CONFLICT_NONE, values)
+        db.insert(Tables.ARTICLES, SQLiteDatabase.CONFLICT_NONE, values)
 
         values = contentValuesOf(
             ArticlesContract.Article._ID to 1,
@@ -151,6 +151,6 @@ class ArticleFullTextSearchTest {
             ArticlesContract.Article.FLAVOR_IMAGE_URI to "article flavor image uri",
             ArticlesContract.Article.CONTENT_EXCERPT to "a content excerpt"
         )
-        db.insert(DbHelper.TABLE_ARTICLES, SQLiteDatabase.CONFLICT_NONE, values)
+        db.insert(Tables.ARTICLES, SQLiteDatabase.CONFLICT_NONE, values)
     }
 }

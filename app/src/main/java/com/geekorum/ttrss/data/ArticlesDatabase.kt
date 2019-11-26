@@ -28,16 +28,22 @@ import com.geekorum.ttrss.providers.ArticlesProvidersDao
     Feed::class, Transaction::class, AccountInfo::class],
         version = 11)
 abstract class ArticlesDatabase : RoomDatabase() {
-    abstract fun articleDao(): ArticleDao?
-    abstract fun accountInfoDao(): AccountInfoDao?
-    abstract fun transactionsDao(): TransactionsDao?
-    abstract fun synchronizationDao(): SynchronizationDao?
-    abstract fun articlesProvidersDao(): ArticlesProvidersDao?
-    abstract fun feedsDao(): FeedsDao?
-    abstract fun manageFeedsDao(): ManageFeedsDao?
+    abstract fun articleDao(): ArticleDao
+    abstract fun accountInfoDao(): AccountInfoDao
+    abstract fun transactionsDao(): TransactionsDao
+    abstract fun synchronizationDao(): SynchronizationDao
+    abstract fun articlesProvidersDao(): ArticlesProvidersDao
+    abstract fun feedsDao(): FeedsDao
+    abstract fun manageFeedsDao(): ManageFeedsDao
 
     companion object {
         const val DATABASE_NAME = "room_articles.db"
     }
 
+    object Tables {
+        const val ARTICLES = "articles"
+        const val TRANSACTIONS = "transactions"
+        const val FEEDS = "feeds"
+        const val CATEGORIES = "categories"
+    }
 }

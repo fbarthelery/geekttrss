@@ -28,8 +28,8 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.geekorum.ttrss.data.ArticlesDatabase
+import com.geekorum.ttrss.data.ArticlesDatabase.Tables
 import com.geekorum.ttrss.providers.ArticlesContract
-import com.geekorum.ttrss.providers.DbHelper
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.runner.RunWith
@@ -70,7 +70,7 @@ class ArticlesDatabaseMigrationTest {
             ArticlesContract.Category.TITLE to "category",
             ArticlesContract.Category.UNREAD_COUNT to 2
         )
-        db.insert(DbHelper.TABLE_CATEGORIES, SQLiteDatabase.CONFLICT_NONE, values)
+        db.insert(Tables.CATEGORIES, SQLiteDatabase.CONFLICT_NONE, values)
 
         values = contentValuesOf(
             ArticlesContract.Feed.TITLE to "feed title",
@@ -80,7 +80,7 @@ class ArticlesDatabaseMigrationTest {
             ArticlesContract.Feed.LAST_TIME_UPDATE to 0,
             ArticlesContract.Feed.DISPLAY_TITLE to "display title"
         )
-        db.insert(DbHelper.TABLE_FEEDS, SQLiteDatabase.CONFLICT_NONE, values)
+        db.insert(Tables.FEEDS, SQLiteDatabase.CONFLICT_NONE, values)
 
         values = contentValuesOf(
             ArticlesContract.Article.TITLE to "article title",
@@ -99,7 +99,7 @@ class ArticlesDatabaseMigrationTest {
             ArticlesContract.Article.FLAVOR_IMAGE_URI to "article flavor image uri",
             ArticlesContract.Article.CONTENT_EXCERPT to "a content excerpt"
         )
-        db.insert(DbHelper.TABLE_ARTICLES, SQLiteDatabase.CONFLICT_NONE, values)
+        db.insert(Tables.ARTICLES, SQLiteDatabase.CONFLICT_NONE, values)
 
 
         values = contentValuesOf(
@@ -107,23 +107,23 @@ class ArticlesDatabaseMigrationTest {
             ArticlesContract.Transaction.VALUE to 1,
             ArticlesContract.Transaction.ARTICLE_ID to 1
         )
-        db.insert(DbHelper.TABLE_TRANSACTIONS, SQLiteDatabase.CONFLICT_NONE, values)
+        db.insert(Tables.TRANSACTIONS, SQLiteDatabase.CONFLICT_NONE, values)
     }
 
     private fun assertMigration1To2DataIntegrity(db: SupportSQLiteDatabase) {
-        db.query("SELECT * FROM " + DbHelper.TABLE_CATEGORIES).use {
+        db.query("SELECT * FROM ${Tables.CATEGORIES}").use {
             assertThat(it.count).isEqualTo(1)
         }
 
-        db.query("SELECT * FROM " + DbHelper.TABLE_FEEDS).use {
+        db.query("SELECT * FROM ${Tables.FEEDS}" ).use {
             assertThat(it.count).isEqualTo(1)
         }
 
-        db.query("SELECT * FROM " + DbHelper.TABLE_ARTICLES).use {
+        db.query("SELECT * FROM ${Tables.ARTICLES}").use {
             assertThat(it.count).isEqualTo(1)
         }
 
-        db.query("SELECT * FROM " + DbHelper.TABLE_TRANSACTIONS).use {
+        db.query("SELECT * FROM ${Tables.TRANSACTIONS}").use {
             assertThat(it.count).isEqualTo(1)
         }
     }
@@ -243,7 +243,7 @@ class ArticlesDatabaseMigrationTest {
 
     private fun assertMigration7To8DataIntegrity(db: SupportSQLiteDatabase) {
         assertMigration1To2DataIntegrity(db)
-        db.query("SELECT * FROM " + DbHelper.TABLE_FEEDS).use {
+        db.query("SELECT * FROM ${Tables.FEEDS}").use {
             assertThat(it.count).isEqualTo(1)
             it.moveToFirst()
             assertThat(it.getValue<Boolean>("is_subscribed")).isTrue()
@@ -255,7 +255,7 @@ class ArticlesDatabaseMigrationTest {
             ArticlesContract.Category.TITLE to "category",
             ArticlesContract.Category.UNREAD_COUNT to 2
         )
-        db.insert(DbHelper.TABLE_CATEGORIES, SQLiteDatabase.CONFLICT_NONE, values)
+        db.insert(Tables.CATEGORIES, SQLiteDatabase.CONFLICT_NONE, values)
 
         values = contentValuesOf(
             ArticlesContract.Feed.TITLE to "feed title",
@@ -266,7 +266,7 @@ class ArticlesDatabaseMigrationTest {
             ArticlesContract.Feed.DISPLAY_TITLE to "display title",
             ArticlesContract.Feed.IS_SUBSCRIBED to 1
             )
-        db.insert(DbHelper.TABLE_FEEDS, SQLiteDatabase.CONFLICT_NONE, values)
+        db.insert(Tables.FEEDS, SQLiteDatabase.CONFLICT_NONE, values)
 
         values = contentValuesOf(
             ArticlesContract.Article.TITLE to "article title",
@@ -285,7 +285,7 @@ class ArticlesDatabaseMigrationTest {
             ArticlesContract.Article.FLAVOR_IMAGE_URI to "article flavor image uri",
             ArticlesContract.Article.CONTENT_EXCERPT to "a content excerpt"
         )
-        db.insert(DbHelper.TABLE_ARTICLES, SQLiteDatabase.CONFLICT_NONE, values)
+        db.insert(Tables.ARTICLES, SQLiteDatabase.CONFLICT_NONE, values)
 
 
         values = contentValuesOf(
@@ -293,7 +293,7 @@ class ArticlesDatabaseMigrationTest {
             ArticlesContract.Transaction.VALUE to 1,
             ArticlesContract.Transaction.ARTICLE_ID to 1
         )
-        db.insert(DbHelper.TABLE_TRANSACTIONS, SQLiteDatabase.CONFLICT_NONE, values)
+        db.insert(Tables.TRANSACTIONS, SQLiteDatabase.CONFLICT_NONE, values)
     }
 
 
