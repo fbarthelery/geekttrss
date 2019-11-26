@@ -268,7 +268,7 @@ public class ArticlesProvider extends DaggerContentProvider {
             ContentProviderResult[] contentProviderResults = super.applyBatch(operations);
             articlesDatabase.setTransactionSuccessful();
             // notify changes to all uri
-            contentResolver.notifyChange(ArticlesContract.AUTHORITY_URI, null);
+            contentResolver.notifyChange(ArticlesContract.AUTHORITY_URI(), null);
             return contentProviderResults;
         } finally {
             articlesDatabase.endTransaction();
