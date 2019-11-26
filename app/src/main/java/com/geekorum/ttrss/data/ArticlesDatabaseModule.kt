@@ -24,15 +24,6 @@ import android.app.Application
 import androidx.room.Room
 import androidx.sqlite.db.SupportSQLiteOpenHelper
 import com.geekorum.ttrss.data.migrations.ALL_MIGRATIONS
-import com.geekorum.ttrss.data.migrations.MigrationFrom1To2
-import com.geekorum.ttrss.data.migrations.MigrationFrom2To3
-import com.geekorum.ttrss.data.migrations.MigrationFrom3To4
-import com.geekorum.ttrss.data.migrations.MigrationFrom4To5
-import com.geekorum.ttrss.data.migrations.MigrationFrom5To6
-import com.geekorum.ttrss.data.migrations.MigrationFrom6To7
-import com.geekorum.ttrss.data.migrations.MigrationFrom7To8
-import com.geekorum.ttrss.data.migrations.MigrationFrom8To9
-import com.geekorum.ttrss.data.migrations.MigrationFrom9To10
 import com.geekorum.ttrss.providers.PurgeArticlesDao
 import dagger.Module
 import dagger.Provides

@@ -24,8 +24,8 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.geekorum.ttrss.providers.PurgeArticlesDao
 
-@Database(entities = [Article::class, ArticleFTS::class, Category::class,
-    Feed::class, Transaction::class, AccountInfo::class],
+@Database(entities = [Article::class, ArticleFTS::class, Attachment::class,
+    Category::class, Feed::class, Transaction::class, AccountInfo::class],
         version = 11)
 abstract class ArticlesDatabase : RoomDatabase() {
     abstract fun articleDao(): ArticleDao

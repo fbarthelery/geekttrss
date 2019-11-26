@@ -192,6 +192,26 @@ data class Metadata(
     }
 }
 
+@Entity(tableName = "attachments", foreignKeys = [ForeignKey(entity = Article::class,
+        parentColumns = ["_id"],
+        childColumns = ["post_id"],
+        onDelete = ForeignKey.CASCADE)])
+data class Attachment(
+    @PrimaryKey
+    @ColumnInfo(name = BaseColumns._ID)
+    val id: Long,
+    @ColumnInfo(name ="post_id")
+    val postId: Long,
+    @ColumnInfo(name ="content_url")
+    val contentUrl: String,
+    @ColumnInfo(name ="content_type")
+    val contentType: String = "",
+    val title: String = "",
+    val duration: Long = 0,
+    val width: Int = 0,
+    val height: Int = 0
+)
+
 
 @Entity(tableName = "categories")
 data class Category(

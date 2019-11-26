@@ -460,6 +460,33 @@ object MigrationFrom9To10 : Migration(9, 10) {
     }
 }
 
+/**
+ * This migration adds the attachments table
+ */
+object MigrationFrom10To11 : Migration(10, 11) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        addAttachmentsTable(database)
+    }
+
+    private fun addAttachmentsTable(database: SupportSQLiteDatabase) {
+        with(database) {
+            execSQL(
+                    """CREATE TABLE IF NOT EXISTS `attachments` (
+                    |`_id` INTEGER NOT NULL,
+                    |`content_url` TEXT NOT NULL,
+                    |`content_type` TEXT NOT NULL,
+                    |`post_id` INTEGER NOT NULL,
+                    |`title` TEXT NOT NULL,
+                    |`duration` INTEGER NOT NULL,
+                    |`width` INTEGER NOT NULL,
+                    |`height` INTEGER NOT NULL,
+                    |PRIMARY KEY(`_id`),
+                    |FOREIGN KEY(`post_id`) REFERENCES `articles`(`_id`)
+                    |ON UPDATE NO ACTION ON DELETE CASCADE
+                    |)""".trimMargin())
+        }
+    }
+}
 
 val ALL_MIGRATIONS = listOf(MigrationFrom1To2,
         MigrationFrom2To3,
@@ -469,4 +496,5 @@ val ALL_MIGRATIONS = listOf(MigrationFrom1To2,
         MigrationFrom6To7,
         MigrationFrom7To8,
         MigrationFrom8To9,
-        MigrationFrom9To10)
+        MigrationFrom9To10,
+        MigrationFrom10To11)

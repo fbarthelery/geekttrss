@@ -58,7 +58,8 @@ class ArticlesDatabaseMigrationTest {
 
         // Re-open the database with version 2 and provide
         // MIGRATION_1_2 as the migration process.
-        helper.runMigrationsAndValidate(TEST_DB, 2, true, MigrationFrom1To2).use {
+        helper.runMigrationsAndValidate(TEST_DB, 2, true,
+                *ALL_MIGRATIONS.toTypedArray()).use {
             // MigrationTestHelper automatically verifies the schema changes,
             // but you need to validate that the data was migrated properly.
             assertMigration1To2DataIntegrity(it)
@@ -139,7 +140,7 @@ class ArticlesDatabaseMigrationTest {
         }
 
         helper.runMigrationsAndValidate(TEST_DB, 3, true,
-            MigrationFrom1To2, MigrationFrom2To3).use {
+                *ALL_MIGRATIONS.toTypedArray()).use {
             // MigrationTestHelper automatically verifies the schema changes,
             // but you need to validate that the data was migrated properly.
             assertMigration1To2DataIntegrity(it)
@@ -159,7 +160,7 @@ class ArticlesDatabaseMigrationTest {
         }
 
         helper.runMigrationsAndValidate(TEST_DB, 4, true,
-            MigrationFrom1To2, MigrationFrom2To3, MigrationFrom3To4).use {
+                *ALL_MIGRATIONS.toTypedArray()).use {
             // MigrationTestHelper automatically verifies the schema changes,
             // but you need to validate that the data was migrated properly.
             assertMigration1To2DataIntegrity(it)
@@ -177,7 +178,7 @@ class ArticlesDatabaseMigrationTest {
         }
 
         helper.runMigrationsAndValidate(TEST_DB, 5, true,
-            MigrationFrom1To2, MigrationFrom2To3, MigrationFrom3To4, MigrationFrom4To5).use {
+                *ALL_MIGRATIONS.toTypedArray()).use {
             // MigrationTestHelper automatically verifies the schema changes,
             // but you need to validate that the contentData was migrated properly.
             assertMigration1To2DataIntegrity(it)
@@ -195,8 +196,7 @@ class ArticlesDatabaseMigrationTest {
         }
 
         helper.runMigrationsAndValidate(TEST_DB, 6, true,
-            MigrationFrom1To2, MigrationFrom2To3, MigrationFrom3To4, MigrationFrom4To5,
-            MigrationFrom5To6).use {
+                *ALL_MIGRATIONS.toTypedArray()).use {
             // MigrationTestHelper automatically verifies the schema changes,
             // but you need to validate that the contentData was migrated properly.
             assertMigration1To2DataIntegrity(it)
@@ -233,8 +233,7 @@ class ArticlesDatabaseMigrationTest {
         }
 
         helper.runMigrationsAndValidate(TEST_DB, 8, true,
-            MigrationFrom1To2, MigrationFrom2To3, MigrationFrom3To4, MigrationFrom4To5,
-            MigrationFrom5To6, MigrationFrom6To7, MigrationFrom7To8).use {
+                *ALL_MIGRATIONS.toTypedArray()).use {
             // MigrationTestHelper automatically verifies the schema changes,
             // but you need to validate that the contentData was migrated properly.
             assertMigration7To8DataIntegrity(it)
@@ -308,8 +307,7 @@ class ArticlesDatabaseMigrationTest {
         }
 
         helper.runMigrationsAndValidate(TEST_DB, 9, true,
-            MigrationFrom1To2, MigrationFrom2To3, MigrationFrom3To4, MigrationFrom4To5,
-            MigrationFrom5To6, MigrationFrom6To7, MigrationFrom7To8, MigrationFrom8To9).use {
+                *ALL_MIGRATIONS.toTypedArray()).use {
             // MigrationTestHelper automatically verifies the schema changes,
             // but you need to validate that the contentData was migrated properly.
             assertMigration7To8DataIntegrity(it)
@@ -326,10 +324,74 @@ class ArticlesDatabaseMigrationTest {
             createSomeArticlesFromVersion8(it)
         }
 
-        helper.runMigrationsAndValidate(TEST_DB, 9, true,
-            MigrationFrom1To2, MigrationFrom2To3, MigrationFrom3To4, MigrationFrom4To5,
-            MigrationFrom5To6, MigrationFrom6To7, MigrationFrom7To8, MigrationFrom8To9,
-            MigrationFrom9To10).use {
+        helper.runMigrationsAndValidate(TEST_DB, 10, true,
+                *ALL_MIGRATIONS.toTypedArray()).use {
+            // MigrationTestHelper automatically verifies the schema changes,
+            // but you need to validate that the contentData was migrated properly.
+            assertMigration7To8DataIntegrity(it)
+        }
+    }
+
+    private fun createSomeArticlesFromVersion10(db: SupportSQLiteDatabase) {
+        var values = contentValuesOf(
+                ArticlesContract.Category.TITLE to "category",
+                ArticlesContract.Category.UNREAD_COUNT to 2
+        )
+        db.insert(Tables.CATEGORIES, SQLiteDatabase.CONFLICT_NONE, values)
+
+        values = contentValuesOf(
+                ArticlesContract.Feed.TITLE to "feed title",
+                ArticlesContract.Feed.URL to "feed url",
+                ArticlesContract.Feed.CAT_ID to 0,
+                ArticlesContract.Feed.UNREAD_COUNT to 2,
+                ArticlesContract.Feed.LAST_TIME_UPDATE to 0,
+                ArticlesContract.Feed.DISPLAY_TITLE to "display title",
+                ArticlesContract.Feed.IS_SUBSCRIBED to 1,
+                ArticlesContract.Feed.ICON_URL to "icon_url"
+        )
+        db.insert(Tables.FEEDS, SQLiteDatabase.CONFLICT_NONE, values)
+
+        values = contentValuesOf(
+                ArticlesContract.Article.TITLE to "article title",
+                ArticlesContract.Article.CONTENT to "a content",
+                ArticlesContract.Article.SCORE to 0,
+                ArticlesContract.Article.PUBLISHED to 1,
+                ArticlesContract.Article.LAST_TIME_UPDATE to 0,
+                ArticlesContract.Article.UNREAD to 1,
+                ArticlesContract.Article.TRANSIENT_UNREAD to 1,
+                ArticlesContract.Article.STARRED to 1,
+                ArticlesContract.Article.IS_UPDATED to 1,
+                ArticlesContract.Article.FEED_ID to 1,
+                ArticlesContract.Article.LINK to "article links",
+                ArticlesContract.Article.TAGS to "article tags",
+                ArticlesContract.Article.AUTHOR to "article author",
+                ArticlesContract.Article.FLAVOR_IMAGE_URI to "article flavor image uri",
+                ArticlesContract.Article.CONTENT_EXCERPT to "a content excerpt"
+        )
+        db.insert(Tables.ARTICLES, SQLiteDatabase.CONFLICT_NONE, values)
+
+
+        values = contentValuesOf(
+                ArticlesContract.Transaction.FIELD to "transaction field",
+                ArticlesContract.Transaction.VALUE to 1,
+                ArticlesContract.Transaction.ARTICLE_ID to 1
+        )
+        db.insert(Tables.TRANSACTIONS, SQLiteDatabase.CONFLICT_NONE, values)
+    }
+
+
+    @Test
+    fun migrate10To11() {
+        helper.createDatabase(TEST_DB, 10).use {
+            // db has schema version 8. insert some contentData using SQL queries.
+            // You cannot use DAO classes because they expect the latest schema.
+            // as our schema for this migration doesn't change much from the previous
+            // we can reuse the same function
+            createSomeArticlesFromVersion10(it)
+        }
+
+        helper.runMigrationsAndValidate(TEST_DB, 11, true,
+                *ALL_MIGRATIONS.toTypedArray()).use {
             // MigrationTestHelper automatically verifies the schema changes,
             // but you need to validate that the contentData was migrated properly.
             assertMigration7To8DataIntegrity(it)
