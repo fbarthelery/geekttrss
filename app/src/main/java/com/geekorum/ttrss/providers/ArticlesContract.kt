@@ -34,13 +34,14 @@ object ArticlesContract {
     @get:JvmName("AUTHORITY_URI")
     val AUTHORITY_URI = "content://$AUTHORITY".toUri()
 
-    object Article : BaseColumns {
+    object Article {
         val CONTENT_URI: Uri = Uri.withAppendedPath(AUTHORITY_URI, "articles")
         const val CONTENT_TYPE = "vnd.android.cursor.dir/vnd.com.geekorum.ttrss.article"
         const val CONTENT_ITEM_TYPE = "vnd.android.cursor.item/vnd.com.geekorum.ttrss.article"
 
         // columns of an Article
         // booleans
+        const val _ID = BaseColumns._ID
         const val UNREAD = "unread"
         // only use temporary to prevent cursors to remove the articles to be shown after reading it
         const val TRANSIENT_UNREAD = "transiant_unread"
@@ -61,9 +62,10 @@ object ArticlesContract {
         const val CONTENT_EXCERPT = "content_excerpt"
     }
 
-    object Feed : BaseColumns {
+    object Feed {
         val CONTENT_URI: Uri = Uri.withAppendedPath(AUTHORITY_URI, "feeds")
         // columns of a Feed
+        const val _ID = BaseColumns._ID
         const val URL = "url"
         const val TITLE = "title"
         const val CAT_ID = "cat_id"
@@ -74,17 +76,19 @@ object ArticlesContract {
         const val ICON_URL = "feed_icon_url"
     }
 
-    object Category : BaseColumns {
+    object Category {
         val CONTENT_URI: Uri = Uri.withAppendedPath(AUTHORITY_URI, "categories")
         // columns of a Category
+        const val _ID = BaseColumns._ID
         const val TITLE = "title"
         const val UNREAD_COUNT = "unread_count"
     }
 
-    object Transaction : BaseColumns {
+    object Transaction {
         val CONTENT_URI: Uri = Uri.withAppendedPath(AUTHORITY_URI, "transactions")
         // columns of a Transaction
         // long
+        const val _ID = BaseColumns._ID
         const val ARTICLE_ID = "article_id"
         // String
         const val FIELD = "field"
