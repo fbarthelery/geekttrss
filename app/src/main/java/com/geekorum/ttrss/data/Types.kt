@@ -27,7 +27,6 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Fts4
 import androidx.room.PrimaryKey
-import kotlinx.serialization.SerialName
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
