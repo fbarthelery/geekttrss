@@ -20,58 +20,21 @@
  */
 package com.geekorum.ttrss.providers
 
-import android.content.Context
 import androidx.work.WorkerFactory
-import com.geekorum.geekdroid.dagger.AndroidComponentsModule
-import com.geekorum.geekdroid.dagger.PerAndroidComponent
 import com.geekorum.geekdroid.dagger.WorkerKey
 import dagger.Binds
-import dagger.BindsInstance
 import dagger.Module
-import dagger.Subcomponent
-import dagger.android.AndroidInjector
-import dagger.multibindings.ClassKey
 import dagger.multibindings.IntoMap
 
 /**
- * Dagger module declaring the subcomponents of the providers package
+ * Dagger module declaring the subcomponents of the provider package
  */
-@Module(subcomponents = [ArticleProviderComponent::class])
+@Module
 abstract class AndroidInjectorsModule {
-
-    @Binds
-    @IntoMap
-    @ClassKey(ArticlesProvider::class)
-    abstract fun bindArticleProviderInjectorFactory(
-        builder: ArticleProviderComponent.Builder
-    ): AndroidInjector.Factory<*>
 
     @Binds
     @IntoMap
     @WorkerKey(PurgeArticlesWorker::class)
     abstract fun providesPurgeArticlesWorkerFactory(workerFactory: PurgeArticlesWorker.Factory): WorkerFactory
 
-}
-
-
-@Subcomponent(modules = [AndroidComponentsModule::class])
-@PerAndroidComponent
-interface ArticleProviderComponent : AndroidInjector<ArticlesProvider> {
-
-    // We need a Builder to bind other dependencies
-    // but DispatchingAndroidInjector requires AndroidInjector.Factory
-    // who already as an abstract create() method
-    @Subcomponent.Builder
-    abstract class Builder : AndroidInjector.Factory<ArticlesProvider> {
-
-        override fun create(instance: ArticlesProvider): AndroidInjector<ArticlesProvider> {
-            bindAndroidComponent(instance.context)
-            return build()
-        }
-
-        @BindsInstance
-        abstract fun bindAndroidComponent(context: Context?): Builder
-
-        abstract fun build(): AndroidInjector<ArticlesProvider>
-    }
 }
