@@ -22,9 +22,9 @@ package com.geekorum.ttrss.webapi
 
 interface TokenRetriever {
     @Throws(RetrieverException::class)
-    fun getToken(): String
+    suspend fun getToken(): String
 
-    fun invalidateToken()
+    suspend fun invalidateToken()
 
     class RetrieverException @JvmOverloads constructor(
         message: String? = null, cause: Throwable? = null

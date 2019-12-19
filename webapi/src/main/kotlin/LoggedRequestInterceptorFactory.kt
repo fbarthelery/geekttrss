@@ -21,6 +21,7 @@
 package com.geekorum.ttrss.webapi
 
 import com.geekorum.ttrss.webapi.model.LoggedRequestPayload
+import kotlinx.coroutines.runBlocking
 import okhttp3.RequestBody
 import retrofit2.Converter
 import retrofit2.Retrofit
@@ -50,7 +51,9 @@ class LoggedRequestInterceptorFactory(
                         val delegate: Converter<LoggedRequestPayload, RequestBody> =
                             retrofit.nextRequestBodyConverter(this, type, parameterAnnotations, methodAnnotations)
                         try {
-                            it.sessionId = tokenRetriever.getToken()
+                            runBlocking {
+                                it.sessionId = tokenRetriever.getToken()
+                            }
                         } catch (e: TokenRetriever.RetrieverException) {
                             logger.log(Level.CONFIG, "unable to retrieve token", e)
                         }

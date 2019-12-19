@@ -26,6 +26,7 @@ import com.geekorum.geekdroid.accounts.AccountTokenRetriever
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.webapi.TokenRetriever
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 
 /**
  * An [AccountTokenRetriever] for Tinyrss.
@@ -41,7 +42,7 @@ internal class TinyrssAccountTokenRetriever(
     account,
     true), TokenRetriever {
 
-    override fun getToken(): String = runBlocking(dispatchers.io) {
+    override suspend fun getToken(): String = withContext(dispatchers.io) {
         try {
             super.getToken()
         } catch (e: com.geekorum.geekdroid.network.TokenRetriever.RetrieverException) {

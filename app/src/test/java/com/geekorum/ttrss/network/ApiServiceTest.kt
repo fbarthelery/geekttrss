@@ -82,9 +82,9 @@ private class ServerModule(val serverUrl: String) {
 
     @Provides
     fun providesTokenRetriever(): TokenRetriever = object : TokenRetriever {
-        override fun getToken(): String = ""
+        override suspend fun getToken(): String = ""
 
-        override fun invalidateToken() {}
+        override suspend fun invalidateToken() {}
     }
 
     @Provides
