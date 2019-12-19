@@ -22,6 +22,8 @@ package com.geekorum.ttrss.network
 
 import android.content.Context
 import android.net.Uri
+import androidx.browser.customtabs.CustomTabColorSchemeParams
+import androidx.browser.customtabs.CustomTabsIntent
 import com.geekorum.geekdroid.network.BrowserLauncher
 import com.geekorum.ttrss.R
 import javax.inject.Inject
@@ -42,10 +44,20 @@ class TtRssBrowserLauncher @Inject constructor(
 
     fun launchUrl(context: Context, uri: Uri) {
         delegate.launchUrl(context, uri) {
-            val tabColor = context.getColor(R.color.primary)
+            val lightColorScheme = CustomTabColorSchemeParams.Builder()
+                .setToolbarColor(context.getColor(R.color.material_blue_grey_500))
+                .build()
+            val darkColorScheme = CustomTabColorSchemeParams.Builder()
+                .setToolbarColor(context.getColor(R.color.material_blue_grey_300))
+                .build()
+            val defaultColor = context.getColor(R.color.primary)
+
             addDefaultShareMenuItem()
-                .setToolbarColor(tabColor)
+                .setToolbarColor(defaultColor)
                 .setShowTitle(true)
+                .setColorScheme(CustomTabsIntent.COLOR_SCHEME_SYSTEM)
+                .setColorSchemeParams(CustomTabsIntent.COLOR_SCHEME_LIGHT, lightColorScheme)
+                .setColorSchemeParams(CustomTabsIntent.COLOR_SCHEME_DARK, darkColorScheme)
                 .enableUrlBarHiding()
         }
     }
@@ -54,7 +66,7 @@ class TtRssBrowserLauncher @Inject constructor(
 
     private fun orderPreferredPackages(availablePackages: List<String>): List<String> {
         return (PREFFERED_PACKAGES_LIST.filter { availablePackages.contains(it) }
-                + availablePackages)
+            + availablePackages)
             .distinct()
     }
 

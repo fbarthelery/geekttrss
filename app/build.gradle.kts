@@ -125,7 +125,7 @@ dependencies {
     implementation("androidx.preference:preference-ktx:1.1.0")
 
     // androidx others
-    implementation("androidx.browser:browser:1.0.0")
+    implementation("androidx.browser:browser:1.2.0")
 
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.4.0")
 
