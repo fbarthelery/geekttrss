@@ -119,8 +119,8 @@ dependencies {
     // androidx ui
     implementation("androidx.drawerlayout:drawerlayout:1.1.0-alpha03")
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")
-    implementation("androidx.recyclerview:recyclerview:1.0.0")
-    implementation("androidx.coordinatorlayout:coordinatorlayout:1.0.0")
+    implementation("androidx.recyclerview:recyclerview:1.1.0")
+    implementation("androidx.coordinatorlayout:coordinatorlayout:1.1.0")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.0.0")
     implementation("androidx.preference:preference-ktx:1.1.0")
 
@@ -205,7 +205,7 @@ dependencies {
     api("androidx.work:work-runtime-ktx:$workVersion")
     api("androidx.room:room-runtime:$roomVersion")
     api("androidx.room:room-ktx:$roomVersion")
-    api("androidx.paging:paging-runtime-ktx:2.1.0")
+    api("androidx.paging:paging-runtime-ktx:2.1.1")
     api("com.squareup.retrofit2:retrofit:2.6.1")
     api("com.squareup.okhttp3:okhttp:4.1.0")
     api("com.jakewharton.timber:timber:4.7.1")
