@@ -33,9 +33,10 @@
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            tools:background="@color/primary"
             android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar">
 
-        <TextView
+        <ImageButton
                 android:id="@+id/unread"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -46,14 +47,9 @@
                 app:layout_constraintHorizontal_chainStyle="packed"
                 app:layout_constraintHorizontal_bias="0"
                 android:focusable="true"
-                android:paddingTop="4dip"
-                android:paddingBottom="4dip"
-                android:paddingStart="8dip"
-                android:paddingEnd="8dip"
-                android:text="@string/context_selection_toggle_unread"
+                android:src="@drawable/ic_archive"
+                android:contentDescription="@string/context_selection_toggle_unread"
                 android:onClick="@{() -> viewModel.toggleArticleRead()}"
-                android:textAppearance="?attr/actionMenuTextAppearance"
-                android:textColor="?attr/actionMenuTextColor"
                 style="?attr/actionButtonStyle"
                 />
 
