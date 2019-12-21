@@ -150,7 +150,9 @@ class ArticleSynchronizer @AssistedInject constructor(
                 .build()
 
         val tag = UUID.randomUUID().toString()
-        val jobRequests = databaseService.getFeeds().map { feed ->
+        val jobRequests = databaseService.getFeeds()
+            .shuffled()
+            .map { feed ->
             val inputData = CollectNewArticlesWorker.getInputData(account, feed.id)
             OneTimeWorkRequestBuilder<CollectNewArticlesWorker>()
                     .setConstraints(constraints)
@@ -176,18 +178,20 @@ class ArticleSynchronizer @AssistedInject constructor(
 
         val tag = UUID.randomUUID().toString()
         val jobRequests = databaseService.getFeeds()
-                .filter {
-                    it.id == feedId || feedId == ApiService.ALL_ARTICLES_FEED_ID
-                }.map { feed ->
-                    val inputData = UpdateArticleStatusWorker.getInputData(
-                            account, feed.id, numberOfLatestArticlesToRefresh)
+            .filter {
+                it.id == feedId || feedId == ApiService.ALL_ARTICLES_FEED_ID
+            }
+            .shuffled()
+            .map { feed ->
+                val inputData = UpdateArticleStatusWorker.getInputData(
+                    account, feed.id, numberOfLatestArticlesToRefresh)
 
-                    OneTimeWorkRequestBuilder<UpdateArticleStatusWorker>()
-                            .setConstraints(constraints)
-                            .setInputData(inputData)
-                            .addTag(tag)
-                            .build()
-                }
+                OneTimeWorkRequestBuilder<UpdateArticleStatusWorker>()
+                    .setConstraints(constraints)
+                    .setInputData(inputData)
+                    .addTag(tag)
+                    .build()
+            }
         updateStatusJobsTag = tag
 
         workManager.enqueue(jobRequests).await()
