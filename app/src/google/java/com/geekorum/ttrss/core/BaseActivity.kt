@@ -22,6 +22,8 @@ package com.geekorum.ttrss.core
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.os.StrictMode.allowThreadDiskReads
+import com.geekorum.ttrss.debugtools.withStrictMode
 import com.google.android.play.core.splitcompat.SplitCompat
 
 
@@ -35,6 +37,8 @@ open class BaseActivity : InjectableBaseActivity() {
 
     override fun attachBaseContext(newBase: Context?) {
         super.attachBaseContext(newBase)
-        SplitCompat.install(newBase)
+        withStrictMode(allowThreadDiskReads()) {
+            SplitCompat.install(newBase)
+        }
     }
 }

@@ -146,7 +146,6 @@ class CollectNewArticlesWorker(
         while (articles.isNotEmpty()) {
             databaseService.runInTransaction {
                 insertArticles(articles)
-
             }
             cacheArticlesImages(articles)
             offset += articles.size
@@ -202,7 +201,7 @@ class CollectNewArticlesWorker(
                 return null
             }
 
-            val syncWorkerComponent = createSyncWorkerComponent( workerParameters)
+            val syncWorkerComponent = createSyncWorkerComponent(workerParameters)
             return with(syncWorkerComponent) {
                 CollectNewArticlesWorker(appContext, workerParameters,
                         dispatchers,

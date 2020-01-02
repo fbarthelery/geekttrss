@@ -21,8 +21,10 @@
 package com.geekorum.ttrss
 
 import android.content.Context
+import android.os.StrictMode.allowThreadDiskReads
 import com.geekorum.geekdroid.dagger.AppInitializer
 import com.geekorum.ttrss.debugtools.StrictModeInitializer
+import com.geekorum.ttrss.debugtools.withStrictMode
 import com.geekorum.ttrss.di.DaggerGoogleFlavorApplicationComponent
 import com.geekorum.ttrss.logging.CrashlyticsInitializer
 import com.google.android.play.core.splitcompat.SplitCompat
@@ -34,7 +36,9 @@ class GoogleFlavorApplication : Application() {
      */
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
-        SplitCompat.install(this)
+        withStrictMode(allowThreadDiskReads()) {
+            SplitCompat.install(this)
+        }
     }
 
     override val applicationComponent by lazy {
