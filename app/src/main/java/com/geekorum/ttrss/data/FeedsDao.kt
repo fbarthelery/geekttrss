@@ -125,7 +125,9 @@ abstract class FeedsDao {
         val feedsIds: List<Long> = feeds.map { it.id }
         val currentFeeds = getAllFeedsList()
         val currentFeedsIds = currentFeeds.map { it.id }
-        val (toDelete, toUpdate) = currentFeeds.partition { it.id !in feedsIds }
+        val (toDelete, toUpdateDb) = currentFeeds.partition { it.id !in feedsIds }
+        val toUpdateDbIds = toUpdateDb.map { it.id }
+        val toUpdate = feeds.filter { it.id in toUpdateDbIds }
         val toInsert = feeds.filter {
             it.id !in currentFeedsIds
         }
@@ -151,7 +153,9 @@ abstract class FeedsDao {
         val categoriesIds: List<Long> = categories.map { it.id }
         val currentCategories = getAllCategoriesList()
         val currentCategoriesIds = currentCategories.map { it.id }
-        val (toDelete, toUpdate) = currentCategories.partition { it.id !in categoriesIds }
+        val (toDelete, toUpdateDb) = currentCategories.partition { it.id !in categoriesIds }
+        val toUpdateDbIds = toUpdateDb.map { it.id }
+        val toUpdate = categories.filter { it.id in toUpdateDbIds }
         val toInsert = categories.filter {
             it.id !in currentCategoriesIds
         }
