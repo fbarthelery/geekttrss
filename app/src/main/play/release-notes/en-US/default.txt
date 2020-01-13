@@ -1,2 +1,4 @@
-Fix synchronization issues with latest TinyTinyRss server version
-Other bug fixes and general improvements
+Add an in app update mechanism
+Various UI tweaks and improve edge to edge navigation
+Display feed's favicon when managing feeds
+Refactoring of the synchronization engine

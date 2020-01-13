@@ -1,2 +1,4 @@
-Correction des problemes de synchronisation avec les derniers versions du serveur TinyTinyRss
-Divers correctifs et améliorations
+Ajout d'un mécanisme de mise à jour de l'application
+Diverses améliorations de l'interface et meilleur support de la navigation par geste
+Affichage de la favicon du feed
+Réecriture du moteur de synchronisation
