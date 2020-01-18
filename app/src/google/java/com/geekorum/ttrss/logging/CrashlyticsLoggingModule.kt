@@ -20,8 +20,8 @@
  */
 package com.geekorum.ttrss.logging
 
-import com.geekorum.geekdroid.dagger.AppInitializer
-import com.geekorum.geekdroid.firebase.logging.CrashlyticsLoggingTree
+import com.geekorum.geekdroid.firebase.logging.FirebaseCrashlyticsLoggingTree
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.Module
 import dagger.Provides
 import dagger.multibindings.IntoSet
@@ -34,9 +34,6 @@ import timber.log.Timber
 class CrashlyticsLoggingModule {
     @Provides
     @IntoSet
-    fun provideCrashlyticsLoggingTree(): Timber.Tree = CrashlyticsLoggingTree()
+    fun provideCrashlyticsLoggingTree(): Timber.Tree = FirebaseCrashlyticsLoggingTree(FirebaseCrashlytics.getInstance())
 
-    @Provides
-    @IntoSet
-    fun providesCrashlyticsInitializer(): AppInitializer = CrashlyticsInitializer()
 }

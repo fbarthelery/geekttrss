@@ -33,7 +33,7 @@ plugins {
     // version used is in gradle.properties
     kotlin("jvm") apply false
     id("androidx.navigation.safeargs.kotlin")  apply false
-    id("io.fabric") apply false
+    id("com.google.firebase.crashlytics") apply false
     id("com.google.gms.google-services") apply false
     id("com.google.android.gms.oss-licenses-plugin") apply false
 }

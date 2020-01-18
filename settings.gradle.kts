@@ -22,7 +22,7 @@
 pluginManagement {
     val kotlinVersion: String by settings
     val androidxNavigationVersion: String by settings
-    val fabricVersion: String by settings
+    val crashlyticsVersion: String by settings
     val googleServicesVersion: String by settings
     val ossLicensesVersion: String by settings
 
@@ -32,7 +32,7 @@ pluginManagement {
         kotlin("kapt") version kotlinVersion
         kotlin("plugin.serialization") version kotlinVersion
         id("androidx.navigation.safeargs.kotlin") version androidxNavigationVersion
-        id("io.fabric") version fabricVersion
+        id("com.google.firebase.crashlytics") version crashlyticsVersion
         id("com.google.gms.google-services") version googleServicesVersion
         id("com.google.android.gms.oss-licenses-plugin") version ossLicensesVersion
     }
@@ -46,16 +46,13 @@ pluginManagement {
             url = uri("https://raw.githubusercontent.com/fbarthelery/play-services-plugins/master/repo/")
         }
         google()
-        maven {
-            url = uri("https://maven.fabric.io/public")
-        }
     }
     resolutionStrategy {
         eachPlugin {
             when (requested.id.id) {
                 "com.google.android.gms.oss-licenses-plugin" -> useModule("com.google.android.gms:oss-licenses-plugin:${ossLicensesVersion}")
                 "com.google.gms.google-services" -> useModule("com.google.gms:google-services:${googleServicesVersion}")
-                "io.fabric" -> useModule("io.fabric.tools:gradle:${fabricVersion}")
+                "com.google.firebase.crashlytics" -> useModule("com.google.firebase:firebase-crashlytics-gradle:${crashlyticsVersion}")
                 "androidx.navigation.safeargs.kotlin" -> useModule("androidx.navigation:navigation-safe-args-gradle-plugin:${androidxNavigationVersion}")
             }
         }

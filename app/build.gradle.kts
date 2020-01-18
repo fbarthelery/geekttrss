@@ -76,11 +76,6 @@ android {
                 proguardFile("proguard-rules.pro")
             }
         }
-        named("debug") {
-            // prevent fabric for generating build id which hurts gradle task caching
-            // see https://docs.fabric.io/android/crashlytics/build-tools.html#optimize-builds-when-you-re-not-proguarding-or-using-beta-by-crashlytics
-            (this as ExtensionAware).extra["alwaysUpdateBuildId"] = false
-        }
     }
 
     dataBinding {
@@ -194,7 +189,7 @@ dependencies {
     androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
 
     implementation(enforcedPlatform("com.google.firebase:firebase-bom:24.5.0"))
-    add("googleImplementation", "com.crashlytics.sdk.android:crashlytics")
+    add("googleImplementation", "com.google.firebase:firebase-crashlytics")
     // ensure that the free flavor don't get any firebase dependencies
     configurations["freeImplementation"].exclude(group = "com.google.firebase")
 
@@ -222,6 +217,6 @@ apply {
     if (playServicesActivated) {
         // needs to be applied after configuration
         plugin("com.google.gms.google-services")
-        plugin("io.fabric")
+        plugin("com.google.firebase.crashlytics")
     }
 }
