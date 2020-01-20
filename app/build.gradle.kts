@@ -24,6 +24,8 @@ import com.geekorum.build.dualTestImplementation
 import com.geekorum.build.enforcedCoroutinesPlatform
 import com.geekorum.build.enforcedDaggerPlatform
 import com.geekorum.build.getChangeSet
+import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
+import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsPlugin
 
 plugins {
     id("com.android.application")
@@ -87,6 +89,13 @@ android {
         register("free") {
             dimension = "distribution"
             applicationIdSuffix = ".free"
+            // disable mapping file upload for free flavor as it doesn't work and the free flavor
+            // doesn't use crashlytics anyway
+            plugins.withType<CrashlyticsPlugin>{
+                (this@register as ExtensionAware).extensions.configure<CrashlyticsExtension> {
+                    mappingFileUploadEnabled = false
+                }
+            }
         }
 
         register("google") {
