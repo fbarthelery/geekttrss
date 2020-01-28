@@ -117,8 +117,8 @@ kapt {
 dependencies {
 
     implementation("androidx.core:core-ktx:1.1.0")
-    implementation("androidx.fragment:fragment-ktx:1.2.0-rc02")
-    implementation("androidx.activity:activity-ktx:1.1.0-rc02")
+    implementation("androidx.fragment:fragment-ktx:1.2.0")
+    implementation("androidx.activity:activity-ktx:1.1.0")
 
     // androidx ui
     implementation("androidx.drawerlayout:drawerlayout:1.1.0-alpha03")
@@ -152,13 +152,13 @@ dependencies {
 
     implementation("org.jsoup:jsoup:1.10.2")
 
-    val lifecycleVersion = "2.2.0-beta01"
+    val lifecycleVersion = "2.2.0"
     implementation("androidx.lifecycle:lifecycle-extensions:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-livedata-core-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:1.0.0-rc02")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:1.0.0")
     dualTestImplementation("androidx.arch.core:core-testing:2.1.0")
 
     // dagger
@@ -216,7 +216,7 @@ dependencies {
 
     // fragment testing declare some activities and resources that needs to be in the apk
     // we don't use it. here but it is used in feature modules
-    debugImplementation("androidx.fragment:fragment-testing:1.2.0-rc02")
+    debugImplementation("androidx.fragment:fragment-testing:1.2.0")
 
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.0-beta-2")
 }

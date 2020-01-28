@@ -90,12 +90,12 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
 
-    implementation("androidx.activity:activity-ktx:1.0.0")
+    implementation("androidx.activity:activity-ktx:1.1.0")
 
     // androidx UI
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")
-    implementation("androidx.recyclerview:recyclerview:1.0.0")
-    implementation("androidx.coordinatorlayout:coordinatorlayout:1.0.0")
+    implementation("androidx.recyclerview:recyclerview:1.1.0")
+    implementation("androidx.coordinatorlayout:coordinatorlayout:1.1.0")
     implementation("com.google.android.material:material:1.1.0-beta02")
 
     implementation("androidx.core:core-ktx:1.1.0")
@@ -109,21 +109,21 @@ dependencies {
     implementation(project(":htmlparsers"))
     implementation(project(":webapi"))
 
-    implementation("io.coil-kt:coil:0.8.0")
+    implementation("io.coil-kt:coil:0.9.1")
 
-    androidTestImplementation("androidx.work:work-testing:2.2.0")
+    androidTestImplementation("androidx.work:work-testing:2.3.0")
     dualTestImplementation("androidx.arch.core:core-testing:2.1.0")
 
-    implementation("androidx.navigation:navigation-fragment-ktx:2.1.0")
-    debugImplementation("androidx.fragment:fragment-testing:1.2.0-rc02")
+    implementation("androidx.navigation:navigation-fragment-ktx:2.2.0")
+    debugImplementation("androidx.fragment:fragment-testing:1.2.0")
 
     // the test apk need these dependencies because they provide some of its resources
     // likely due to manifest merging with :app manifest
-    androidTestImplementation("androidx.fragment:fragment-testing:1.2.0-rc02")
+    androidTestImplementation("androidx.fragment:fragment-testing:1.2.0")
     androidTestImplementation("com.squareup.leakcanary:leakcanary-android:2.0-beta-2")
     androidTestImplementation("com.google.android.gms:play-services-oss-licenses:17.0.0")
 
     // used in test through geekdroid
-    androidTestImplementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:1.0.0-rc02")
+    androidTestImplementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:1.0.0")
 
 }
