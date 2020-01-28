@@ -82,7 +82,7 @@ class InstallModuleViewModel @Inject constructor(
                 _sessionState.value = it
             }
         } catch (e: OnDemandModuleException) {
-            Timber.w("Unable to start installation of modules : $modules", e)
+            Timber.w(e, "Unable to start installation of modules : $modules")
             _sessionState.value = InstallSession.State(FAILED, 0, 0)
         }
     }

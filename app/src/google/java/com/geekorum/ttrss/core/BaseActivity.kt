@@ -38,7 +38,7 @@ open class BaseActivity : InjectableBaseActivity() {
     override fun attachBaseContext(newBase: Context?) {
         super.attachBaseContext(newBase)
         withStrictMode(allowThreadDiskReads()) {
-            SplitCompat.install(newBase)
+            SplitCompat.installActivity(this)
         }
     }
 }
