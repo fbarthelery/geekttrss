@@ -183,7 +183,7 @@ dependencies {
     implementation("androidx.navigation:navigation-fragment-ktx:$navigationVersion")
     implementation("androidx.navigation:navigation-ui-ktx:$navigationVersion")
 
-    val workVersion = "2.2.0"
+    val workVersion = "2.3.0"
     androidTestImplementation("androidx.work:work-testing:$workVersion")
 
     implementation(enforcedPlatform(kotlin("bom")))
