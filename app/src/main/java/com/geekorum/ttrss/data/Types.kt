@@ -200,7 +200,7 @@ data class Attachment(
     @PrimaryKey
     @ColumnInfo(name = BaseColumns._ID)
     val id: Long,
-    @ColumnInfo(name ="post_id")
+    @ColumnInfo(name ="post_id", index = true)
     val postId: Long,
     @ColumnInfo(name ="content_url")
     val contentUrl: String,

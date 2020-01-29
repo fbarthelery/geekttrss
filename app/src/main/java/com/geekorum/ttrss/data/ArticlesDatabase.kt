@@ -26,7 +26,7 @@ import com.geekorum.ttrss.providers.PurgeArticlesDao
 
 @Database(entities = [Article::class, ArticleFTS::class, Attachment::class,
     Category::class, Feed::class, Transaction::class, AccountInfo::class],
-        version = 11)
+        version = 12)
 abstract class ArticlesDatabase : RoomDatabase() {
     abstract fun articleDao(): ArticleDao
     abstract fun accountInfoDao(): AccountInfoDao

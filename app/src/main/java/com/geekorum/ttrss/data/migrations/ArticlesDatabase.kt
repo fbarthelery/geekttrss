@@ -488,7 +488,23 @@ object MigrationFrom10To11 : Migration(10, 11) {
     }
 }
 
-val ALL_MIGRATIONS = listOf(MigrationFrom1To2,
+/**
+ * This migration adds an index on post_id of the attachments table
+ */
+object MigrationFrom11To12 : Migration(11, 12) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        addPostIdIndex(database)
+    }
+
+    private fun addPostIdIndex(database: SupportSQLiteDatabase) {
+        with(database) {
+            execSQL("CREATE INDEX IF NOT EXISTS `index_attachments_post_id` ON `attachments` (`post_id`)")
+        }
+    }
+}
+
+
+internal val ALL_MIGRATIONS = listOf(MigrationFrom1To2,
         MigrationFrom2To3,
         MigrationFrom3To4,
         MigrationFrom4To5,
@@ -497,4 +513,5 @@ val ALL_MIGRATIONS = listOf(MigrationFrom1To2,
         MigrationFrom7To8,
         MigrationFrom8To9,
         MigrationFrom9To10,
-        MigrationFrom10To11)
+        MigrationFrom10To11,
+        MigrationFrom11To12)
