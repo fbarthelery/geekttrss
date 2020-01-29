@@ -31,13 +31,6 @@ import com.geekorum.ttrss.core.CoreFactoriesModule
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.data.ArticlesDatabase
 import com.geekorum.ttrss.data.migrations.ALL_MIGRATIONS
-import com.geekorum.ttrss.data.migrations.MigrationFrom1To2
-import com.geekorum.ttrss.data.migrations.MigrationFrom2To3
-import com.geekorum.ttrss.data.migrations.MigrationFrom3To4
-import com.geekorum.ttrss.data.migrations.MigrationFrom4To5
-import com.geekorum.ttrss.data.migrations.MigrationFrom5To6
-import com.geekorum.ttrss.data.migrations.MigrationFrom6To7
-import com.geekorum.ttrss.data.migrations.MigrationFrom7To8
 import com.geekorum.ttrss.di.AndroidBindingsModule
 import com.geekorum.ttrss.di.ApplicationComponent
 import com.geekorum.ttrss.di.ViewModelsModule
@@ -60,10 +53,6 @@ open class TestApplication : Application() {
     }
 }
 
-/**
- *  Application used by Robolectric when running tests with AndroidJUnit4 but for the google flavor
- */
-class TestGoogleFlavorApplication : TestApplication()
 
 @Singleton
 @Component(modules = [AppInitializersModule::class,

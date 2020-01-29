@@ -121,7 +121,7 @@ class ApiRetrofitService(
         val payload = UpdateArticleRequestPayload(
             id.toString(),
             if (value) 1 else 0,
-            field.asApiInteger()
+            field.apiInteger
         )
         executeOrFail("Unable to update article") {
             tinyrssApi.updateArticle(payload)
