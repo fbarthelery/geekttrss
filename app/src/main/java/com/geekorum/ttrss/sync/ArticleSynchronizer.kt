@@ -128,12 +128,12 @@ class ArticleSynchronizer @AssistedInject constructor(
                 .setInputData(inputData)
                 .build()
 
-        val work = workManager.beginWith(listOf(updateAccountInfo, sendTransactions))
+        var work = workManager.beginWith(listOf(updateAccountInfo, sendTransactions))
                 .then(syncFeeds)
-                .apply {
-                    if (updateFeedIcons)
-                        then(syncFeedsIcons)
-                }
+
+         work = if (updateFeedIcons || true)
+             work.then(syncFeedsIcons)
+         else work
 
         work.enqueue().await()
 
