@@ -20,6 +20,7 @@
  */
 import com.android.build.gradle.BaseExtension
 import com.geekorum.build.SourceLicenseCheckerPlugin
+import com.geekorum.build.configureAnnotationProcessorDeps
 import com.geekorum.build.configureJavaVersion
 import com.geekorum.build.createComponentsPlatforms
 import com.geekorum.build.setupGoogleContent
@@ -56,6 +57,7 @@ allprojects {
     dependencies {
         createComponentsPlatforms()
     }
+    configureAnnotationProcessorDeps()
 
     apply<SourceLicenseCheckerPlugin>()
 
