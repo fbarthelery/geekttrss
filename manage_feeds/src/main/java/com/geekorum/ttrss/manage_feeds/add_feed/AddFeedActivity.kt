@@ -31,6 +31,7 @@ import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.viewModels
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import com.geekorum.geekdroid.app.BottomSheetDialogActivity
@@ -152,3 +153,9 @@ private class AccountsAdapter(context: Context) :
         return v
     }
 }
+
+/**
+ * Only used as a destination in the feature modules.
+ * The AddFeedInstallerActivity takes care of the logic.
+ */
+class CompleteInstallFragment : Fragment()

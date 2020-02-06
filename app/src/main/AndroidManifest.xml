@@ -94,6 +94,10 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".add_feed.AddFeedInstallerActivity"
+            android:label="@string/lbl_install_feature_title"
+           />
+
         <service android:name="com.geekorum.ttrss.accounts.AuthenticatorService"
                  tools:ignore="ExportedService">
             <intent-filter>

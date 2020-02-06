@@ -30,5 +30,8 @@ abstract class AndroidInjectorsModule {
     @ContributesAndroidInjector
     abstract fun contributeAddFeedLauncherActivityInjector(): AddFeedLauncherActivity
 
+    @ContributesAndroidInjector
+    abstract fun contributeAddFeedInstallerActivityInjector(): AddFeedInstallerActivity
+
 }
 
