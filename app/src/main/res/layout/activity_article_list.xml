@@ -66,7 +66,7 @@
 
         <fragment
             android:id="@+id/middle_pane_layout"
-            android:name="androidx.navigation.fragment.NavHostFragment"
+            android:name="com.geekorum.ttrss.on_demand_modules.OnDemandModuleNavHostFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:navGraph="@navigation/articles_list"

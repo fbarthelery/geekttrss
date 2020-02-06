@@ -30,6 +30,7 @@ import com.geekorum.ttrss.core.ActualCoroutineDispatchersModule
 import com.geekorum.ttrss.data.ArticlesDatabaseModule
 import com.geekorum.ttrss.debugtools.StrictModeModule
 import com.geekorum.ttrss.logging.LogcatLoggingModule
+import com.geekorum.ttrss.on_demand_modules.OnDemandModules
 import com.geekorum.ttrss.settings.SettingsModule
 import com.geekorum.ttrss.sync.SyncWorkersModule
 import dagger.Module
@@ -42,7 +43,6 @@ import dagger.Module
     AndroidFrameworkModule::class,
     AndroidBindingsModule::class,
     ViewModelsModule::class,
-    FragmentFactoriesModule::class,
     DefaultNightModeModule::class,
     BackgroundJobsModule::class,
     NetworkModule::class,
@@ -52,6 +52,7 @@ import dagger.Module
     AndroidTinyrssAccountManagerModule::class,
     StrictModeModule::class,
     ActualCoroutineDispatchersModule::class,
+    OnDemandModules::class,
     com.geekorum.ttrss.article_details.ActivitiesInjectorModule::class,
     com.geekorum.ttrss.articles_list.ActivitiesInjectorModule::class,
     com.geekorum.ttrss.sync.ServiceInjectorModule::class,

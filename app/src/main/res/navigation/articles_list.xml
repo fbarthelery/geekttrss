@@ -39,6 +39,8 @@
                 app:destination="@id/articleDetailActivity"/>
         <action android:id="@+id/action_show_settings"
                 app:destination="@id/settingsActivity" />
+        <action android:id="@+id/action_manage_feeds"
+            app:destination="@id/manageFeedsActivity" />
     </fragment>
 
     <fragment android:id="@+id/articlesSearchFragment"
@@ -67,5 +69,11 @@
             app:destination="@id/articlesListFragment"
             app:popUpTo="@id/articlesListFragment"
             app:popUpToInclusive="true"/>
+
+    <activity android:id="@+id/manageFeedsActivity"
+        android:name="com.geekorum.ttrss.manage_feeds.ManageFeedsActivity"
+        app:moduleName="manage_feeds"
+        tools:layout="@layout/activity_manage_feeds"
+        />
 
 </navigation>

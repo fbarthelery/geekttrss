@@ -194,7 +194,7 @@ class ArticleListActivity : SessionActivity() {
         binding.navigationView.setNavigationItemSelectedListener {
             when {
                 it.itemId == R.id.manage_feeds -> {
-                    installOrStartManageFeed()
+                    navController.navigate(ArticlesListFragmentDirections.actionManageFeeds())
                     true
                 }
                 it.itemId == R.id.settings -> {

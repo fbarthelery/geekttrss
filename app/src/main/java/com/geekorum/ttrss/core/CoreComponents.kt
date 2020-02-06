@@ -30,6 +30,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.geekorum.geekdroid.dagger.DaggerDelegateFragmentFactory
 import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
+import com.geekorum.geekdroid.dagger.FragmentFactoriesModule
 import com.geekorum.ttrss.BatteryFriendlyActivity
 import dagger.Binds
 import dagger.Module
@@ -108,7 +109,7 @@ open class BaseDialogFragment (
 }
 
 
-@Module
+@Module(includes = [FragmentFactoriesModule::class])
 abstract class CoreFactoriesModule {
 
     @Binds
