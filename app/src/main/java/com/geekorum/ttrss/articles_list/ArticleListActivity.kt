@@ -81,6 +81,7 @@ class ArticleListActivity : SessionActivity() {
     private lateinit var inAppUpdatePresenter: InAppUpdatePresenter
     private lateinit var searchToolbarPresenter: SearchToolbarPresenter
     private lateinit var appBarPresenter: AppBarPresenter
+    private lateinit var fabPresenter: FabPresenter
     private lateinit var feedNavigationPresenter: FeedsNavigationMenuPresenter
     private lateinit var accountHeaderPresenter: AccountHeaderPresenter
     private lateinit var drawerLayoutPresenter: DrawerLayoutPresenter
@@ -130,25 +131,19 @@ class ArticleListActivity : SessionActivity() {
 
         inAppUpdatePresenter = InAppUpdatePresenter(binding.bannerContainer, this, inAppUpdateViewModel)
 
-        navController = findNavController(R.id.middle_pane_layout).apply {
-            addOnDestinationChangedListener { controller, destination, arguments ->
-                when (destination.id) {
-                    R.id.articlesListFragment -> {
-                        binding.fab.show()
-                    }
-                    R.id.articlesSearchFragment -> {
-                        //TODO hide fab. but fab has scrollaware behavior that get it shown back when scrolling
-                    }
-                }
-            }
-        }
+        navController = findNavController(R.id.middle_pane_layout)
 
         setupToolbar()
-        setUpNavigationView()
-        setUpEdgeToEdge()
+        setupNavigationView()
+        setupEdgeToEdge()
+        setupFab()
     }
 
-    private fun setUpEdgeToEdge() {
+    private fun setupFab() {
+        fabPresenter = FabPresenter(binding.fab, navController)
+    }
+
+    private fun setupEdgeToEdge() {
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
                 View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
 
@@ -187,7 +182,7 @@ class ArticleListActivity : SessionActivity() {
         appBarPresenter = AppBarPresenter(binding.appBar, binding.toolbar, navController)
     }
 
-    private fun setUpNavigationView() {
+    private fun setupNavigationView() {
         binding.navigationView.setNavigationItemSelectedListener {
             when(it.itemId) {
                 R.id.manage_feeds -> {
