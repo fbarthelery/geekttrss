@@ -71,6 +71,7 @@
     <string name="btn_uninstall_feature">Uninstall</string>
 
     <!-- Install feature -->
+    <string name="lbl_install_feature_title">Module installation</string>
     <string name="lbl_download_in_progress">Downloading</string>
     <string name="lbl_install_in_progress">Installing</string>
     <string name="lbl_failed_to_install">Installation failed</string>

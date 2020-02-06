@@ -80,6 +80,7 @@ class ArticleListActivity : SessionActivity() {
 
     private lateinit var inAppUpdatePresenter: InAppUpdatePresenter
     private lateinit var searchToolbarPresenter: SearchToolbarPresenter
+    private lateinit var appBarPresenter: AppBarPresenter
     private lateinit var feedNavigationPresenter: FeedsNavigationMenuPresenter
     private lateinit var accountHeaderPresenter: AccountHeaderPresenter
     private lateinit var drawerLayoutPresenter: DrawerLayoutPresenter
@@ -133,11 +134,9 @@ class ArticleListActivity : SessionActivity() {
             addOnDestinationChangedListener { controller, destination, arguments ->
                 when (destination.id) {
                     R.id.articlesListFragment -> {
-                        binding.appBar.setExpanded(true)
                         binding.fab.show()
                     }
                     R.id.articlesSearchFragment -> {
-                        binding.appBar.setExpanded(true)
                         //TODO hide fab. but fab has scrollaware behavior that get it shown back when scrolling
                     }
                 }
@@ -185,16 +184,17 @@ class ArticleListActivity : SessionActivity() {
     private fun setupToolbar() {
         setupSearch()
         binding.toolbar.setupWithNavController(navController, drawerLayout)
+        appBarPresenter = AppBarPresenter(binding.appBar, binding.toolbar, navController)
     }
 
     private fun setUpNavigationView() {
         binding.navigationView.setNavigationItemSelectedListener {
-            when {
-                it.itemId == R.id.manage_feeds -> {
+            when(it.itemId) {
+                R.id.manage_feeds -> {
                     navController.navigate(ArticlesListFragmentDirections.actionManageFeeds())
                     true
                 }
-                it.itemId == R.id.settings -> {
+                R.id.settings -> {
                     navController.navigate(ArticlesListFragmentDirections.actionShowSettings())
                     true
                 }
