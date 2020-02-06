@@ -20,10 +20,7 @@
  */
 package com.geekorum.ttrss.articles_list
 
-import android.app.Activity
-import android.content.ComponentName
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
@@ -48,7 +45,6 @@ import com.geekorum.ttrss.doOnApplyWindowInsets
 import com.geekorum.ttrss.in_app_update.InAppUpdateViewModel
 import com.geekorum.ttrss.on_demand_modules.OnDemandModuleManager
 import com.geekorum.ttrss.session.SessionActivity
-import com.geekorum.ttrss.settings.manage_features.InstallFeatureActivity
 import com.google.android.material.appbar.AppBarLayout
 import timber.log.Timber
 import javax.inject.Inject
@@ -64,7 +60,6 @@ import javax.inject.Inject
 class ArticleListActivity : SessionActivity() {
     companion object {
         internal const val CODE_START_IN_APP_UPDATE = 1
-        private const val CODE_INSTALL_MANAGE_FEED = 2
     }
 
     private lateinit var binding: ActivityArticleListBinding
@@ -215,9 +210,6 @@ class ArticleListActivity : SessionActivity() {
         Timber.d("activity result $requestCode result $resultCode")
         super.onActivityResult(requestCode, resultCode, data)
         inAppUpdatePresenter.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == CODE_INSTALL_MANAGE_FEED && resultCode == Activity.RESULT_OK) {
-            installOrStartManageFeed()
-        }
     }
 
     private fun setupSearch() {
@@ -228,25 +220,4 @@ class ArticleListActivity : SessionActivity() {
         searchToolbarPresenter = SearchToolbarPresenter(searchItem, navController, activityViewModel)
     }
 
-    private fun installOrStartManageFeed() {
-        val context = this
-        if (isManageFeedInstalled) {
-            try {
-                val freshContext = context.createPackageContext(context.packageName, 0)
-                val intent = Intent().apply {
-                    component = ComponentName.createRelative(freshContext,
-                        "com.geekorum.ttrss.manage_feeds.ManageFeedsActivity")
-                }
-                startActivity(intent)
-            } catch (e: PackageManager.NameNotFoundException) {
-                Timber.wtf(e, "Unable to create our package context")
-            }
-        } else {
-            val intent = Intent(context, InstallFeatureActivity::class.java).apply {
-                putExtra(InstallFeatureActivity.EXTRA_FEATURES_LIST,
-                    arrayOf(Features.MANAGE_FEEDS))
-            }
-            startActivityForResult(intent, CODE_INSTALL_MANAGE_FEED)
-        }
-    }
 }
