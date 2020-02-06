@@ -48,6 +48,11 @@ interface OnDemandModuleManager {
      */
     @Throws(OnDemandModuleException::class)
     suspend fun startInstallModule(vararg modules: String): InstallSession
+
+    /**
+     * Wether this ModuleManager can install new modules or not
+     */
+    val canInstallModule: Boolean
 }
 
 class OnDemandModuleException

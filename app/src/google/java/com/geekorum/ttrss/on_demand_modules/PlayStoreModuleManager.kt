@@ -46,6 +46,8 @@ import kotlinx.coroutines.runBlocking
 class PlayStoreModuleManager constructor(
     private val splitInstallManager: SplitInstallManager
 ) : OnDemandModuleManager {
+    override val canInstallModule = true
+
     override suspend fun startInstallModule(vararg modules: String): InstallSession {
         try {
             val id = splitInstallManager.requestInstall(modules = modules.toList())

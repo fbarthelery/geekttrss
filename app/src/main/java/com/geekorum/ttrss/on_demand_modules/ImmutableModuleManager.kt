@@ -34,6 +34,8 @@ class ImmutableModuleManager(
     override val installedModules: Set<String>
 ) : OnDemandModuleManager {
 
+    override val canInstallModule = false
+
     private var nextSessionId = 1
     override suspend fun startInstallModule(vararg modules: String): InstallSession {
         val toInstall = modules.toSet() - installedModules
