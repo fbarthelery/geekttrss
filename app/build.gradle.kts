@@ -179,10 +179,6 @@ dependencies {
     kapt("androidx.room:room-compiler:$roomVersion")
     androidTestImplementation("androidx.room:room-testing:$roomVersion")
 
-    val navigationVersion = "2.1.0"
-    implementation("androidx.navigation:navigation-fragment-ktx:$navigationVersion")
-    implementation("androidx.navigation:navigation-ui-ktx:$navigationVersion")
-
     val workVersion = "2.3.0"
     androidTestImplementation("androidx.work:work-testing:$workVersion")
 
@@ -213,6 +209,11 @@ dependencies {
     api("com.squareup.retrofit2:retrofit:2.6.1")
     api("com.squareup.okhttp3:okhttp:4.1.0")
     api("com.jakewharton.timber:timber:4.7.1")
+
+    val navigationVersion = "2.3.0-alpha01"
+    api("androidx.navigation:navigation-fragment-ktx:$navigationVersion")
+    api("androidx.navigation:navigation-ui-ktx:$navigationVersion")
+    api("androidx.navigation:navigation-dynamic-features-fragment:$navigationVersion")
 
     // fragment testing declare some activities and resources that needs to be in the apk
     // we don't use it. here but it is used in feature modules

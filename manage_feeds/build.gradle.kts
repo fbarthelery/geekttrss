@@ -114,7 +114,6 @@ dependencies {
     androidTestImplementation("androidx.work:work-testing:2.3.0")
     dualTestImplementation("androidx.arch.core:core-testing:2.1.0")
 
-    implementation("androidx.navigation:navigation-fragment-ktx:2.2.0")
     debugImplementation("androidx.fragment:fragment-testing:1.2.1")
 
     // the test apk need these dependencies because they provide some of its resources
