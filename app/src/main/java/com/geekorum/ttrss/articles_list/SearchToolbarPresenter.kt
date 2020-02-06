@@ -24,12 +24,13 @@ import android.view.MenuItem
 import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
+import androidx.navigation.dynamicfeatures.DynamicGraphNavigator
 import com.geekorum.ttrss.R
 
 /**
  * Presenter for the search toolbar widget
  */
-class SearchToolbarPresenter(
+internal class SearchToolbarPresenter(
     private val searchItem: MenuItem,
     private val navController: NavController,
     private val activityViewModel: ActivityViewModel
@@ -40,10 +41,14 @@ class SearchToolbarPresenter(
     }
 
     private fun setup() {
-        navController.addOnDestinationChangedListener { _, destination, _ ->
+        navController.addOnDestinationChangedListener { controller, destination, _ ->
             if (destination.id != R.id.articlesSearchFragment && searchItem.isActionViewExpanded) {
                 searchItem.collapseActionView()
             }
+            val progressDestinationId = (controller.graph as? DynamicGraphNavigator.DynamicNavGraph)?.progressDestination ?: 0
+            val isOnProgress = destination.id == progressDestinationId
+            searchItem.isVisible = !isOnProgress
+            searchItem.isEnabled = !isOnProgress
         }
 
         searchItem.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {

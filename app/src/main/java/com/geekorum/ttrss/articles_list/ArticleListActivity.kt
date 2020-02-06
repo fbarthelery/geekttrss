@@ -82,6 +82,7 @@ class ArticleListActivity : SessionActivity() {
     private lateinit var searchToolbarPresenter: SearchToolbarPresenter
     private lateinit var feedNavigationPresenter: FeedsNavigationMenuPresenter
     private lateinit var accountHeaderPresenter: AccountHeaderPresenter
+    private lateinit var drawerLayoutPresenter: DrawerLayoutPresenter
 
     @Inject
     lateinit var moduleManager: OnDemandModuleManager
@@ -99,7 +100,6 @@ class ArticleListActivity : SessionActivity() {
         }
         activityViewModel.feedSelectedEvent.observe(this, EventObserver {
             navController.navigate(ArticlesListDirections.actionShowFeed(it.id, it.title))
-            drawerLayout?.closeDrawers()
         })
 
         activityViewModel.articleSelectedEvent.observe(this, EventObserver { (position, article) ->
@@ -134,12 +134,10 @@ class ArticleListActivity : SessionActivity() {
                 when (destination.id) {
                     R.id.articlesListFragment -> {
                         binding.appBar.setExpanded(true)
-                        drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
                         binding.fab.show()
                     }
                     R.id.articlesSearchFragment -> {
                         binding.appBar.setExpanded(true)
-                        drawerLayout?.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
                         //TODO hide fab. but fab has scrollaware behavior that get it shown back when scrolling
                     }
                 }
@@ -182,7 +180,6 @@ class ArticleListActivity : SessionActivity() {
                 bottom = innerViewInitialPaddingBottom + insets.systemWindowInsetBottom)
             insets
         }
-
     }
 
     private fun setupToolbar() {
@@ -214,6 +211,9 @@ class ArticleListActivity : SessionActivity() {
 
         val headerView = binding.navigationView.getHeaderView(0)
         accountHeaderPresenter = AccountHeaderPresenter(headerView, this, accountViewModel)
+        drawerLayout?.let {
+            drawerLayoutPresenter = DrawerLayoutPresenter(it, navController)
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
