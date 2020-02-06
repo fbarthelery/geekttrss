@@ -65,6 +65,7 @@ data class GetArticlesRequestPayload(
     @SerialName("op")
     override val operation = "getHeadlines"
 
+    @Serializable
     enum class ViewMode {
         @SerialName("all_articles")
         ALL_ARTICLES,
@@ -78,6 +79,7 @@ data class GetArticlesRequestPayload(
         UPDATED
     }
 
+    @Serializable
     enum class SortOrder {
         @SerialName("title")
         TITLE,

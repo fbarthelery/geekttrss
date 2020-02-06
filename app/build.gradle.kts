@@ -116,8 +116,8 @@ kapt {
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.1.0")
-    implementation("androidx.fragment:fragment-ktx:1.2.0")
+    implementation("androidx.core:core-ktx:1.2.0")
+    implementation("androidx.fragment:fragment-ktx:1.2.1")
     implementation("androidx.activity:activity-ktx:1.1.0")
 
     // androidx ui
@@ -158,7 +158,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:1.0.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycleVersion")
     dualTestImplementation("androidx.arch.core:core-testing:2.1.0")
 
     // dagger

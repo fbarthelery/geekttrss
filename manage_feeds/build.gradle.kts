@@ -98,9 +98,9 @@ dependencies {
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.1.0")
     implementation("com.google.android.material:material:1.1.0-beta02")
 
-    implementation("androidx.core:core-ktx:1.1.0")
+    implementation("androidx.core:core-ktx:1.2.0")
 
-    val lifecycleVersion = "2.2.0-beta01"
+    val lifecycleVersion = "2.2.0"
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-livedata-core-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
@@ -115,15 +115,15 @@ dependencies {
     dualTestImplementation("androidx.arch.core:core-testing:2.1.0")
 
     implementation("androidx.navigation:navigation-fragment-ktx:2.2.0")
-    debugImplementation("androidx.fragment:fragment-testing:1.2.0")
+    debugImplementation("androidx.fragment:fragment-testing:1.2.1")
 
     // the test apk need these dependencies because they provide some of its resources
     // likely due to manifest merging with :app manifest
-    androidTestImplementation("androidx.fragment:fragment-testing:1.2.0")
+    androidTestImplementation("androidx.fragment:fragment-testing:1.2.1")
     androidTestImplementation("com.squareup.leakcanary:leakcanary-android:2.0-beta-2")
     androidTestImplementation("com.google.android.gms:play-services-oss-licenses:17.0.0")
 
     // used in test through geekdroid
-    androidTestImplementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:1.0.0")
+    androidTestImplementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.2.0")
 
 }
