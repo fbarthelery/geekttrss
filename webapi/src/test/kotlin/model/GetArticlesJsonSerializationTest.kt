@@ -45,7 +45,7 @@ class GetArticlesJsonSerializationTest {
         val serializer = getSerializer<GetArticlesRequestPayload>()
         val result = Json.stringify(serializer, payload)
         assertThat(result).isEqualTo("""
-            {"sid":"SESSION_ID","feed_id":256,"view_mode":"ALL_ARTICLES","show_content":true,"show_excerpt":false,"skip":10,"since_id":200,"limit":10,"order_by":"TITLE","op":"getHeadlines"}
+            {"sid":"SESSION_ID","feed_id":256,"view_mode":"all_articles","show_content":true,"show_excerpt":false,"skip":10,"since_id":200,"limit":10,"order_by":"title","op":"getHeadlines"}
         """.trimIndent())
     }
 

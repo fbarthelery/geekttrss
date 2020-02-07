@@ -87,7 +87,7 @@ abstract class ResponsePayload<T : BaseContent> {
 
 }
 
-@Serializable(EnumSerializer::class)
+@Serializable
 enum class Error {
     NO_ERROR,
     API_DISABLED,
@@ -96,14 +96,7 @@ enum class Error {
     INCORRECT_USAGE,
     NOT_LOGGED_IN,
     FEED_NOT_FOUND,
-    UNKNOWN_METHOD;
-
-    // to keep same syntax
-    companion object {
-        fun serializer(): KSerializer<Error> {
-            return EnumSerializer(Error::class)
-        }
-    }
+    UNKNOWN_METHOD
 }
 
 
