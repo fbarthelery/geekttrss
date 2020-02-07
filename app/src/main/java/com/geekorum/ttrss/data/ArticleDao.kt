@@ -18,62 +18,62 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.geekorum.ttrss.data;
+package com.geekorum.ttrss.data
 
-import androidx.lifecycle.LiveData;
-import androidx.paging.DataSource;
-import androidx.room.Dao;
-import androidx.room.Query;
+import androidx.lifecycle.LiveData
+import androidx.paging.DataSource
+import androidx.room.Dao
+import androidx.room.Query
 
 /**
  * Dao to read and modify articles.
  */
 @Dao
-public interface ArticleDao {
-    @Query("SELECT * FROM articles WHERE _id=:id ORDER BY last_time_update DESC")
-    LiveData<Article> getArticleById(long id);
+interface ArticleDao {
+    @Query("SELECT * FROM articles WHERE _id=:id")
+    fun getArticleById(id: Long): LiveData<Article?>
 
     @Query("SELECT * FROM articles ORDER BY last_time_update DESC")
-    DataSource.Factory<Integer, Article> getAllArticles();
+    fun getAllArticles(): DataSource.Factory<Int, Article>
 
     @Query("SELECT * FROM articles WHERE unread=1 ORDER BY last_time_update DESC")
-    DataSource.Factory<Integer, Article> getAllUnreadArticles();
+    fun getAllUnreadArticles(): DataSource.Factory<Int, Article>
 
     @Query("SELECT * FROM articles WHERE feed_id=:feedId ORDER BY last_time_update DESC ")
-    DataSource.Factory<Integer, Article> getAllArticlesForFeed(long feedId);
+    fun getAllArticlesForFeed(feedId: Long): DataSource.Factory<Int, Article>
 
     @Query("SELECT * FROM articles WHERE feed_id=:feedId AND unread=1 ORDER BY last_time_update DESC")
-    DataSource.Factory<Integer, Article> getAllUnreadArticlesForFeed(long feedId);
+    fun getAllUnreadArticlesForFeed(feedId: Long): DataSource.Factory<Int, Article>
 
     @Query("SELECT * FROM articles WHERE marked=1 ORDER BY last_time_update DESC")
-    DataSource.Factory<Integer, Article> getAllStarredArticles();
+    fun getAllStarredArticles(): DataSource.Factory<Int, Article>
 
     @Query("SELECT * FROM articles WHERE marked=1 AND unread=1 ORDER BY last_time_update DESC")
-    DataSource.Factory<Integer, Article> getAllUnreadStarredArticles();
+    fun getAllUnreadStarredArticles(): DataSource.Factory<Int, Article>
 
     @Query("SELECT * FROM articles WHERE published=1 ORDER BY last_time_update DESC")
-    DataSource.Factory<Integer, Article> getAllPublishedArticles();
+    fun getAllPublishedArticles(): DataSource.Factory<Int, Article>
 
     @Query("SELECT * FROM articles WHERE published=1 AND unread=1 ORDER BY last_time_update DESC")
-    DataSource.Factory<Integer, Article> getAllUnreadPublishedArticles();
+    fun getAllUnreadPublishedArticles(): DataSource.Factory<Int, Article>
 
     @Query("SELECT * FROM articles WHERE last_time_update>=:time ORDER BY last_time_update DESC")
-    DataSource.Factory<Integer, Article> getAllArticlesUpdatedAfterTime(long time);
+    fun getAllArticlesUpdatedAfterTime(time: Long): DataSource.Factory<Int, Article>
 
     @Query("SELECT * FROM articles WHERE last_time_update>=:time AND unread=1 ORDER BY last_time_update DESC")
-    DataSource.Factory<Integer, Article> getAllUnreadArticlesUpdatedAfterTime(long time);
+    fun getAllUnreadArticlesUpdatedAfterTime(time: Long): DataSource.Factory<Int, Article>
 
     @Query("UPDATE articles SET transiant_unread=:isUnread WHERE _id=:articleId")
-    void updateArticleTransientUnread(long articleId, boolean isUnread);
+    suspend fun updateArticleTransientUnread(articleId: Long, isUnread: Boolean)
 
     @Query("UPDATE articles SET transiant_unread=:isUnread, unread=:isUnread WHERE _id=:articleId")
-    int updateArticleUnread(long articleId, boolean isUnread);
+    suspend fun updateArticleUnread(articleId: Long, isUnread: Boolean): Int
 
     @Query("UPDATE articles SET marked=:isMarked WHERE _id=:articleId")
-    int updateArticleMarked(long articleId, boolean isMarked);
+    suspend fun updateArticleMarked(articleId: Long, isMarked: Boolean): Int
 
     @Query("SELECT articles.* FROM ArticleFTS JOIN articles ON (ArticleFTS.rowid = _id) "
-            + "WHERE ArticleFTS MATCH :query "
-            + "ORDER BY last_time_update DESC")
-    DataSource.Factory<Integer, Article> searchArticles(String query);
+        + "WHERE ArticleFTS MATCH :query "
+        + "ORDER BY last_time_update DESC")
+    fun searchArticles(query: String?): DataSource.Factory<Int, Article>
 }
