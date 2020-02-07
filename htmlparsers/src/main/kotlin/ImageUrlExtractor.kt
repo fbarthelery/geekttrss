@@ -1,7 +1,7 @@
 /*
  * Geekttrss is a RSS feed reader application on the Android Platform.
  *
- * Copyright (C) 2017-2019 by Frederic-Charles Barthelery.
+ * Copyright (C) 2017-2020 by Frederic-Charles Barthelery.
  *
  * This file is part of Geekttrss.
  *
@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package com.geekorum.ttrss.htmlparsers
 
 import org.jsoup.nodes.Document

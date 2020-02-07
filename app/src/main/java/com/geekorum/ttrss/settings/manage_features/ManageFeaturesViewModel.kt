@@ -1,7 +1,7 @@
 /*
  * Geekttrss is a RSS feed reader application on the Android Platform.
  *
- * Copyright (C) 2017-2019 by Frederic-Charles Barthelery.
+ * Copyright (C) 2017-2020 by Frederic-Charles Barthelery.
  *
  * This file is part of Geekttrss.
  *
