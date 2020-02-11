@@ -20,9 +20,6 @@
  */
 package com.geekorum.ttrss.articles_list
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.distinctUntilChanged
 import androidx.paging.DataSource
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.data.Article
@@ -34,6 +31,7 @@ import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.session.Action
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
@@ -52,33 +50,53 @@ class ArticlesRepository
 ) {
 
     fun getAllArticles(): DataSource.Factory<Int, Article> = articleDao.getAllArticles()
+    fun getAllArticlesOldestFirst(): DataSource.Factory<Int, Article> = articleDao.getAllArticlesOldestFirst()
 
     fun getAllUnreadArticles(): DataSource.Factory<Int, Article> {
         return articleDao.getAllUnreadArticles()
     }
+    fun getAllUnreadArticlesOldestFirst(): DataSource.Factory<Int, Article> {
+        return articleDao.getAllUnreadArticlesOldestFirst()
+    }
 
     fun getAllPublishedArticles(): DataSource.Factory<Int, Article> = articleDao.getAllPublishedArticles()
+    fun getAllPublishedArticlesOldestFirst(): DataSource.Factory<Int, Article> = articleDao.getAllPublishedArticlesOldestFirst()
 
     fun getAllUnreadPublishedArticles(): DataSource.Factory<Int, Article> = articleDao.getAllUnreadPublishedArticles()
+    fun getAllUnreadPublishedArticlesOldestFirst(): DataSource.Factory<Int, Article> = articleDao.getAllUnreadPublishedArticlesOldestFirst()
 
     fun getAllStarredArticles(): DataSource.Factory<Int, Article> = articleDao.getAllStarredArticles()
+    fun getAllStarredArticlesOldestFirst(): DataSource.Factory<Int, Article> = articleDao.getAllStarredArticlesOldestFirst()
 
     fun getAllUnreadStarredArticles(): DataSource.Factory<Int, Article> = articleDao.getAllUnreadStarredArticles()
+    fun getAllUnreadStarredArticlesOldestFirst(): DataSource.Factory<Int, Article> = articleDao.getAllUnreadStarredArticlesOldestFirst()
 
     fun getAllArticlesForFeed(feedId: Long): DataSource.Factory<Int, Article> = articleDao.getAllArticlesForFeed(feedId)
+    fun getAllArticlesForFeedOldestFirst(feedId: Long): DataSource.Factory<Int, Article> = articleDao.getAllArticlesForFeedOldestFirst(feedId)
 
     fun getAllUnreadArticlesForFeed(feedId: Long): DataSource.Factory<Int, Article> {
         return articleDao.getAllUnreadArticlesForFeed(feedId)
     }
+    fun getAllUnreadArticlesForFeedOldestFirst(feedId: Long): DataSource.Factory<Int, Article> {
+        return articleDao.getAllUnreadArticlesForFeedOldestFirst(feedId)
+    }
 
     fun getAllArticlesUpdatedAfterTime(time: Long): DataSource.Factory<Int, Article> {
         return articleDao.getAllArticlesUpdatedAfterTime(time)
+    }
+    fun getAllArticlesUpdatedAfterTimeOldestFirst(time: Long): DataSource.Factory<Int, Article> {
+        return articleDao.getAllArticlesUpdatedAfterTimeOldestFirst(time)
     }
 
     fun getAllUnreadArticlesUpdatedAfterTime(time: Long): DataSource.Factory<Int, Article> {
         return articleDao.getAllUnreadArticlesUpdatedAfterTime(time)
     }
 
+    fun getAllUnreadArticlesUpdatedAfterTimeOldestFirst(time: Long): DataSource.Factory<Int, Article> {
+        return articleDao.getAllUnreadArticlesUpdatedAfterTimeOldestFirst(time)
+    }
+
+    @UseExperimental(ExperimentalCoroutinesApi::class)
     fun getArticleById(articleId: Long): Flow<Article?> = articleDao.getArticleById(articleId).distinctUntilChanged()
 
     fun setArticleUnread(articleId: Long, newValue: Boolean): Action {
@@ -140,7 +158,6 @@ open class SetArticleFieldAction(
     }
 
     class Factory @Inject internal constructor(
-        private val dispatchers: CoroutineDispatchersProvider,
         private val setUnreadActionFactory: SetUnreadAction.Factory,
         private val setStarredActionFactory: SetStarredAction.Factory
     ) : SetUnreadAction.Factory by setUnreadActionFactory, SetStarredAction.Factory by setStarredActionFactory
