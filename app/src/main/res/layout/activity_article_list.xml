@@ -59,6 +59,7 @@
                     android:layout_height="wrap_content"
                     app:layout_scrollFlags="scroll|enterAlways|snap"
                     android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
+                    app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light"
                     style="?appBarToolbarStyle"
                     />
 

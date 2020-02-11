@@ -31,4 +31,22 @@
             android:title="@string/search"
             app:actionViewClass="androidx.appcompat.widget.SearchView"
             app:showAsAction="collapseActionView|always" />
+
+    <item
+        android:id="@+id/articles_sort_order"
+        android:icon="@drawable/ic_baseline_sort_24"
+        app:iconTint="?colorControlNormal"
+        android:title="@string/sort_order"
+        app:showAsAction="always" >
+        <menu>
+            <group android:checkableBehavior="single">
+                <item android:id="@+id/articles_sort_order_most_recent"
+                    android:title="@string/sort_order_most_recent_first"
+                    />
+                <item android:id="@+id/articles_sort_order_oldest"
+                    android:title="@string/sort_order_oldest_first"
+                    />
+            </group>
+        </menu>
+    </item>
 </menu>
