@@ -21,11 +21,12 @@
 package com.geekorum.ttrss.articles_list
 
 import android.accounts.Account
-import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
@@ -42,11 +43,13 @@ import com.geekorum.ttrss.session.Action
 import com.geekorum.ttrss.session.UndoManager
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 
-private const val PREF_VIEW_MODE = "view_mode"
 private const val STATE_FEED_ID = "feed_id"
 private const val STATE_NEED_UNREAD = "need_unread"
+private const val STATE_ORDER_MOST_RECENT_FIRST = "order_most_recent_first" // most_recent_first, oldest_first
 
 /**
  * [ViewModel] for the [ArticlesListFragment].
@@ -56,15 +59,8 @@ class FragmentViewModel @AssistedInject constructor(
     private val articlesRepository: ArticlesRepository,
     private val feedsRepository: FeedsRepository,
     private val backgroundJobManager: BackgroundJobManager,
-    private val account: Account,
-    private val prefs: SharedPreferences
+    private val account: Account
 ) : ViewModel() {
-
-    private val onSharedPreferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-        if (PREF_VIEW_MODE == key) {
-            updateNeedUnread()
-        }
-    }
 
     private val feedId = state.getLiveData(STATE_FEED_ID, Feed.FEED_ID_ALL_ARTICLES).apply {
         // workaround for out of sync values see
@@ -99,52 +95,32 @@ class FragmentViewModel @AssistedInject constructor(
     // and will briefly show the empty view
     val haveZeroArticles = articles.map { it.size == 0 }
 
-    init {
-        prefs.registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener)
-        updateNeedUnread()
+    fun setSortByMostRecentFirst(mostRecentFirst: Boolean) {
+        state[STATE_ORDER_MOST_RECENT_FIRST] = mostRecentFirst
+    }
+
+    fun setNeedUnread(needUnread: Boolean) {
+        state[STATE_NEED_UNREAD] = needUnread
     }
 
     private fun getArticlesForFeed(feed: Feed): LiveData<PagedList<Article>> {
-        return state.getLiveData<Boolean>(STATE_NEED_UNREAD).switchMap { needUnread ->
-            val factory: DataSource.Factory<Int, Article> = when {
-                feed.isStarredFeed -> if (needUnread)
-                    articlesRepository.getAllUnreadStarredArticles()
-                else
-                    articlesRepository.getAllStarredArticles()
-
-                feed.isPublishedFeed -> if (needUnread)
-                    articlesRepository.getAllUnreadPublishedArticles()
-                else
-                    articlesRepository.getAllPublishedArticles()
-
-                feed.isFreshFeed -> {
-                    val freshTimeSec = System.currentTimeMillis() / 1000 - 3600 * 36
-                    if (needUnread)
-                        articlesRepository.getAllUnreadArticlesUpdatedAfterTime(freshTimeSec)
-                    else
-                        articlesRepository.getAllArticlesUpdatedAfterTime(freshTimeSec)
-                }
-
-                feed.isAllArticlesFeed -> if (needUnread)
-                    articlesRepository.getAllUnreadArticles()
-                else
-                    articlesRepository.getAllArticles()
-
-                else -> if (needUnread)
-                    articlesRepository.getAllUnreadArticlesForFeed(feed.id)
-                else
-                    articlesRepository.getAllArticlesForFeed(feed.id)
+        val isMostRecentOrderFlow = state.getLiveData<Boolean>(STATE_ORDER_MOST_RECENT_FIRST).asFlow()
+        val needUnreadFlow = state.getLiveData<Boolean>(STATE_NEED_UNREAD).asFlow()
+        return isMostRecentOrderFlow.combine(needUnreadFlow) { mostRecentFirst, needUnread ->
+            getArticleAccess(mostRecentFirst, needUnread)
+        }.mapLatest { access ->
+            when {
+                feed.isStarredFeed -> access.starredArticles
+                feed.isPublishedFeed -> access.publishedArticles
+                feed.isFreshFeed -> access.freshArticles
+                feed.isAllArticlesFeed -> access.allArticles
+                else -> access.articlesForFeed(feed.id)
             }
-
-            factory.toLiveData(pageSize = 50,
+        }.asLiveData()
+        .switchMap { factory ->
+            val liveData = factory.toLiveData(pageSize = 50,
                 boundaryCallback = PageBoundaryCallback())
-        }
-    }
-
-    private fun updateNeedUnread() {
-        state[STATE_NEED_UNREAD] = when (prefs.getString(PREF_VIEW_MODE, "adaptive")) {
-            "unread", "adaptive" -> true
-            else -> false
+            liveData
         }
     }
 
@@ -183,11 +159,6 @@ class FragmentViewModel @AssistedInject constructor(
         _pendingArticlesSetUnread.value = unreadActionUndoManager.nbActions
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        prefs.unregisterOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener)
-    }
-
     private inner class PageBoundaryCallback<T> : PagedList.BoundaryCallback<T>() {
         override fun onZeroItemsLoaded() {
             if (shouldRefreshOnZeroItems) {
@@ -204,6 +175,109 @@ class FragmentViewModel @AssistedInject constructor(
             shouldRefreshOnZeroItems = true
         }
     }
+
+    private interface ArticlesAccess {
+        val starredArticles: DataSource.Factory<Int, Article>
+        val publishedArticles: DataSource.Factory<Int, Article>
+        val freshArticles: DataSource.Factory<Int, Article>
+        val allArticles: DataSource.Factory<Int, Article>
+        fun articlesForFeed(feedId: Long) :DataSource.Factory<Int, Article>
+
+    }
+
+    private fun getArticleAccess(mostRecentFirst: Boolean, needUnread: Boolean): ArticlesAccess = when {
+        needUnread && mostRecentFirst -> UnreadMostRecentAccess(articlesRepository)
+        needUnread && !mostRecentFirst -> UnreadOldestAccess(articlesRepository)
+        !needUnread && mostRecentFirst -> MostRecentAccess(articlesRepository)
+        !needUnread && !mostRecentFirst -> OldestFirstAccess(articlesRepository)
+        else -> UnreadMostRecentAccess(articlesRepository)
+    }
+
+    class UnreadMostRecentAccess(private val articlesRepository: ArticlesRepository) : ArticlesAccess {
+        override val starredArticles: DataSource.Factory<Int, Article>
+            get() = articlesRepository.getAllUnreadStarredArticles()
+
+        override val publishedArticles: DataSource.Factory<Int, Article>
+            get() = articlesRepository.getAllUnreadPublishedArticles()
+
+        override val freshArticles: DataSource.Factory<Int, Article>
+            get() {
+                val freshTimeSec = System.currentTimeMillis() / 1000 - 3600 * 36
+                return articlesRepository.getAllUnreadArticlesUpdatedAfterTime(freshTimeSec)
+            }
+
+        override val allArticles: DataSource.Factory<Int, Article>
+            get() =  articlesRepository.getAllUnreadArticles()
+
+        override fun articlesForFeed(feedId: Long): DataSource.Factory<Int, Article> {
+            return articlesRepository.getAllUnreadArticlesForFeed(feedId)
+        }
+    }
+
+    class UnreadOldestAccess(private val articlesRepository: ArticlesRepository) : ArticlesAccess {
+        override val starredArticles: DataSource.Factory<Int, Article>
+            get() = articlesRepository.getAllUnreadStarredArticlesOldestFirst()
+
+        override val publishedArticles: DataSource.Factory<Int, Article>
+            get() = articlesRepository.getAllUnreadPublishedArticlesOldestFirst()
+
+        override val freshArticles: DataSource.Factory<Int, Article>
+            get() {
+                val freshTimeSec = System.currentTimeMillis() / 1000 - 3600 * 36
+                return articlesRepository.getAllUnreadArticlesUpdatedAfterTimeOldestFirst(freshTimeSec)
+            }
+
+        override val allArticles: DataSource.Factory<Int, Article>
+            get() =  articlesRepository.getAllUnreadArticlesOldestFirst()
+
+        override fun articlesForFeed(feedId: Long): DataSource.Factory<Int, Article> {
+            return articlesRepository.getAllUnreadArticlesForFeedOldestFirst(feedId)
+        }
+    }
+
+
+    class MostRecentAccess(private val articlesRepository: ArticlesRepository) : ArticlesAccess {
+        override val starredArticles: DataSource.Factory<Int, Article>
+            get() = articlesRepository.getAllStarredArticles()
+
+        override val publishedArticles: DataSource.Factory<Int, Article>
+            get() = articlesRepository.getAllPublishedArticles()
+
+        override val freshArticles: DataSource.Factory<Int, Article>
+            get() {
+                val freshTimeSec = System.currentTimeMillis() / 1000 - 3600 * 36
+                return articlesRepository.getAllArticlesUpdatedAfterTime(freshTimeSec)
+            }
+
+        override val allArticles: DataSource.Factory<Int, Article>
+            get() =  articlesRepository.getAllArticles()
+
+        override fun articlesForFeed(feedId: Long): DataSource.Factory<Int, Article> {
+            return articlesRepository.getAllArticlesForFeed(feedId)
+        }
+    }
+
+    class OldestFirstAccess(private val articlesRepository: ArticlesRepository) : ArticlesAccess {
+        override val starredArticles: DataSource.Factory<Int, Article>
+            get() = articlesRepository.getAllStarredArticlesOldestFirst()
+
+        override val publishedArticles: DataSource.Factory<Int, Article>
+            get() = articlesRepository.getAllPublishedArticlesOldestFirst()
+
+        override val freshArticles: DataSource.Factory<Int, Article>
+            get() {
+                val freshTimeSec = System.currentTimeMillis() / 1000 - 3600 * 36
+                return articlesRepository.getAllArticlesUpdatedAfterTimeOldestFirst(freshTimeSec)
+            }
+
+        override val allArticles: DataSource.Factory<Int, Article>
+            get() =  articlesRepository.getAllArticlesOldestFirst()
+
+        override fun articlesForFeed(feedId: Long): DataSource.Factory<Int, Article> {
+            return articlesRepository.getAllArticlesForFeedOldestFirst(feedId)
+        }
+    }
+
 
     @AssistedInject.Factory
     interface Factory : ViewModelAssistedFactory<FragmentViewModel> {
