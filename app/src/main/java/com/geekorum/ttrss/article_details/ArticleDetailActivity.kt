@@ -21,7 +21,6 @@
 package com.geekorum.ttrss.article_details
 
 import android.annotation.SuppressLint
-import android.content.ContentUris
 import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
@@ -72,8 +71,6 @@ class ArticleDetailActivity : SessionActivity() {
                 replace(R.id.content, ArticleDetailFragment::class.java, args)
             }
         }
-
-        articleDetailsViewModel.init(ContentUris.parseId(articleUri!!))
     }
 
     @SuppressLint("RestrictedApi")

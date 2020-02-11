@@ -27,34 +27,42 @@ import android.net.Uri
 import androidx.core.app.ShareCompat
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
+import com.geekorum.geekdroid.dagger.ViewModelAssistedFactory
 import com.geekorum.ttrss.articles_list.ArticlesRepository
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.network.TtRssBrowserLauncher
-import javax.inject.Inject
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
+import kotlinx.coroutines.flow.onEach
+
+private const val STATE_ARTICLE_ID = "article_id"
 
 /**
  * [ViewModel] for [ArticleDetailActivity] and [ArticleDetailFragment].
  */
-class ArticleDetailsViewModel
-@Inject constructor(
+class ArticleDetailsViewModel @AssistedInject constructor(
+    @Assisted private val state: SavedStateHandle,
     private val articlesRepository: ArticlesRepository,
     private val browserLauncher: TtRssBrowserLauncher
 ) : ViewModel() {
 
-    private val articleId = MutableLiveData<Long>()
+    private val articleId = state.getLiveData<Long>(STATE_ARTICLE_ID)
 
-    val article: LiveData<Article?> = articleId.switchMap { articlesRepository.getArticleById(it) }
-        .map {
-            if (it != null) {
-                browserLauncher.mayLaunchUrl(it.link.toUri())
+    val article: LiveData<Article?> = articleId.switchMap {
+        articlesRepository.getArticleById(it)
+            .onEach { article ->
+                article?.let {
+                    browserLauncher.mayLaunchUrl(article.link.toUri())
+                }
             }
-            it
-        }
+            .asLiveData()
+    }
 
     val articleContent: LiveData<String> = article.map { it?.content ?: "" }.distinctUntilChanged()
 
@@ -63,7 +71,7 @@ class ArticleDetailsViewModel
     }
 
     fun init(articleId: Long) {
-        this.articleId.value = articleId
+        state[STATE_ARTICLE_ID] = articleId
     }
 
     override fun onCleared() {
@@ -121,4 +129,10 @@ class ArticleDetailsViewModel
             articlesRepository.setArticleUnread(it.id, unread)
         }
     }
+
+    @AssistedInject.Factory
+    interface Factory : ViewModelAssistedFactory<ArticleDetailsViewModel> {
+        override fun create(state: SavedStateHandle): ArticleDetailsViewModel
+    }
+
 }

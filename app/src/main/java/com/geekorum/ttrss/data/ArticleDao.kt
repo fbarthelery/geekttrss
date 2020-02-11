@@ -24,6 +24,7 @@ import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
 import androidx.room.Dao
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Dao to read and modify articles.
@@ -31,7 +32,7 @@ import androidx.room.Query
 @Dao
 interface ArticleDao {
     @Query("SELECT * FROM articles WHERE _id=:id")
-    fun getArticleById(id: Long): LiveData<Article?>
+    fun getArticleById(id: Long): Flow<Article?>
 
     @Query("SELECT * FROM articles ORDER BY last_time_update DESC")
     fun getAllArticles(): DataSource.Factory<Int, Article>

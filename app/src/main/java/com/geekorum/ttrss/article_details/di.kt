@@ -26,6 +26,7 @@ import android.accounts.Account
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import com.geekorum.geekdroid.dagger.FragmentKey
+import com.geekorum.geekdroid.dagger.ViewModelAssistedFactory
 import com.geekorum.geekdroid.dagger.ViewModelKey
 import com.geekorum.ttrss.accounts.NetworkLoginModule
 import com.geekorum.ttrss.accounts.PerAccount
@@ -50,7 +51,7 @@ abstract class ViewModelsModule {
     @Binds
     @IntoMap
     @ViewModelKey(ArticleDetailsViewModel::class)
-    abstract fun getArticleDetailsViewModel(articleDetailsViewModel: ArticleDetailsViewModel): ViewModel
+    abstract fun getArticleDetailsViewModel(articleDetailsViewModel: ArticleDetailsViewModel.Factory): ViewModelAssistedFactory<out ViewModel>
 
 }
 

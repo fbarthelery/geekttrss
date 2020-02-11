@@ -21,6 +21,7 @@
 package com.geekorum.ttrss.articles_list
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.distinctUntilChanged
 import androidx.paging.DataSource
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
@@ -36,6 +37,8 @@ import com.squareup.inject.assisted.AssistedInject
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -76,7 +79,7 @@ class ArticlesRepository
         return articleDao.getAllUnreadArticlesUpdatedAfterTime(time)
     }
 
-    fun getArticleById(articleId: Long): LiveData<Article?> = articleDao.getArticleById(articleId).distinctUntilChanged()
+    fun getArticleById(articleId: Long): Flow<Article?> = articleDao.getArticleById(articleId).distinctUntilChanged()
 
     fun setArticleUnread(articleId: Long, newValue: Boolean): Action {
         val setUnreadAction = setFieldActionFactory.createSetUnreadAction(articleId, newValue)
