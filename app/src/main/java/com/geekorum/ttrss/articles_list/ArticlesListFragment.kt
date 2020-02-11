@@ -88,15 +88,24 @@ class ArticlesListFragment @Inject constructor(
         super.onActivityCreated(savedInstanceState)
         fragmentViewModel.articles.observe(this) { articles -> adapter!!.submitList(articles) }
 
-        fragmentViewModel.getPendingArticlesSetUnread().observe(this) { nbArticles ->
+        fragmentViewModel.getPendingArticlesSetUnread().observe(viewLifecycleOwner) { nbArticles ->
             if (nbArticles > 0) {
                 updateUnreadSnackbar(nbArticles)
             }
         }
 
-        activityViewModel.refreshClickedEvent.observe(this, EventObserver {
+        activityViewModel.refreshClickedEvent.observe(viewLifecycleOwner, EventObserver {
             fragmentViewModel.refresh()
         })
+
+        activityViewModel.mostRecentSortOrder.observe(viewLifecycleOwner) {
+            fragmentViewModel.setSortByMostRecentFirst(it)
+        }
+
+        activityViewModel.onlyUnreadArticles.observe(viewLifecycleOwner) {
+            fragmentViewModel.setNeedUnread(it)
+        }
+
 
         binding.fragmentViewModel = fragmentViewModel
     }
@@ -186,10 +195,6 @@ class ArticlesListFragment @Inject constructor(
         }
 
         override fun getSwipeThreshold(viewHolder: RecyclerView.ViewHolder): Float = 0.3f
-    }
-
-    companion object {
-        const val ARG_FEED_ID = "feed_id"
     }
 
 }

@@ -21,6 +21,7 @@
 package com.geekorum.ttrss.articles_list
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
@@ -173,8 +174,34 @@ class ArticleListActivity : SessionActivity() {
 
     private fun setupToolbar() {
         setupSearch()
+        setupSortOrder()
         binding.toolbar.setupWithNavController(navController, drawerLayout)
         appBarPresenter = AppBarPresenter(binding.appBar, binding.toolbar, navController)
+    }
+
+    private fun setupSortOrder() {
+        val mostRecent = binding.toolbar.menu.findItem(R.id.articles_sort_order_most_recent)!!
+        val oldestFirst = binding.toolbar.menu.findItem(R.id.articles_sort_order_oldest)!!
+        activityViewModel.mostRecentSortOrder.observe(this) {
+            if (it) {
+                mostRecent.isChecked = true
+            } else {
+                oldestFirst.isChecked = true
+            }
+        }
+        binding.toolbar.setOnMenuItemClickListener {
+            when (it.itemId) {
+                R.id.articles_sort_order_oldest -> {
+                    activityViewModel.setSortByMostRecentFirst(false)
+                    true
+                }
+                R.id.articles_sort_order_most_recent -> {
+                    activityViewModel.setSortByMostRecentFirst(true)
+                    true
+                }
+                else -> false
+            }
+        }
     }
 
     private fun setupNavigationView() {
