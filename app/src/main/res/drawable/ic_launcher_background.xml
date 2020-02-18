@@ -29,10 +29,10 @@
 
     <path
             android:pathData="M0,0 L108,0 L0,108 L0,0 Z"
-            android:fillColor="@color/primary" />
+            android:fillColor="@color/material_blue_grey_500" />
     <path
             android:pathData="M0,108 L108,0108L108,0 Z"
-            android:fillColor="@color/primary_darker" />
+            android:fillColor="@color/material_blue_grey_500_darker" />
 
     <path   android:fillColor="#CC7600"
             android:pathData="M54,54 m-18,0

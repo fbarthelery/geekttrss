@@ -50,7 +50,7 @@ class TtRssBrowserLauncher @Inject constructor(
             val darkColorScheme = CustomTabColorSchemeParams.Builder()
                 .setToolbarColor(context.getColor(R.color.material_blue_grey_300))
                 .build()
-            val defaultColor = context.getColor(R.color.primary)
+            val defaultColor = context.getColor(R.color.material_blue_grey_500)
 
             addDefaultShareMenuItem()
                 .setToolbarColor(defaultColor)

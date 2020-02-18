@@ -22,11 +22,27 @@
 
 -->
 <resources>
+    <style name="AppTheme" parent="Base.AppTheme">
+        <!-- use the material Blue Grey palette -->
+        <item name="colorPrimary">@color/material_blue_grey_300</item>
+        <item name="colorPrimaryDark">@color/material_blue_grey_300_darker</item>
+        <item name="colorPrimaryVariant">@color/material_blue_grey_300_darker</item>
+        <item name="colorSecondary">@color/material_green_a200</item>
+        <item name="colorSecondaryVariant">@color/material_green_a200_darker</item>
+        <item name="colorOnPrimary">@android:color/black</item>
+        <item name="colorOnSecondary">@android:color/black</item>
+    </style>
+
+    <style name="AppTheme.ArticleListActivity" parent="AppTheme.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="articleListHeader">@color/dark_color_primary_surface</item>
+    </style>
+
     <style name="ThemeOverlay.AppTheme.DayNight" parent="@style/ThemeOverlay.MaterialComponents.Dark"/>
     <style name="ThemeOverlay.AppTheme.DayNight.Inverse" parent="@style/ThemeOverlay.MaterialComponents.Light" />
 
     <style name="ThemeOverlay.AppTheme.BottomSheet" parent="ThemeOverlay.MaterialComponents.Dark">
-        <item name="colorPrimary">@color/secondary</item>
+        <item name="colorPrimary">?colorSecondary</item>
     </style>
 
     <style name="AppTheme.ArticleDetailActivity" parent="AppTheme.NoActionBar">

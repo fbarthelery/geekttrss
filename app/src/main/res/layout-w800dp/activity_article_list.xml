@@ -40,7 +40,7 @@
         <View android:id="@+id/header"
               android:layout_width="match_parent"
               android:layout_height="192dp"
-              android:background="@color/article_list_header"  />
+              android:background="?articleListHeader"  />
 
         <!-- Let the app bar draw the status bar -->
         <!-- Override stateListAnimator to not lift elevation        -->

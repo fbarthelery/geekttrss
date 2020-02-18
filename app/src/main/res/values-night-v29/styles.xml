@@ -25,6 +25,7 @@
     <style name="AppTheme.ArticleListActivity" parent="AppTheme.NoActionBar">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="articleListHeader">@color/dark_color_primary_surface</item>
     </style>
 
     <style name="AppTheme.ArticleDetailActivity" parent="AppTheme.NoActionBar">

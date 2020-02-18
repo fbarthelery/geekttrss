@@ -23,23 +23,7 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
            xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Activity themes -->
-
-    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <!-- use the material Blue Grey palette -->
-        <item name="colorPrimary">@color/primary</item>
-        <item name="colorPrimaryDark">@color/primary_darker</item>
-        <item name="colorPrimaryVariant">@color/primary_variant</item>
-        <item name="colorSecondary">@color/secondary</item>
-        <item name="colorSecondaryVariant">@color/secondary_variant</item>
-        <item name="colorOnPrimary">@color/color_on_primary</item>
-        <item name="colorOnSecondary">@color/color_on_secondary</item>
-
-        <!-- used to configure style on the content webview -->
-        <item name="articleBackground">?colorSurface</item>
-        <!-- must be a color, not a drawable -->
-        <item name="articleTextColor">@color/article_text_color</item>
-        <item name="linkColor">?colorSecondary</item>
+    <style name="Base.AppTheme" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <item name="bottomAppBarStyle">@style/Widget.AppTheme.BottomAppBar</item>
         <item name="materialAlertDialogTheme">@style/ThemeOverlay.AppTheme.AlertDialog</item>
         <!-- This style needs to be applied manually in layout to have the correct theme overlay -->
@@ -52,6 +36,24 @@
         <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.AppTheme.SmallComponent</item>
         <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.AppTheme.MediumComponent</item>
         <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.AppTheme.LargeComponent</item>
+
+        <!-- used to configure style on the content webview -->
+        <item name="articleBackground">?colorSurface</item>
+        <!-- must be a color, not a drawable -->
+        <item name="articleTextColor">?android:textColorTertiary</item>
+        <item name="linkColor">?colorSecondary</item>
+    </style>
+
+    <!-- Activity themes -->
+    <style name="AppTheme" parent="Base.AppTheme">
+        <!-- use the material Blue Grey palette -->
+        <item name="colorPrimary">@color/material_blue_grey_500</item>
+        <item name="colorPrimaryDark">@color/material_blue_grey_500_darker</item>
+        <item name="colorPrimaryVariant">@color/material_blue_grey_500_darker</item>
+        <item name="colorSecondary">@color/material_green_a700</item>
+        <item name="colorSecondaryVariant">@color/material_green_a700_darker</item>
+        <item name="colorOnPrimary">@android:color/white</item>
+        <item name="colorOnSecondary">@android:color/white</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -72,6 +74,7 @@
 
     <style name="AppTheme.ArticleListActivity" parent="AppTheme.NoActionBar">
         <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="articleListHeader">@color/material_blue_grey_500_lighter</item>
     </style>
 
     <style name="AppTheme.ArticleDetailActivity" parent="AppTheme.NoActionBar">
@@ -95,7 +98,7 @@
 
     <style name="ThemeOverlay.AppTheme.BottomSheet" parent="ThemeOverlay.MaterialComponents.Light">
         <item name="colorSurface">@color/material_blue_grey_100</item>
-        <item name="colorPrimary">@color/secondary</item>
+        <item name="colorPrimary">?colorSecondary</item>
     </style>
 
 

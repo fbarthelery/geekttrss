@@ -73,7 +73,7 @@
                 tools:text="My simple but hilariously and excessively long  headline"
                 android:text="@{viewModel.article.title != null ? Html.fromHtml(viewModel.article.title) : null}"
                 android:textAppearance="@style/Base.TextAppearance.AppCompat.Display1"
-                android:textColor="@color/primary" />
+                android:textColor="?colorPrimary" />
 
             <TextView
                 android:id="@+id/date"

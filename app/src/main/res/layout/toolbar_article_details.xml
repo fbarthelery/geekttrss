@@ -33,7 +33,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:background="@color/primary"
+            tools:background="?colorPrimary"
             android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar">
 
         <ImageButton
