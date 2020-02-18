@@ -70,7 +70,7 @@ dependencies {
     implementation(enforcedPlatform(kotlin("bom")))
     implementation(kotlin("stdlib-jdk8"))
 
-    val daggerVersion = "2.25.2"
+    val daggerVersion = "2.26"
     implementation(enforcedDaggerPlatform(daggerVersion))
     kapt(enforcedDaggerPlatform(daggerVersion))
     implementation("com.google.dagger:dagger:$daggerVersion")
@@ -96,7 +96,7 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")
     implementation("androidx.recyclerview:recyclerview:1.1.0")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.1.0")
-    implementation("com.google.android.material:material:1.1.0-beta02")
+    implementation("com.google.android.material:material:1.1.0")
 
     implementation("androidx.core:core-ktx:1.2.0")
 
@@ -111,7 +111,7 @@ dependencies {
 
     implementation("io.coil-kt:coil:0.9.1")
 
-    androidTestImplementation("androidx.work:work-testing:2.3.0")
+    androidTestImplementation("androidx.work:work-testing:2.3.1")
     dualTestImplementation("androidx.arch.core:core-testing:2.1.0")
 
     debugImplementation("androidx.fragment:fragment-testing:1.2.1")

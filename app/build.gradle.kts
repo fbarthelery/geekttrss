@@ -144,7 +144,7 @@ dependencies {
     implementation(project(":webapi"))
     implementation(project(":faviKonSnoop"))
 
-    implementation("com.google.android.material:material:1.1.0-beta02")
+    implementation("com.google.android.material:material:1.1.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.1.0")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.1.0")
     implementation("io.coil-kt:coil:0.9.1")
@@ -162,7 +162,7 @@ dependencies {
     dualTestImplementation("androidx.arch.core:core-testing:2.1.0")
 
     // dagger
-    val daggerVersion = "2.25.2"
+    val daggerVersion = "2.26"
     implementation(enforcedDaggerPlatform(daggerVersion))
     kapt(enforcedDaggerPlatform(daggerVersion))
     implementation("com.google.dagger:dagger:$daggerVersion")
@@ -217,7 +217,7 @@ dependencies {
 
     // fragment testing declare some activities and resources that needs to be in the apk
     // we don't use it. here but it is used in feature modules
-    debugImplementation("androidx.fragment:fragment-testing:1.2.0")
+    debugImplementation("androidx.fragment:fragment-testing:1.2.1")
 
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.0-beta-2")
 }
