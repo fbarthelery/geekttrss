@@ -37,12 +37,12 @@ import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
+import com.geekorum.geekdroid.views.doOnApplyWindowInsets
 import com.geekorum.ttrss.ArticlesListDirections
 import com.geekorum.ttrss.Features
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.article_details.ArticleDetailActivity
 import com.geekorum.ttrss.databinding.ActivityArticleListBinding
-import com.geekorum.ttrss.doOnApplyWindowInsets
 import com.geekorum.ttrss.in_app_update.InAppUpdateViewModel
 import com.geekorum.ttrss.on_demand_modules.OnDemandModuleManager
 import com.geekorum.ttrss.session.SessionActivity

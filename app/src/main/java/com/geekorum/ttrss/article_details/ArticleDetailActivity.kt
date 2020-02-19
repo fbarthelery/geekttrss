@@ -30,11 +30,11 @@ import androidx.core.view.marginBottom
 import androidx.core.view.updateLayoutParams
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.commit
+import com.geekorum.geekdroid.views.doOnApplyWindowInsets
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.articles_list.ArticleListActivity
 import com.geekorum.ttrss.databinding.ActivityArticleDetailBinding
 import com.geekorum.ttrss.databinding.ToolbarArticleDetailsBinding
-import com.geekorum.ttrss.doOnApplyWindowInsets
 import com.geekorum.ttrss.session.SessionActivity
 
 /**
