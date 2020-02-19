@@ -25,6 +25,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.updatePadding
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
@@ -34,10 +35,11 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
+import com.geekorum.geekdroid.views.doOnApplyWindowInsets
 import com.geekorum.geekdroid.views.recyclerview.ItemSwiper
 import com.geekorum.geekdroid.views.recyclerview.ScrollFromBottomAppearanceItemAnimator
-import com.geekorum.ttrss.core.BaseFragment
 import com.geekorum.ttrss.R
+import com.geekorum.ttrss.core.BaseFragment
 import com.geekorum.ttrss.core.activityViewModels
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.databinding.FragmentArticleListBinding
@@ -84,8 +86,16 @@ class ArticlesListFragment @Inject constructor(
         return binding.root
     }
 
+    private fun setupEdgeToEdge() {
+        binding.articleList.doOnApplyWindowInsets { view, insets, padding ->
+            view.updatePadding(bottom = padding.bottom + insets.systemWindowInsetBottom)
+            insets
+        }
+    }
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        setupEdgeToEdge()
         fragmentViewModel.articles.observe(this) { articles -> adapter!!.submitList(articles) }
 
         fragmentViewModel.getPendingArticlesSetUnread().observe(viewLifecycleOwner) { nbArticles ->
