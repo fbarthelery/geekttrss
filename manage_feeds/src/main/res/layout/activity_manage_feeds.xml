@@ -38,9 +38,11 @@
                 android:id="@+id/app_bar"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/app_bar_height"
+                android:fitsSystemWindows="true"
                 app:liftOnScroll="true">
 
             <com.google.android.material.appbar.CollapsingToolbarLayout
+                    android:id="@+id/collapsing_toolbar"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     app:layout_scrollFlags="scroll|exitUntilCollapsed|snap"

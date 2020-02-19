@@ -25,6 +25,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.updatePadding
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
@@ -38,10 +39,11 @@ import androidx.recyclerview.widget.RecyclerView
 import coil.api.load
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
+import com.geekorum.geekdroid.views.doOnApplyWindowInsets
+import com.geekorum.ttrss.applicationComponent
 import com.geekorum.ttrss.core.BaseDialogFragment
 import com.geekorum.ttrss.core.BaseFragment
 import com.geekorum.ttrss.core.activityViewModels
-import com.geekorum.ttrss.applicationComponent
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.manage_feeds.databinding.ActivityManageFeedsBinding
 import com.geekorum.ttrss.manage_feeds.databinding.DialogUnsubscribeFeedBinding
@@ -63,6 +65,7 @@ class ManageFeedsActivity : SessionActivity() {
         binding.fab.setOnClickListener {
             startSubscribeToFeed()
         }
+        setupEdgeToEdge()
     }
 
     override fun inject() {
@@ -77,6 +80,16 @@ class ManageFeedsActivity : SessionActivity() {
         navController.navigate(direction)
     }
 
+    private fun setupEdgeToEdge() {
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+            View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+
+        // CollapsingToolbar consumes the insets by default.
+        // override it to not consume them so that they can be dispathed to the recycler view
+        binding.collapsingToolbar.doOnApplyWindowInsets { _, insets, _ ->
+            insets
+        }
+    }
 }
 
 class ManageFeedsFragment @Inject constructor(
@@ -101,9 +114,17 @@ class ManageFeedsFragment @Inject constructor(
             adapter.submitList(it)
         }
 
-        viewModel.feedClickedEvent.observe(this, EventObserver {
+        viewModel.feedClickedEvent.observe(viewLifecycleOwner, EventObserver {
             showConfirmationDialog(it)
         })
+        setupEdgeToEdge()
+    }
+
+    private fun setupEdgeToEdge() {
+        binding.recyclerView.doOnApplyWindowInsets { view, insets, padding ->
+            view.updatePadding(bottom = padding.bottom + insets.systemWindowInsetBottom)
+            insets
+        }
     }
 
     private fun showConfirmationDialog(feed: Feed) {
