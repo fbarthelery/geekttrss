@@ -51,6 +51,9 @@ data class GetArticlesRequestPayload(
     @SerialName("show_excerpt")
     val showExcerpt: Boolean = true,
 
+    @SerialName("include_attachments")
+    val includeAttachments: Boolean = false,
+
     private val skip: Int = 0,
 
     @SerialName("since_id")
