@@ -31,6 +31,7 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.data.Article
+import com.geekorum.ttrss.data.ArticleWithAttachments
 import com.geekorum.ttrss.htmlparsers.ImageUrlExtractor
 import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.sync.BackgroundDataUsageManager
@@ -91,7 +92,7 @@ class CollectNewArticlesWorker(
         val latestId = getLatestArticleId()
 
         val articles = getArticles(feedId, latestId, 0)
-        val latestReceivedId = articles.maxBy { it.id }?.id
+        val latestReceivedId = articles.maxBy { it.article.id }?.article?.id
         val difference = (latestReceivedId ?: latestId) - latestId
         if (difference > 1000) {
             collectNewArticlesGradually()
@@ -114,17 +115,17 @@ class CollectNewArticlesWorker(
         val latestId = getLatestArticleId()
 
         var offset = 0
-        var articles = getArticles(feedId, latestId, offset)
+        var articles = getArticles(feedId, latestId, offset, includeAttachments = true)
 
         databaseService.runInTransaction {
             while (articles.isNotEmpty()) {
                 insertArticles(articles)
                 coroutineScope {
-                    cacheArticlesImages(articles)
+                    cacheArticlesImages(articles.map { it.article } )
                 }
 
                 offset += articles.size
-                articles = getArticles(feedId, latestId, offset)
+                articles = getArticles(feedId, latestId, offset, includeAttachments = true)
             }
         }
     }
@@ -142,19 +143,22 @@ class CollectNewArticlesWorker(
         val latestId = getLatestArticleId()
 
         var offset = 0
-        var articles = getArticles(feedId, latestId, offset, gradually = true)
+        var articles = getArticles(feedId, latestId, offset,
+            includeAttachments = true, gradually = true)
         while (articles.isNotEmpty()) {
             databaseService.runInTransaction {
                 insertArticles(articles)
             }
-            cacheArticlesImages(articles)
+            cacheArticlesImages(articles.map { it.article })
             offset += articles.size
-            articles = getArticles(feedId, latestId, offset, gradually = true)
+            articles = getArticles(feedId, latestId, offset, includeAttachments = true, gradually = true)
         }
     }
 
-    private suspend fun insertArticles(articles: List<Article>) {
-        databaseService.insertArticles(articles)
+    private suspend fun insertArticles(articles: List<ArticleWithAttachments>) {
+        databaseService.insertArticles(articles.map { it.article })
+        val attachments = articles.flatMap { it.attachments }
+        databaseService.insertAttachments(attachments)
     }
 
     private fun CoroutineScope.cacheArticlesImages(articles: List<Article>) {

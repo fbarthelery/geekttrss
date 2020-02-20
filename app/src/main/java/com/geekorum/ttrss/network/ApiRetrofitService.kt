@@ -23,6 +23,8 @@ package com.geekorum.ttrss.network
 import com.geekorum.ttrss.accounts.ServerInformation
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleContentIndexed
+import com.geekorum.ttrss.data.ArticleWithAttachments
+import com.geekorum.ttrss.data.Attachment
 import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.providers.ArticlesContract
@@ -59,19 +61,20 @@ class ApiRetrofitService(
 
     @Throws(ApiCallException::class)
     override suspend fun getArticles(feedId: Long, sinceId: Long, offset: Int,
-                             showExcerpt: Boolean, showContent: Boolean): List<Article> {
-        return getArticlesInt(feedId, sinceId, offset, showExcerpt, showContent)
+                             showExcerpt: Boolean, showContent: Boolean, includeAttachments: Boolean): List<ArticleWithAttachments> {
+        return getArticlesInt(feedId, sinceId, offset, showExcerpt, showContent, includeAttachments)
     }
 
     @Throws(ApiCallException::class)
     override suspend fun getArticlesOrderByDateReverse(feedId: Long, sinceId: Long, offset: Int,
-                                               showExcerpt: Boolean, showContent: Boolean): List<Article> {
-        return getArticlesInt(feedId, sinceId, offset, showExcerpt, showContent, DATE_REVERSE)
+                                               showExcerpt: Boolean, showContent: Boolean, includeAttachments: Boolean): List<ArticleWithAttachments> {
+        return getArticlesInt(feedId, sinceId, offset, showExcerpt, showContent, includeAttachments, sortOrder = DATE_REVERSE)
     }
 
     private suspend fun getArticlesInt(feedId: Long, sinceId: Long, offset: Int,
                                        showExcerpt: Boolean, showContent: Boolean,
-                                       sortOrder: SortOrder = FEED_DATES): List<Article> {
+                                       includeAttachments: Boolean = false,
+                                       sortOrder: SortOrder = FEED_DATES): List<ArticleWithAttachments> {
         val payload = GetArticlesRequestPayload(
             feedId = feedId,
             viewMode = GetArticlesRequestPayload.ViewMode.ALL_ARTICLES,
@@ -80,6 +83,7 @@ class ApiRetrofitService(
             skip = offset,
             sinceId = sinceId,
             limit =  OFFLINE_SYNC_SEQ,
+            includeAttachments = includeAttachments,
             orderBy = sortOrder)
         val response = executeOrFail("Unable to get articles") {
             tinyrssApi.getArticles(payload)
@@ -169,8 +173,8 @@ class ApiRetrofitService(
 
 }
 
-private fun Headline.toDataType(): Article {
-    return Article(
+private fun Headline.toDataType(): ArticleWithAttachments {
+    val article = Article(
         id = id,
         contentData = ArticleContentIndexed(
             title = title,
@@ -188,6 +192,17 @@ private fun Headline.toDataType(): Article {
         feedId = feedId ?: 0,
         contentExcerpt = excerpt
     )
+    val attachments = this.attachments.map {
+        Attachment(id = it.id,
+            postId = it.postId,
+            contentUrl = it.contentUrl,
+            contentType = it.contentType,
+            title = it.title,
+            duration = it.duration,
+            width = it.width,
+            height = it.height)
+    }
+    return ArticleWithAttachments(article, attachments)
 }
 
 private fun FeedCategory.toDataType(): Category {

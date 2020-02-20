@@ -27,6 +27,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Fts4
 import androidx.room.PrimaryKey
+import androidx.room.Relation
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -159,6 +160,14 @@ data class ArticleContentIndexed(
 data class ArticleFTS(
     @Embedded
     val content: ArticleContentIndexed
+)
+
+
+data class ArticleWithAttachments(
+    @Embedded
+    val article: Article,
+    @Relation(parentColumn = "_id", entityColumn = "post_id")
+    val attachments: List<Attachment>
 )
 
 /**

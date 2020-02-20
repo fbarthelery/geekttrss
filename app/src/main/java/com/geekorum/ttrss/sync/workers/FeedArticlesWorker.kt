@@ -24,6 +24,7 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.geekorum.ttrss.data.Article
+import com.geekorum.ttrss.data.ArticleWithAttachments
 import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.sync.ArticleAugmenter
 import com.geekorum.ttrss.webapi.ApiCallException
@@ -42,14 +43,15 @@ abstract class FeedArticlesWorker(
             feedId: Long, sinceId: Long, offset: Int,
             showExcerpt: Boolean = true,
             showContent: Boolean = true,
+            includeAttachments: Boolean = false,
             gradually: Boolean = false
-    ): List<Article> {
+    ): List<ArticleWithAttachments> {
         val articles = if (gradually) {
             apiService.getArticlesOrderByDateReverse(feedId,
-                    sinceId, offset, showExcerpt, showContent)
+                    sinceId, offset, showExcerpt, showContent, includeAttachments)
         } else {
             apiService.getArticles(feedId,
-                    sinceId, offset, showExcerpt, showContent)
+                    sinceId, offset, showExcerpt, showContent, includeAttachments)
         }
 
         if (showContent) {
@@ -60,11 +62,13 @@ abstract class FeedArticlesWorker(
         return articles
     }
 
-    private fun augmentArticle(article: Article): Article {
-        val augmenter = ArticleAugmenter(article)
-        article.contentExcerpt = augmenter.getContentExcerpt()
-        article.flavorImageUri = augmenter.getFlavorImageUri()
-        return article
+    private fun augmentArticle(articleWithAttachments: ArticleWithAttachments): ArticleWithAttachments {
+        with(articleWithAttachments.article) {
+            val augmenter = ArticleAugmenter(this)
+            contentExcerpt = augmenter.getContentExcerpt()
+            flavorImageUri = augmenter.getFlavorImageUri()
+        }
+        return articleWithAttachments
     }
 
 }

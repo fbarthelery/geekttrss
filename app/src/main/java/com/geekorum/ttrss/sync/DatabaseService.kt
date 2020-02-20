@@ -22,6 +22,7 @@ package com.geekorum.ttrss.sync
 
 import com.geekorum.ttrss.data.AccountInfo
 import com.geekorum.ttrss.data.Article
+import com.geekorum.ttrss.data.Attachment
 import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.data.Transaction
@@ -56,4 +57,5 @@ interface DatabaseService {
 
     suspend fun getAccountInfo(username: String, apiUrl: String): AccountInfo?
     suspend fun insertAccountInfo(accountInfo: AccountInfo)
+    suspend fun insertAttachments(attachments: List<Attachment>)
 }

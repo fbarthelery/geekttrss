@@ -25,6 +25,7 @@ import com.geekorum.ttrss.data.AccountInfo
 import com.geekorum.ttrss.data.AccountInfoDao
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticlesDatabase
+import com.geekorum.ttrss.data.Attachment
 import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.data.SynchronizationDao
@@ -96,5 +97,9 @@ class SynchronizationFacade @Inject constructor(
 
     override suspend fun insertAccountInfo(accountInfo: AccountInfo) {
         accountInfoDao.insertAccountInfo(accountInfo)
+    }
+
+    override suspend fun insertAttachments(attachments: List<Attachment>) {
+        synchronizationDao.insertAttachments(attachments)
     }
 }

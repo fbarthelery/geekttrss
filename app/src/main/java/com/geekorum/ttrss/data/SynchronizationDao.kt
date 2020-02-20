@@ -91,4 +91,7 @@ abstract class SynchronizationDao {
 
     @Update(entity = Article::class)
     abstract suspend fun updateArticlesMetadata(metadata: List<Metadata>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract suspend fun insertAttachments(attachments: List<Attachment>)
 }

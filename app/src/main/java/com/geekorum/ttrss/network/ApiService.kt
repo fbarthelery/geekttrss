@@ -21,6 +21,7 @@
 package com.geekorum.ttrss.network
 
 import com.geekorum.ttrss.data.Article
+import com.geekorum.ttrss.data.ArticleWithAttachments
 import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.providers.ArticlesContract
@@ -34,14 +35,16 @@ interface ApiService {
     @Throws(ApiCallException::class)
     suspend fun getArticles(
         feedId: Long, sinceId: Long, offset: Int,
-        showExcerpt: Boolean, showContent: Boolean
-    ): List<Article>
+        showExcerpt: Boolean, showContent: Boolean,
+        includeAttachments: Boolean
+    ): List<ArticleWithAttachments>
 
     @Throws(ApiCallException::class)
     suspend fun getArticlesOrderByDateReverse(
         feedId: Long, sinceId: Long, offset: Int,
-        showExcerpt: Boolean, showContent: Boolean
-    ): List<Article>
+        showExcerpt: Boolean, showContent: Boolean,
+        includeAttachments: Boolean
+    ): List<ArticleWithAttachments>
 
     @Throws(ApiCallException::class)
     suspend fun getCategories(): List<Category>

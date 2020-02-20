@@ -112,8 +112,9 @@ class UpdateArticleStatusWorker(
             repeat(capacity) {
                 launch(dispatchers.io) {
                     for (offsetForRequest in newRequestChannel) {
-                        val articles = getArticles(feedId, 0, offsetForRequest,
+                        val articlesWithAttachments = getArticles(feedId, 0, offsetForRequest,
                                 showExcerpt = false, showContent = false)
+                        val articles = articlesWithAttachments.map { it.article }
                         updateArticleMetadata(articles)
                         orchestratorChannel.send(articles.size)
                     }
