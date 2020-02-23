@@ -82,8 +82,7 @@
                 android:paddingRight="16dp"
                 app:textStyle="@{article.transientUnread ? Typeface.BOLD : Typeface.NORMAL}"
                 android:text="@{Html.fromHtml(article.title ?? ``)}"
-                android:textColor="?android:textColorPrimary"
-                android:textSize="24sp"
+                android:textAppearance="?textAppearanceHeadline5"
                 android:maxLines="3"
                 android:ellipsize="end"
                 tools:text="Title for article"
@@ -113,7 +112,9 @@
                 android:paddingRight="16dp"
                 android:paddingBottom="16dp"
                 android:text="@{article.getContentExcerpt()}"
-                tools:text="Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                android:textAppearance="?textAppearanceBody1"
+                android:textColor="?android:textColorSecondary"
+                tools:text="@tools:sample/lorem/random"
                 />
 
         <TextView
@@ -126,13 +127,12 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 android:padding="16dp"
                 android:ellipsize="end"
-                android:fontFamily="sans-serif-light"
                 android:gravity="center_vertical"
                 android:maxLines="1"
                 android:text="@{!TextUtils.isEmpty(article.author) ? @string/author_formatted(article.author) : ``}"
-                android:textColor="?android:textColorSecondary"
-                android:textSize="12sp"
-                android:textStyle="italic" />
+                tools:text="@tools:sample/full_names"
+                android:textAppearance="?textAppearanceCaption"
+             />
 
         <ImageView
                     android:id="@+id/open"

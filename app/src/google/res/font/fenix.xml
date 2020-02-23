@@ -21,10 +21,9 @@
     along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
 
 -->
-<resources>
-    <array name="preloaded_fonts" translatable="false">
-        <item>@font/expletus_sans_medium</item>
-        <item>@font/rubik</item>
-        <item>@font/rubik_light</item>
-    </array>
-</resources>
+<font-family xmlns:app="http://schemas.android.com/apk/res-auto"
+        app:fontProviderAuthority="com.google.android.gms.fonts"
+        app:fontProviderPackage="com.google.android.gms"
+        app:fontProviderQuery="Fenix"
+        app:fontProviderCerts="@array/com_google_android_gms_fonts_certs">
+</font-family>

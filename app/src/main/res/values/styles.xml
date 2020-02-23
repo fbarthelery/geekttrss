@@ -39,6 +39,10 @@
 
         <!-- Text appearances -->
         <item name="textAppearanceHeadline4">@style/TextAppearance.AppTheme.Headline4</item>
+        <item name="textAppearanceHeadline5">@style/TextAppearance.AppTheme.Headline5</item>
+        <item name="textAppearanceBody1">@style/TextAppearance.AppTheme.Body1</item>
+        <item name="textAppearanceCaption">@style/TextAppearance.AppTheme.Caption</item>
+        <item name="textAppearanceButton">@style/TextAppearance.AppTheme.Button</item>
 
         <!-- used to configure style on the content webview -->
         <item name="articleBackground">?colorSurface</item>
@@ -131,6 +135,21 @@
         <item name="fontFamily">@font/expletus_sans_medium</item>
     </style>
 
+    <style name="TextAppearance.AppTheme.Headline5" parent="TextAppearance.MaterialComponents.Headline5">
+        <item name="fontFamily">@font/expletus_sans_medium</item>
+    </style>
+
+    <style name="TextAppearance.AppTheme.Body1" parent="TextAppearance.MaterialComponents.Body1">
+        <item name="fontFamily">@font/fenix</item>
+    </style>
+
+    <style name="TextAppearance.AppTheme.Caption" parent="TextAppearance.MaterialComponents.Caption">
+        <item name="fontFamily">@font/rubik_light</item>
+    </style>
+
+    <style name="TextAppearance.AppTheme.Button" parent="TextAppearance.MaterialComponents.Button">
+        <item name="fontFamily">@font/rubik</item>
+    </style>
 
     <style name="TextAppearance.AppTheme.CollapsingToolbar.Expanded" parent="TextAppearance.Design.CollapsingToolbar.Expanded">
         <item name="android:textColor">?colorOnPrimarySurface</item>
