@@ -59,7 +59,7 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
                     app:layout_constraintGuide_end="16dp"/>
-            
+
             <TextView
                 android:id="@+id/title"
                 android:layout_width="0dp"
@@ -70,10 +70,10 @@
                 app:layout_constraintBottom_toTopOf="@+id/date"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
-                tools:text="My simple but hilariously and excessively long  headline"
                 android:text="@{viewModel.article.title != null ? Html.fromHtml(viewModel.article.title) : null}"
-                android:textAppearance="@style/Base.TextAppearance.AppCompat.Display1"
-                android:textColor="?colorPrimary" />
+                android:textAppearance="?textAppearanceHeadline4"
+                android:textColor="?colorPrimary"
+                tools:text="My simple but hilariously and excessively long  headline" />
 
             <TextView
                 android:id="@+id/date"

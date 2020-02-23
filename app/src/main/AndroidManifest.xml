@@ -126,6 +126,11 @@
                   android:authorities="${applicationId}.workmanager-init"
                   android:enabled="false"/>
 
+        <!-- Preloaded downloaded fonts -->
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
+
     </application>
 
 </manifest>

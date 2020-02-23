@@ -37,6 +37,9 @@
         <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.AppTheme.MediumComponent</item>
         <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.AppTheme.LargeComponent</item>
 
+        <!-- Text appearances -->
+        <item name="textAppearanceHeadline4">@style/TextAppearance.AppTheme.Headline4</item>
+
         <!-- used to configure style on the content webview -->
         <item name="articleBackground">?colorSurface</item>
         <!-- must be a color, not a drawable -->
@@ -124,6 +127,10 @@
 
 
     <!-- Text appearances -->
+    <style name="TextAppearance.AppTheme.Headline4" parent="TextAppearance.MaterialComponents.Headline4">
+        <item name="fontFamily">@font/expletus_sans_medium</item>
+    </style>
+
 
     <style name="TextAppearance.AppTheme.CollapsingToolbar.Expanded" parent="TextAppearance.Design.CollapsingToolbar.Expanded">
         <item name="android:textColor">?colorOnPrimarySurface</item>
