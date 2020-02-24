@@ -22,6 +22,7 @@ package com.geekorum.ttrss.sync.workers
 
 import com.geekorum.ttrss.data.AccountInfo
 import com.geekorum.ttrss.data.Article
+import com.geekorum.ttrss.data.ArticleWithAttachments
 import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.data.Metadata
@@ -35,16 +36,17 @@ import com.geekorum.ttrss.sync.DatabaseService
 
 internal open class MockApiService : ApiService {
 
-    override suspend fun getArticles(feedId: Long, sinceId: Long, offset: Int, showExcerpt: Boolean, showContent: Boolean): List<Article> {
-        return if (sinceId == 0L) {
-            listOf(Article(id = 1, isUnread = true))
+    override suspend fun getArticles(feedId: Long, sinceId: Long, offset: Int, showExcerpt: Boolean, showContent: Boolean, includeAttachments: Boolean): List<ArticleWithAttachments> {
+        return if (offset == 0) {
+            val article = Article(id = 1, isUnread = true)
+            listOf(ArticleWithAttachments(article, emptyList()))
         } else {
             emptyList()
         }
     }
 
-    override suspend fun getArticlesOrderByDateReverse(feedId: Long, sinceId: Long, offset: Int, showExcerpt: Boolean, showContent: Boolean): List<Article> {
-        TODO("not implemented")
+    override suspend fun getArticlesOrderByDateReverse(feedId: Long, sinceId: Long, offset: Int, showExcerpt: Boolean, showContent: Boolean, includeAttachments: Boolean): List<ArticleWithAttachments> {
+        return getArticles(feedId, sinceId, offset, showExcerpt, showContent, includeAttachments)
     }
 
     override suspend fun getCategories(): List<Category> {
