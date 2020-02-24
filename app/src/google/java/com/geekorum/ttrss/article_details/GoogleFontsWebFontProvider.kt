@@ -20,10 +20,12 @@
  */
 package com.geekorum.ttrss.article_details
 
+import androidx.core.provider.FontRequest
+import androidx.core.provider.FontsContractCompat
+import com.geekorum.ttrss.R
 import dagger.Binds
 import dagger.Module
-import kotlin.collections.first
-import kotlin.let
+import timber.log.Timber
 
 @Module
 abstract class GoogleFontsWebFontProviderModule {
@@ -44,19 +46,19 @@ internal class GoogleFontsWebFontProvider @javax.inject.Inject constructor(
 
     override fun getFont(font: String): java.io.InputStream? {
         val request = when(font) {
-            WebFontProvider.WEB_FONT_ARTICLE_BODY_URL -> androidx.core.provider.FontRequest(AUTHORITY, PACKAGE, "Lora", com.geekorum.ttrss.R.array.com_google_android_gms_fonts_certs)
+            WebFontProvider.WEB_FONT_ARTICLE_BODY_URL -> FontRequest(AUTHORITY, PACKAGE, "Lora", R.array.com_google_android_gms_fonts_certs)
             else -> null
         }
         val fontUri = request?.let { getFontUri(it) }
         return fontUri?.let { application.contentResolver.openInputStream(fontUri) }
     }
 
-    private fun getFontUri(fontRequest: androidx.core.provider.FontRequest): android.net.Uri? {
-        val fontFamilyResult = androidx.core.provider.FontsContractCompat.fetchFonts(application, null, fontRequest)
-        return if (fontFamilyResult.statusCode == android.provider.FontsContract.FontFamilyResult.STATUS_OK) {
+    private fun getFontUri(fontRequest: FontRequest): android.net.Uri? {
+        val fontFamilyResult = FontsContractCompat.fetchFonts(application, null, fontRequest)
+        return if (fontFamilyResult.statusCode == FontsContractCompat.FontFamilyResult.STATUS_OK) {
             fontFamilyResult.fonts.first().uri
         } else {
-            timber.log.Timber.w("Unable to fetch font $fontRequest. Error ${fontFamilyResult.statusCode}")
+            Timber.w("Unable to fetch font $fontRequest. Error ${fontFamilyResult.statusCode}")
             null
         }
     }

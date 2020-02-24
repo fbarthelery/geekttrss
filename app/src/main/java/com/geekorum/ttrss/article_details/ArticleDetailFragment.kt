@@ -58,6 +58,7 @@ import com.geekorum.ttrss.debugtools.withStrictMode
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import okhttp3.OkHttpClient
+import timber.log.Timber
 import java.util.Locale
 import javax.inject.Inject
 import kotlin.math.max
@@ -98,7 +99,7 @@ class ArticleDetailFragment @Inject constructor(
             body {
                 background : $backgroundHexColor;
                 color : $textColor;
-                font-family: "TextAppearance.AppTheme.Body1" serif;
+                font-family: "TextAppearance.AppTheme.Body1", serif;
             }
             a:link {
                 color: $linkHexColor;
@@ -340,6 +341,7 @@ class ArticleDetailFragment @Inject constructor(
         override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
             val url = request.url.toString()
             if (webFontProvider.isWebFontUrl(url)) {
+                Timber.d("Intercept url for webfont $url")
                 return webFontProvider.getFont(url)?.let {
                     WebResourceResponse("application/octet-stream", null, it ).apply {
                         responseHeaders = mapOf("Access-Control-Allow-Origin"  to "*")
