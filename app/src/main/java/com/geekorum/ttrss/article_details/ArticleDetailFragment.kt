@@ -71,7 +71,7 @@ import kotlin.math.max
 class ArticleDetailFragment @Inject constructor(
     savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator,
     private val okHttpClient: OkHttpClient,
-    private val webFontProvider: ResourcesWebFontProvider
+    private val webFontProvider: WebFontProvider
 ) : BaseFragment(savedStateVmFactoryCreator) {
 
     private lateinit var binding: FragmentArticleDetailBinding
