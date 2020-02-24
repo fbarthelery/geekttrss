@@ -85,6 +85,13 @@ abstract class FragmentsInjectorModule {
 }
 
 @Module
+abstract class ResourcesWebFontProviderModule {
+
+    @Binds
+    internal abstract fun bindsWebFontProvider(webFontProvider: ResourcesWebFontProvider): WebFontProvider
+}
+
+@Module
 object SelectedAccountModule {
 
     @Provides

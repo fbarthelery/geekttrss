@@ -35,6 +35,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.annotation.ColorInt
@@ -47,10 +48,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
 import com.geekorum.geekdroid.network.OkHttpWebViewClient
-import com.geekorum.ttrss.core.BaseFragment
 import com.geekorum.ttrss.R
-import com.geekorum.ttrss.core.activityViewModels
 import com.geekorum.ttrss.articles_list.ArticleListActivity
+import com.geekorum.ttrss.core.BaseFragment
+import com.geekorum.ttrss.core.activityViewModels
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.databinding.FragmentArticleDetailBinding
 import com.geekorum.ttrss.debugtools.withStrictMode
@@ -69,7 +70,8 @@ import kotlin.math.max
  */
 class ArticleDetailFragment @Inject constructor(
     savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator,
-    private val okHttpClient: OkHttpClient
+    private val okHttpClient: OkHttpClient,
+    private val webFontProvider: ResourcesWebFontProvider
 ) : BaseFragment(savedStateVmFactoryCreator) {
 
     private lateinit var binding: FragmentArticleDetailBinding
@@ -88,9 +90,23 @@ class ArticleDetailFragment @Inject constructor(
             val backgroundHexColor = colors.backgroundColor.toRgbaCall()
             val textColor = colors.textColor.toRgbaCall()
             val linkHexColor = colors.linkColor.toRgbaCall()
-            var cssOverride = ("body { background : " + backgroundHexColor + "; "
-                    + "color : " + textColor + "; }")
-            cssOverride += " a:link {color: $linkHexColor;} a:visited { color: $linkHexColor;}"
+            var cssOverride = """
+            @font-face {
+                font-family: "TextAppearance.AppTheme.Body1";
+                src: url("${WebFontProvider.WEB_FONT_ARTICLE_BODY_URL}");
+            }
+            body {
+                background : $backgroundHexColor;
+                color : $textColor;
+                font-family: "TextAppearance.AppTheme.Body1" serif;
+            }
+            a:link {
+                color: $linkHexColor;
+            }
+            a:visited {
+                color: $linkHexColor;
+            }
+            """.trimIndent()
             return cssOverride
         }
 
@@ -319,6 +335,18 @@ class ArticleDetailFragment @Inject constructor(
                 articleDetailsViewModel.openUrlInBrowser(context, request.url)
             }
             return true
+        }
+
+        override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
+            val url = request.url.toString()
+            if (webFontProvider.isWebFontUrl(url)) {
+                return webFontProvider.getFont(url)?.let {
+                    WebResourceResponse("application/octet-stream", null, it ).apply {
+                        responseHeaders = mapOf("Access-Control-Allow-Origin"  to "*")
+                    }
+                }
+            }
+            return super.shouldInterceptRequest(view, request)
         }
 
         override fun onPageFinished(view: WebView?, url: String?) {
