@@ -29,6 +29,7 @@ import androidx.work.WorkerParameters
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.data.Article
+import com.geekorum.ttrss.data.ArticleWithAttachments
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -96,9 +97,10 @@ class UpdateArticleStatusWorkerTest {
 
     private class MyMockApiService : MockApiService() {
 
-        override suspend fun getArticles(feedId: Long, sinceId: Long, offset: Int, showExcerpt: Boolean, showContent: Boolean): List<Article> {
+        override suspend fun getArticles(feedId: Long, sinceId: Long, offset: Int, showExcerpt: Boolean, showContent: Boolean, includeAttachments: Boolean): List<ArticleWithAttachments> {
             return if (sinceId == 0L) {
-                listOf(Article(id = 1, isUnread = true))
+                val article = Article(id = 1, isUnread = true)
+                listOf(ArticleWithAttachments(article, emptyList()))
             } else {
                 emptyList()
             }
