@@ -55,11 +55,16 @@ internal fun Project.configureGenymotionDevices(useLocalDevices: Boolean = false
                     logcat = "$genymotionLogcatDir/$name.logcat"
                     isClearLogAfterBoot = false
                 }
+                // disable api 28+ tests
+                // TODO enable that again when bug is fixed.
+                // https://github.com/mockk/mockk/issues/297
+/*
                 register("$name-pixel3-v28") {
                     template = "Google Pixel 3 - 9.0 - API 28 - 1080x2160"
                     logcat = "$genymotionLogcatDir/$name.logcat"
                     isClearLogAfterBoot = false
                 }
+*/
             })
         }
     }
