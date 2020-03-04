@@ -36,5 +36,6 @@ fun MavenArtifactRepository.setupGoogleContent() = apply {
         includeGroup("io.fabric.sdk.android")
         includeGroup("org.chromium.net")
         includeGroup("zipflinger")
+        includeGroup("com.android")
     }
 }
