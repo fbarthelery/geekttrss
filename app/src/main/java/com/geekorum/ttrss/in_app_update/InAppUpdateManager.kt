@@ -28,7 +28,7 @@ import kotlinx.coroutines.flow.Flow
  * Allows to query some service to know if an Application update is available,
  * and if so, to download and install it.
  */
-@UseExperimental(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 interface InAppUpdateManager {
 
     suspend fun getUpdateAvailability(): UpdateAvailability

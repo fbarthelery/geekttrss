@@ -58,7 +58,7 @@ import java.util.UUID
 /**
  * Synchronize Articles from the network.
  */
-@UseExperimental(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class ArticleSynchronizer @AssistedInject constructor(
         application: Application,
         @Assisted params: Bundle,

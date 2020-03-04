@@ -25,7 +25,7 @@ import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 
-@UseExperimental(UnstableDefault::class)
+@OptIn(UnstableDefault::class)
 class GetConfigJsonSerializationTest {
 
     @Test

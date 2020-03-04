@@ -29,7 +29,7 @@ import kotlinx.serialization.typeTokenOf
 import kotlin.test.Test
 import com.geekorum.ttrss.webapi.model.Error.NOT_LOGGED_IN
 
-@UseExperimental(UnstableDefault::class)
+@OptIn(UnstableDefault::class)
 class JsonSerializationTest {
 
     @Test

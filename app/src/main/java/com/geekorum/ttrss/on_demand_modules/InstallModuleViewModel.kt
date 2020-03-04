@@ -68,7 +68,7 @@ class InstallModuleViewModel @Inject constructor(
         return module in moduleManager.installedModules
     }
 
-    @UseExperimental(ExperimentalCoroutinesApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     fun startInstallModules(vararg modules: String) = viewModelScope.launch {
         if (session != null) {
             return@launch

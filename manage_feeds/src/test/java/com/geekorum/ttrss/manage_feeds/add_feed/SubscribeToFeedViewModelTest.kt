@@ -46,7 +46,7 @@ import org.junit.Test
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 
-@UseExperimental(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class SubscribeToFeedViewModelTest {
     @get:Rule
     val archRule = InstantTaskExecutorRule()

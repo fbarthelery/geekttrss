@@ -25,7 +25,7 @@ import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 
-@UseExperimental(UnstableDefault::class)
+@OptIn(UnstableDefault::class)
 class GetVersionJsonSerializationTest {
 
     @Test
@@ -80,7 +80,7 @@ class GetVersionJsonSerializationTest {
 }
 
 
-@UseExperimental(UnstableDefault::class)
+@OptIn(UnstableDefault::class)
 class GetApiLevelJsonSerializationTest {
 
     @Test

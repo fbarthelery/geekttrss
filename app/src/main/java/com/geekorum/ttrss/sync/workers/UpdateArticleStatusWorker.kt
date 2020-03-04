@@ -43,7 +43,7 @@ import javax.inject.Inject
 /**
  * Update the status of the latest articles of a Feed
  */
-@UseExperimental(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class UpdateArticleStatusWorker(
         context: Context,
         workerParams: WorkerParameters,

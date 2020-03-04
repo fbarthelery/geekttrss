@@ -53,7 +53,7 @@ private const val NB_LOOKUP_COROUTINES = 5
 /**
  * Update icon's url for every feed.
  */
-@UseExperimental(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class FeedIconSynchronizer @Inject constructor(
     private val dispatchers: CoroutineDispatchersProvider,
     private val databaseService: DatabaseService,

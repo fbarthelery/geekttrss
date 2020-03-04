@@ -43,7 +43,7 @@ import org.junit.Test
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 
-@UseExperimental(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class SendTransactionsWorkerTest {
     private lateinit var workerBuilder: TestListenableWorkerBuilder<SendTransactionsWorker>
     private lateinit var apiService: MyMockApiService

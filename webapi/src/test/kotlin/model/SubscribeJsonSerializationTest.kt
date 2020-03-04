@@ -26,7 +26,7 @@ import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import org.junit.Test
 
-@UseExperimental(UnstableDefault::class)
+@OptIn(UnstableDefault::class)
 class SubscribeToFeedJsonSerializationTest {
     @Test
     fun testThatSubscribeToFeedRequestPayloadDoCorrectJson() {

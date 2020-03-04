@@ -68,7 +68,7 @@ abstract class InstallSession(
 
     abstract suspend fun getSessionState(): State
 
-    @UseExperimental(ExperimentalCoroutinesApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     abstract fun getSessionStates(): Flow<State>
 
     abstract suspend fun startUserConfirmationDialog(activity: Activity, code: Int)

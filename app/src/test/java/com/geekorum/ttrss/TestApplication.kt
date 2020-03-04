@@ -104,7 +104,7 @@ private object WorkManagerConfigurationModule {
 }
 
 @Module
-@UseExperimental(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 private object TestCoroutineDispatchersProviderModule {
     @Provides
     fun provideCoroutineDispatchersProvider(): CoroutineDispatchersProvider {

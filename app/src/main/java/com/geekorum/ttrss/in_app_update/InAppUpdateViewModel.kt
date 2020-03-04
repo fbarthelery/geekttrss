@@ -35,7 +35,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
-@UseExperimental(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class InAppUpdateViewModel @Inject constructor(
     private val updateManager: InAppUpdateManager
 ) : ViewModel() {

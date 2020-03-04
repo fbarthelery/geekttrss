@@ -96,7 +96,7 @@ class ArticlesRepository
         return articleDao.getAllUnreadArticlesUpdatedAfterTimeOldestFirst(time)
     }
 
-    @UseExperimental(ExperimentalCoroutinesApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     fun getArticleById(articleId: Long): Flow<Article?> = articleDao.getArticleById(articleId).distinctUntilChanged()
 
     fun setArticleUnread(articleId: Long, newValue: Boolean): Action {

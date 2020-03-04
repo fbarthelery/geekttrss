@@ -46,7 +46,7 @@ import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 
 
-@UseExperimental(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class CollectNewArticlesWorkerTest {
     private lateinit var workerBuilder: TestListenableWorkerBuilder<CollectNewArticlesWorker>
     private lateinit var apiService: MockApiService

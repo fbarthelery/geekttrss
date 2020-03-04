@@ -53,7 +53,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-@UseExperimental(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class LoginViewModelTest {
 
     @get:Rule

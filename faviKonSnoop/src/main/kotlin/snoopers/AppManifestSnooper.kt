@@ -131,7 +131,7 @@ data class ImageResource(
 internal class WebAppManifestParser(
     private val  json: Json = Json(JsonConfiguration.Stable)
 ) {
-    @UseExperimental(ImplicitReflectionSerializer::class)
+    @OptIn(ImplicitReflectionSerializer::class)
     fun parseManifest(content: String): WebAppManifest? {
         return try {
             json.parse(content)

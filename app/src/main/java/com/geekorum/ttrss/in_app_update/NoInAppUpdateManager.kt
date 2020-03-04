@@ -27,7 +27,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
-@UseExperimental(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 private class NoInAppUpdateManager: InAppUpdateManager {
     override suspend fun getUpdateState(): UpdateState {
         return UpdateState(UpdateState.Status.UNKNOWN)
