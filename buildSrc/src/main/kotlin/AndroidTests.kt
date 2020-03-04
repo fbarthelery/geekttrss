@@ -85,10 +85,21 @@ internal fun Project.configureTests() {
         dualTestImplementation("androidx.test.ext:truth:1.3.0-alpha01")
 
         // mock
-        testImplementation("io.mockk:mockk:1.9")
-        androidTestImplementation("io.mockk:mockk-android:1.9")
+        testImplementation("io.mockk:mockk:1.9.3")
+        androidTestImplementation("io.mockk:mockk-android:1.9.3")
         testImplementation("org.robolectric:robolectric:$robolectricVersion")
 
+        constraints {
+            dualTestImplementation(kotlin("reflect")) {
+                because("Use the kotlin version that we use")
+            }
+            androidTestImplementation("org.objenesis:objenesis") {
+                because("3.x version use instructions only available with minSdk 26 (Android O)")
+                version {
+                    strictly("2.6")
+                }
+            }
+        }
     }
 }
 
@@ -106,6 +117,10 @@ fun DependencyHandler.dualTestImplementation(dependencyNotation: Any, action: Ex
 internal fun DependencyHandler.androidTestImplementation(dependencyNotation: Any): Dependency? =
     add("androidTestImplementation", dependencyNotation)
 
+internal fun DependencyHandler.androidTestImplementation(dependencyNotation: Any, action: ExternalModuleDependency.() -> Unit) {
+    val closure = closureOf(action)
+    add("androidTestImplementation", dependencyNotation, closure)
+}
 
 internal fun DependencyHandler.androidTestUtil(dependencyNotation: Any): Dependency? =
     add("androidTestUtil", dependencyNotation)

@@ -22,7 +22,6 @@ package com.geekorum.build
 
 import com.android.build.gradle.AppExtension
 import com.github.triplet.gradle.play.PlayPublisherExtension
-import com.github.triplet.gradle.play.PlayPublisherPlugin
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
@@ -43,7 +42,7 @@ import org.gradle.kotlin.dsl.the
 // PLAY_STORE_FROM_TRACK: track from which to promote a build, default to internal but can be set to alpha, beta or production
 
 internal fun Project.configureAndroidPlayStorePublisher(): Unit {
-    apply<PlayPublisherPlugin>()
+    apply(plugin = "com.github.triplet.play")
     configure<PlayPublisherExtension> {
         defaultToAppBundles = true
         track = properties.getOrDefault("PLAY_STORE_TRACK", "internal") as String
