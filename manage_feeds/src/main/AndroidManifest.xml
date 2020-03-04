@@ -36,11 +36,13 @@
 
     <application tools:ignore="GoogleAppIndexingWarning">
         <activity android:name="com.geekorum.ttrss.manage_feeds.ManageFeedsActivity"
-                  android:theme="@style/AppTheme.ManageFeedsActivity" />
+                  android:theme="@style/AppTheme.ManageFeedsActivity"
+                  tools:ignore="Instantiatable" />
 
         <activity android:name="com.geekorum.ttrss.manage_feeds.add_feed.SubscribeToFeedActivity"
                 android:theme="@style/AppTheme.NoActionBar"
-                android:windowSoftInputMode="adjustResize"/>
+                android:windowSoftInputMode="adjustResize"
+                tools:ignore="Instantiatable" />
 
         <activity android:name="com.geekorum.ttrss.manage_feeds.add_feed.AddFeedActivity"
                   android:label="@string/activity_add_feed_title"
