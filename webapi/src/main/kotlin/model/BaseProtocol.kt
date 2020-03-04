@@ -32,12 +32,11 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Serializer
 import kotlinx.serialization.Transient
-import kotlinx.serialization.internal.EnumSerializer
-import kotlinx.serialization.internal.IntSerializer
 import kotlinx.serialization.internal.SerialClassDescImpl
 import kotlinx.serialization.internal.nullable
 import kotlinx.serialization.json.JsonDecodingException
 import kotlinx.serialization.list
+import kotlinx.serialization.serializer
 
 /* Requests */
 
@@ -220,7 +219,7 @@ data class ListResponsePayload<T>(
                 when (val i = contentDecoder.decodeElementIndex(descriptor)) {
                     CompositeDecoder.READ_DONE -> break@loop
                     0 -> seq = contentDecoder.decodeNullableSerializableElement(descriptor, i,
-                        IntSerializer.nullable)
+                        Int.serializer().nullable)
                     1 -> status = contentDecoder.decodeIntElement(descriptor, i)
                     2 -> {
                         val listContentDecoder = ListContent.serializer(contentSerializer)

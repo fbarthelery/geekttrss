@@ -28,8 +28,8 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Serializer
-import kotlinx.serialization.internal.IntSerializer
 import kotlinx.serialization.internal.nullable
+import kotlinx.serialization.serializer
 
 /**
  * Request Payload to subscribe to a new feed
@@ -103,7 +103,7 @@ data class SubscribeToFeedResponsePayload(
                 when (val i = contentDecoder.decodeElementIndex(descriptor)) {
                     CompositeDecoder.READ_DONE -> break@loop
                     0 -> seq = contentDecoder.decodeNullableSerializableElement(descriptor, i,
-                        IntSerializer.nullable)
+                        Int.serializer().nullable)
                     1 -> status = contentDecoder.decodeIntElement(descriptor, i)
                     2 -> {
                         val contentSerializer = Content.serializer()
@@ -187,7 +187,7 @@ data class UnsubscribeFeedResponsePayload(
                 when (val i = contentDecoder.decodeElementIndex(descriptor)) {
                     CompositeDecoder.READ_DONE -> break@loop
                     0 -> seq = contentDecoder.decodeNullableSerializableElement(descriptor, i,
-                        IntSerializer.nullable)
+                        Int.serializer().nullable)
                     1 -> status = contentDecoder.decodeIntElement(descriptor, i)
                     2 -> {
                         val contentSerializer = Content.serializer()
