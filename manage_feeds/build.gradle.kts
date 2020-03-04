@@ -121,6 +121,7 @@ dependencies {
     androidTestImplementation("androidx.fragment:fragment-testing:1.2.1")
     androidTestImplementation("com.squareup.leakcanary:leakcanary-android:2.0-beta-2")
     androidTestImplementation("com.google.android.gms:play-services-oss-licenses:17.0.0")
+    androidTestImplementation("com.google.android.play:core-ktx:1.6.4")
 
     // used in test through geekdroid
     androidTestImplementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.2.0")
