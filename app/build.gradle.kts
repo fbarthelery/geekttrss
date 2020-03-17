@@ -197,6 +197,7 @@ dependencies {
     add("googleImplementation", "com.google.firebase:firebase-crashlytics")
     // ensure that the free flavor don't get any firebase dependencies
     configurations["freeImplementation"].exclude(group = "com.google.firebase")
+    configurations["freeImplementation"].exclude(group = "com.google.android.play")
 
     add("googleImplementation", "com.google.android.play:core-ktx:1.6.4")
 

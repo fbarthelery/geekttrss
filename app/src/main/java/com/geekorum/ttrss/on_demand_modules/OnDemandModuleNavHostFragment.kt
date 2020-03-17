@@ -26,6 +26,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphNavigator
 import androidx.navigation.Navigator
 import androidx.navigation.dynamicfeatures.fragment.DynamicNavHostFragment
+import androidx.navigation.fragment.DialogFragmentNavigator
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.plusAssign
 import com.geekorum.geekdroid.dagger.FragmentFactoriesModule
@@ -45,8 +46,6 @@ class OnDemandModuleNavHostFragment @Inject constructor(
 ): DynamicNavHostFragment() {
 
     override fun onCreateNavController(navController: NavController) {
-        super.onCreateNavController(navController)
-
         if (!onDemandModuleManager.canInstallModule) {
             Timber.i("The application can't install dynamic feature modules. Fallback to standard navigators")
             // restore default navigator (undo DynamicNavHostFragment
@@ -55,6 +54,9 @@ class OnDemandModuleNavHostFragment @Inject constructor(
             check(id > 0)
             navigatorProvider += FragmentNavigator(requireContext(), childFragmentManager, id)
             navigatorProvider += NavGraphNavigator(navigatorProvider)
+            navigatorProvider += DialogFragmentNavigator(requireContext(), childFragmentManager)
+        } else {
+            super.onCreateNavController(navController)
         }
     }
 
