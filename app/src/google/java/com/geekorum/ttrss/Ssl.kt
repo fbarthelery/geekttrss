@@ -57,5 +57,5 @@ class GmsSecurityProviderModule {
 
     @Provides
     @IntoSet
-    fun providesCrahslyticsInitializer(): AppInitializer = GmsSecurityProviderInitializer()
+    fun providesGmsSecurityProviderInitializer(): AppInitializer = GmsSecurityProviderInitializer()
 }

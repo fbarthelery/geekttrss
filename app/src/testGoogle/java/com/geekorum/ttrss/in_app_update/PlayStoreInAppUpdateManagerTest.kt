@@ -49,8 +49,7 @@ import kotlin.test.Test
 
 
 @RunWith(AndroidJUnit4::class)
-@Config(sdk = [28]) // for now we don't do robolectric on sdk 29 (needs to run on java9)
-@UseExperimental(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class PlayStoreInAppUpdateManagerTest {
 
     private val mainThreadSurrogate = Executors.newSingleThreadExecutor {
