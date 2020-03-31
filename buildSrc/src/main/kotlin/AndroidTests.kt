@@ -34,9 +34,9 @@ import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.kotlin
 
 const val espressoVersion = "3.2.0"
-const val androidxTestRunnerVersion = "1.3.0-alpha01"
-const val androidxTestCoreVersion = "1.2.1-alpha01"
-const val robolectricVersion = "4.1"
+const val androidxTestRunnerVersion = "1.3.0-alpha05"
+const val androidxTestCoreVersion = "1.3.0-alpha05"
+const val robolectricVersion = "4.3.1"
 
 
 /*

@@ -59,14 +59,14 @@ class BatteryFriendlyActivityTest {
         // declare BatteryFriendlyActivity to handle UI mode configuration change
         // this allows the test to not care about the activity being destroyed/recreated
         val packageManager = Shadows.shadowOf(application.packageManager)
-        val packageInfo = packageManager.getInternalMutablePackageInfo(application.packageName)
+        val packageInfo = application.packageManager.getPackageInfo(application.packageName, 0)
         val batteryFriendly = ActivityInfo().apply {
             configChanges = ActivityInfo.CONFIG_UI_MODE
             name = BatteryFriendlyActivityRecordNightModeChanged::class.qualifiedName
             applicationInfo = packageInfo.applicationInfo
             packageName = packageInfo.packageName
         }
-        packageInfo.activities += batteryFriendly
+        packageManager.addOrUpdateActivity(batteryFriendly)
     }
 
     @Test
