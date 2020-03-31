@@ -31,7 +31,6 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.geekorum.geekdroid.dagger.ViewModelKey
 import com.geekorum.ttrss.R
-import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import dagger.Module
 import dagger.Provides
 import dagger.android.ContributesAndroidInjector
@@ -43,7 +42,6 @@ import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 
 @RunWith(AndroidJUnit4::class)
-@Config(sdk = [28]) // for now we don't do robolectric on sdk 29 (needs to run on java9)
 class LoginActivityTest {
 
     @Test
