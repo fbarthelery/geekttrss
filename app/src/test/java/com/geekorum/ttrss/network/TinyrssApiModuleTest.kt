@@ -49,6 +49,9 @@ class TinyrssApiModuleTest {
 
     @BeforeTest
     fun setUp() {
+        // workaround ssl error on jdk 11
+        // https://github.com/robolectric/robolectric/issues/5115
+        System.setProperty("javax.net.ssl.trustStoreType", "JKS")
         okHttpClient = OkHttpClient.Builder().build()
         server = MockWebServer()
         server.start()
