@@ -45,6 +45,9 @@ class ApiServiceTest {
 
     @BeforeTest
     fun setUp() {
+        // workaround ssl error on jdk 11
+        // https://github.com/robolectric/robolectric/issues/5115
+        System.setProperty("javax.net.ssl.trustStoreType", "JKS")
         server = MockWebServer()
         server.start()
         val component = DaggerTestComponent.builder()
