@@ -139,7 +139,7 @@ data class ListContent<T>(
             }
         }
 
-        override fun serialize(encoder: Encoder, obj: ListContent<E>) {
+        override fun serialize(encoder: Encoder, value: ListContent<E>) {
             TODO("not implemented")
         }
 

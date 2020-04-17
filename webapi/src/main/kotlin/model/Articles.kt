@@ -137,7 +137,7 @@ data class UpdateArticleResponsePayload(
 
     @Serializer(UpdateArticleResponsePayload::class)
     internal object OwnSerializer : KSerializer<UpdateArticleResponsePayload> {
-        override fun serialize(encoder: Encoder, obj: UpdateArticleResponsePayload) {
+        override fun serialize(encoder: Encoder, value: UpdateArticleResponsePayload) {
             TODO("not implemented")
         }
 

@@ -78,7 +78,7 @@ data class GetConfigResponsePayload(
 
     @Serializer(GetConfigResponsePayload::class)
     internal object OwnSerializer : KSerializer<GetConfigResponsePayload> {
-        override fun serialize(encoder: Encoder, obj: GetConfigResponsePayload) {
+        override fun serialize(encoder: Encoder, value: GetConfigResponsePayload) {
             TODO("not implemented")
         }
 

@@ -81,7 +81,7 @@ data class LoginResponsePayload(
 
     @Serializer(LoginResponsePayload::class)
     internal object OwnSerializer : KSerializer<LoginResponsePayload> {
-        override fun serialize(encoder: Encoder, obj: LoginResponsePayload) {
+        override fun serialize(encoder: Encoder, value: LoginResponsePayload) {
             TODO("not implemented")
         }
 

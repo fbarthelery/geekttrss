@@ -63,7 +63,7 @@ class PlayStoreInAppUpdateManager(
         return UpdateState(status)
     }
 
-    @UseExperimental(ExperimentalCoroutinesApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun startUpdate(activity: Activity, requestCode: Int): Flow<UpdateState> {
         val updateInfo = appUpdateManager.requestAppUpdateInfo()
         appUpdateManager.startUpdateFlowForResult(updateInfo, AppUpdateType.FLEXIBLE,

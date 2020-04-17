@@ -42,7 +42,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 
-@UseExperimental(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class PlayStoreModuleManager constructor(
     private val splitInstallManager: SplitInstallManager
 ) : OnDemandModuleManager {

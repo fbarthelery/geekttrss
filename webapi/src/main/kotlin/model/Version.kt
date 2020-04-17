@@ -63,7 +63,7 @@ data class GetVersionResponsePayload(
 
     @Serializer(GetVersionResponsePayload::class)
     internal object OwnSerializer : KSerializer<GetVersionResponsePayload> {
-        override fun serialize(encoder: Encoder, obj: GetVersionResponsePayload) {
+        override fun serialize(encoder: Encoder, value: GetVersionResponsePayload) {
             TODO("not implemented")
         }
 
@@ -127,7 +127,7 @@ data class GetApiLevelResponsePayload(
 
     @Serializer(GetApiLevelResponsePayload::class)
     internal object OwnSerializer : KSerializer<GetApiLevelResponsePayload> {
-        override fun serialize(encoder: Encoder, obj: GetApiLevelResponsePayload) {
+        override fun serialize(encoder: Encoder, value: GetApiLevelResponsePayload) {
             TODO("not implemented")
         }
 

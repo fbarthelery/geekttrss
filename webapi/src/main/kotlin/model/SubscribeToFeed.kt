@@ -90,7 +90,7 @@ data class SubscribeToFeedResponsePayload(
 
     @Serializer(SubscribeToFeedResponsePayload::class)
     object OwnSerializer : KSerializer<SubscribeToFeedResponsePayload> {
-        override fun serialize(encoder: Encoder, obj: SubscribeToFeedResponsePayload) {
+        override fun serialize(encoder: Encoder, value: SubscribeToFeedResponsePayload) {
             TODO("not implemented")
         }
 
@@ -174,7 +174,7 @@ data class UnsubscribeFeedResponsePayload(
 
     @Serializer(UnsubscribeFeedResponsePayload::class)
     internal object OwnSerializer : KSerializer<UnsubscribeFeedResponsePayload> {
-        override fun serialize(encoder: Encoder, obj: UnsubscribeFeedResponsePayload) {
+        override fun serialize(encoder: Encoder, value: UnsubscribeFeedResponsePayload) {
             TODO("not implemented")
         }
 
