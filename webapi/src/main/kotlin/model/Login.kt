@@ -29,8 +29,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Serializer
 import kotlinx.serialization.Transient
-import kotlinx.serialization.internal.nullable
-import kotlinx.serialization.serializer
+import kotlinx.serialization.builtins.nullable
+import kotlinx.serialization.builtins.serializer
 
 /**
  * Request payload to log the user in.

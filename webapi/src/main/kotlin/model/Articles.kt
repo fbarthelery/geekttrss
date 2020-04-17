@@ -28,8 +28,8 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Serializer
-import kotlinx.serialization.internal.nullable
-import kotlinx.serialization.serializer
+import kotlinx.serialization.builtins.nullable
+import kotlinx.serialization.builtins.serializer
 
 /**
  * The payload gor a getHeadlines request.

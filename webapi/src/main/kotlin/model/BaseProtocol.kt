@@ -32,11 +32,10 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Serializer
 import kotlinx.serialization.Transient
-import kotlinx.serialization.internal.SerialClassDescImpl
-import kotlinx.serialization.internal.nullable
+import kotlinx.serialization.builtins.list
+import kotlinx.serialization.builtins.nullable
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.JsonDecodingException
-import kotlinx.serialization.list
-import kotlinx.serialization.serializer
 
 /* Requests */
 
@@ -133,10 +132,8 @@ data class ListContent<T>(
         val contentSerializer: KSerializer<E>
     ) : KSerializer<ListContent<E>> {
 
-        override val descriptor: SerialDescriptor = object : SerialClassDescImpl("ListContentSerializer") {
-            init {
-                addElement("error")
-            }
+        override val descriptor: SerialDescriptor = SerialDescriptor("ListContentSerializer") {
+            element("error", Error.serializer().descriptor, isOptional = true)
         }
 
         override fun serialize(encoder: Encoder, value: ListContent<E>) {
@@ -198,12 +195,10 @@ data class ListResponsePayload<T>(
         val contentSerializer: KSerializer<E>
     ) : KSerializer<ListResponsePayload<E>> {
 
-        override val descriptor: SerialDescriptor = object : SerialClassDescImpl("ListResponsePayloadSerializer") {
-            init {
-                addElement("seq")
-                addElement("status")
-                addElement("content")
-            }
+        override val descriptor: SerialDescriptor = SerialDescriptor("ListResponsePayloadSerializer") {
+            element("seq", Int.serializer().descriptor, isOptional = true)
+            element("status", Int.serializer().descriptor, isOptional = true)
+            element("content", ListContent.serializer(contentSerializer).descriptor)
         }
 
         override fun serialize(encoder: Encoder, obj: ListResponsePayload<E>) {
