@@ -117,16 +117,16 @@ kapt {
 dependencies {
 
     implementation("androidx.core:core-ktx:1.2.0")
-    implementation("androidx.fragment:fragment-ktx:1.2.3")
+    implementation("androidx.fragment:fragment-ktx:1.2.4")
     implementation("androidx.activity:activity-ktx:1.1.0")
 
     // androidx ui
-    implementation("androidx.drawerlayout:drawerlayout:1.1.0-alpha03")
+    implementation("androidx.drawerlayout:drawerlayout:1.1.0-beta01")
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")
     implementation("androidx.recyclerview:recyclerview:1.1.0")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.1.0")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.0.0")
-    implementation("androidx.preference:preference-ktx:1.1.0")
+    implementation("androidx.preference:preference-ktx:1.1.1")
 
     // androidx others
     implementation("androidx.browser:browser:1.2.0")
@@ -147,7 +147,7 @@ dependencies {
     implementation("com.google.android.material:material:1.1.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.1.0")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.1.0")
-    implementation("io.coil-kt:coil:0.9.1")
+    implementation("io.coil-kt:coil:0.9.5")
     implementation("com.google.android.gms:play-services-oss-licenses:17.0.0")
 
     implementation("org.jsoup:jsoup:1.10.2")
@@ -206,9 +206,9 @@ dependencies {
     api("androidx.work:work-runtime-ktx:$workVersion")
     api("androidx.room:room-runtime:$roomVersion")
     api("androidx.room:room-ktx:$roomVersion")
-    api("androidx.paging:paging-runtime-ktx:2.1.1")
+    api("androidx.paging:paging-runtime-ktx:2.1.2")
     api("com.squareup.retrofit2:retrofit:2.6.1")
-    api("com.squareup.okhttp3:okhttp:4.1.0")
+    api("com.squareup.okhttp3:okhttp:4.4.0")
     api("com.jakewharton.timber:timber:4.7.1")
 
     val navigationVersion = "2.3.0-alpha01"
@@ -218,7 +218,7 @@ dependencies {
 
     // fragment testing declare some activities and resources that needs to be in the apk
     // we don't use it. here but it is used in feature modules
-    debugImplementation("androidx.fragment:fragment-testing:1.2.1")
+    debugImplementation("androidx.fragment:fragment-testing:1.2.4")
 
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.0-beta-2")
 }

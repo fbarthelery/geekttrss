@@ -109,19 +109,19 @@ dependencies {
     implementation(project(":htmlparsers"))
     implementation(project(":webapi"))
 
-    implementation("io.coil-kt:coil:0.9.1")
+    implementation("io.coil-kt:coil:0.9.5")
 
-    androidTestImplementation("androidx.work:work-testing:2.3.1")
+    androidTestImplementation("androidx.work:work-testing:2.3.4")
     dualTestImplementation("androidx.arch.core:core-testing:2.1.0")
 
-    debugImplementation("androidx.fragment:fragment-testing:1.2.1")
+    debugImplementation("androidx.fragment:fragment-testing:1.2.4")
 
     // the test apk need these dependencies because they provide some of its resources
     // likely due to manifest merging with :app manifest
-    androidTestImplementation("androidx.fragment:fragment-testing:1.2.1")
+    androidTestImplementation("androidx.fragment:fragment-testing:1.2.4")
     androidTestImplementation("com.squareup.leakcanary:leakcanary-android:2.0-beta-2")
     androidTestImplementation("com.google.android.gms:play-services-oss-licenses:17.0.0")
-    androidTestImplementation("com.google.android.play:core-ktx:1.6.4")
+    androidTestImplementation("com.google.android.play:core-ktx:1.7.0")
 
     // used in test through geekdroid
     androidTestImplementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.2.0")

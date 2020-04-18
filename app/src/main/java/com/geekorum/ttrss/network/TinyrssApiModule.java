@@ -21,23 +21,23 @@
 package com.geekorum.ttrss.network;
 
 import com.geekorum.ttrss.accounts.ServerInformation;
+import com.geekorum.ttrss.webapi.BasicAuthAuthenticator;
 import com.geekorum.ttrss.webapi.LoggedRequestInterceptorFactory;
 import com.geekorum.ttrss.webapi.TinyRssApi;
-import com.geekorum.ttrss.webapi.BasicAuthAuthenticator;
 import com.geekorum.ttrss.webapi.TokenRetriever;
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.KotlinSerializationConverterFactory;
+
+import java.util.Objects;
+import java.util.Optional;
+
 import dagger.BindsOptionalOf;
 import dagger.Module;
 import dagger.Provides;
-import kotlinx.serialization.StringFormat;
 import kotlinx.serialization.json.Json;
 import okhttp3.Authenticator;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
-
-import java.util.Objects;
-import java.util.Optional;
 
 /**
  * This module provides an {@link ApiService} to access a TinyRss server
@@ -71,9 +71,8 @@ public abstract class TinyrssApiModule {
             okHttpClient = okHttpClient.newBuilder().authenticator(serverAuthenticator).build();
         }
 
-        StringFormat json = Json.Companion;
         retrofitBuilder.addConverterFactory(KotlinSerializationConverterFactory.create(
-                json,
+                Json.Default,
                 Objects.requireNonNull(MediaType.parse("application/json"))
         ))
                 .client(okHttpClient);
