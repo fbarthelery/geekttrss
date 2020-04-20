@@ -197,7 +197,7 @@ dependencies {
     configurations["freeImplementation"].exclude(group = "com.google.firebase")
     configurations["freeImplementation"].exclude(group = "com.google.android.play")
 
-    add("googleImplementation", "com.google.android.play:core-ktx:1.6.4")
+    add("googleImplementation", "com.google.android.play:core-ktx:1.7.0")
 
     // api dependencies for features modules
     api("androidx.appcompat:appcompat:1.1.0")
