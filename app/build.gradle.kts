@@ -21,7 +21,6 @@
 
 import com.geekorum.build.computeChangesetVersionCode
 import com.geekorum.build.dualTestImplementation
-import com.geekorum.build.enforcedCoroutinesPlatform
 import com.geekorum.build.enforcedDaggerPlatform
 import com.geekorum.build.getChangeSet
 import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
@@ -185,13 +184,12 @@ dependencies {
     implementation(enforcedPlatform(kotlin("bom")))
     implementation(kotlin("stdlib-jdk8"))
 
-    val coroutinesVersion = "1.3.2"
-    implementation(enforcedCoroutinesPlatform(coroutinesVersion))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$coroutinesVersion")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
-    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
+    implementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.3.5"))
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
+    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
 
     implementation(enforcedPlatform("com.google.firebase:firebase-bom:24.5.0"))
     add("googleImplementation", "com.google.firebase:firebase-crashlytics")

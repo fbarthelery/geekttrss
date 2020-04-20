@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-import com.geekorum.build.enforcedCoroutinesPlatform
 
 plugins {
     kotlin("jvm")
@@ -34,9 +33,8 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.6.1")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
 
-    val coroutinesVersion = "1.3.2"
-    implementation(enforcedCoroutinesPlatform(coroutinesVersion))
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
+    implementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.3.5"))
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-core")
 
 
     testImplementation("com.google.truth:truth:1.0")

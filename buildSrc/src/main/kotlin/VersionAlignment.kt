@@ -32,7 +32,6 @@ private val componentsPlatform = mutableMapOf<ComponentMetadataHandler, MutableS
 
 fun DependencyHandler.createComponentsPlatforms() {
     components.apply {
-        getOrCreatePlatform(CoroutinesPlatform)
         getOrCreatePlatform(DaggerPlatform)
     }
 }
@@ -44,28 +43,6 @@ private fun ComponentMetadataHandler.getOrCreatePlatform(platformFactory: Platfo
     }
     return platformFactory.platformName
 }
-
-internal class CoroutinesPlatform {
-
-    companion object : PlatformFactory("org.jetbrains.kotlinx:kotlinx-coroutines-platform",
-        AlignmentRule::class.java)
-
-    open class AlignmentRule : ComponentMetadataRule {
-
-        override fun execute(ctx: ComponentMetadataContext) {
-            ctx.details.run {
-                if (id.group == "org.jetbrains.kotlinx" && id.name.startsWith("kotlinx-coroutines")) {
-                    belongsTo("$platformName:${id.version}")
-                }
-            }
-        }
-    }
-}
-
-fun DependencyHandler.enforcedCoroutinesPlatform(version: String): Dependency {
-    return enforcedPlatform("${components.getOrCreatePlatform(CoroutinesPlatform)}:$version")
-}
-
 
 internal class DaggerPlatform {
     companion object : PlatformFactory("com.google.dagger:dagger-platform",

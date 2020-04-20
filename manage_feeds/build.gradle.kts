@@ -19,7 +19,6 @@
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
 import com.geekorum.build.dualTestImplementation
-import com.geekorum.build.enforcedCoroutinesPlatform
 import com.geekorum.build.enforcedDaggerPlatform
 
 plugins {
@@ -85,10 +84,9 @@ dependencies {
     val geekdroidExt = GEEKDROID_PROJECT_DIR?.let { "" } ?: "aar"
     implementation(group = "com.geekorum", name = "geekdroid", version = "0.0.1", ext = geekdroidExt)
 
-    val coroutinesVersion = "1.3.2"
-    implementation(enforcedCoroutinesPlatform(coroutinesVersion))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutinesVersion")
+    implementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.3.5"))
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
 
     implementation("androidx.activity:activity-ktx:1.1.0")
 
