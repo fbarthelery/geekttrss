@@ -22,17 +22,13 @@ package com.geekorum.ttrss.di
 
 import android.app.Application
 import android.os.StrictMode.allowThreadDiskWrites
-import coil.Coil
 import coil.ImageLoader
-import com.geekorum.geekdroid.dagger.AppInitializer
-import com.geekorum.geekdroid.dagger.AppInitializersModule
+import coil.ImageLoaderBuilder
 import com.geekorum.geekdroid.network.TaggedSocketFactory
 import com.geekorum.ttrss.debugtools.withStrictMode
 import com.geekorum.ttrss.logging.RetrofitInvocationLogger
-import dagger.Lazy
 import dagger.Module
 import dagger.Provides
-import dagger.multibindings.IntoSet
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -47,7 +43,7 @@ private const val TAG_OKHTTP = 1
 private const val TAG_PICASSO = 2
 private const val TAG_COIL = 3
 
-@Module(includes = [AppInitializersModule::class])
+@Module
 object NetworkModule {
 
     @Provides
@@ -97,27 +93,13 @@ object NetworkModule {
     @Provides
     @Singleton
     internal fun providesImageLoader(application: Application, okHttpClient: OkHttpClient): ImageLoader {
-        return ImageLoader(application) {
-            val socketFactory = TaggedSocketFactory(okHttpClient.socketFactory, TAG_COIL)
-            val okHttpBuilder = okHttpClient.newBuilder()
-                .socketFactory(socketFactory)
-            okHttpClient(okHttpBuilder.build())
-        }
-    }
-
-    @Provides
-    @IntoSet
-    internal fun providesCoilInitializer(imageLoader: Lazy<ImageLoader>): AppInitializer {
-        return CoilInitializer(imageLoader)
-    }
-
-}
-
-private class CoilInitializer(
-    private val imageLoader: Lazy<ImageLoader>
-): AppInitializer {
-
-    override fun initialize(app: Application) {
-        Coil.setDefaultImageLoader { imageLoader.get() }
+        return ImageLoaderBuilder(application)
+            .okHttpClient {
+                val socketFactory = TaggedSocketFactory(okHttpClient.socketFactory, TAG_COIL)
+                okHttpClient.newBuilder()
+                    .socketFactory(socketFactory)
+                    .build()
+            }
+            .build()
     }
 }

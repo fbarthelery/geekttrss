@@ -22,6 +22,8 @@ package com.geekorum.ttrss
 
 import android.app.Activity
 import androidx.work.Configuration
+import coil.ImageLoader
+import coil.ImageLoaderFactory
 import com.geekorum.geekdroid.dagger.AppInitializer
 import com.geekorum.geekdroid.dagger.initialize
 import com.geekorum.ttrss.debugtools.StrictModeInitializer
@@ -33,13 +35,16 @@ import javax.inject.Inject
 /**
  * Initialize global component for the TTRSS application.
  */
-open class Application : DaggerApplication(), Configuration.Provider {
+open class Application : DaggerApplication(), Configuration.Provider, ImageLoaderFactory {
 
     @Inject
     lateinit var appInitializers: MutableSet<AppInitializer>
 
     @Inject
     lateinit var workManagerConfig: Configuration
+
+    @Inject
+    lateinit var imageLoader: ImageLoader
 
     open val applicationComponent by lazy {
         DaggerApplicationComponent.builder().bindApplication(this).build()
@@ -59,13 +64,11 @@ open class Application : DaggerApplication(), Configuration.Provider {
         return result.distinct()
     }
 
-    override fun applicationInjector(): ApplicationComponent {
-        return applicationComponent
-    }
+    override fun applicationInjector(): ApplicationComponent = applicationComponent
 
-    override fun getWorkManagerConfiguration(): Configuration {
-        return workManagerConfig
-    }
+    override fun getWorkManagerConfiguration(): Configuration = workManagerConfig
+
+    override fun newImageLoader(): ImageLoader = imageLoader
 
 }
 
