@@ -22,6 +22,7 @@ package com.geekorum.ttrss
 
 import androidx.room.Room
 import androidx.work.Configuration
+import coil.ImageLoader
 import com.geekorum.geekdroid.dagger.AndroidFrameworkModule
 import com.geekorum.geekdroid.dagger.AppInitializersModule
 import com.geekorum.geekdroid.dagger.FragmentFactoriesModule
@@ -92,6 +93,9 @@ private object MockDatabaseModule {
 private object MockNetworkModule {
     @Provides
     fun providesOkHttpClient(): OkHttpClient = mockk()
+
+    @Provides
+    fun providesImageLoader(): ImageLoader = mockk()
 }
 
 @Module
