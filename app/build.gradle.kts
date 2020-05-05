@@ -182,13 +182,15 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
 
     implementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.3.5"))
+    testImplementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.3.5"))
+    androidTestImplementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.3.5"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
     androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
 
-    implementation(enforcedPlatform("com.google.firebase:firebase-bom:24.5.0"))
+    implementation(enforcedPlatform("com.google.firebase:firebase-bom:25.3.1"))
     add("googleImplementation", "com.google.firebase:firebase-crashlytics")
     // ensure that the free flavor don't get any firebase dependencies
     configurations["freeImplementation"].exclude(group = "com.google.firebase")
