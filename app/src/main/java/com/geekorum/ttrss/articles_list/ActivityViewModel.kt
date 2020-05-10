@@ -51,7 +51,6 @@ private const val PREF_SORT_ORDER = "sort_order"
  */
 class ActivityViewModel @AssistedInject constructor(
     @Assisted private val state: SavedStateHandle,
-    private val feedsRepository: FeedsRepository,
     private val browserLauncher: TtRssBrowserLauncher,
     private val prefs: SharedPreferences
 ) : ViewModel() {
@@ -61,14 +60,6 @@ class ActivityViewModel @AssistedInject constructor(
             PREF_VIEW_MODE -> updateNeedUnread()
             PREF_SORT_ORDER -> updateSortOrder()
         }
-    }
-
-    val selectedFeed: LiveData<Feed?> = state.getLiveData(STATE_FEED_ID, Feed.FEED_ID_ALL_ARTICLES).apply{
-        // workaround for out of sync values see
-        // https://issuetracker.google.com/issues/129989646
-        value = value
-    }.switchMap {
-        feedsRepository.getFeedById(it)
     }
 
     private val _articleSelectedEvent = MutableLiveData<Event<ArticleSelectedParameters>>()

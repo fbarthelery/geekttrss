@@ -86,17 +86,9 @@ class ArticleListActivity : SessionActivity() {
     @Inject
     lateinit var moduleManager: OnDemandModuleManager
 
-    private val isManageFeedInstalled: Boolean
-        get() = moduleManager.installedModules.contains(Features.MANAGE_FEEDS)
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        activityViewModel.selectedFeed.observe(this) {
-            it?.let { feedsViewModel.setSelectedFeed(it.id) }
-            title = it?.title ?: ""
-        }
 
         activityViewModel.articleSelectedEvent.observe(this, EventObserver { (position, article) ->
             navController.navigate(ArticlesListFragmentDirections.actionShowArticle(article.id))

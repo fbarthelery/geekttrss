@@ -41,7 +41,6 @@ import timber.log.Timber
 
 private const val STATE_ONLY_UNREAD = "only_unread"
 private const val STATE_SELECTED_CATEGORY_ID = "selected_category_id"
-private const val STATE_SELECTED_FEED_ID = "selected_category_id"
 
 /**
  * [ViewModel] for to display the list of feeds
@@ -80,10 +79,6 @@ class FeedsViewModel @AssistedInject constructor(
 
     fun setOnlyUnread(onlyUnread: Boolean) {
         state[STATE_ONLY_UNREAD] = onlyUnread
-    }
-
-    fun setSelectedFeed(selectedFeedId: Long) {
-        state[STATE_SELECTED_FEED_ID] = selectedFeedId
     }
 
     fun setSelectedCategory(selectedCategoryId: Long) {
