@@ -71,9 +71,6 @@ class ActivityViewModel @AssistedInject constructor(
         feedsRepository.getFeedById(it)
     }
 
-    private val _feedSelectedEvent = MutableLiveData<Event<Feed>>()
-    val feedSelectedEvent: LiveData<Event<Feed>> = _feedSelectedEvent
-
     private val _articleSelectedEvent = MutableLiveData<Event<ArticleSelectedParameters>>()
     val articleSelectedEvent: LiveData<Event<ArticleSelectedParameters>> = _articleSelectedEvent
 
@@ -106,7 +103,6 @@ class ActivityViewModel @AssistedInject constructor(
 
     fun setSelectedFeed(feed: Feed) {
         state[STATE_FEED_ID] = feed.id
-        _feedSelectedEvent.value = Event(feed)
     }
 
     fun refresh() {

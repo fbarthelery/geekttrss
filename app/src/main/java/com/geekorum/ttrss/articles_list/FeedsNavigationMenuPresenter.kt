@@ -24,9 +24,12 @@ import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.observe
 import androidx.navigation.NavController
+import androidx.navigation.ui.NavigationUI
+import com.geekorum.ttrss.ArticlesListDirections
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.databinding.MenuFeedActionViewBinding
@@ -58,6 +61,7 @@ class FeedsNavigationMenuPresenter(
     fun onFeedSelected(item: MenuItem): Boolean {
         item.feed?.let {
             activityViewModel.setSelectedFeed(it)
+            navController.navigate(ArticlesListDirections.actionShowFeed(it.id, it.title))
             return true
         }
         return false
@@ -123,4 +127,15 @@ class FeedsNavigationMenuPresenter(
         get() = actionView?.tag as? Feed
         set(value) { actionView.tag = value }
 
+}
+
+fun NavigationView.setupWithNavController(navController: NavController, presenter: FeedsNavigationMenuPresenter) {
+    setNavigationItemSelectedListener { item ->
+        var handled = NavigationUI.onNavDestinationSelected(item, navController)
+        handled = handled || presenter.onFeedSelected(item)
+        if (handled) {
+            (parent as? DrawerLayout)?.closeDrawer(this)
+        }
+        handled
+    }
 }

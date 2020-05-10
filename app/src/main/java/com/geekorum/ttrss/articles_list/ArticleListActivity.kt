@@ -35,6 +35,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.geekdroid.views.doOnApplyWindowInsets
@@ -96,9 +97,6 @@ class ArticleListActivity : SessionActivity() {
             it?.let { feedsViewModel.setSelectedFeed(it.id) }
             title = it?.title ?: ""
         }
-        activityViewModel.feedSelectedEvent.observe(this, EventObserver {
-            navController.navigate(ArticlesListDirections.actionShowFeed(it.id, it.title))
-        })
 
         activityViewModel.articleSelectedEvent.observe(this, EventObserver { (position, article) ->
             navController.navigate(ArticlesListFragmentDirections.actionShowArticle(article.id))
@@ -205,26 +203,13 @@ class ArticleListActivity : SessionActivity() {
     }
 
     private fun setupNavigationView() {
-        binding.navigationView.setNavigationItemSelectedListener {
-            when(it.itemId) {
-                R.id.manage_feeds -> {
-                    navController.navigate(ArticlesListFragmentDirections.actionManageFeeds())
-                    true
-                }
-                R.id.settings -> {
-                    navController.navigate(ArticlesListFragmentDirections.actionShowSettings())
-                    true
-                }
-                else -> feedNavigationPresenter.onFeedSelected(it)
-            }
-        }
-
         val feedsMenu = binding.navigationView.menu.addSubMenu(R.string.title_feeds_menu)
         binding.navigationView.inflateMenu(R.menu.fragment_feed_list)
 
         feedNavigationPresenter =
             FeedsNavigationMenuPresenter(binding.navigationView, feedsMenu, this, navController,
                 feedsViewModel, activityViewModel)
+        binding.navigationView.setupWithNavController(navController, feedNavigationPresenter)
 
         val headerView = binding.navigationView.getHeaderView(0)
         accountHeaderPresenter = AccountHeaderPresenter(headerView, this, accountViewModel)
