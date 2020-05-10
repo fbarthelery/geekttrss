@@ -26,6 +26,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.observe
+import androidx.navigation.NavController
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.databinding.MenuFeedActionViewBinding
@@ -41,14 +42,17 @@ class FeedsNavigationMenuPresenter(
     private val view: NavigationView,
     private val menu: Menu,
     private val lifeCycleOwner: LifecycleOwner,
+    private val navController: NavController,
     private val feedsViewModel: FeedsViewModel,
     private val activityViewModel: ActivityViewModel
 ) {
 
     private val layoutInflater = LayoutInflater.from(view.context)
+    private var currentFeedId: Long = 4L
 
     init {
         observeViewModels()
+        setDestinationListener()
     }
 
     fun onFeedSelected(item: MenuItem): Boolean {
@@ -59,16 +63,26 @@ class FeedsNavigationMenuPresenter(
         return false
     }
 
+    private fun setDestinationListener() {
+        navController.addOnDestinationChangedListener { _, destination, arguments ->
+            when(destination.id) {
+                R.id.articlesListFragment -> {
+                    currentFeedId = arguments!!.getLong("feed_id")
+                    view.setCheckedItem(currentFeedId.toInt())
+                }
+            }
+        }
+    }
+
     private fun observeViewModels() {
         feedsViewModel.feeds.observe(lifeCycleOwner) { feeds ->
             transformFeedViewsInMenuEntry(menu, feeds)
         }
     }
 
-    private fun transformFeedViewsInMenuEntry(menu: Menu, feeds: List<FeedsViewModel.FeedView>) {
+    private fun transformFeedViewsInMenuEntry(menu: Menu, feeds: List<Feed>) {
         menu.clear()
-        var selectedItem: MenuItem? = null
-        feeds.forEach { (feed, isSelected) ->
+        feeds.forEach { feed ->
             val title = if (feed.displayTitle.isEmpty()) feed.title else feed.displayTitle
             val feedId = feed.id.toInt()
             val menuItem = if (feedId < 0) {
@@ -80,10 +94,8 @@ class FeedsNavigationMenuPresenter(
             setMenuItemUnreadCount(feed, menuItem)
             menuItem.isCheckable = true
             menuItem.feed = feed
-            if (isSelected)
-                selectedItem = menuItem
         }
-        selectedItem?.let { view.setCheckedItem(it) }
+        view.setCheckedItem(currentFeedId.toInt())
     }
 
     private fun setMenuItemUnreadCount(feed: Feed, menuItem: MenuItem) {

@@ -223,8 +223,8 @@ class ArticleListActivity : SessionActivity() {
         binding.navigationView.inflateMenu(R.menu.fragment_feed_list)
 
         feedNavigationPresenter =
-            FeedsNavigationMenuPresenter(binding.navigationView, feedsMenu, this, feedsViewModel,
-                activityViewModel)
+            FeedsNavigationMenuPresenter(binding.navigationView, feedsMenu, this, navController,
+                feedsViewModel, activityViewModel)
 
         val headerView = binding.navigationView.getHeaderView(0)
         accountHeaderPresenter = AccountHeaderPresenter(headerView, this, accountViewModel)

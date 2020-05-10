@@ -57,13 +57,8 @@ class FeedsViewModel @AssistedInject constructor(
 
     private val selectedCategory = state.getLiveData<Long>(STATE_SELECTED_CATEGORY_ID)
 
-    val feeds: LiveData<List<FeedView>> = onlyUnread.switchMap { onlyUnread ->
+    val feeds: LiveData<List<Feed>> = onlyUnread.switchMap { onlyUnread ->
         if (onlyUnread) feedsRepository.allUnreadFeeds else feedsRepository.allFeeds
-    }.map { feeds ->
-        // should be reactive on STATE_SELECTED_FEED_ID ?
-        feeds.map {
-            FeedView(it, it.id == state[STATE_SELECTED_FEED_ID])
-        }
     }.refreshed()
 
 
@@ -115,8 +110,6 @@ class FeedsViewModel @AssistedInject constructor(
             Timber.w(e, "Unable to refresh feeds and categories")
         }
     }
-
-    data class FeedView(val feed: Feed, val isSelected: Boolean)
 
     @AssistedInject.Factory
     interface Factory : ViewModelAssistedFactory<FeedsViewModel> {
