@@ -206,7 +206,7 @@ class ArticleListActivity : SessionActivity() {
         val headerView = binding.navigationView.getHeaderView(0)
         accountHeaderPresenter = AccountHeaderPresenter(headerView, this, accountViewModel)
         drawerLayout?.let {
-            drawerLayoutPresenter = DrawerLayoutPresenter(it, navController)
+            drawerLayoutPresenter = DrawerLayoutPresenter(it, navController, this)
         }
     }
 

@@ -20,6 +20,9 @@
  */
 package com.geekorum.ttrss.articles_list
 
+import android.view.View
+import androidx.activity.OnBackPressedDispatcherOwner
+import androidx.activity.addCallback
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
 import androidx.navigation.dynamicfeatures.DynamicGraphNavigator
@@ -30,7 +33,8 @@ import com.geekorum.ttrss.R
  */
 internal class DrawerLayoutPresenter(
     private val drawerLayout: DrawerLayout,
-    private val navController: NavController
+    private val navController: NavController,
+    private val onBackPressedDispatcherOwner: OnBackPressedDispatcherOwner
 ) {
 
     init {
@@ -48,5 +52,19 @@ internal class DrawerLayoutPresenter(
             }
             drawerLayout.setDrawerLockMode(lockMode)
         }
+
+        val backPressedCallback = onBackPressedDispatcherOwner.onBackPressedDispatcher.addCallback(onBackPressedDispatcherOwner) {
+            drawerLayout.closeDrawers()
+        }
+
+        drawerLayout.addDrawerListener(object : DrawerLayout.SimpleDrawerListener() {
+            override fun onDrawerClosed(drawerView: View) {
+                backPressedCallback.isEnabled = false
+            }
+
+            override fun onDrawerOpened(drawerView: View) {
+                backPressedCallback.isEnabled = true
+            }
+        })
     }
 }
