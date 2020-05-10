@@ -32,6 +32,7 @@ import androidx.work.workDataOf
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleWithAttachments
+import com.geekorum.ttrss.data.ArticlesTags
 import com.geekorum.ttrss.htmlparsers.ImageUrlExtractor
 import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.sync.BackgroundDataUsageManager
@@ -156,7 +157,15 @@ class CollectNewArticlesWorker(
     }
 
     private suspend fun insertArticles(articles: List<ArticleWithAttachments>) {
-        databaseService.insertArticles(articles.map { it.article })
+        val articlesOnly = articles.map { it.article }
+        databaseService.insertArticles(articlesOnly)
+        val articlesTags = articlesOnly.flatMap {
+            val tags = it.tags.split(",").map(String::trim)
+            tags.map {tag ->
+                ArticlesTags(it.id, tag)
+            }
+        }
+        databaseService.insertArticleTags(articlesTags)
         val attachments = articles.flatMap { it.attachments }
         databaseService.insertAttachments(attachments)
     }

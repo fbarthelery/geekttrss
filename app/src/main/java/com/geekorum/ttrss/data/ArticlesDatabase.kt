@@ -24,9 +24,9 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.geekorum.ttrss.providers.PurgeArticlesDao
 
-@Database(entities = [Article::class, ArticleFTS::class, Attachment::class,
+@Database(entities = [Article::class, ArticleFTS::class, ArticlesTags::class, Attachment::class,
     Category::class, Feed::class, Transaction::class, AccountInfo::class],
-        version = 12)
+        version = 13)
 abstract class ArticlesDatabase : RoomDatabase() {
     abstract fun articleDao(): ArticleDao
     abstract fun accountInfoDao(): AccountInfoDao
@@ -45,5 +45,6 @@ abstract class ArticlesDatabase : RoomDatabase() {
         const val TRANSACTIONS = "transactions"
         const val FEEDS = "feeds"
         const val CATEGORIES = "categories"
+        const val ARTICLES_TAGS = "articles_tags"
     }
 }

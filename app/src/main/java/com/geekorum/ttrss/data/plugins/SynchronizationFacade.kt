@@ -25,6 +25,7 @@ import com.geekorum.ttrss.data.AccountInfo
 import com.geekorum.ttrss.data.AccountInfoDao
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticlesDatabase
+import com.geekorum.ttrss.data.ArticlesTags
 import com.geekorum.ttrss.data.Attachment
 import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
@@ -62,6 +63,9 @@ class SynchronizationFacade @Inject constructor(
     override suspend fun getRandomArticleFromFeed(feedId: Long): Article? = synchronizationDao.getArticleFromFeed(feedId)
 
     override suspend fun insertArticles(articles: List<Article>) = synchronizationDao.insertArticles(articles)
+    override suspend fun insertArticleTags(articlesTags: List<ArticlesTags>) {
+        synchronizationDao.insertArticlesTags(articlesTags)
+    }
 
     override suspend fun getCategories(): List<Category> = synchronizationDao.getAllCategories()
 

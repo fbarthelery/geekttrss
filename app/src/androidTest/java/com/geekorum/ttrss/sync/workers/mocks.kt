@@ -23,6 +23,7 @@ package com.geekorum.ttrss.sync.workers
 import com.geekorum.ttrss.data.AccountInfo
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleWithAttachments
+import com.geekorum.ttrss.data.ArticlesTags
 import com.geekorum.ttrss.data.Attachment
 import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
@@ -75,6 +76,7 @@ internal open class MockDatabaseService: DatabaseService {
     private val articles = mutableListOf<Article>()
     private val attachments = mutableListOf<Attachment>()
     private val transactions = mutableListOf<Transaction>()
+    private val articlesTags = mutableListOf<ArticlesTags>()
 
     override suspend fun <R> runInTransaction(block: suspend () -> R) {
         block()
@@ -130,6 +132,10 @@ internal open class MockDatabaseService: DatabaseService {
 
     override suspend fun insertArticles(articles: List<Article>) {
         this.articles.addAll(articles)
+    }
+
+    override suspend fun insertArticleTags(articlesTags: List<ArticlesTags>) {
+        this.articlesTags.addAll(articlesTags)
     }
 
     override suspend fun updateArticle(article: Article) {

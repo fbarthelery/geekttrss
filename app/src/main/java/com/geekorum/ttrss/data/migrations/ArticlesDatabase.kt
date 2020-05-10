@@ -504,6 +504,47 @@ object MigrationFrom11To12 : Migration(11, 12) {
 }
 
 
+/**
+ * This migration adds a relation table for articles_tags
+ */
+object MigrationFrom12To13 : Migration(12, 13) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+        addArticleTagsTable(database)
+        migrateArticleTags(database)
+    }
+
+    private fun addArticleTagsTable(database: SupportSQLiteDatabase) {
+        with(database) {
+            execSQL("""CREATE TABLE IF NOT EXISTS `articles_tags` (
+                |`article_id` INTEGER NOT NULL,
+                |`tag` TEXT NOT NULL,
+                |PRIMARY KEY(`tag`, `article_id`)
+                |FOREIGN KEY(`article_id`) REFERENCES `articles`(`_id`) ON UPDATE NO ACTION ON DELETE CASCADE
+                |)""".trimMargin())
+            execSQL("CREATE INDEX IF NOT EXISTS `index_articles_tags_article_id` ON `articles_tags` (`article_id`)")
+            execSQL("CREATE INDEX IF NOT EXISTS `index_articles_tags_tag` ON `articles_tags` (`tag`)")
+        }
+    }
+
+    private fun migrateArticleTags(database: SupportSQLiteDatabase) {
+        with(database) {
+            query("SELECT _id, tags FROM articles").use {
+                while (it.moveToNext()) {
+                    val articleId = it.getLong(0)
+                    val tags = it.getString(1)
+                    val tagsList = tags.split(",")
+                        .map(String::trim)
+                        .filter(String::isNotEmpty)
+                        .distinct()
+                    for (tag in tagsList) {
+                        execSQL("INSERT INTO `articles_tags` (`article_id`, `tag`) VALUES (?, ?)", arrayOf(articleId, tag))
+                    }
+                }
+            }
+        }
+    }
+}
+
 internal val ALL_MIGRATIONS = listOf(MigrationFrom1To2,
         MigrationFrom2To3,
         MigrationFrom3To4,
@@ -514,4 +555,5 @@ internal val ALL_MIGRATIONS = listOf(MigrationFrom1To2,
         MigrationFrom8To9,
         MigrationFrom9To10,
         MigrationFrom10To11,
-        MigrationFrom11To12)
+        MigrationFrom11To12,
+        MigrationFrom12To13)

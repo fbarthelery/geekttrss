@@ -22,6 +22,7 @@ package com.geekorum.ttrss.sync
 
 import com.geekorum.ttrss.data.AccountInfo
 import com.geekorum.ttrss.data.Article
+import com.geekorum.ttrss.data.ArticlesTags
 import com.geekorum.ttrss.data.Attachment
 import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
@@ -49,6 +50,7 @@ interface DatabaseService {
     suspend fun getArticle(id: Long): Article?
     suspend fun getRandomArticleFromFeed(feedId: Long): Article?
     suspend fun insertArticles(articles: List<Article>)
+    suspend fun insertArticleTags(articlesTags: List<ArticlesTags>)
     suspend fun updateArticle(article: Article)
     suspend fun getLatestArticleId(): Long?
     suspend fun getLatestArticleIdFromFeed(feedId: Long): Long?

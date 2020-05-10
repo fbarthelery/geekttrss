@@ -249,6 +249,15 @@ class ArticlesDatabaseMigrationTest {
         }
     }
 
+    private fun assertMigration12To13DataIntegrity(db: SupportSQLiteDatabase) {
+        assertMigration7To8DataIntegrity(db)
+        db.query("SELECT * FROM ${Tables.ARTICLES_TAGS}").use {
+            assertThat(it.count).isEqualTo(1)
+            it.moveToFirst()
+            assertThat(it.getValue<String>("tag")).isEqualTo("article tags")
+        }
+    }
+
     private fun createSomeArticlesFromVersion8(db: SupportSQLiteDatabase) {
         var values = contentValuesOf(
             ArticlesContract.Category.TITLE to "category",
@@ -413,6 +422,24 @@ class ArticlesDatabaseMigrationTest {
             // MigrationTestHelper automatically verifies the schema changes,
             // but you need to validate that the contentData was migrated properly.
             assertMigration7To8DataIntegrity(it)
+        }
+    }
+
+    @Test
+    fun migrate12To13() {
+        helper.createDatabase(TEST_DB, 12).use {
+            // db has schema version 8. insert some contentData using SQL queries.
+            // You cannot use DAO classes because they expect the latest schema.
+            // as our schema for this migration doesn't change much from the previous
+            // we can reuse the same function
+            createSomeArticlesFromVersion10(it)
+        }
+
+        helper.runMigrationsAndValidate(TEST_DB, 13, true,
+            *ALL_MIGRATIONS.toTypedArray()).use {
+            // MigrationTestHelper automatically verifies the schema changes,
+            // but you need to validate that the contentData was migrated properly.
+            assertMigration12To13DataIntegrity(it)
         }
     }
 

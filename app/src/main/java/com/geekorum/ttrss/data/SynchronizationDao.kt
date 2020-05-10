@@ -89,6 +89,9 @@ abstract class SynchronizationDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertArticles(dataArticles: List<Article>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract suspend fun insertArticlesTags(articlesTags: List<ArticlesTags>)
+
     @Update(entity = Article::class)
     abstract suspend fun updateArticlesMetadata(metadata: List<Metadata>)
 

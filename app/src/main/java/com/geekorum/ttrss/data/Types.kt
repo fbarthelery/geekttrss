@@ -26,6 +26,8 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Fts4
+import androidx.room.Index
+import androidx.room.Junction
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 import java.text.DateFormat
@@ -232,6 +234,28 @@ data class Category(
 
     @ColumnInfo(name = "unread_count")
     var unreadCount: Int = 0
+)
+
+@Entity(tableName = "articles_tags", primaryKeys = ["tag", "article_id"],
+    foreignKeys = [ForeignKey(
+        entity = Article::class,
+        parentColumns = ["_id"],
+        childColumns = ["article_id"],
+        onDelete = ForeignKey.CASCADE
+    )])
+data class ArticlesTags(
+    @ColumnInfo(name = "article_id", index = true)
+    val articleId: Long,
+    @ColumnInfo(index = true)
+    val tag: String
+)
+
+data class TagWithArticles(
+    val tag: String,
+//    val articleId: Long,
+    @Relation(parentColumn = "tag", entityColumn = "_id",
+    associateBy = Junction(ArticlesTags::class, entityColumn = "article_id"))
+    val article: List<Article>
 )
 
 
