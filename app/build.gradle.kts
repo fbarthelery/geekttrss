@@ -34,6 +34,7 @@ plugins {
     id("com.geekorum.build.android-tests")
     id("com.geekorum.build.android-signing")
     id("com.geekorum.build.android-genymotion")
+    id("com.geekorum.build.android-avdl")
     id("com.geekorum.build.android-release-universal-apk")
     id("com.geekorum.build.play-store-publish")
     id("androidx.navigation.safeargs.kotlin")

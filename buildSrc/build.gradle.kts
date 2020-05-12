@@ -38,6 +38,9 @@ repositories {
         // we publish 1.4.2 version with fixes
         url = uri("https://raw.githubusercontent.com/fbarthelery/genymotion-gradle-plugin/master/repo/")
     }
+    maven {
+        url = uri("https://kotlin.bintray.com/kotlinx")
+    }
 }
 
 dependencies {
@@ -47,4 +50,5 @@ dependencies {
     implementation("com.genymotion:plugin:1.4.2")
     implementation("gradle.plugin.com.hierynomus.gradle.plugins:license-gradle-plugin:0.15.0")
     implementation("com.github.triplet.gradle:play-publisher:2.7.5")
+    implementation("com.geekorum.gradle.avdl:flydroid:0.0.2")
 }

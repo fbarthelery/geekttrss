@@ -27,6 +27,7 @@ plugins {
     kotlin("kapt")
     id("com.geekorum.build.android-tests")
     id("com.geekorum.build.android-genymotion")
+    id("com.geekorum.build.android-avdl")
     id("androidx.navigation.safeargs.kotlin")
 }
 
