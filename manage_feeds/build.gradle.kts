@@ -111,6 +111,7 @@ dependencies {
 
     androidTestImplementation("androidx.work:work-testing:2.3.4")
     dualTestImplementation("androidx.arch.core:core-testing:2.1.0")
+    androidTestImplementation("com.squareup.okhttp3:mockwebserver:4.1.0")
 
     debugImplementation("androidx.fragment:fragment-testing:1.2.4")
 
