@@ -63,7 +63,7 @@ fun Project.configureAvdlDevices(flydroidUrl: String, flydroidKey: String) {
                         this.flydroidKey = flydroidKey
                         // android-q images fail, don't manage to start the tests
                         image = "android-n"
-//                        useTunnel = true
+                        useTunnel = true
                     }
                 }
             }
