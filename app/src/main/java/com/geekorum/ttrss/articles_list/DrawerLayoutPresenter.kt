@@ -55,6 +55,8 @@ internal class DrawerLayoutPresenter(
 
         val backPressedCallback = onBackPressedDispatcherOwner.onBackPressedDispatcher.addCallback(onBackPressedDispatcherOwner) {
             drawerLayout.closeDrawers()
+        }.apply {
+            isEnabled = drawerLayout.isOpen
         }
 
         drawerLayout.addDrawerListener(object : DrawerLayout.SimpleDrawerListener() {
