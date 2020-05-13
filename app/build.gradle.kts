@@ -132,13 +132,10 @@ dependencies {
 
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.4.0")
 
-    // internal libraries
-    val GEEKDROID_PROJECT_DIR: String? by project
-    val geekdroidExt = GEEKDROID_PROJECT_DIR?.let { "" } ?: "aar"
-    implementation(group = "com.geekorum", name = "geekdroid", version = "0.0.1", ext = geekdroidExt)
-    create(group = "com.geekorum", name = "geekdroid-firebase", version = "0.0.1", ext = geekdroidExt).also {
-        add("googleImplementation", it)
-    }
+    //geekdroid
+    implementation("com.github.fbarthelery.geekdroid:geekdroid:master-SNAPSHOT")
+    add("googleImplementation", "com.github.fbarthelery.geekdroid:geekdroid-firebase:master-SNAPSHOT")
+
     implementation(project(":htmlparsers"))
     implementation(project(":webapi"))
     implementation(project(":faviKonSnoop"))

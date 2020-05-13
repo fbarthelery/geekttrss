@@ -43,7 +43,7 @@ fun BaseExtension.configureJavaVersion() {
 }
 
 /**
- * Add missing annotation processord dependencies to build on Java 11
+ * Add missing annotation processor dependencies to build on Java 11
  */
 fun Project.configureAnnotationProcessorDeps() {
     dependencies {

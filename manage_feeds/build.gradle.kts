@@ -80,9 +80,8 @@ dependencies {
     kaptTest("com.google.dagger:dagger-compiler:$daggerVersion")
     kaptTest("com.google.dagger:dagger-android-processor:$daggerVersion")
 
-    val GEEKDROID_PROJECT_DIR: String? by project
-    val geekdroidExt = GEEKDROID_PROJECT_DIR?.let { "" } ?: "aar"
-    implementation(group = "com.geekorum", name = "geekdroid", version = "0.0.1", ext = geekdroidExt)
+    //geekdroid
+    implementation("com.github.fbarthelery.geekdroid:geekdroid:master-SNAPSHOT")
 
     implementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.3.5"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")

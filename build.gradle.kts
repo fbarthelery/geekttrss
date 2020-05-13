@@ -53,6 +53,9 @@ allprojects {
         flatDir {
             dirs(rootProject.files("libs"))
         }
+        maven {
+            url = uri("https://jitpack.io")
+        }
     }
     dependencies {
         createComponentsPlatforms()
