@@ -130,7 +130,7 @@ dependencies {
     // androidx others
     implementation("androidx.browser:browser:1.2.0")
 
-    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.4.0")
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.5.0")
 
     //geekdroid
     implementation("com.github.fbarthelery.geekdroid:geekdroid:master-SNAPSHOT")
@@ -204,8 +204,8 @@ dependencies {
     api("androidx.room:room-runtime:$roomVersion")
     api("androidx.room:room-ktx:$roomVersion")
     api("androidx.paging:paging-runtime-ktx:2.1.2")
-    api("com.squareup.retrofit2:retrofit:2.6.1")
-    api("com.squareup.okhttp3:okhttp:4.4.0")
+    api("com.squareup.retrofit2:retrofit:2.8.1")
+    api("com.squareup.okhttp3:okhttp:4.6.0")
     api("com.jakewharton.timber:timber:4.7.1")
 
     val navigationVersion = "2.3.0-alpha01"

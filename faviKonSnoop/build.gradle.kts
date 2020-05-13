@@ -27,8 +27,8 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(enforcedPlatform(kotlin("bom")))
 
-    api("com.squareup.okhttp3:okhttp:4.4.0")
-    api("com.squareup.okio:okio:2.4.3")
+    api("com.squareup.okhttp3:okhttp:4.6.0")
+    api("com.squareup.okio:okio:2.6.0")
     implementation("javax.inject:javax.inject:1")
     implementation("org.jsoup:jsoup:1.10.2")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
