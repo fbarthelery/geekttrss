@@ -113,6 +113,10 @@ class ArticlesRepository
     fun searchArticles(query: String): DataSource.Factory<Int, Article> {
         return articleDao.searchArticles(query)
     }
+
+    suspend fun getMostUnreadTags(count: Int): List<String> {
+        return articleDao.getMostUnreadTags(count)
+    }
 }
 
 

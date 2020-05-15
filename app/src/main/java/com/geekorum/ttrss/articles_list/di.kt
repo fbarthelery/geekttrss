@@ -102,6 +102,11 @@ private abstract class ArticlesListModule {
     @ViewModelKey(InAppUpdateViewModel::class)
     abstract fun getInAppUpdateViewModel(fragmentViewModel: InAppUpdateViewModel): ViewModel
 
+    @Binds
+    @IntoMap
+    @ViewModelKey(TagsViewModel::class)
+    abstract fun getTagsViewModel(tagsViewModel: TagsViewModel.Factory): ViewModelAssistedFactory<out ViewModel>
+
 
     @Module
     companion object {
