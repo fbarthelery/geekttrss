@@ -96,4 +96,13 @@ interface ArticleDao {
         + "WHERE ArticleFTS MATCH :query "
         + "ORDER BY last_time_update DESC")
     fun searchArticles(query: String?): DataSource.Factory<Int, Article>
+
+    @Query("SELECT tag  FROM articles_tags " +
+        " JOIN articles ON (articles_tags.article_id = articles._id)" +
+        " WHERE articles.unread=1" +
+        " GROUP BY tag" +
+        " ORDER BY COUNT(article_id) DESC" +
+        " LIMIT :count ")
+    suspend fun getMostUnreadTags(count: Int): List<String>
+
 }
