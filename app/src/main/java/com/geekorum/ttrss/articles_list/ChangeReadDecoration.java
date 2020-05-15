@@ -22,14 +22,19 @@ package com.geekorum.ttrss.articles_list;
 
 import android.content.Context;
 import android.graphics.Rect;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
+
+import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.geekorum.geekdroid.views.recyclerview.SingleItemSwipedCallback;
 import com.geekorum.geekdroid.views.recyclerview.ViewItemDecoration;
+import com.geekorum.ttrss.R;
 import com.geekorum.ttrss.data.Article;
 import com.geekorum.ttrss.databinding.ViewChangeReadDecorationBinding;
+import com.google.android.material.card.MaterialCardView;
 
 /**
  * Recycler view item decoration to show the read/unread label when swiping.
@@ -64,6 +69,11 @@ public class ChangeReadDecoration extends ViewItemDecoration implements SingleIt
                 if (swipingItem != null && parent.getChildViewHolder(child) == swipingItem) {
                     isSwipingToRight = child.getTranslationX() >= 0;
                     parent.getDecoratedBoundsWithMargins(child, outBounds);
+                    if (swipingItem.itemView instanceof ConstraintLayout) { // we are in a w800dp layout
+                        MaterialCardView card = swipingItem.itemView.findViewById(R.id.headlines_row);
+                        outBounds.left = card.getLeft();
+                        outBounds.right = card.getRight();
+                    }
                     return;
                 }
             }
