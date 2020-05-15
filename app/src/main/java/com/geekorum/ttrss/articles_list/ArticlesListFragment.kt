@@ -57,8 +57,7 @@ class ArticlesListFragment @Inject constructor(
 ) : BaseFragment(savedStateVmFactoryCreator) {
 
     private lateinit var binding: FragmentArticleListBinding
-    private val adapter: SwipingArticlesListAdapter?
-        get() = binding.articleList.adapter as? SwipingArticlesListAdapter
+    private lateinit var adapter: SwipingArticlesListAdapter
 
     private val fragmentViewModel: FragmentViewModel by viewModels()
     private val activityViewModel: ActivityViewModel by activityViewModels()
@@ -129,7 +128,8 @@ class ArticlesListFragment @Inject constructor(
 
     private fun setupRecyclerView(recyclerView: RecyclerView, swipeRefresh: SwipeRefreshLayout) {
         val eventHandler = ArticleEventHandler(requireActivity())
-        recyclerView.adapter = SwipingArticlesListAdapter(layoutInflater, eventHandler)
+        adapter = SwipingArticlesListAdapter(layoutInflater, eventHandler)
+        recyclerView.adapter = adapter
         recyclerView.setupCardSpacing()
 
         swipeRefresh.setOnRefreshListener {
@@ -194,7 +194,7 @@ class ArticlesListFragment @Inject constructor(
         }
 
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-            adapter?.getArticle(viewHolder)?.let {
+            adapter.getArticle(viewHolder)?.let {
                 fragmentViewModel.setArticleUnread(it.id, !it.isTransientUnread)
             }
         }
