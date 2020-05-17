@@ -81,6 +81,16 @@ class ArticlesRepository
         return articleDao.getAllUnreadArticlesForFeedOldestFirst(feedId)
     }
 
+    fun getAllArticlesForTag(tag: String): DataSource.Factory<Int, Article> = articleDao.getAllArticlesForTag(tag)
+    fun getAllArticlesForTagOldestFirst(tag: String): DataSource.Factory<Int, Article> = articleDao.getAllArticlesForTagOldestFirst(tag)
+
+    fun getAllUnreadArticlesForTag(tag: String): DataSource.Factory<Int, Article> {
+        return articleDao.getAllUnreadArticlesForTag(tag)
+    }
+    fun getAllUnreadArticlesForTagOldestFirst(tag: String): DataSource.Factory<Int, Article> {
+        return articleDao.getAllUnreadArticlesForTagOldestFirst(tag)
+    }
+
     fun getAllArticlesUpdatedAfterTime(time: Long): DataSource.Factory<Int, Article> {
         return articleDao.getAllArticlesUpdatedAfterTime(time)
     }
