@@ -54,7 +54,7 @@ private const val STATE_ORDER_MOST_RECENT_FIRST = "order_most_recent_first" // m
 /**
  * [ViewModel] for the [ArticlesListFragment].
  */
-class FragmentViewModel @AssistedInject constructor(
+class ArticlesViewModel @AssistedInject constructor(
     @Assisted private val state: SavedStateHandle,
     private val articlesRepository: ArticlesRepository,
     private val feedsRepository: FeedsRepository,
@@ -280,7 +280,7 @@ class FragmentViewModel @AssistedInject constructor(
 
 
     @AssistedInject.Factory
-    interface Factory : ViewModelAssistedFactory<FragmentViewModel> {
-        override fun create(state: SavedStateHandle): FragmentViewModel
+    interface Factory : ViewModelAssistedFactory<ArticlesViewModel> {
+        override fun create(state: SavedStateHandle): ArticlesViewModel
     }
 }

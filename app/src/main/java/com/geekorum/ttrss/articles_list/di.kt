@@ -84,8 +84,8 @@ private abstract class ArticlesListModule {
 
     @Binds
     @IntoMap
-    @ViewModelKey(FragmentViewModel::class)
-    abstract fun getArticlesFragmentViewModel(fragmentViewModel: FragmentViewModel.Factory): ViewModelAssistedFactory<out ViewModel>
+    @ViewModelKey(ArticlesViewModel::class)
+    abstract fun getArticlesFragmentViewModel(articlesViewModel: ArticlesViewModel.Factory): ViewModelAssistedFactory<out ViewModel>
 
     @Binds
     @IntoMap

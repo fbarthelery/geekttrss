@@ -59,18 +59,18 @@ class ArticlesListFragment @Inject constructor(
     private lateinit var binding: FragmentArticleListBinding
     private lateinit var adapter: SwipingArticlesListAdapter
 
-    private val fragmentViewModel: FragmentViewModel by viewModels()
+    private val articlesViewModel: ArticlesViewModel by viewModels()
     private val activityViewModel: ActivityViewModel by activityViewModels()
 
     private val unreadSnackbar: Snackbar by lazy {
         Snackbar.make(binding.root, "", Snackbar.LENGTH_LONG).apply {
             addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
                 override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-                    fragmentViewModel.commitSetUnreadActions()
+                    articlesViewModel.commitSetUnreadActions()
                 }
             })
             setAction(R.string.undo_set_articles_read_btn) { view ->
-                fragmentViewModel.undoSetUnreadActions()
+                articlesViewModel.undoSetUnreadActions()
             }
         }
     }
@@ -95,28 +95,28 @@ class ArticlesListFragment @Inject constructor(
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         setupEdgeToEdge()
-        fragmentViewModel.articles.observe(this) { articles -> adapter!!.submitList(articles) }
+        articlesViewModel.articles.observe(this) { articles -> adapter!!.submitList(articles) }
 
-        fragmentViewModel.getPendingArticlesSetUnread().observe(viewLifecycleOwner) { nbArticles ->
+        articlesViewModel.getPendingArticlesSetUnread().observe(viewLifecycleOwner) { nbArticles ->
             if (nbArticles > 0) {
                 updateUnreadSnackbar(nbArticles)
             }
         }
 
         activityViewModel.refreshClickedEvent.observe(viewLifecycleOwner, EventObserver {
-            fragmentViewModel.refresh()
+            articlesViewModel.refresh()
         })
 
         activityViewModel.mostRecentSortOrder.observe(viewLifecycleOwner) {
-            fragmentViewModel.setSortByMostRecentFirst(it)
+            articlesViewModel.setSortByMostRecentFirst(it)
         }
 
         activityViewModel.onlyUnreadArticles.observe(viewLifecycleOwner) {
-            fragmentViewModel.setNeedUnread(it)
+            articlesViewModel.setNeedUnread(it)
         }
 
 
-        binding.fragmentViewModel = fragmentViewModel
+        binding.fragmentViewModel = articlesViewModel
     }
 
     private fun updateUnreadSnackbar(nbArticles: Int) {
@@ -133,13 +133,13 @@ class ArticlesListFragment @Inject constructor(
         recyclerView.setupCardSpacing()
 
         swipeRefresh.setOnRefreshListener {
-            fragmentViewModel.refresh()
+            articlesViewModel.refresh()
             // leave the progress at least 1s, then refresh its value
             // So if the user trigger a refresh but no sync operation is launch (eg: because of no connectivity)
             // the SwipeRefreshLayout will come back to original status
             viewLifecycleOwner.lifecycleScope.launch {
                 delay(1000)
-                binding.swipeRefreshContainer.isRefreshing = fragmentViewModel.isRefreshing.value!!
+                binding.swipeRefreshContainer.isRefreshing = articlesViewModel.isRefreshing.value!!
             }
         }
         recyclerView.itemAnimator = ScrollFromBottomAppearanceItemAnimator(recyclerView, DefaultItemAnimator())
@@ -166,7 +166,7 @@ class ArticlesListFragment @Inject constructor(
         }
 
         override fun onStarChanged(article: Article, newValue: Boolean) {
-            fragmentViewModel.setArticleStarred(article.id, newValue)
+            articlesViewModel.setArticleStarred(article.id, newValue)
         }
 
         override fun onShareClicked(article: Article) {
@@ -174,7 +174,7 @@ class ArticlesListFragment @Inject constructor(
         }
 
         override fun onMenuToggleReadSelected(article: Article) {
-            fragmentViewModel.setArticleUnread(article.id, !article.isTransientUnread)
+            articlesViewModel.setArticleUnread(article.id, !article.isTransientUnread)
         }
 
         override fun onOpenButtonClicked(button: View, article: Article) {
@@ -195,7 +195,7 @@ class ArticlesListFragment @Inject constructor(
 
         override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
             adapter.getArticle(viewHolder)?.let {
-                fragmentViewModel.setArticleUnread(it.id, !it.isTransientUnread)
+                articlesViewModel.setArticleUnread(it.id, !it.isTransientUnread)
             }
         }
 

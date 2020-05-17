@@ -28,7 +28,7 @@
 
     <data>
         <import type="android.view.View" />
-        <variable name="fragmentViewModel" type="com.geekorum.ttrss.articles_list.FragmentViewModel" />
+        <variable name="fragmentViewModel" type="com.geekorum.ttrss.articles_list.ArticlesViewModel" />
     </data>
 
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
