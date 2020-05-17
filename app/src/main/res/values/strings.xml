@@ -45,7 +45,7 @@
     <string name="sort_order_oldest_first">Oldest first</string>
     <string name="title_article_search">Search</string>
     <string name="label_feed_name">{feed_name}</string>
-    <string name="label_tag">{tag}</string>
+    <string name="label_tag">#{tag}</string>
 
     <!-- activity article details -->
     <string name="title_article_details">Article details</string>

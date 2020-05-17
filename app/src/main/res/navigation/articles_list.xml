@@ -46,7 +46,8 @@
         <action
             android:id="@+id/action_show_tag"
             app:destination="@id/articlesListByTagFragment"
-            app:launchSingleTop="true" />
+            app:popUpTo="@id/articlesListByTagFragment"
+            app:popUpToInclusive="true" />
 
     </fragment>
 
@@ -60,7 +61,8 @@
         <action
             android:id="@+id/action_show_tag"
             app:destination="@id/articlesListByTagFragment"
-            app:launchSingleTop="true" />
+            app:popUpTo="@id/articlesListByTagFragment"
+            app:popUpToInclusive="true" />
 
     </fragment>
 

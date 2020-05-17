@@ -47,6 +47,9 @@ internal class AppBarPresenter(
     private val navController: NavController
 ){
 
+    private var tagsIds: Map<Int, String>? = null
+    private var currentTag: String? = null
+
     init {
         setup()
         observeTags()
@@ -78,22 +81,44 @@ internal class AppBarPresenter(
                 else -> View.GONE
             }
             tagsList.visibility = tagsVisibility
+            currentTag = if (destination.id == R.id.articlesListByTagFragment) arguments?.getString("tag") else null
         }
     }
 
     private fun observeTags() {
         tagsViewModel.tags.observe(lifecycleOwner) { tags ->
-            tagsGroup.removeAllViews()
-            for (tag in tags) {
-                val chip = Chip(tagsGroup.context).apply {
-                    text = tag
-                    setOnClickListener {
-                        val showTag = ArticlesListFragmentDirections.actionShowTag(tag)
-                        navController.navigate(showTag)
-                    }
-                }
-                tagsGroup += chip
+            tagsIds = tags.map { View.generateViewId() to it }.toMap()
+            transformTagsToChips(tags)
+        }
+        tagsGroup.setOnCheckedChangeListener { _, checkedId ->
+            val tag = tagsIds?.get(checkedId)
+            if (tag == null) {
+                navController.popBackStack()
+            } else {
+                val showTag = ArticlesListFragmentDirections.actionShowTag(tag)
+                navController.navigate(showTag)
             }
         }
+    }
+
+    private fun transformTagsToChips(tags: List<String>) {
+        tagsGroup.removeAllViews()
+        for ((id, tag) in tagsIds!!) {
+            val chip = Chip(tagsGroup.context).apply {
+                setId(id)
+                text = tag
+                setTag(tag)
+                isCheckable = true
+            }
+            tagsGroup += chip
+        }
+        checkCurrentTagChip()
+    }
+
+    private fun checkCurrentTagChip() {
+        val checkedId = currentTag?.let {
+            tagsGroup.findViewWithTag<View>(it)?.id
+        } ?: View.NO_ID
+        tagsGroup.check(checkedId)
     }
 }

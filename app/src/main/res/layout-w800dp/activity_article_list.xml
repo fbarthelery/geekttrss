@@ -85,6 +85,7 @@
                             android:id="@+id/tags_group"
                             android:layout_width="wrap_content"
                             android:layout_height="match_parent"
+                            app:singleSelection="true"
                             app:singleLine="true"/>
                     </HorizontalScrollView>
 
