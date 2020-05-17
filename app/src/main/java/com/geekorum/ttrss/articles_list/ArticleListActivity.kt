@@ -34,6 +34,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.geekdroid.views.doOnApplyWindowInsets
@@ -162,7 +163,10 @@ class ArticleListActivity : SessionActivity() {
     private fun setupToolbar() {
         setupSearch()
         setupSortOrder()
-        binding.toolbar.setupWithNavController(navController, drawerLayout)
+        val appBarConfiguration = AppBarConfiguration.Builder(R.id.articlesListFragment, R.id.articlesListByTagFragment)
+            .setDrawerLayout(drawerLayout)
+            .build()
+        binding.toolbar.setupWithNavController(navController, appBarConfiguration)
         appBarPresenter = AppBarPresenter(binding.appBar, binding.toolbar, binding.tagsList, binding.tagsGroup,
             this, tagsViewModel, navController)
     }

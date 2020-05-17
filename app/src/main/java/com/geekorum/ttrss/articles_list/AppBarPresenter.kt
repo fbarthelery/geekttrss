@@ -57,6 +57,7 @@ internal class AppBarPresenter(
             val progressDestinationId = (controller.graph as? DynamicGraphNavigator.DynamicNavGraph)?.progressDestination ?: 0
             when (destination.id) {
                 R.id.articlesListFragment,
+                R.id.articlesListByTagFragment,
                 R.id.articlesSearchFragment -> appBarLayout.setExpanded(true)
 
                 progressDestinationId -> {
@@ -65,7 +66,8 @@ internal class AppBarPresenter(
                 }
             }
             val tagsVisibility = when (destination.id) {
-                R.id.articlesListFragment -> {
+                R.id.articlesListFragment,
+                R.id.articlesListByTagFragment -> {
                     val feedId = arguments?.let { ArticlesListFragmentArgs.fromBundle(it) }?.feedId ?: FEED_ID_ALL_ARTICLES
                     if (feedId == FEED_ID_ALL_ARTICLES) {
                         View.VISIBLE
@@ -85,6 +87,10 @@ internal class AppBarPresenter(
             for (tag in tags) {
                 val chip = Chip(tagsGroup.context).apply {
                     text = tag
+                    setOnClickListener {
+                        val showTag = ArticlesListFragmentDirections.actionShowTag(tag)
+                        navController.navigate(showTag)
+                    }
                 }
                 tagsGroup += chip
             }
