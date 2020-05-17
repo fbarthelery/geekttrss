@@ -23,7 +23,6 @@ package com.geekorum.ttrss.articles_list
 import android.view.LayoutInflater
 import android.view.View
 import androidx.core.view.children
-import androidx.core.view.plusAssign
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.observe
 import androidx.navigation.NavController
@@ -83,7 +82,12 @@ internal class AppBarPresenter(
                 else -> View.GONE
             }
             tagsList.visibility = tagsVisibility
-            currentTag = if (destination.id == R.id.articlesListByTagFragment) arguments?.getString("tag") else null
+            if (destination.id == R.id.articlesListByTagFragment) {
+                currentTag = arguments?.getString("tag")
+            } else {
+                currentTag = null
+                tagsGroup.clearCheck()
+            }
         }
     }
 
@@ -95,7 +99,9 @@ internal class AppBarPresenter(
         tagsGroup.setOnCheckedChangeListener { _, checkedId ->
             val tag = tagsIds?.get(checkedId)
             if (tag == null) {
-                navController.popBackStack()
+                if (navController.currentDestination?.id == R.id.articlesListByTagFragment) {
+                    navController.popBackStack()
+                }
             } else {
                 val showTag = ArticlesListFragmentDirections.actionShowTag(tag)
                 navController.navigate(showTag)
