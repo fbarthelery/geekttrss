@@ -108,6 +108,10 @@
         <item name="colorPrimary">?colorSecondary</item>
     </style>
 
+    <style name="ThemeOverlay.AppTheme.TagChip" parent="">
+        <item name="colorPrimary">?colorSecondaryVariant</item>
+    </style>
+
 
     <!-- Widget styles -->
 

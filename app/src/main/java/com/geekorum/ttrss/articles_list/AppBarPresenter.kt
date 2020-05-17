@@ -20,7 +20,9 @@
  */
 package com.geekorum.ttrss.articles_list
 
+import android.view.LayoutInflater
 import android.view.View
+import androidx.core.view.children
 import androidx.core.view.plusAssign
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.observe
@@ -103,14 +105,15 @@ internal class AppBarPresenter(
 
     private fun transformTagsToChips(tags: List<String>) {
         tagsGroup.removeAllViews()
+        val layoutInflater = LayoutInflater.from(tagsGroup.context)
         for ((id, tag) in tagsIds!!) {
-            val chip = Chip(tagsGroup.context).apply {
+            layoutInflater.inflate(R.layout.chip_tag, tagsGroup)
+            val chip = tagsGroup.children.last() as Chip
+            chip.apply {
                 setId(id)
                 text = tag
                 setTag(tag)
-                isCheckable = true
             }
-            tagsGroup += chip
         }
         checkCurrentTagChip()
     }

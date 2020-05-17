@@ -140,7 +140,8 @@ dependencies {
     implementation(project(":webapi"))
     implementation(project(":faviKonSnoop"))
 
-    implementation("com.google.android.material:material:1.1.0")
+    // alpha for bugfix in chip. TODO remove when 1.2.0 is out
+    implementation("com.google.android.material:material:1.2.0-alpha06")
     implementation("com.squareup.okhttp3:logging-interceptor:4.1.0")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.1.0")
     implementation("io.coil-kt:coil:0.10.0")
