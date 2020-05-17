@@ -20,11 +20,19 @@
  */
 package com.geekorum.ttrss.articles_list
 
+import android.view.View
+import androidx.core.view.plusAssign
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.observe
 import androidx.navigation.NavController
 import androidx.navigation.dynamicfeatures.DynamicGraphNavigator
 import com.geekorum.ttrss.R
+import com.geekorum.ttrss.data.Feed.Companion.FEED_ID_ALL_ARTICLES
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
+
 
 /**
  * Controls the behavior of the AppBar
@@ -32,11 +40,16 @@ import com.google.android.material.appbar.MaterialToolbar
 internal class AppBarPresenter(
     private val appBarLayout: AppBarLayout,
     private val toolbar: MaterialToolbar,
+    private val tagsList: View,
+    private val tagsGroup: ChipGroup,
+    private val lifecycleOwner: LifecycleOwner,
+    private val tagsViewModel: TagsViewModel,
     private val navController: NavController
 ){
 
     init {
         setup()
+        observeTags()
     }
 
     private fun setup() {
@@ -50,6 +63,30 @@ internal class AppBarPresenter(
                     appBarLayout.setExpanded(true)
                     toolbar.title = toolbar.resources.getString(R.string.lbl_install_feature_title)
                 }
+            }
+            val tagsVisibility = when (destination.id) {
+                R.id.articlesListFragment -> {
+                    val feedId = arguments?.let { ArticlesListFragmentArgs.fromBundle(it) }?.feedId ?: FEED_ID_ALL_ARTICLES
+                    if (feedId == FEED_ID_ALL_ARTICLES) {
+                        View.VISIBLE
+                    } else {
+                        View.GONE
+                    }
+                }
+                else -> View.GONE
+            }
+            tagsList.visibility = tagsVisibility
+        }
+    }
+
+    private fun observeTags() {
+        tagsViewModel.tags.observe(lifecycleOwner) { tags ->
+            tagsGroup.removeAllViews()
+            for (tag in tags) {
+                val chip = Chip(tagsGroup.context).apply {
+                    text = tag
+                }
+                tagsGroup += chip
             }
         }
     }

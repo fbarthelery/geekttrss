@@ -31,46 +31,13 @@
             type="com.geekorum.ttrss.articles_list.ActivityViewModel" />
     </data>
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fitsSystemWindows="true"
-            tools:context="com.geekorum.ttrss.articles_list.ArticleListActivity">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.geekorum.ttrss.articles_list.ArticleListActivity"
+        >
 
-        <View android:id="@+id/header"
-              android:layout_width="match_parent"
-              android:layout_height="192dp"
-              android:background="?articleListHeader"  />
-
-        <!-- Let the app bar draw the status bar -->
-        <!-- Override stateListAnimator to not lift elevation        -->
-        <com.google.android.material.appbar.AppBarLayout
-                android:id="@+id/app_bar"
-                android:fitsSystemWindows="true"
-                app:statusBarForeground="?colorPrimaryDark"
-                android:layout_width="match_parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:layout_height="wrap_content"
-                >
-
-            <com.google.android.material.appbar.MaterialToolbar
-                    android:id="@+id/toolbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_scrollFlags="noScroll"
-                    android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
-                    style="?appBarToolbarStyle"
-                    />
-        </com.google.android.material.appbar.AppBarLayout>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="?actionBarSize"
-                android:fitsSystemWindows="true"
-                >
-
-            <com.google.android.material.navigation.NavigationView
+        <com.google.android.material.navigation.NavigationView
                     android:id="@+id/navigation_view"
                     android:layout_width="300dp"
                     android:layout_height="match_parent"
@@ -83,7 +50,46 @@
                     android:layout_height="match_parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/navigation_view"
+                    android:fitsSystemWindows="true"
                     app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+                <com.google.android.material.appbar.AppBarLayout
+                    android:id="@+id/app_bar"
+                    android:fitsSystemWindows="true"
+                    app:statusBarForeground="?colorPrimaryDark"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <com.google.android.material.appbar.MaterialToolbar
+                        android:id="@+id/toolbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="?actionBarSize"
+                        app:layout_scrollFlags="scroll|enterAlways|snap"
+                        android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
+                        app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light"
+                        style="?appBarToolbarStyle"
+                        />
+
+                    <HorizontalScrollView
+                        android:id="@+id/tags_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:scrollbars="none"
+                        app:layout_scrollFlags="scroll|enterAlways"
+                        android:background="?colorSurface"
+                        android:paddingHorizontal="16dp"
+                        android:clipToPadding="false"
+                        >
+
+                        <com.google.android.material.chip.ChipGroup
+                            android:id="@+id/tags_group"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            app:singleLine="true"/>
+                    </HorizontalScrollView>
+
+                </com.google.android.material.appbar.AppBarLayout>
+
 
                 <fragment android:id="@+id/middle_pane_layout"
                         android:name="com.geekorum.ttrss.on_demand_modules.OnDemandModuleNavHostFragment"
@@ -91,7 +97,8 @@
                         android:layout_height="match_parent"
                         app:defaultNavHost="true"
                         app:navGraph="@navigation/articles_list"
-                        />
+                        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+                    />
 
                 <com.geekorum.geekdroid.views.banners.BannerContainer
                         android:id="@+id/banner_container"
@@ -104,21 +111,20 @@
                         tools:layout_height="0dp"
                         android:theme="@style/ThemeOverlay.AppTheme.BottomSheet" />
 
-            </androidx.coordinatorlayout.widget.CoordinatorLayout>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/fab"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_margin="@dimen/fab_margin"
                     android:src="@drawable/ic_refresh"
-                    app:layout_anchor="@id/header"
-                    app:layout_anchorGravity="bottom|end"
+                    android:layout_marginTop="128dp"
+                    android:layout_marginEnd="@dimen/fab_margin"
+                    android:layout_gravity="end"
                     android:onClick="@{() -> activityViewModel.refresh()}"
                     />
 
-        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+            </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>

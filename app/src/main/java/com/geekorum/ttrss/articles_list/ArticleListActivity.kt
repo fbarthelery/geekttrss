@@ -21,7 +21,6 @@
 package com.geekorum.ttrss.articles_list
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
@@ -35,12 +34,9 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
-import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.setupWithNavController
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.geekdroid.views.doOnApplyWindowInsets
-import com.geekorum.ttrss.ArticlesListDirections
-import com.geekorum.ttrss.Features
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.article_details.ArticleDetailActivity
 import com.geekorum.ttrss.databinding.ActivityArticleListBinding
@@ -74,6 +70,7 @@ class ArticleListActivity : SessionActivity() {
     private val accountViewModel: TtrssAccountViewModel by viewModels()
     private val inAppUpdateViewModel: InAppUpdateViewModel by viewModels()
     private val feedsViewModel: FeedsViewModel by viewModels()
+    private val tagsViewModel: TagsViewModel by viewModels()
 
     private lateinit var inAppUpdatePresenter: InAppUpdatePresenter
     private lateinit var searchToolbarPresenter: SearchToolbarPresenter
@@ -166,7 +163,8 @@ class ArticleListActivity : SessionActivity() {
         setupSearch()
         setupSortOrder()
         binding.toolbar.setupWithNavController(navController, drawerLayout)
-        appBarPresenter = AppBarPresenter(binding.appBar, binding.toolbar, navController)
+        appBarPresenter = AppBarPresenter(binding.appBar, binding.toolbar, binding.tagsList, binding.tagsGroup,
+            this, tagsViewModel, navController)
     }
 
     private fun setupSortOrder() {
