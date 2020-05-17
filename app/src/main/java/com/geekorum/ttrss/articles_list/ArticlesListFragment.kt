@@ -59,7 +59,7 @@ class ArticlesListFragment @Inject constructor(
     private lateinit var binding: FragmentArticleListBinding
     private lateinit var adapter: SwipingArticlesListAdapter
 
-    private val articlesViewModel: ArticlesViewModel by viewModels()
+    private val articlesViewModel: ArticlesListViewModel by viewModels()
     private val activityViewModel: ActivityViewModel by activityViewModels()
 
     private val unreadSnackbar: Snackbar by lazy {

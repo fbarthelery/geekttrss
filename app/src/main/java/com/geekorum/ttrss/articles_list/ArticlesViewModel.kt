@@ -52,29 +52,18 @@ private const val STATE_NEED_UNREAD = "need_unread"
 private const val STATE_ORDER_MOST_RECENT_FIRST = "order_most_recent_first" // most_recent_first, oldest_first
 
 /**
- * [ViewModel] for the [ArticlesListFragment].
+ * Base [ViewModel] for a list of Articles.
  */
-class ArticlesViewModel @AssistedInject constructor(
-    @Assisted private val state: SavedStateHandle,
+abstract class BaseArticlesViewModel(
+    private val state: SavedStateHandle,
     private val articlesRepository: ArticlesRepository,
-    private val feedsRepository: FeedsRepository,
     private val backgroundJobManager: BackgroundJobManager,
     private val account: Account
 ) : ViewModel() {
 
-    private val feedId = state.getLiveData(STATE_FEED_ID, Feed.FEED_ID_ALL_ARTICLES).apply {
-        // workaround for out of sync values see
-        // https://issuetracker.google.com/issues/129989646
-        value = value
-    }
-    private val _pendingArticlesSetUnread = MutableLiveData<Int>().apply { value = 0 }
+    abstract val articles: LiveData<PagedList<Article>>
 
-    val articles: LiveData<PagedList<Article>> = feedId.switchMap {
-        feedsRepository.getFeedById(it)
-    }.switchMap {
-        checkNotNull(it)
-        getArticlesForFeed(it)
-    }
+    private val _pendingArticlesSetUnread = MutableLiveData<Int>().apply { value = 0 }
 
     private var refreshJobName: MutableLiveData<String?> = MutableLiveData<String?>().apply {
         value = null
@@ -93,7 +82,8 @@ class ArticlesViewModel @AssistedInject constructor(
     // default value in databinding is False for boolean and 0 for int
     // we can't test size() == 0 in layout file because the default value will make the test true
     // and will briefly show the empty view
-    val haveZeroArticles = articles.map { it.size == 0 }
+    val haveZeroArticles: LiveData<Boolean>
+        get() = articles.map { it.size == 0 }
 
     fun setSortByMostRecentFirst(mostRecentFirst: Boolean) {
         state[STATE_ORDER_MOST_RECENT_FIRST] = mostRecentFirst
@@ -101,27 +91,6 @@ class ArticlesViewModel @AssistedInject constructor(
 
     fun setNeedUnread(needUnread: Boolean) {
         state[STATE_NEED_UNREAD] = needUnread
-    }
-
-    private fun getArticlesForFeed(feed: Feed): LiveData<PagedList<Article>> {
-        val isMostRecentOrderFlow = state.getLiveData<Boolean>(STATE_ORDER_MOST_RECENT_FIRST).asFlow()
-        val needUnreadFlow = state.getLiveData<Boolean>(STATE_NEED_UNREAD).asFlow()
-        return isMostRecentOrderFlow.combine(needUnreadFlow) { mostRecentFirst, needUnread ->
-            getArticleAccess(mostRecentFirst, needUnread)
-        }.mapLatest { access ->
-            when {
-                feed.isStarredFeed -> access.starredArticles
-                feed.isPublishedFeed -> access.publishedArticles
-                feed.isFreshFeed -> access.freshArticles
-                feed.isAllArticlesFeed -> access.allArticles
-                else -> access.articlesForFeed(feed.id)
-            }
-        }.asLiveData()
-        .switchMap { factory ->
-            val liveData = factory.toLiveData(pageSize = 50,
-                boundaryCallback = PageBoundaryCallback())
-            liveData
-        }
     }
 
     fun refresh() {
@@ -159,7 +128,7 @@ class ArticlesViewModel @AssistedInject constructor(
         _pendingArticlesSetUnread.value = unreadActionUndoManager.nbActions
     }
 
-    private inner class PageBoundaryCallback<T> : PagedList.BoundaryCallback<T>() {
+    protected inner class PageBoundaryCallback<T> : PagedList.BoundaryCallback<T>() {
         override fun onZeroItemsLoaded() {
             if (shouldRefreshOnZeroItems) {
                 shouldRefreshOnZeroItems = false
@@ -176,7 +145,7 @@ class ArticlesViewModel @AssistedInject constructor(
         }
     }
 
-    private interface ArticlesAccess {
+    protected interface ArticlesAccess {
         val starredArticles: DataSource.Factory<Int, Article>
         val publishedArticles: DataSource.Factory<Int, Article>
         val freshArticles: DataSource.Factory<Int, Article>
@@ -185,7 +154,7 @@ class ArticlesViewModel @AssistedInject constructor(
 
     }
 
-    private fun getArticleAccess(mostRecentFirst: Boolean, needUnread: Boolean): ArticlesAccess = when {
+    protected fun getArticleAccess(mostRecentFirst: Boolean, needUnread: Boolean): ArticlesAccess = when {
         needUnread && mostRecentFirst -> UnreadMostRecentAccess(articlesRepository)
         needUnread && !mostRecentFirst -> UnreadOldestAccess(articlesRepository)
         !needUnread && mostRecentFirst -> MostRecentAccess(articlesRepository)
@@ -278,9 +247,56 @@ class ArticlesViewModel @AssistedInject constructor(
         }
     }
 
+}
+
+/**
+ * ViewModel for [ArticlesListFragment]
+ */
+class ArticlesListViewModel @AssistedInject constructor(
+    @Assisted private val state: SavedStateHandle,
+    articlesRepository: ArticlesRepository,
+    private val feedsRepository: FeedsRepository,
+    backgroundJobManager: BackgroundJobManager,
+    account: Account
+) : BaseArticlesViewModel(state, articlesRepository, backgroundJobManager, account) {
+
+    val feedId = state.getLiveData(STATE_FEED_ID, Feed.FEED_ID_ALL_ARTICLES).apply {
+        // workaround for out of sync values see
+        // https://issuetracker.google.com/issues/129989646
+        value = value
+    }
+
+    override val articles: LiveData<PagedList<Article>> = feedId.switchMap {
+        feedsRepository.getFeedById(it)
+    }.switchMap {
+        checkNotNull(it)
+        getArticlesForFeed(it)
+    }
+
+    private fun getArticlesForFeed(feed: Feed): LiveData<PagedList<Article>> {
+        val isMostRecentOrderFlow = state.getLiveData<Boolean>(STATE_ORDER_MOST_RECENT_FIRST).asFlow()
+        val needUnreadFlow = state.getLiveData<Boolean>(STATE_NEED_UNREAD).asFlow()
+        return isMostRecentOrderFlow.combine(needUnreadFlow) { mostRecentFirst, needUnread ->
+            getArticleAccess(mostRecentFirst, needUnread)
+        }.mapLatest { access ->
+            when {
+                feed.isStarredFeed -> access.starredArticles
+                feed.isPublishedFeed -> access.publishedArticles
+                feed.isFreshFeed -> access.freshArticles
+                feed.isAllArticlesFeed -> access.allArticles
+                else -> access.articlesForFeed(feed.id)
+            }
+        }.asLiveData()
+            .switchMap { factory ->
+                val liveData = factory.toLiveData(pageSize = 50,
+                    boundaryCallback = PageBoundaryCallback())
+                liveData
+            }
+    }
+
 
     @AssistedInject.Factory
-    interface Factory : ViewModelAssistedFactory<ArticlesViewModel> {
-        override fun create(state: SavedStateHandle): ArticlesViewModel
+    interface Factory : ViewModelAssistedFactory<ArticlesListViewModel> {
+        override fun create(state: SavedStateHandle): ArticlesListViewModel
     }
 }
