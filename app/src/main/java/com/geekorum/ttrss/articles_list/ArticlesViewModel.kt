@@ -48,6 +48,7 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 
 private const val STATE_FEED_ID = "feed_id"
+private const val STATE_TAG = "tag"
 private const val STATE_NEED_UNREAD = "need_unread"
 private const val STATE_ORDER_MOST_RECENT_FIRST = "order_most_recent_first" // most_recent_first, oldest_first
 
@@ -150,8 +151,8 @@ abstract class BaseArticlesViewModel(
         val publishedArticles: DataSource.Factory<Int, Article>
         val freshArticles: DataSource.Factory<Int, Article>
         val allArticles: DataSource.Factory<Int, Article>
-        fun articlesForFeed(feedId: Long) :DataSource.Factory<Int, Article>
-
+        fun articlesForFeed(feedId: Long): DataSource.Factory<Int, Article>
+        fun articlesForTag(tag: String): DataSource.Factory<Int, Article>
     }
 
     protected fun getArticleAccess(mostRecentFirst: Boolean, needUnread: Boolean): ArticlesAccess = when {
@@ -181,6 +182,10 @@ abstract class BaseArticlesViewModel(
         override fun articlesForFeed(feedId: Long): DataSource.Factory<Int, Article> {
             return articlesRepository.getAllUnreadArticlesForFeed(feedId)
         }
+
+        override fun articlesForTag(tag: String): DataSource.Factory<Int, Article> {
+            return articlesRepository.getAllUnreadArticlesForTag(tag)
+        }
     }
 
     class UnreadOldestAccess(private val articlesRepository: ArticlesRepository) : ArticlesAccess {
@@ -201,6 +206,10 @@ abstract class BaseArticlesViewModel(
 
         override fun articlesForFeed(feedId: Long): DataSource.Factory<Int, Article> {
             return articlesRepository.getAllUnreadArticlesForFeedOldestFirst(feedId)
+        }
+
+        override fun articlesForTag(tag: String): DataSource.Factory<Int, Article> {
+            return articlesRepository.getAllUnreadArticlesForTagOldestFirst(tag)
         }
     }
 
@@ -224,6 +233,10 @@ abstract class BaseArticlesViewModel(
         override fun articlesForFeed(feedId: Long): DataSource.Factory<Int, Article> {
             return articlesRepository.getAllArticlesForFeed(feedId)
         }
+
+        override fun articlesForTag(tag: String): DataSource.Factory<Int, Article> {
+            return articlesRepository.getAllArticlesForTag(tag)
+        }
     }
 
     class OldestFirstAccess(private val articlesRepository: ArticlesRepository) : ArticlesAccess {
@@ -244,6 +257,10 @@ abstract class BaseArticlesViewModel(
 
         override fun articlesForFeed(feedId: Long): DataSource.Factory<Int, Article> {
             return articlesRepository.getAllArticlesForFeedOldestFirst(feedId)
+        }
+
+        override fun articlesForTag(tag: String): DataSource.Factory<Int, Article> {
+            return articlesRepository.getAllArticlesForTagOldestFirst(tag)
         }
     }
 
@@ -298,5 +315,45 @@ class ArticlesListViewModel @AssistedInject constructor(
     @AssistedInject.Factory
     interface Factory : ViewModelAssistedFactory<ArticlesListViewModel> {
         override fun create(state: SavedStateHandle): ArticlesListViewModel
+    }
+}
+
+
+class ArticlesListByTagViewModel @AssistedInject constructor(
+    @Assisted private val state: SavedStateHandle,
+    articlesRepository: ArticlesRepository,
+    backgroundJobManager: BackgroundJobManager,
+    account: Account
+) : BaseArticlesViewModel(state, articlesRepository, backgroundJobManager, account) {
+
+    val tag = state.getLiveData<String>(STATE_TAG).apply {
+        // workaround for out of sync values see
+        // https://issuetracker.google.com/issues/129989646
+        value = value
+    }
+
+    override val articles: LiveData<PagedList<Article>> = tag.switchMap {
+        getArticlesForTag(it)
+    }
+
+    private fun getArticlesForTag(tag: String): LiveData<PagedList<Article>> {
+        val isMostRecentOrderFlow = state.getLiveData<Boolean>(STATE_ORDER_MOST_RECENT_FIRST).asFlow()
+        val needUnreadFlow = state.getLiveData<Boolean>(STATE_NEED_UNREAD).asFlow()
+        return isMostRecentOrderFlow.combine(needUnreadFlow) { mostRecentFirst, needUnread ->
+            getArticleAccess(mostRecentFirst, needUnread)
+        }.mapLatest { access ->
+           access.articlesForTag(tag)
+        }.asLiveData()
+            .switchMap { factory ->
+                val liveData = factory.toLiveData(pageSize = 50,
+                    boundaryCallback = PageBoundaryCallback())
+                liveData
+            }
+    }
+
+
+    @AssistedInject.Factory
+    interface Factory : ViewModelAssistedFactory<ArticlesListByTagViewModel> {
+        override fun create(state: SavedStateHandle): ArticlesListByTagViewModel
     }
 }
