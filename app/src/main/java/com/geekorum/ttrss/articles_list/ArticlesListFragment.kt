@@ -52,14 +52,14 @@ import javax.inject.Inject
 /**
  * Display all the articles in a list.
  */
-class ArticlesListFragment @Inject constructor(
+abstract class BaseArticlesListFragment(
     savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator
 ) : BaseFragment(savedStateVmFactoryCreator) {
 
     private lateinit var binding: FragmentArticleListBinding
     private lateinit var adapter: SwipingArticlesListAdapter
 
-    private val articlesViewModel: ArticlesListViewModel by viewModels()
+    protected abstract val articlesViewModel: BaseArticlesViewModel
     private val activityViewModel: ActivityViewModel by activityViewModels()
 
     private val unreadSnackbar: Snackbar by lazy {
@@ -207,4 +207,16 @@ class ArticlesListFragment @Inject constructor(
         override fun getSwipeThreshold(viewHolder: RecyclerView.ViewHolder): Float = 0.3f
     }
 
+}
+
+class ArticlesListFragment @Inject constructor(
+    savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator
+) : BaseArticlesListFragment(savedStateVmFactoryCreator) {
+    override val articlesViewModel: BaseArticlesViewModel by viewModels<ArticlesListViewModel>()
+}
+
+class ArticlesListByTagFragment @Inject constructor(
+    savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator
+) : BaseArticlesListFragment(savedStateVmFactoryCreator) {
+    override val articlesViewModel: BaseArticlesViewModel by viewModels<ArticlesListByTagViewModel>()
 }
