@@ -125,11 +125,6 @@ private abstract class ArticlesListModule {
         @Provides
         fun providesAccount(articleListActivity: ArticleListActivity): Account = articleListActivity.account!!
 
-        @JvmStatic
-        @Provides
-        fun providesApplicationPreferences(application: Application): SharedPreferences =
-            PreferenceManager.getDefaultSharedPreferences(application)
-
     }
 
 }

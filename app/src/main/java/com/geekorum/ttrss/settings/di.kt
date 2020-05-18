@@ -20,12 +20,16 @@
  */
 package com.geekorum.ttrss.settings
 
+import android.app.Application
+import android.content.SharedPreferences
 import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
 import com.geekorum.geekdroid.dagger.FragmentKey
 import com.geekorum.ttrss.settings.manage_features.InstallFeatureActivity
 import com.geekorum.ttrss.settings.manage_features.ManageFeaturesModule
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.android.ContributesAndroidInjector
 import dagger.multibindings.IntoMap
 
@@ -42,5 +46,13 @@ abstract class SettingsModule {
     @IntoMap
     @FragmentKey(SettingsActivity.SettingsFragment::class)
     abstract fun bindSettingsFragment(settingsFragment: SettingsActivity.SettingsFragment): Fragment
+
+    @Module
+    companion object {
+
+        @Provides
+        fun providesApplicationPreferences(application: Application): SharedPreferences =
+            PreferenceManager.getDefaultSharedPreferences(application)
+    }
 
 }
