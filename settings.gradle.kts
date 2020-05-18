@@ -71,8 +71,8 @@ GEEKDROID_PROJECT_DIR?.let {
         dependencySubstitution {
             substitute(module("com.geekorum:geekdroid")).with(project(":geekdroid"))
             substitute(module("com.geekorum:geekdroid-firebase")).with(project(":geekdroid-firebase"))
-            substitute(module("com.github.fbarthelery.geekdroid:geekdroid")).with(project(":geekdroid"))
-            substitute(module("com.github.fbarthelery.geekdroid:geekdroid-firebase")).with(project(":geekdroid-firebase"))
+            substitute(module("com.geekorum.geekdroid:geekdroid")).with(project(":geekdroid"))
+            substitute(module("com.geekorum.geekdroid:geekdroid-firebase")).with(project(":geekdroid-firebase"))
         }
     }
 }
