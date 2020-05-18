@@ -47,8 +47,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 
-private const val STATE_FEED_ID = "feed_id"
-private const val STATE_TAG = "tag"
 private const val STATE_NEED_UNREAD = "need_unread"
 private const val STATE_ORDER_MOST_RECENT_FIRST = "order_most_recent_first" // most_recent_first, oldest_first
 
@@ -57,25 +55,14 @@ private const val STATE_ORDER_MOST_RECENT_FIRST = "order_most_recent_first" // m
  */
 abstract class BaseArticlesViewModel(
     private val state: SavedStateHandle,
-    private val articlesRepository: ArticlesRepository,
-    private val backgroundJobManager: BackgroundJobManager,
-    private val account: Account
+    private val articlesRepository: ArticlesRepository
 ) : ViewModel() {
 
     abstract val articles: LiveData<PagedList<Article>>
 
     private val _pendingArticlesSetUnread = MutableLiveData<Int>().apply { value = 0 }
 
-    private var refreshJobName: MutableLiveData<String?> = MutableLiveData<String?>().apply {
-        value = null
-    }
-
-    val isRefreshing: LiveData<Boolean> = refreshJobName.switchMap {
-        if (it == null)
-            SyncInProgressLiveData(account, ArticlesContract.AUTHORITY)
-        else
-            backgroundJobManager.isRefreshingStatus(state.get<Long>(STATE_FEED_ID)!!)
-    }
+    abstract val isRefreshing: LiveData<Boolean>
 
     private var shouldRefreshOnZeroItems = true
     private val unreadActionUndoManager = UndoManager<Action>()
@@ -86,23 +73,14 @@ abstract class BaseArticlesViewModel(
     val haveZeroArticles: LiveData<Boolean>
         get() = articles.map { it.size == 0 }
 
+    abstract fun refresh()
+
     fun setSortByMostRecentFirst(mostRecentFirst: Boolean) {
         state[STATE_ORDER_MOST_RECENT_FIRST] = mostRecentFirst
     }
 
     fun setNeedUnread(needUnread: Boolean) {
         state[STATE_NEED_UNREAD] = needUnread
-    }
-
-    fun refresh() {
-        viewModelScope.launch {
-            val feedId: Long = state[STATE_FEED_ID]!!
-            if (Feed.isVirtualFeed(feedId)) {
-                backgroundJobManager.refresh(account)
-            } else {
-                refreshJobName.value = backgroundJobManager.refreshFeed(account, feedId)
-            }
-        }
     }
 
     fun setArticleUnread(articleId: Long, newValue: Boolean) {
@@ -273,9 +251,9 @@ class ArticlesListViewModel @AssistedInject constructor(
     @Assisted private val state: SavedStateHandle,
     articlesRepository: ArticlesRepository,
     private val feedsRepository: FeedsRepository,
-    backgroundJobManager: BackgroundJobManager,
-    account: Account
-) : BaseArticlesViewModel(state, articlesRepository, backgroundJobManager, account) {
+    private val backgroundJobManager: BackgroundJobManager,
+    private val account: Account
+) : BaseArticlesViewModel(state, articlesRepository) {
 
     val feedId = state.getLiveData(STATE_FEED_ID, Feed.FEED_ID_ALL_ARTICLES).apply {
         // workaround for out of sync values see
@@ -288,6 +266,17 @@ class ArticlesListViewModel @AssistedInject constructor(
     }.switchMap {
         checkNotNull(it)
         getArticlesForFeed(it)
+    }
+
+    private var refreshJobName: MutableLiveData<String?> = MutableLiveData<String?>().apply {
+        value = null
+    }
+
+    override val isRefreshing: LiveData<Boolean> = refreshJobName.switchMap {
+        if (it == null)
+            SyncInProgressLiveData(account, ArticlesContract.AUTHORITY)
+        else
+            backgroundJobManager.isRefreshingStatus(state.get<Long>(STATE_FEED_ID)!!)
     }
 
     private fun getArticlesForFeed(feed: Feed): LiveData<PagedList<Article>> {
@@ -312,6 +301,21 @@ class ArticlesListViewModel @AssistedInject constructor(
     }
 
 
+    override fun refresh() {
+        viewModelScope.launch {
+            val feedId: Long = state[STATE_FEED_ID]!!
+            if (Feed.isVirtualFeed(feedId)) {
+                backgroundJobManager.refresh(account)
+            } else {
+                refreshJobName.value = backgroundJobManager.refreshFeed(account, feedId)
+            }
+        }
+    }
+
+    companion object {
+        private const val STATE_FEED_ID = "feed_id"
+    }
+
     @AssistedInject.Factory
     interface Factory : ViewModelAssistedFactory<ArticlesListViewModel> {
         override fun create(state: SavedStateHandle): ArticlesListViewModel
@@ -322,9 +326,9 @@ class ArticlesListViewModel @AssistedInject constructor(
 class ArticlesListByTagViewModel @AssistedInject constructor(
     @Assisted private val state: SavedStateHandle,
     articlesRepository: ArticlesRepository,
-    backgroundJobManager: BackgroundJobManager,
-    account: Account
-) : BaseArticlesViewModel(state, articlesRepository, backgroundJobManager, account) {
+    private val backgroundJobManager: BackgroundJobManager,
+    private val account: Account
+) : BaseArticlesViewModel(state, articlesRepository) {
 
     val tag = state.getLiveData<String>(STATE_TAG).apply {
         // workaround for out of sync values see
@@ -334,6 +338,11 @@ class ArticlesListByTagViewModel @AssistedInject constructor(
 
     override val articles: LiveData<PagedList<Article>> = tag.switchMap {
         getArticlesForTag(it)
+    }
+    override val isRefreshing: LiveData<Boolean> = SyncInProgressLiveData(account, ArticlesContract.AUTHORITY)
+
+    override fun refresh() {
+        backgroundJobManager.refresh(account)
     }
 
     private fun getArticlesForTag(tag: String): LiveData<PagedList<Article>> {
@@ -351,6 +360,9 @@ class ArticlesListByTagViewModel @AssistedInject constructor(
             }
     }
 
+    companion object {
+        private const val STATE_TAG = "tag"
+    }
 
     @AssistedInject.Factory
     interface Factory : ViewModelAssistedFactory<ArticlesListByTagViewModel> {
