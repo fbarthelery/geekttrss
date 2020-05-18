@@ -20,10 +20,14 @@
  */
 package com.geekorum.ttrss.settings
 
+import androidx.fragment.app.Fragment
+import com.geekorum.geekdroid.dagger.FragmentKey
 import com.geekorum.ttrss.settings.manage_features.InstallFeatureActivity
 import com.geekorum.ttrss.settings.manage_features.ManageFeaturesModule
+import dagger.Binds
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
+import dagger.multibindings.IntoMap
 
 @Module(includes = [SettingsInitializerModule::class, ManageFeaturesModule::class])
 abstract class SettingsModule {
@@ -33,4 +37,10 @@ abstract class SettingsModule {
 
     @ContributesAndroidInjector
     abstract fun contributesInstallFeatureActivityInjector(): InstallFeatureActivity
+
+    @Binds
+    @IntoMap
+    @FragmentKey(SettingsActivity.SettingsFragment::class)
+    abstract fun bindSettingsFragment(settingsFragment: SettingsActivity.SettingsFragment): Fragment
+
 }

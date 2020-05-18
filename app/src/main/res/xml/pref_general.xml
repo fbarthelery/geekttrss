@@ -37,6 +37,17 @@
     </PreferenceCategory>
 
     <PreferenceCategory
+        android:title="@string/pref_category_advanced">
+
+        <ListPreference
+            android:key="in_app_browser_engine"
+            android:defaultValue="-1"
+            android:title="@string/pref_title_in_app_browser_engine"
+            android:negativeButtonText="@null"
+            />
+    </PreferenceCategory>
+
+    <PreferenceCategory
             android:title="@string/pref_category_development"
             app:isPreferenceVisible="@bool/dev_show_manage_features">
 

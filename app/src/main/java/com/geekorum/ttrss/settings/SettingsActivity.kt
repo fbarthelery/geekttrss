@@ -21,10 +21,13 @@
 package com.geekorum.ttrss.settings
 
 import android.annotation.TargetApi
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.StrictMode
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
@@ -32,11 +35,12 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import com.geekorum.ttrss.core.BaseActivity
 import com.geekorum.ttrss.BuildConfig
 import com.geekorum.ttrss.R
+import com.geekorum.ttrss.core.BaseActivity
 import com.geekorum.ttrss.databinding.ActivitySettingsBinding
 import com.geekorum.ttrss.debugtools.withStrictMode
+import javax.inject.Inject
 
 
 class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
@@ -48,11 +52,6 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
         binding = DataBindingUtil.setContentView(this, R.layout.activity_settings)
         setSupportActionBar(binding.toolbar)
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
-        if (savedInstanceState == null) {
-            supportFragmentManager.commit {
-                replace(R.id.preferences_container, SettingsFragment())
-            }
-        }
     }
 
     private fun allowDiskReads() {
@@ -75,7 +74,9 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    class SettingsFragment : PreferenceFragmentCompat() {
+    class SettingsFragment @Inject constructor(
+        private val packageManager: PackageManager
+    ) : PreferenceFragmentCompat() {
 
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             withStrictMode(StrictMode.allowThreadDiskReads()) {
@@ -86,6 +87,13 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
                 summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
                 onPreferenceChangeListener = ThemePreferenceListener()
             }
+            findPreference<ListPreference>(KEY_IN_APP_BROWSER_ENGINE)!!.apply {
+                summaryProvider = ListPreference.SimpleSummaryProvider.getInstance()
+                val inAppBrowser = getInAppBrowserPackages()
+                entryValues = inAppBrowser.keys.toTypedArray()
+                entries = inAppBrowser.values.toTypedArray()
+            }
+
             displayVersion()
         }
 
@@ -98,6 +106,12 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
             }
         }
 
+        private fun getInAppBrowserPackages(): Map<String, CharSequence> {
+            val activityIntent = Intent(Intent.ACTION_VIEW, "http://".toUri())
+            val resolveInfoList =
+                packageManager.queryIntentActivities(activityIntent, PackageManager.MATCH_DEFAULT_ONLY)
+            return resolveInfoList.map { it.activityInfo.packageName to it.loadLabel(packageManager) }.toMap()
+        }
     }
 
     private class ThemePreferenceListener : Preference.OnPreferenceChangeListener {
@@ -114,6 +128,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 
     companion object {
         const val KEY_THEME = "theme"
+        const val KEY_IN_APP_BROWSER_ENGINE = "in_app_browser_engine"
         const val KEY_ABOUT_VERSION = "about_version"
     }
 
