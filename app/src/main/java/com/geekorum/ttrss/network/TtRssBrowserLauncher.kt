@@ -21,18 +21,21 @@
 package com.geekorum.ttrss.network
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.net.Uri
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
 import com.geekorum.geekdroid.network.BrowserLauncher
 import com.geekorum.ttrss.R
+import com.geekorum.ttrss.settings.SettingsActivity
 import javax.inject.Inject
 
 /**
  * A wrapper of [BrowserLauncher] with customization for the ttrss app
  */
 class TtRssBrowserLauncher @Inject constructor(
-    private val delegate: BrowserLauncher
+    private val delegate: BrowserLauncher,
+    private val appPreferences: SharedPreferences
 ) {
     private val PREFFERED_PACKAGES_LIST = arrayOf("org.mozilla.focus")
 
@@ -65,7 +68,11 @@ class TtRssBrowserLauncher @Inject constructor(
     fun shutdown() = delegate.shutdown()
 
     private fun orderPreferredPackages(availablePackages: List<String>): List<String> {
-        return (PREFFERED_PACKAGES_LIST.filter { availablePackages.contains(it) }
+        val preferredPackages = (arrayOf(
+            appPreferences.getString(SettingsActivity.KEY_IN_APP_BROWSER_ENGINE, null)) + PREFFERED_PACKAGES_LIST
+            ).filterNotNull()
+
+        return (preferredPackages.filter { availablePackages.contains(it) }
             + availablePackages)
             .distinct()
     }
