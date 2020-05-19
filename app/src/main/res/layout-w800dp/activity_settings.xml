@@ -60,6 +60,7 @@
                          android:id="@+id/preferences_container"
                          android:layout_width="match_parent"
                          android:layout_height="match_parent"
+                         android:name="com.geekorum.ttrss.settings.SettingsActivity$SettingsFragment"
                     />
 
         </com.google.android.material.card.MaterialCardView>
