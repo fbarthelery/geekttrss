@@ -160,7 +160,9 @@ class CollectNewArticlesWorker(
         val articlesOnly = articles.map { it.article }
         databaseService.insertArticles(articlesOnly)
         val articlesTags = articlesOnly.flatMap {
-            val tags = it.tags.split(",").map(String::trim)
+            val tags = it.tags.split(",")
+                .map(String::trim)
+                .filter(String::isNotEmpty)
             tags.map {tag ->
                 ArticlesTags(it.id, tag)
             }
