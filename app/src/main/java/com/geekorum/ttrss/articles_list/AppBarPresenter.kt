@@ -102,7 +102,7 @@ internal class AppBarPresenter(
                 if (navController.currentDestination?.id == R.id.articlesListByTagFragment) {
                     navController.popBackStack()
                 }
-            } else {
+            } else if (tag != currentTag) {
                 val showTag = ArticlesListFragmentDirections.actionShowTag(tag)
                 navController.navigate(showTag)
             }
