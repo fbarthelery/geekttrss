@@ -21,6 +21,7 @@
 package com.geekorum.ttrss.article_details
 
 import android.annotation.SuppressLint
+import android.content.ContentUris
 import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
@@ -63,14 +64,8 @@ class ArticleDetailActivity : SessionActivity() {
         actionBar.setDisplayShowTitleEnabled(false)
         actionBar.setDisplayHomeAsUpEnabled(true)
 
-        val articleUri = intent.data
-
-        if (savedInstanceState == null) {
-            supportFragmentManager.commit {
-                val args = bundleOf(ArticleDetailFragment.ARG_ARTICLE_URI to articleUri)
-                replace(R.id.content, ArticleDetailFragment::class.java, args)
-            }
-        }
+        val articleUri = requireNotNull(intent.data)
+        articleDetailsViewModel.init(ContentUris.parseId(articleUri))
     }
 
     @SuppressLint("RestrictedApi")

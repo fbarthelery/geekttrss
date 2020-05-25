@@ -20,7 +20,6 @@
  */
 package com.geekorum.ttrss.article_details
 
-import android.content.ContentUris
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
@@ -59,7 +58,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import okhttp3.OkHttpClient
 import timber.log.Timber
-import java.util.Locale
+import java.util.*
 import javax.inject.Inject
 import kotlin.math.max
 
@@ -91,7 +90,7 @@ class ArticleDetailFragment @Inject constructor(
             val backgroundHexColor = colors.backgroundColor.toRgbaCall()
             val textColor = colors.textColor.toRgbaCall()
             val linkHexColor = colors.linkColor.toRgbaCall()
-            var cssOverride = """
+            return """
             @font-face {
                 font-family: "TextAppearance.AppTheme.Body1";
                 src: url("${WebFontProvider.WEB_FONT_ARTICLE_BODY_URL}");
@@ -108,7 +107,6 @@ class ArticleDetailFragment @Inject constructor(
                 color: $linkHexColor;
             }
             """.trimIndent()
-            return cssOverride
         }
 
     override fun onCreateView(
@@ -127,8 +125,8 @@ class ArticleDetailFragment @Inject constructor(
         super.onViewCreated(view, savedInstanceState)
         configureWebView()
 
-        articleDetailsViewModel.article.observe(this) { this.article = it }
-        articleDetailsViewModel.articleContent.observe(this) { renderContent(it) }
+        articleDetailsViewModel.article.observe(viewLifecycleOwner) { this.article = it }
+        articleDetailsViewModel.articleContent.observe(viewLifecycleOwner) { renderContent(it) }
 
         binding.root.setOnScrollChangeListener { v, _, _, _, _ ->
             markReadJob?.cancel()
@@ -137,12 +135,6 @@ class ArticleDetailFragment @Inject constructor(
                 articleDetailsViewModel.setArticleUnread(false)
             }
         }
-    }
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        articleUri = requireNotNull(arguments?.getParcelable(ARG_ARTICLE_URI))
-        articleDetailsViewModel.init(ContentUris.parseId(articleUri))
     }
 
     private fun renderContent(articleContent: String) {
