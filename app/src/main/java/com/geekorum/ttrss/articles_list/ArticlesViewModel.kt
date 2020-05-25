@@ -262,7 +262,7 @@ class ArticlesListViewModel @AssistedInject constructor(
     }
 
     override val articles: LiveData<PagedList<Article>> = feedId.switchMap {
-        feedsRepository.getFeedById(it)
+        feedsRepository.getFeedById(it).asLiveData()
     }.switchMap {
         checkNotNull(it)
         getArticlesForFeed(it)

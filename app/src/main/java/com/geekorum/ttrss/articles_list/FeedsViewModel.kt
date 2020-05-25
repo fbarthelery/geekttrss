@@ -23,6 +23,7 @@ package com.geekorum.ttrss.articles_list
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asFlow
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
@@ -36,6 +37,11 @@ import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.switchMap
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -52,25 +58,25 @@ class FeedsViewModel @AssistedInject constructor(
     private val apiService: ApiService
 ) : ViewModel() {
 
-    private val onlyUnread = state.getLiveData(STATE_ONLY_UNREAD, true)
+    private val onlyUnread = state.getLiveData(STATE_ONLY_UNREAD, true).asFlow()
 
-    private val selectedCategory = state.getLiveData<Long>(STATE_SELECTED_CATEGORY_ID)
+    private val selectedCategory = state.getLiveData<Long>(STATE_SELECTED_CATEGORY_ID).asFlow()
 
-    val feeds: LiveData<List<Feed>> = onlyUnread.switchMap { onlyUnread ->
+    val feeds: Flow<List<Feed>> = onlyUnread.flatMapLatest { onlyUnread ->
         if (onlyUnread) feedsRepository.allUnreadFeeds else feedsRepository.allFeeds
     }.refreshed()
 
 
-    val feedsForCategory = selectedCategory.switchMap(this::getFeedsForCategory)
+    val feedsForCategory = selectedCategory.flatMapLatest(this::getFeedsForCategory)
 
-    private fun getFeedsForCategory(catId: Long) = onlyUnread.switchMap { onlyUnread ->
+    private suspend fun getFeedsForCategory(catId: Long) = onlyUnread.flatMapLatest { onlyUnread ->
         if (onlyUnread)
             feedsRepository.getUnreadFeedsForCategory(catId)
         else
             feedsRepository.getFeedsForCategory(catId)
     }
 
-    val categories: LiveData<List<Category>> = onlyUnread.switchMap { onlyUnread ->
+    val categories: Flow<List<Category>> = onlyUnread.flatMapLatest { onlyUnread ->
         if (onlyUnread)
             feedsRepository.allUnreadCategories
         else
@@ -95,15 +101,12 @@ class FeedsViewModel @AssistedInject constructor(
     }
 
     /**
-     * Refresh feeds and categories when observing this livedata for the first time
+     * Refresh feeds and categories when collecting this flow for the first time
      */
-    private fun <T> LiveData<T>.refreshed(): LiveData<T> = liveData {
-        emitSource(this@refreshed)
-        try {
-            refreshFeeds()
-        } catch (e: ApiCallException) {
-            Timber.w(e, "Unable to refresh feeds and categories")
-        }
+    private fun <T> Flow<T>.refreshed() = this.onStart {
+        refreshFeeds()
+    }.catch {
+        Timber.w(it, "Unable to refresh feeds and categories")
     }
 
     @AssistedInject.Factory

@@ -20,12 +20,12 @@
  */
 package com.geekorum.ttrss.articles_list
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.map
 import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.data.FeedsDao
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 /**
@@ -35,24 +35,22 @@ class FeedsRepository
 @Inject constructor(
     private val feedsDao: FeedsDao
 ) {
-    val allUnreadFeeds: LiveData<List<Feed>> = feedsDao.allUnreadFeeds.map(this::addSpecialFeeds)
+    val allUnreadFeeds: Flow<List<Feed>> = feedsDao.allUnreadFeeds.map(this::addSpecialFeeds)
 
-    val allFeeds: LiveData<List<Feed>> = feedsDao.allFeeds.map(this::addSpecialFeeds)
+    val allFeeds: Flow<List<Feed>> = feedsDao.allFeeds.map(this::addSpecialFeeds)
 
-    val allCategories: LiveData<List<Category>> = feedsDao.allCategories
+    val allCategories: Flow<List<Category>> = feedsDao.allCategories
 
-    val allUnreadCategories: LiveData<List<Category>> = feedsDao.allUnreadCategories
+    val allUnreadCategories: Flow<List<Category>> = feedsDao.allUnreadCategories
 
-    fun getFeedById(feedId: Long): LiveData<Feed?> {
+    fun getFeedById(feedId: Long): Flow<Feed?> {
         return when {
-            Feed.isVirtualFeed(feedId) -> MutableLiveData<Feed>().apply {
-                value = Feed.createVirtualFeedForId(feedId)
-            }
+            Feed.isVirtualFeed(feedId) -> flowOf(Feed.createVirtualFeedForId(feedId))
             else -> feedsDao.getFeedById(feedId)
         }
     }
 
-    private fun addSpecialFeeds(feeds: List<Feed>): List<Feed> {
+    private suspend fun addSpecialFeeds(feeds: List<Feed>): List<Feed> {
         // add special feeds
         val totalUnread = feeds.sumBy { it.unreadCount }
         val allArticles = Feed.createVirtualFeedForId(Feed.FEED_ID_ALL_ARTICLES, totalUnread)
@@ -64,11 +62,11 @@ class FeedsRepository
         return listOf(allArticles, freshArticles, starredArticles, *feeds.toTypedArray())
     }
 
-    fun getUnreadFeedsForCategory(catId: Long): LiveData<List<Feed>> {
+    fun getUnreadFeedsForCategory(catId: Long): Flow<List<Feed>> {
         return feedsDao.getUnreadFeedsForCategory(catId)
     }
 
-    fun getFeedsForCategory(catId: Long): LiveData<List<Feed>> {
+    fun getFeedsForCategory(catId: Long): Flow<List<Feed>> {
         return feedsDao.getFeedsForCategory(catId)
     }
 

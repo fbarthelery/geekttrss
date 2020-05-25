@@ -20,13 +20,13 @@
  */
 package com.geekorum.ttrss.data
 
-import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Dao to access Feeds and Categories
@@ -35,19 +35,19 @@ import androidx.room.Transaction
 abstract class FeedsDao {
 
     @get:Query("SELECT * FROM feeds WHERE unread_count > 0 ORDER BY title")
-    abstract val allUnreadFeeds: LiveData<List<Feed>>
+    abstract val allUnreadFeeds: Flow<List<Feed>>
 
     @get:Query("SELECT * FROM feeds ORDER BY title")
-    abstract val allFeeds: LiveData<List<Feed>>
+    abstract val allFeeds: Flow<List<Feed>>
 
     @Query("SELECT * FROM feeds")
     internal abstract suspend fun getAllFeedsList(): List<Feed>
 
     @get:Query("SELECT * FROM categories ORDER BY title")
-    abstract val allCategories: LiveData<List<Category>>
+    abstract val allCategories: Flow<List<Category>>
 
     @get:Query("SELECT * FROM categories WHERE unread_count > 0 ORDER BY title")
-    abstract val allUnreadCategories: LiveData<List<Category>>
+    abstract val allUnreadCategories: Flow<List<Category>>
 
     @Query("SELECT * FROM categories")
     internal abstract suspend fun getAllCategoriesList(): List<Category>
@@ -71,7 +71,7 @@ abstract class FeedsDao {
 
 
     @Query("SELECT * FROM feeds WHERE _id=:id")
-    abstract fun getFeedById(id: Long): LiveData<Feed?>
+    abstract fun getFeedById(id: Long): Flow<Feed?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertCategories(categories: Collection<Category>)
@@ -80,10 +80,10 @@ abstract class FeedsDao {
     abstract suspend fun deleteCategories(categories: Collection<Category>)
 
     @Query("SELECT * FROM feeds WHERE unread_count > 0 AND cat_id=:catId ORDER BY title")
-    abstract fun getUnreadFeedsForCategory(catId: Long): LiveData<List<Feed>>
+    abstract fun getUnreadFeedsForCategory(catId: Long): Flow<List<Feed>>
 
     @Query("SELECT * FROM feeds WHERE cat_id=:catId ORDER BY title")
-    abstract fun getFeedsForCategory(catId: Long): LiveData<List<Feed>>
+    abstract fun getFeedsForCategory(catId: Long): Flow<List<Feed>>
 
     @Transaction
     open suspend fun setFeedsAndCategories(feeds: Collection<Feed>, categories: Collection<Category>) {

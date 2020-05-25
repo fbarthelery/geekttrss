@@ -115,7 +115,6 @@ abstract class BaseArticlesListFragment(
             articlesViewModel.setNeedUnread(it)
         }
 
-
         binding.fragmentViewModel = articlesViewModel
     }
 
@@ -139,7 +138,7 @@ abstract class BaseArticlesListFragment(
             // the SwipeRefreshLayout will come back to original status
             viewLifecycleOwner.lifecycleScope.launch {
                 delay(1000)
-                binding.swipeRefreshContainer.isRefreshing = articlesViewModel.isRefreshing.value!!
+                swipeRefresh.isRefreshing = articlesViewModel.isRefreshing.value!!
             }
         }
         recyclerView.itemAnimator = ScrollFromBottomAppearanceItemAnimator(recyclerView, DefaultItemAnimator())

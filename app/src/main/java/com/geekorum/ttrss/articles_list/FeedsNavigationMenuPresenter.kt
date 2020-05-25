@@ -26,7 +26,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.observe
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.ui.NavigationUI
 import com.geekorum.ttrss.ArticlesListDirections
@@ -34,6 +34,8 @@ import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.databinding.MenuFeedActionViewBinding
 import com.google.android.material.navigation.NavigationView
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 private const val MENU_GROUP_ID_SPECIAL = 1
 
@@ -54,7 +56,7 @@ class FeedsNavigationMenuPresenter(
     private var currentFeedId: Long = 4L
 
     init {
-        observeViewModels()
+        collectFeeds()
         setDestinationListener()
     }
 
@@ -78,10 +80,10 @@ class FeedsNavigationMenuPresenter(
         }
     }
 
-    private fun observeViewModels() {
-        feedsViewModel.feeds.observe(lifeCycleOwner) { feeds ->
+    private fun collectFeeds() {
+        feedsViewModel.feeds.onEach { feeds ->
             transformFeedViewsInMenuEntry(menu, feeds)
-        }
+        }.launchIn(lifeCycleOwner.lifecycleScope)
     }
 
     private fun transformFeedViewsInMenuEntry(menu: Menu, feeds: List<Feed>) {
