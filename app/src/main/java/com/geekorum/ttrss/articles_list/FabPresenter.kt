@@ -38,7 +38,7 @@ internal class FabPresenter(
     }
 
     private fun setup() {
-        navController.addOnDestinationChangedListener { controller, destination, arguments ->
+        navController.addOnDestinationChangedListener { controller, destination, _ ->
             val progressDestinationId = (controller.graph as? DynamicGraphNavigator.DynamicNavGraph)?.progressDestination ?: 0
             when (destination.id) {
                 progressDestinationId -> {

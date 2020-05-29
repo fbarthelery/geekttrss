@@ -94,7 +94,7 @@ internal class AppBarPresenter(
     private fun observeTags() {
         tagsViewModel.tags.observe(lifecycleOwner) { tags ->
             tagsIds = tags.map { View.generateViewId() to it }.toMap()
-            transformTagsToChips(tags)
+            transformTagsToChips()
         }
         tagsGroup.setOnCheckedChangeListener { _, checkedId ->
             val tag = tagsIds?.get(checkedId)
@@ -109,7 +109,7 @@ internal class AppBarPresenter(
         }
     }
 
-    private fun transformTagsToChips(tags: List<String>) {
+    private fun transformTagsToChips() {
         tagsGroup.removeAllViews()
         val layoutInflater = LayoutInflater.from(tagsGroup.context)
         for ((id, tag) in tagsIds!!) {

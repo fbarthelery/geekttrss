@@ -43,6 +43,7 @@ import com.geekorum.ttrss.session.Action
 import com.geekorum.ttrss.session.UndoManager
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
@@ -279,6 +280,7 @@ class ArticlesListViewModel @AssistedInject constructor(
             backgroundJobManager.isRefreshingStatus(state.get<Long>(STATE_FEED_ID)!!)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun getArticlesForFeed(feed: Feed): LiveData<PagedList<Article>> {
         val isMostRecentOrderFlow = state.getLiveData<Boolean>(STATE_ORDER_MOST_RECENT_FIRST).asFlow()
         val needUnreadFlow = state.getLiveData<Boolean>(STATE_NEED_UNREAD).asFlow()
@@ -345,6 +347,7 @@ class ArticlesListByTagViewModel @AssistedInject constructor(
         backgroundJobManager.refresh(account)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun getArticlesForTag(tag: String): LiveData<PagedList<Article>> {
         val isMostRecentOrderFlow = state.getLiveData<Boolean>(STATE_ORDER_MOST_RECENT_FIRST).asFlow()
         val needUnreadFlow = state.getLiveData<Boolean>(STATE_NEED_UNREAD).asFlow()

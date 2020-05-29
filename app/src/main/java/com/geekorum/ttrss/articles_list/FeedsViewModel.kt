@@ -32,6 +32,7 @@ import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.webapi.ApiCallException
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -47,6 +48,7 @@ private const val STATE_SELECTED_CATEGORY_ID = "selected_category_id"
 /**
  * [ViewModel] for to display the list of feeds
  */
+@OptIn(ExperimentalCoroutinesApi::class)
 class FeedsViewModel @AssistedInject constructor(
     @Assisted private val state: SavedStateHandle,
     private val dispatchers: CoroutineDispatchersProvider,

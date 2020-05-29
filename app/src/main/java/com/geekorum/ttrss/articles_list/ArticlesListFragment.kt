@@ -69,7 +69,7 @@ abstract class BaseArticlesListFragment(
                     articlesViewModel.commitSetUnreadActions()
                 }
             })
-            setAction(R.string.undo_set_articles_read_btn) { view ->
+            setAction(R.string.undo_set_articles_read_btn) {
                 articlesViewModel.undoSetUnreadActions()
             }
         }
@@ -95,7 +95,7 @@ abstract class BaseArticlesListFragment(
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         setupEdgeToEdge()
-        articlesViewModel.articles.observe(this) { articles -> adapter!!.submitList(articles) }
+        articlesViewModel.articles.observe(this) { articles -> adapter.submitList(articles) }
 
         articlesViewModel.getPendingArticlesSetUnread().observe(viewLifecycleOwner) { nbArticles ->
             if (nbArticles > 0) {

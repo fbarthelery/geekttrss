@@ -53,20 +53,20 @@ interface ArticleDao {
     @Query("SELECT * FROM articles WHERE feed_id=:feedId AND unread=1 ORDER BY last_time_update")
     fun getAllUnreadArticlesForFeedOldestFirst(feedId: Long): DataSource.Factory<Int, Article>
 
-    @Query("SELECT * FROM articles " +
+    @Query("SELECT articles.* FROM articles " +
         " JOIN articles_tags ON (articles_tags.article_id = articles._id)" +
         " WHERE articles_tags.tag=:tag ORDER BY last_time_update DESC")
     fun getAllArticlesForTag(tag: String): DataSource.Factory<Int, Article>
-    @Query("SELECT * FROM articles " +
+    @Query("SELECT articles.* FROM articles " +
         " JOIN articles_tags ON (articles_tags.article_id = articles._id)" +
         " WHERE articles_tags.tag=:tag ORDER BY last_time_update")
     fun getAllArticlesForTagOldestFirst(tag: String): DataSource.Factory<Int, Article>
 
-    @Query("SELECT * FROM articles " +
+    @Query("SELECT articles.* FROM articles " +
         " JOIN articles_tags ON (articles_tags.article_id = articles._id)" +
         " WHERE articles_tags.tag=:tag AND unread=1 ORDER BY last_time_update DESC")
     fun getAllUnreadArticlesForTag(tag: String): DataSource.Factory<Int, Article>
-    @Query("SELECT * FROM articles " +
+    @Query("SELECT articles.* FROM articles " +
         " JOIN articles_tags ON (articles_tags.article_id = articles._id)" +
         " WHERE articles_tags.tag=:tag AND unread=1 ORDER BY last_time_update")
     fun getAllUnreadArticlesForTagOldestFirst(tag: String): DataSource.Factory<Int, Article>

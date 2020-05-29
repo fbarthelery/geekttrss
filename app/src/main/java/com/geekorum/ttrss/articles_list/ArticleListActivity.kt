@@ -24,6 +24,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.viewModels
+import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.get
@@ -140,11 +141,12 @@ class ArticleListActivity : SessionActivity() {
         // banner container
         ViewCompat.setOnApplyWindowInsetsListener(binding.bannerContainer) { view, insets ->
             // consume top padding since we are not on top of screen
-            val noTopInsets = insets.replaceSystemWindowInsets(insets.systemWindowInsetLeft,
+            val noTopInsets = WindowInsetsCompat.Builder().setSystemWindowInsets(
+                Insets.of(insets.systemWindowInsetLeft,
                 0,
                 insets.systemWindowInsetRight,
-                insets.systemWindowInsetBottom
-            )
+                insets.systemWindowInsetBottom)
+            ).build()
             WindowInsetsCompat.toWindowInsetsCompat(
                 view.onApplyWindowInsets(noTopInsets.toWindowInsets())
             )
