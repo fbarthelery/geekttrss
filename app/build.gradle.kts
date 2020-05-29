@@ -104,6 +104,12 @@ android {
     }
 
     dynamicFeatures = mutableSetOf(":manage_feeds")
+
+    packagingOptions {
+        // Fix: https://github.com/Kotlin/kotlinx.coroutines/issues/2023
+        exclude("META-INF/AL2.0")
+        exclude("META-INF/LGPL2.1")
+    }
 }
 
 kapt {
@@ -182,7 +188,7 @@ dependencies {
     implementation(enforcedPlatform(kotlin("bom")))
     implementation(kotlin("stdlib-jdk8"))
 
-    val coroutinesVersion = "1.3.6"
+    val coroutinesVersion = "1.3.7"
     implementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:$coroutinesVersion"))
     testImplementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:$coroutinesVersion"))
     androidTestImplementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:$coroutinesVersion"))

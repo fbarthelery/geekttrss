@@ -83,7 +83,7 @@ dependencies {
     //geekdroid
     implementation("com.geekorum.geekdroid:geekdroid:master-SNAPSHOT")
 
-    implementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.3.6"))
+    implementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.3.7"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
 
