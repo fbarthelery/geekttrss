@@ -20,13 +20,10 @@
  */
 package com.geekorum.ttrss.articles_list
 
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
-import androidx.lifecycle.liveData
-import androidx.lifecycle.map
-import androidx.lifecycle.switchMap
+import androidx.lifecycle.viewModelScope
 import com.geekorum.geekdroid.dagger.ViewModelAssistedFactory
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.data.Category
@@ -38,10 +35,9 @@ import com.squareup.inject.assisted.AssistedInject
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.switchMap
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -104,9 +100,13 @@ class FeedsViewModel @AssistedInject constructor(
      * Refresh feeds and categories when collecting this flow for the first time
      */
     private fun <T> Flow<T>.refreshed() = this.onStart {
-        refreshFeeds()
-    }.catch {
-        Timber.w(it, "Unable to refresh feeds and categories")
+        viewModelScope.launch {
+            try {
+                refreshFeeds()
+            } catch(e: ApiCallException) {
+                Timber.w(e, "Unable to refresh feeds and categories")
+            }
+        }
     }
 
     @AssistedInject.Factory
