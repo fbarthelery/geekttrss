@@ -33,7 +33,7 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.6.1")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
 
-    implementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.3.5"))
+    implementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.3.6"))
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core")
 
 
