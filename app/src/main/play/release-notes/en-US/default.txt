@@ -1,4 +1,3 @@
-Add an in app update mechanism
-Various UI tweaks and improve edge to edge navigation
-Display feed's favicon when managing feeds
-Refactoring of the synchronization engine
+Allow to sort the articles by most recent first or oldest first
+Add a setting to select the In app browser engine
+Display most unread tags

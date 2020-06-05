@@ -1,4 +1,3 @@
-Ajout d'un mécanisme de mise à jour de l'application
-Diverses améliorations de l'interface et meilleur support de la navigation par geste
-Affichage de la favicon du feed
-Réecriture du moteur de synchronisation
+Possibilité de choisir l'ordre d'affichage des articles: du plus récent au plus vieux ou inversement
+Ajout d'un paramètre pour sélectionner le moteur web
+Affichage des étiquettes les moins lues
