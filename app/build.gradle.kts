@@ -139,8 +139,8 @@ dependencies {
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.5.0")
 
     //geekdroid
-    implementation("com.geekorum.geekdroid:geekdroid:master-SNAPSHOT")
-    add("googleImplementation", "com.geekorum.geekdroid:geekdroid-firebase:master-SNAPSHOT")
+    implementation("com.geekorum.geekdroid:geekdroid:geekttrss-1.5.1")
+    add("googleImplementation", "com.geekorum.geekdroid:geekdroid-firebase:geekttrss-1.5.1")
 
     implementation(project(":htmlparsers"))
     implementation(project(":webapi"))
