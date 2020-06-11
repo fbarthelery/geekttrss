@@ -30,6 +30,9 @@ import com.geekorum.geekdroid.accounts.CancellableSyncAdapter;
 
 import javax.inject.Inject;
 
+import dagger.hilt.android.AndroidEntryPoint;
+import dagger.hilt.android.qualifiers.ApplicationContext;
+
 /**
  * Allows the Android Sync Framework to synchronize Articles of Tiny Tiny Rss.
  */
@@ -38,7 +41,7 @@ public class ArticleSyncAdapter extends CancellableSyncAdapter {
     private SyncComponent.Builder syncBuilder;
 
     @Inject
-    public ArticleSyncAdapter(Context context, SyncComponent.Builder syncBuilder) {
+    public ArticleSyncAdapter(@ApplicationContext Context context, SyncComponent.Builder syncBuilder) {
         super(context, true, false); //no parallel sync for now
         this.syncBuilder = syncBuilder;
     }

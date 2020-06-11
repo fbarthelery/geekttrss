@@ -23,10 +23,6 @@ package com.geekorum.ttrss.sync
 import android.accounts.Account
 import android.content.Context
 import android.content.SharedPreferences
-import com.geekorum.favikonsnoop.FaviKonSnoop
-import com.geekorum.favikonsnoop.snoopers.AppManifestSnooper
-import com.geekorum.favikonsnoop.snoopers.AppleTouchIconSnooper
-import com.geekorum.favikonsnoop.snoopers.WhatWgSnooper
 import com.geekorum.ttrss.accounts.NetworkLoginModule
 import com.geekorum.ttrss.accounts.PerAccount
 import com.geekorum.ttrss.data.plugins.SynchronizationFacade
@@ -38,29 +34,21 @@ import dagger.BindsInstance
 import dagger.Module
 import dagger.Provides
 import dagger.Subcomponent
-import dagger.android.ContributesAndroidInjector
-import okhttp3.OkHttpClient
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ServiceComponent
 
 /**
  * Dependency injection pieces for the Sync functionality.
  *
- * ArticleSyncService has a SubComponent of the ApplicationComponent, that allows it to inject to ArticleSyncService.
- * ArticleSyncAdapter has a SubSubComponent which provides the actual SyncComponent
- *
+ * The SyncComponent is a SubComponent of the ServiceComponent. It provides an ArticleSynchronizerFactory
  */
 
-@Module
-abstract class ServiceInjectorModule {
-
-    @ContributesAndroidInjector(modules = [SyncComponentModule::class, SyncServiceModule::class])
-    abstract fun contributeArticleSyncServiceInjector(): ArticleSyncService
-
-}
 
 @Module(includes = [WorkersModule::class])
 object SyncWorkersModule
 
 @Module(subcomponents = [SyncComponent::class])
+@InstallIn(ServiceComponent::class)
 private object SyncComponentModule
 
 
@@ -81,24 +69,6 @@ internal interface SyncComponent {
         fun seedAccount(account: Account): Builder
 
         fun build(): SyncComponent
-    }
-}
-
-@Module
-internal object SyncServiceModule {
-
-    @Provides
-    fun providesContext(service: ArticleSyncService): Context {
-        return service
-    }
-
-    @Provides
-    fun providesFaviKonSnoop(okHttpClient: OkHttpClient): FaviKonSnoop {
-        val snoopers = listOf(
-            AppManifestSnooper(),
-            WhatWgSnooper(),
-            AppleTouchIconSnooper())
-        return FaviKonSnoop(snoopers, okHttpClient)
     }
 }
 
