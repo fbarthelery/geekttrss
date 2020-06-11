@@ -18,21 +18,18 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.geekorum.ttrss.manage_feeds.workers
+package com.geekorum.ttrss.di
 
-import androidx.annotation.Keep
-import androidx.work.WorkerFactory
-import com.geekorum.ttrss.di.ApplicationComponent
-import com.geekorum.ttrss.di.ApplicationComponentEntryPoint
-import com.geekorum.ttrss.features_api.WorkerFactoryProvider
-import com.geekorum.ttrss.manage_feeds.DaggerManageFeedComponent
+import com.geekorum.ttrss.AllFeaturesInstalledModule
+import com.geekorum.ttrss.article_details.ResourcesWebFontProviderModule
+import com.geekorum.ttrss.in_app_update.NoInAppUpdateModule
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ApplicationComponent
 
-@Keep
-class ManageFeedWorkersProvider : WorkerFactoryProvider {
-    override fun getWorkerFactories(appComponent: ApplicationComponentEntryPoint): List<WorkerFactory> {
-        val manageFeedComponent = DaggerManageFeedComponent.builder()
-            .manageFeedsDependencies(appComponent)
-            .build()
-        return listOf(manageFeedComponent.getWorkerFactory())
-    }
-}
+@Module(includes = [FlavorLessModule::class,
+    ResourcesWebFontProviderModule::class,
+    AllFeaturesInstalledModule::class,
+    NoInAppUpdateModule::class])
+@InstallIn(ApplicationComponent::class)
+interface FreeFlavorApplicationModule

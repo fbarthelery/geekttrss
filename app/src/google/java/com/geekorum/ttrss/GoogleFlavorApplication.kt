@@ -40,10 +40,6 @@ class GoogleFlavorApplication : Application() {
         }
     }
 
-    override val applicationComponent by lazy {
-        DaggerGoogleFlavorApplicationComponent.builder().bindApplication(this).build()
-    }
-
     override fun sortAppInitializers(initializers: Set<AppInitializer>): List<AppInitializer> {
         val result = mutableListOf<AppInitializer>()
         val strictModeInitializer = initializers.find { it is StrictModeInitializer }

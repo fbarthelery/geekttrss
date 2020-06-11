@@ -117,6 +117,7 @@ kapt {
     arguments {
         arg("room.schemaLocation", "$projectDir/schemas")
         arg("room.incremental", true)
+        arg("dagger.hilt.disableModulesHaveInstallInCheck", true)
     }
 }
 
@@ -166,7 +167,7 @@ dependencies {
     dualTestImplementation("androidx.arch.core:core-testing:2.1.0")
 
     // dagger
-    val daggerVersion = "2.27"
+    val daggerVersion = "2.28"
     implementation(enforcedDaggerPlatform(daggerVersion))
     kapt(enforcedDaggerPlatform(daggerVersion))
     implementation("com.google.dagger:dagger:$daggerVersion")

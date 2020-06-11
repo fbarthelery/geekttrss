@@ -27,14 +27,17 @@ import coil.ImageLoaderFactory
 import com.geekorum.geekdroid.dagger.AppInitializer
 import com.geekorum.geekdroid.dagger.initialize
 import com.geekorum.ttrss.debugtools.StrictModeInitializer
-import com.geekorum.ttrss.di.ApplicationComponent
-import com.geekorum.ttrss.di.DaggerApplicationComponent
+import com.geekorum.ttrss.di.ApplicationComponentEntryPoint
+import dagger.android.AndroidInjector
 import dagger.android.support.DaggerApplication
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
 /**
  * Initialize global component for the TTRSS application.
  */
+@HiltAndroidApp
 open class Application : DaggerApplication(), Configuration.Provider, ImageLoaderFactory {
 
     @Inject
@@ -47,7 +50,7 @@ open class Application : DaggerApplication(), Configuration.Provider, ImageLoade
     lateinit var imageLoader: ImageLoader
 
     open val applicationComponent by lazy {
-        DaggerApplicationComponent.builder().bindApplication(this).build()
+        EntryPointAccessors.fromApplication(this, ApplicationComponentEntryPoint::class.java)
     }
 
     override fun onCreate() {
@@ -64,7 +67,7 @@ open class Application : DaggerApplication(), Configuration.Provider, ImageLoade
         return result.distinct()
     }
 
-    override fun applicationInjector(): ApplicationComponent = applicationComponent
+    override fun applicationInjector(): AndroidInjector<Application> = applicationComponent
 
     override fun getWorkManagerConfiguration(): Configuration = workManagerConfig
 
@@ -72,5 +75,5 @@ open class Application : DaggerApplication(), Configuration.Provider, ImageLoade
 
 }
 
-val Activity.applicationComponent: ApplicationComponent
+val Activity.applicationComponent: ApplicationComponentEntryPoint
         get() = (applicationContext as Application).applicationComponent

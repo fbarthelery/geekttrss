@@ -26,6 +26,8 @@ import com.geekorum.ttrss.in_app_update.PlayStoreInAppUpdateModule
 import com.geekorum.ttrss.logging.CrashlyticsLoggingModule
 import com.geekorum.ttrss.on_demand_modules.PlayStoreInstallModule
 import dagger.Component
+import dagger.Module
+import dagger.hilt.InstallIn
 import javax.inject.Singleton
 
 /**
@@ -46,3 +48,14 @@ interface GoogleFlavorApplicationComponent : ApplicationComponent {
     @Component.Builder
     interface Builder : ApplicationComponent.Builder
 }
+
+@Module(includes = [
+    FlavorLessModule::class,
+    GoogleFontsWebFontProviderModule::class,
+    CrashlyticsLoggingModule::class,
+    PlayStoreInstallModule::class,
+    PlayStoreInAppUpdateModule::class,
+    GmsSecurityProviderModule::class
+])
+@InstallIn(dagger.hilt.android.components.ApplicationComponent::class)
+interface GoogleFlavorApplicationModule

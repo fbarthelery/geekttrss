@@ -25,7 +25,7 @@ import androidx.work.ListenableWorker
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import com.geekorum.ttrss.Application
-import com.geekorum.ttrss.di.ApplicationComponent
+import com.geekorum.ttrss.di.ApplicationComponentEntryPoint
 import java.util.ServiceLoader
 import javax.inject.Inject
 
@@ -33,7 +33,7 @@ import javax.inject.Inject
  * Each feature module can implement this interface to provide a list of [WorkerFactory] to the application.
  */
 interface WorkerFactoryProvider {
-    fun getWorkerFactories(appComponent: ApplicationComponent): List<WorkerFactory>
+    fun getWorkerFactories(appComponent: ApplicationComponentEntryPoint): List<WorkerFactory>
 }
 
 
