@@ -23,14 +23,17 @@ package com.geekorum.ttrss.accounts;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+
 import androidx.annotation.Nullable;
-import dagger.android.AndroidInjection;
 
 import javax.inject.Inject;
 
+import dagger.hilt.android.AndroidEntryPoint;
+
 /**
- *
+ *  Authenticator service to authenticate to a TinyTinyRss provider
  */
+@AndroidEntryPoint
 public class AuthenticatorService extends Service {
 
     @Inject AccountAuthenticator accountAuthenticator;
@@ -41,9 +44,4 @@ public class AuthenticatorService extends Service {
         return accountAuthenticator.getIBinder();
     }
 
-    @Override
-    public void onCreate() {
-        AndroidInjection.inject(this);
-        super.onCreate();
-    }
 }

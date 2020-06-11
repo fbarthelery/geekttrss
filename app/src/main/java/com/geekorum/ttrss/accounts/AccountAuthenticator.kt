@@ -37,6 +37,7 @@ import com.geekorum.ttrss.webapi.ApiCallException
 import com.geekorum.ttrss.webapi.checkStatus
 import com.geekorum.ttrss.webapi.model.LoginRequestPayload
 import com.geekorum.ttrss.webapi.model.LoginResponsePayload
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -48,7 +49,7 @@ import javax.inject.Inject
 
 class AccountAuthenticator @Inject
 internal constructor(
-    private val context: Context,
+    @ApplicationContext private val context: Context,
     private val dispatchers: CoroutineDispatchersProvider,
     private val accountManager: AndroidTinyrssAccountManager,
     private val authenticatorBuilder: AuthenticatorNetworkComponent.Builder

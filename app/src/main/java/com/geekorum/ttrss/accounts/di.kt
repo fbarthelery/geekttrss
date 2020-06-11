@@ -40,6 +40,8 @@ import dagger.multibindings.IntoMap
 import javax.inject.Scope
 import kotlin.annotation.AnnotationRetention.RUNTIME
 import com.geekorum.ttrss.webapi.TokenRetriever
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ServiceComponent
 
 /**
  * Dependency injection pieces for the account authenticator functionality.
@@ -79,9 +81,6 @@ object AndroidTinyrssAccountManagerModule {
 @Module
 abstract class ServicesInjectorModule {
 
-    @ContributesAndroidInjector(modules = [AuthenticatorServiceModule::class])
-    internal abstract fun contributesAuthenticatorServiceInjector(): AuthenticatorService
-
     @ContributesAndroidInjector(modules = [AuthenticatorActivityModule::class, ViewModelsModule::class])
     internal abstract fun contributesLoginActivityInjector(): LoginActivity
 
@@ -116,14 +115,8 @@ object NetworkLoginModule {
 
 
 @Module(subcomponents = [AuthenticatorNetworkComponent::class])
-internal object AuthenticatorServiceModule {
-
-    @Provides
-    fun providesContext(service: AuthenticatorService): Context {
-        return service
-    }
-
-}
+@InstallIn(ServiceComponent::class)
+internal object AuthenticatorServiceModule
 
 @Module(subcomponents = [AuthenticatorNetworkComponent::class])
 internal object AuthenticatorActivityModule {
