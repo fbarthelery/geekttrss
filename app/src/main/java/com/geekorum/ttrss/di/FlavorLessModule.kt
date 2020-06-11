@@ -55,6 +55,7 @@ import dagger.Module
     OnDemandModules::class,
     com.geekorum.ttrss.article_details.ActivitiesInjectorModule::class,
     com.geekorum.ttrss.articles_list.ActivitiesInjectorModule::class,
+    com.geekorum.ttrss.sync.ServiceInjectorModule::class,
     SyncWorkersModule::class,
     com.geekorum.ttrss.accounts.ServicesInjectorModule::class,
     com.geekorum.ttrss.add_feed.AndroidInjectorsModule::class,
