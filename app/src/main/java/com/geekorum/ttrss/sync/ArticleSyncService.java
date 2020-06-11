@@ -23,14 +23,17 @@ package com.geekorum.ttrss.sync;
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
+
 import androidx.annotation.Nullable;
-import dagger.android.AndroidInjection;
 
 import javax.inject.Inject;
+
+import dagger.hilt.android.AndroidEntryPoint;
 
 /**
  * Background service to synchronize Tiny Tiny Rss articles.
  */
+@AndroidEntryPoint
 public class ArticleSyncService extends Service {
     @Inject ArticleSyncAdapter articleSyncAdapter;
 
@@ -40,9 +43,4 @@ public class ArticleSyncService extends Service {
         return articleSyncAdapter.getSyncAdapterBinder();
     }
 
-    @Override
-    public void onCreate() {
-        AndroidInjection.inject(this);
-        super.onCreate();
-    }
 }

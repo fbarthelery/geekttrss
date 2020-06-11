@@ -23,10 +23,6 @@ package com.geekorum.ttrss.sync
 import android.accounts.Account
 import android.content.Context
 import android.content.SharedPreferences
-import com.geekorum.favikonsnoop.FaviKonSnoop
-import com.geekorum.favikonsnoop.snoopers.AppManifestSnooper
-import com.geekorum.favikonsnoop.snoopers.AppleTouchIconSnooper
-import com.geekorum.favikonsnoop.snoopers.WhatWgSnooper
 import com.geekorum.ttrss.accounts.NetworkLoginModule
 import com.geekorum.ttrss.accounts.PerAccount
 import com.geekorum.ttrss.data.plugins.SynchronizationFacade
@@ -37,72 +33,43 @@ import dagger.Binds
 import dagger.BindsInstance
 import dagger.Module
 import dagger.Provides
-import dagger.Subcomponent
-import dagger.android.ContributesAndroidInjector
-import okhttp3.OkHttpClient
+import dagger.hilt.DefineComponent
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ServiceComponent
 
-/**
+/*
  * Dependency injection pieces for the Sync functionality.
  *
- * ArticleSyncService has a SubComponent of the ApplicationComponent, that allows it to inject to ArticleSyncService.
- * ArticleSyncAdapter has a SubSubComponent which provides the actual SyncComponent
+ * AccountSyncServiceComponent is a SubComponent of the [ServiceComponent]:
+ *   It has binding for a specific account in the SyncService
  *
  */
-
-@Module
-abstract class ServiceInjectorModule {
-
-    @ContributesAndroidInjector(modules = [SyncComponentModule::class, SyncServiceModule::class])
-    abstract fun contributeArticleSyncServiceInjector(): ArticleSyncService
-
-}
 
 @Module(includes = [WorkersModule::class])
 object SyncWorkersModule
 
-@Module(subcomponents = [SyncComponent::class])
-private object SyncComponentModule
 
-
-@Subcomponent(modules = [
-    AssistedFactoriesModule::class,
-    NetworkLoginModule::class, TinyrssApiModule::class,
-    AccountPreferenceModule::class, DatabaseAccessModule::class
-])
+@DefineComponent(parent = ServiceComponent::class)
 @PerAccount
-internal interface SyncComponent {
+interface AccountSyncServiceComponent
 
-    val articleSynchronizerFactory: ArticleSynchronizer.Factory
+@DefineComponent.Builder
+interface AccountSyncServiceComponentBuilder {
+    @BindsInstance
+    fun seedAccount(account: Account): AccountSyncServiceComponentBuilder
 
-    @Subcomponent.Builder
-    interface Builder {
-
-        @BindsInstance
-        fun seedAccount(account: Account): Builder
-
-        fun build(): SyncComponent
-    }
+    fun build(): AccountSyncServiceComponent
 }
 
-@Module
-internal object SyncServiceModule {
-
-    @Provides
-    fun providesContext(service: ArticleSyncService): Context {
-        return service
-    }
-
-    @Provides
-    fun providesFaviKonSnoop(okHttpClient: OkHttpClient): FaviKonSnoop {
-        val snoopers = listOf(
-            AppManifestSnooper(),
-            WhatWgSnooper(),
-            AppleTouchIconSnooper())
-        return FaviKonSnoop(snoopers, okHttpClient)
-    }
-}
+@Module(includes = [
+    AssistedFactoriesModule::class,
+    NetworkLoginModule::class, TinyrssApiModule::class
+])
+@InstallIn(AccountSyncServiceComponent::class)
+internal interface AccountSyncServiceModule
 
 @Module
+@InstallIn(AccountSyncServiceComponent::class)
 internal object AccountPreferenceModule {
 
     @Provides
@@ -112,6 +79,7 @@ internal object AccountPreferenceModule {
 }
 
 @Module
+@InstallIn(AccountSyncServiceComponent::class)
 internal abstract class DatabaseAccessModule {
     @Binds
     abstract fun providesDatabaseService(synchronizationFacade: SynchronizationFacade): DatabaseService

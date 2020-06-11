@@ -25,20 +25,33 @@ import android.content.ContentProviderClient;
 import android.content.Context;
 import android.content.SyncResult;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
+
 import com.geekorum.geekdroid.accounts.CancellableSyncAdapter;
 
 import javax.inject.Inject;
+
+import dagger.hilt.EntryPoint;
+import dagger.hilt.EntryPoints;
+import dagger.hilt.InstallIn;
+import dagger.hilt.android.qualifiers.ApplicationContext;
 
 /**
  * Allows the Android Sync Framework to synchronize Articles of Tiny Tiny Rss.
  */
 public class ArticleSyncAdapter extends CancellableSyncAdapter {
 
-    private SyncComponent.Builder syncBuilder;
+    private AccountSyncServiceComponentBuilder syncBuilder;
+
+    @EntryPoint
+    @InstallIn(AccountSyncServiceComponent.class)
+    public interface AccountSyncEntryPoint{
+        ArticleSynchronizer.Factory getArticleSynchronizerFactory();
+    }
 
     @Inject
-    public ArticleSyncAdapter(Context context, SyncComponent.Builder syncBuilder) {
+    public ArticleSyncAdapter(@ApplicationContext Context context, AccountSyncServiceComponentBuilder syncBuilder) {
         super(context, true, false); //no parallel sync for now
         this.syncBuilder = syncBuilder;
     }
@@ -48,10 +61,11 @@ public class ArticleSyncAdapter extends CancellableSyncAdapter {
     public CancellableSync createCancellableSync(@NonNull Account account, @NonNull Bundle extras,
                                                  @NonNull String authority, @NonNull ContentProviderClient provider,
                                                  @NonNull SyncResult syncResult) {
-        SyncComponent syncComponent = syncBuilder
+        AccountSyncServiceComponent syncComponent = syncBuilder
                 .seedAccount(account)
                 .build();
 
-        return syncComponent.getArticleSynchronizerFactory().create(extras);
+        AccountSyncEntryPoint accountSyncEntryPoint = EntryPoints.get(syncComponent, AccountSyncEntryPoint.class);
+        return accountSyncEntryPoint.getArticleSynchronizerFactory().create(extras);
     }
 }
