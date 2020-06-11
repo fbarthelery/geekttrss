@@ -40,9 +40,11 @@ import com.geekorum.ttrss.R
 import com.geekorum.ttrss.core.BaseActivity
 import com.geekorum.ttrss.databinding.ActivitySettingsBinding
 import com.geekorum.ttrss.debugtools.withStrictMode
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 
+@AndroidEntryPoint
 class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
     lateinit var binding: ActivitySettingsBinding
 
