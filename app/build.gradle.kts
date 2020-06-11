@@ -37,6 +37,7 @@ plugins {
     id("com.geekorum.build.android-release-universal-apk")
     id("com.geekorum.build.play-store-publish")
     id("androidx.navigation.safeargs.kotlin")
+    id("dagger.hilt.android.plugin")
 }
 
 android {
@@ -177,6 +178,10 @@ dependencies {
     kaptTest("com.google.dagger:dagger-android-processor:$daggerVersion")
     implementation("com.squareup.inject:assisted-inject-annotations-dagger2:0.5.2")
     kapt("com.squareup.inject:assisted-inject-processor-dagger2:0.5.2")
+    val hiltVersion = "2.28-alpha"
+    implementation("com.google.dagger:hilt-android:$hiltVersion")
+    kapt("com.google.dagger:hilt-android-compiler:$hiltVersion")
+
 
     val roomVersion = "2.2.0"
     kapt("androidx.room:room-compiler:$roomVersion")

@@ -25,6 +25,7 @@ pluginManagement {
     val crashlyticsVersion: String by settings
     val googleServicesVersion: String by settings
     val ossLicensesVersion: String by settings
+    val hiltVersion: String by settings
 
     plugins {
         kotlin("android") version kotlinVersion
@@ -35,6 +36,7 @@ pluginManagement {
         id("com.google.firebase.crashlytics") version crashlyticsVersion
         id("com.google.gms.google-services") version googleServicesVersion
         id("com.google.android.gms.oss-licenses-plugin") version ossLicensesVersion
+        id("dagger.hilt.android.plugin") version hiltVersion
     }
 
     repositories {
@@ -54,6 +56,7 @@ pluginManagement {
                 "com.google.gms.google-services" -> useModule("com.google.gms:google-services:${googleServicesVersion}")
                 "com.google.firebase.crashlytics" -> useModule("com.google.firebase:firebase-crashlytics-gradle:${crashlyticsVersion}")
                 "androidx.navigation.safeargs.kotlin" -> useModule("androidx.navigation:navigation-safe-args-gradle-plugin:${androidxNavigationVersion}")
+                "dagger.hilt.android.plugin" -> useModule("com.google.dagger:hilt-android-gradle-plugin:${hiltVersion}")
             }
         }
     }

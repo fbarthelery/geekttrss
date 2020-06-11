@@ -37,6 +37,7 @@ plugins {
     id("com.google.firebase.crashlytics") apply false
     id("com.google.gms.google-services") apply false
     id("com.google.android.gms.oss-licenses-plugin") apply false
+    id("dagger.hilt.android.plugin") apply false
 }
 
 
