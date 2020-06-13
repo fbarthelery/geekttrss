@@ -23,108 +23,60 @@
 package com.geekorum.ttrss.articles_list
 
 import android.accounts.Account
-import android.app.Application
-import android.content.SharedPreferences
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModel
-import androidx.preference.PreferenceManager
-import com.geekorum.geekdroid.dagger.FragmentKey
-import com.geekorum.geekdroid.dagger.ViewModelAssistedFactory
-import com.geekorum.geekdroid.dagger.ViewModelKey
+import android.app.Activity
 import com.geekorum.ttrss.accounts.NetworkLoginModule
 import com.geekorum.ttrss.accounts.PerAccount
 import com.geekorum.ttrss.di.AssistedFactoriesModule
-import com.geekorum.ttrss.in_app_update.InAppUpdateViewModel
+import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.network.TinyrssApiModule
-import dagger.Binds
+import com.geekorum.ttrss.session.SessionActivity
 import dagger.Module
 import dagger.Provides
-import dagger.android.ContributesAndroidInjector
-import dagger.multibindings.IntoMap
+import dagger.Subcomponent
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.migration.DisableInstallInCheck
 
 
 /**
  * Dependency injection pieces for the article_list functionality.
  *
- * ArticleListActivity has a SubComponent of the ApplicationComponent.
- * Each Fragment contained by ArticleListActivity has a SubComponent of ArticleListActivitySubComponent
+ * ArticleListActivity has a SubComponent of the ActivityComponent.
+ * This component is bount to the lifecycle of the activity
  *
  * ArticleListActivity's component provides the Account selected
  */
 
-
-/**
- * Provides the Activities injectors subcomponents.
- */
-@Module
-abstract class ActivitiesInjectorModule {
-
-    @ContributesAndroidInjector(modules = [
-        AssistedFactoriesModule::class,
-        ArticlesListModule::class,
-        com.geekorum.ttrss.article_details.FragmentsInjectorModule::class,
-        com.geekorum.ttrss.articles_list.search.FragmentsInjectorModule::class,
-        TinyrssApiModule::class,
-        NetworkLoginModule::class])
-    @PerAccount
-    internal abstract fun contributesArticleListActivityInjector(): ArticleListActivity
-
-}
-
-/**
- * Provides the dependencies for article lists
- */
-@Module
-private abstract class ArticlesListModule {
-
-    @Binds
-    @IntoMap
-    @FragmentKey(ArticlesListFragment::class)
-    abstract fun bindArticlesListFragment(articlesListFragment: ArticlesListFragment): Fragment
-
-    @Binds
-    @IntoMap
-    @FragmentKey(ArticlesListByTagFragment::class)
-    abstract fun bindArticlesListByTagFragment(articlesListByTagFragment: ArticlesListByTagFragment): Fragment
-
-    @Binds
-    @IntoMap
-    @ViewModelKey(ArticlesListViewModel::class)
-    abstract fun getArticlesListFragmentViewModel(articlesViewModel: ArticlesListViewModel.Factory): ViewModelAssistedFactory<out ViewModel>
-
-    @Binds
-    @IntoMap
-    @ViewModelKey(ArticlesListByTagViewModel::class)
-    abstract fun getArticlesListByTagFragmentViewModel(articlesViewModel: ArticlesListByTagViewModel.Factory): ViewModelAssistedFactory<out ViewModel>
-
-    @Binds
-    @IntoMap
-    @ViewModelKey(FeedsViewModel::class)
-    abstract fun getFeedsViewModel(feedsViewModel: FeedsViewModel.Factory): ViewModelAssistedFactory<out ViewModel>
-
-    @Binds
-    @IntoMap
-    @ViewModelKey(ActivityViewModel::class)
-    abstract fun getActivityViewModel(activityViewModel: ActivityViewModel.Factory): ViewModelAssistedFactory<out ViewModel>
-
-    @Binds
-    @IntoMap
-    @ViewModelKey(InAppUpdateViewModel::class)
-    abstract fun getInAppUpdateViewModel(fragmentViewModel: InAppUpdateViewModel): ViewModel
-
-    @Binds
-    @IntoMap
-    @ViewModelKey(TagsViewModel::class)
-    abstract fun getTagsViewModel(tagsViewModel: TagsViewModel.Factory): ViewModelAssistedFactory<out ViewModel>
+@Module(subcomponents = [ArticleListActivityComponent::class])
+@InstallIn(ActivityComponent::class)
+class ArticleListActivityModule
 
 
-    @Module
-    companion object {
+@Subcomponent(modules = [
+    AssistedFactoriesModule::class,
+    TinyrssApiModule::class,
+    NetworkLoginModule::class,
+    AccountModule::class
+])
+@PerAccount
+interface ArticleListActivityComponent {
 
-        @JvmStatic
-        @Provides
-        fun providesAccount(articleListActivity: ArticleListActivity): Account = articleListActivity.account!!
+    val account: Account
+    val apiService: ApiService
+    val articleRepository: ArticlesRepository
 
+    @Subcomponent.Factory
+    interface Factory {
+        fun newComponent(): ArticleListActivityComponent
     }
-
 }
+
+@Module
+@DisableInstallInCheck
+internal class AccountModule {
+    @Provides
+    fun providesAccount(activity: Activity) : Account {
+        return (activity as SessionActivity).account!!
+    }
+}
+

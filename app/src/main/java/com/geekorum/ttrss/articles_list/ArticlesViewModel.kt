@@ -21,6 +21,8 @@
 package com.geekorum.ttrss.articles_list
 
 import android.accounts.Account
+import androidx.hilt.Assisted
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -34,15 +36,12 @@ import androidx.paging.DataSource
 import androidx.paging.PagedList
 import androidx.paging.toLiveData
 import com.geekorum.geekdroid.accounts.SyncInProgressLiveData
-import com.geekorum.geekdroid.dagger.ViewModelAssistedFactory
 import com.geekorum.ttrss.background_job.BackgroundJobManager
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.session.Action
 import com.geekorum.ttrss.session.UndoManager
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.mapLatest
@@ -56,9 +55,11 @@ private const val STATE_ORDER_MOST_RECENT_FIRST = "order_most_recent_first" // m
  */
 abstract class BaseArticlesViewModel(
     private val state: SavedStateHandle,
-    private val articlesRepository: ArticlesRepository
+    componentFactory: ArticleListActivityComponent.Factory
 ) : ViewModel() {
 
+    protected val component = componentFactory.newComponent()
+    private val articlesRepository = component.articleRepository
     abstract val articles: LiveData<PagedList<Article>>
 
     private val _pendingArticlesSetUnread = MutableLiveData<Int>().apply { value = 0 }
@@ -248,13 +249,12 @@ abstract class BaseArticlesViewModel(
 /**
  * ViewModel for [ArticlesListFragment]
  */
-class ArticlesListViewModel @AssistedInject constructor(
+class ArticlesListViewModel @ViewModelInject constructor(
     @Assisted private val state: SavedStateHandle,
-    articlesRepository: ArticlesRepository,
     private val feedsRepository: FeedsRepository,
     private val backgroundJobManager: BackgroundJobManager,
-    private val account: Account
-) : BaseArticlesViewModel(state, articlesRepository) {
+    componentFactory: ArticleListActivityComponent.Factory
+) : BaseArticlesViewModel(state, componentFactory) {
 
     val feedId = state.getLiveData(STATE_FEED_ID, Feed.FEED_ID_ALL_ARTICLES).apply {
         // workaround for out of sync values see
@@ -272,6 +272,8 @@ class ArticlesListViewModel @AssistedInject constructor(
     private var refreshJobName: MutableLiveData<String?> = MutableLiveData<String?>().apply {
         value = null
     }
+
+    private val account = component.account
 
     override val isRefreshing: LiveData<Boolean> = refreshJobName.switchMap {
         if (it == null)
@@ -318,25 +320,22 @@ class ArticlesListViewModel @AssistedInject constructor(
         private const val STATE_FEED_ID = "feed_id"
     }
 
-    @AssistedInject.Factory
-    interface Factory : ViewModelAssistedFactory<ArticlesListViewModel> {
-        override fun create(state: SavedStateHandle): ArticlesListViewModel
-    }
 }
 
 
-class ArticlesListByTagViewModel @AssistedInject constructor(
+class ArticlesListByTagViewModel @ViewModelInject constructor(
     @Assisted private val state: SavedStateHandle,
-    articlesRepository: ArticlesRepository,
     private val backgroundJobManager: BackgroundJobManager,
-    private val account: Account
-) : BaseArticlesViewModel(state, articlesRepository) {
+    componentFactory: ArticleListActivityComponent.Factory
+) : BaseArticlesViewModel(state, componentFactory) {
 
     val tag = state.getLiveData<String>(STATE_TAG).apply {
         // workaround for out of sync values see
         // https://issuetracker.google.com/issues/129989646
         value = value
     }
+
+    private val account: Account = component.account
 
     override val articles: LiveData<PagedList<Article>> = tag.switchMap {
         getArticlesForTag(it)
@@ -367,8 +366,4 @@ class ArticlesListByTagViewModel @AssistedInject constructor(
         private const val STATE_TAG = "tag"
     }
 
-    @AssistedInject.Factory
-    interface Factory : ViewModelAssistedFactory<ArticlesListByTagViewModel> {
-        override fun create(state: SavedStateHandle): ArticlesListByTagViewModel
-    }
 }

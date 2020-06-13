@@ -26,6 +26,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.updatePadding
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
@@ -45,6 +47,7 @@ import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.databinding.FragmentArticleListBinding
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -52,9 +55,7 @@ import javax.inject.Inject
 /**
  * Display all the articles in a list.
  */
-abstract class BaseArticlesListFragment(
-    savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator
-) : BaseFragment(savedStateVmFactoryCreator) {
+abstract class BaseArticlesListFragment() : Fragment() {
 
     private lateinit var binding: FragmentArticleListBinding
     private lateinit var adapter: SwipingArticlesListAdapter
@@ -208,14 +209,12 @@ abstract class BaseArticlesListFragment(
 
 }
 
-class ArticlesListFragment @Inject constructor(
-    savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator
-) : BaseArticlesListFragment(savedStateVmFactoryCreator) {
+@AndroidEntryPoint
+class ArticlesListFragment : BaseArticlesListFragment() {
     override val articlesViewModel: BaseArticlesViewModel by viewModels<ArticlesListViewModel>()
 }
 
-class ArticlesListByTagFragment @Inject constructor(
-    savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator
-) : BaseArticlesListFragment(savedStateVmFactoryCreator) {
+@AndroidEntryPoint
+class ArticlesListByTagFragment : BaseArticlesListFragment() {
     override val articlesViewModel: BaseArticlesViewModel by viewModels<ArticlesListByTagViewModel>()
 }

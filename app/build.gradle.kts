@@ -182,6 +182,7 @@ dependencies {
     val hiltVersion = "2.28-alpha"
     implementation("com.google.dagger:hilt-android:$hiltVersion")
     implementation("androidx.hilt:hilt-work:1.0.0-alpha01")
+    implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha01")
     kapt("androidx.hilt:hilt-compiler:1.0.0-alpha01")
     kapt("com.google.dagger:hilt-android-compiler:$hiltVersion")
     androidTestImplementation("com.google.dagger:hilt-android-testing:2.28-alpha")

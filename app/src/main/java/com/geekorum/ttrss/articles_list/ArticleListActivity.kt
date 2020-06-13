@@ -46,6 +46,7 @@ import com.geekorum.ttrss.in_app_update.InAppUpdateViewModel
 import com.geekorum.ttrss.on_demand_modules.OnDemandModuleManager
 import com.geekorum.ttrss.session.SessionActivity
 import com.google.android.material.appbar.AppBarLayout
+import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -57,6 +58,7 @@ import javax.inject.Inject
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
+@AndroidEntryPoint
 class ArticleListActivity : SessionActivity() {
     companion object {
         internal const val CODE_START_IN_APP_UPDATE = 1

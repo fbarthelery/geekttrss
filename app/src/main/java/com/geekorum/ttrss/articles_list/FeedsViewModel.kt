@@ -20,18 +20,17 @@
  */
 package com.geekorum.ttrss.articles_list
 
+import androidx.hilt.Assisted
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
-import com.geekorum.geekdroid.dagger.ViewModelAssistedFactory
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.webapi.ApiCallException
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -49,12 +48,15 @@ private const val STATE_SELECTED_CATEGORY_ID = "selected_category_id"
  * [ViewModel] for to display the list of feeds
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-class FeedsViewModel @AssistedInject constructor(
+class FeedsViewModel @ViewModelInject constructor(
     @Assisted private val state: SavedStateHandle,
     private val dispatchers: CoroutineDispatchersProvider,
     private val feedsRepository: FeedsRepository,
-    private val apiService: ApiService
+    componentFactory: ArticleListActivityComponent.Factory
 ) : ViewModel() {
+
+    private val component = componentFactory.newComponent()
+    private val apiService: ApiService = component.apiService
 
     private val onlyUnread = state.getLiveData(STATE_ONLY_UNREAD, true).asFlow()
 
@@ -111,8 +113,4 @@ class FeedsViewModel @AssistedInject constructor(
         }
     }
 
-    @AssistedInject.Factory
-    interface Factory : ViewModelAssistedFactory<FeedsViewModel> {
-        override fun create(state: SavedStateHandle): FeedsViewModel
-    }
 }

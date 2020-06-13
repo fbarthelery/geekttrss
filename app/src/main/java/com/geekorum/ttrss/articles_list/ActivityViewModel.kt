@@ -24,19 +24,17 @@ import android.accounts.Account
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.net.toUri
+import androidx.hilt.Assisted
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.map
-import androidx.lifecycle.switchMap
 import com.geekorum.geekdroid.app.lifecycle.Event
-import com.geekorum.geekdroid.dagger.ViewModelAssistedFactory
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.network.TtRssBrowserLauncher
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
 
 private const val STATE_FEED_ID = "feed_id"
 private const val STATE_ACCOUNT = "account"
@@ -49,7 +47,7 @@ private const val PREF_SORT_ORDER = "sort_order"
 /**
  * [ViewModel] for the [ArticleListActivity]
  */
-class ActivityViewModel @AssistedInject constructor(
+class ActivityViewModel @ViewModelInject constructor(
     @Assisted private val state: SavedStateHandle,
     private val browserLauncher: TtRssBrowserLauncher,
     private val prefs: SharedPreferences
@@ -150,9 +148,4 @@ class ActivityViewModel @AssistedInject constructor(
     private fun ArticleSelectedEvent(position: Int, article: Article) =
         Event(ArticleSelectedParameters(position, article))
 
-
-    @AssistedInject.Factory
-    interface Factory : ViewModelAssistedFactory<ActivityViewModel> {
-        override fun create(state: SavedStateHandle): ActivityViewModel
-    }
 }
