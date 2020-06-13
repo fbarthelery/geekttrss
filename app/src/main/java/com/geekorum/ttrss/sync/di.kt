@@ -45,9 +45,6 @@ import dagger.hilt.migration.DisableInstallInCheck
  */
 
 
-@Module(includes = [WorkersModule::class])
-object SyncWorkersModule
-
 @Module(subcomponents = [SyncComponent::class])
 @InstallIn(ServiceComponent::class)
 private object SyncComponentModule

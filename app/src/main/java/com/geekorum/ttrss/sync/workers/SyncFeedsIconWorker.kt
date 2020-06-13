@@ -21,6 +21,8 @@
 package com.geekorum.ttrss.sync.workers
 
 import android.content.Context
+import androidx.hilt.Assisted
+import androidx.hilt.work.WorkerInject
 import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
@@ -35,12 +37,14 @@ import javax.inject.Inject
 /**
  * Synchronize icon url info for every feeds.
  */
-class SyncFeedsIconWorker(
-        context: Context,
-        workerParams: WorkerParameters,
-        private val dispatchers: CoroutineDispatchersProvider,
-        private val feedIconSynchronizer: FeedIconSynchronizer
-) : CoroutineWorker(context, workerParams) {
+class SyncFeedsIconWorker @WorkerInject constructor(
+    @Assisted context: Context,
+    @Assisted workerParams: WorkerParameters,
+    syncWorkerComponentBuilder: SyncWorkerComponent.Builder,
+    private val dispatchers: CoroutineDispatchersProvider
+) : BaseSyncWorker(context, workerParams, syncWorkerComponentBuilder) {
+
+    private val feedIconSynchronizer: FeedIconSynchronizer = syncWorkerComponent.feedIconSynchronizer
 
     override suspend fun doWork(): Result = withContext(dispatchers.io) {
         try {
@@ -52,26 +56,5 @@ class SyncFeedsIconWorker(
             Result.failure()
         }
     }
-
-    class WorkerFactory @Inject constructor(
-            syncWorkerComponentBuilder: SyncWorkerComponent.Builder
-    ) : SyncWorkerFactory(syncWorkerComponentBuilder) {
-
-        override fun createWorker(
-                appContext: Context, workerClassName: String, workerParameters: WorkerParameters
-        ): ListenableWorker? {
-            if (workerClassName != SyncFeedsIconWorker::class.java.name) {
-                return null
-            }
-
-            val syncWorkerComponent = createSyncWorkerComponent(workerParameters)
-            return with(syncWorkerComponent) {
-                SyncFeedsIconWorker(appContext, workerParameters,
-                        dispatchers,
-                        feedIconSynchronizer)
-            }
-        }
-    }
-
 
 }

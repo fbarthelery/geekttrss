@@ -21,9 +21,7 @@
 package com.geekorum.ttrss.sync.workers
 
 import android.content.Context
-import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleWithAttachments
 import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.sync.ArticleAugmenter
@@ -35,8 +33,10 @@ import com.geekorum.ttrss.webapi.ApiCallException
 abstract class FeedArticlesWorker(
         context: Context,
         workerParams: WorkerParameters,
-        protected val apiService: ApiService
-) : CoroutineWorker(context, workerParams) {
+        syncWorkerComponentBuilder: SyncWorkerComponent.Builder
+) : BaseSyncWorker(context, workerParams, syncWorkerComponentBuilder) {
+
+    protected val apiService: ApiService = syncWorkerComponent.apiService
 
     @Throws(ApiCallException::class)
     protected suspend fun getArticles(

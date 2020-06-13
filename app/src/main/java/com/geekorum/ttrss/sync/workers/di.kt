@@ -21,13 +21,10 @@
 package com.geekorum.ttrss.sync.workers
 
 import android.accounts.Account
-import androidx.work.WorkerFactory
 import com.geekorum.favikonsnoop.FaviKonSnoop
 import com.geekorum.favikonsnoop.snoopers.AppManifestSnooper
 import com.geekorum.favikonsnoop.snoopers.AppleTouchIconSnooper
 import com.geekorum.favikonsnoop.snoopers.WhatWgSnooper
-import com.geekorum.geekdroid.dagger.WorkerInjectionModule
-import com.geekorum.geekdroid.dagger.WorkerKey
 import com.geekorum.ttrss.accounts.NetworkLoginModule
 import com.geekorum.ttrss.accounts.PerAccount
 import com.geekorum.ttrss.accounts.ServerInformation
@@ -40,51 +37,18 @@ import com.geekorum.ttrss.sync.DatabaseAccessModule
 import com.geekorum.ttrss.sync.DatabaseService
 import com.geekorum.ttrss.sync.FeedIconSynchronizer
 import com.geekorum.ttrss.sync.HttpCacher
-import dagger.Binds
 import dagger.BindsInstance
 import dagger.Module
 import dagger.Provides
 import dagger.Subcomponent
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ApplicationComponent
-import dagger.multibindings.IntoMap
 import okhttp3.OkHttpClient
 
 
-@Module(includes = [WorkerInjectionModule::class], subcomponents = [SyncWorkerComponent::class])
-abstract class WorkersModule {
-
-    @Binds
-    @IntoMap
-    @WorkerKey(SendTransactionsWorker::class)
-    abstract fun providesSendTransactionsWorkerFactory(
-            workerFactory: SendTransactionsWorker.WorkerFactory): WorkerFactory
-
-    @Binds
-    @IntoMap
-    @WorkerKey(SyncFeedsWorker::class)
-    abstract fun providesSyncFeedsWorkerFactory(
-            workerFactory: SyncFeedsWorker.WorkerFactory): WorkerFactory
-
-    @Binds
-    @IntoMap
-    @WorkerKey(SyncFeedsIconWorker::class)
-    abstract fun providesSyncFeedsIconWorkerFactory(
-            workerFactory: SyncFeedsIconWorker.WorkerFactory): WorkerFactory
-
-    @Binds
-    @IntoMap
-    @WorkerKey(CollectNewArticlesWorker::class)
-    abstract fun providesCollectNewArticlesWorkerFactory(
-            workerFactory: CollectNewArticlesWorker.WorkerFactory): WorkerFactory
-
-    @Binds
-    @IntoMap
-    @WorkerKey(UpdateArticleStatusWorker::class)
-    abstract fun providesUpdateArticleStatusWorkerFactory(
-            workerFactory: UpdateArticleStatusWorker.WorkerFactory): WorkerFactory
-
-}
+@Module(subcomponents = [SyncWorkerComponent::class])
+@InstallIn(ApplicationComponent::class)
+abstract class WorkersModule
 
 @Subcomponent(modules = [
     NetworkLoginModule::class,

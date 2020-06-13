@@ -21,6 +21,8 @@
 package com.geekorum.ttrss.sync.workers
 
 import android.content.Context
+import androidx.hilt.Assisted
+import androidx.hilt.work.WorkerInject
 import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
@@ -38,13 +40,16 @@ import javax.inject.Inject
 /**
  * Send the saved transactions to the tinyrss service.
  */
-class SendTransactionsWorker(
-        context: Context,
-        workerParams: WorkerParameters,
-        private val dispatchers: CoroutineDispatchersProvider,
-        private val apiService: ApiService,
-        private val databaseService: DatabaseService
-) : CoroutineWorker(context, workerParams) {
+class SendTransactionsWorker @WorkerInject constructor(
+    @Assisted context: Context,
+    @Assisted workerParams: WorkerParameters,
+    syncWorkerComponentBuilder: SyncWorkerComponent.Builder,
+    private val dispatchers: CoroutineDispatchersProvider
+) : BaseSyncWorker(context, workerParams, syncWorkerComponentBuilder) {
+
+    private val apiService: ApiService = syncWorkerComponent.apiService
+    private val databaseService: DatabaseService = syncWorkerComponent.databaseService
+
 
     override suspend fun doWork(): Result = withContext(dispatchers.io)  {
         try {
@@ -86,26 +91,5 @@ class SendTransactionsWorker(
     @Throws(ApiCallException::class)
     private fun updateArticleField(id: Long, field: ArticlesContract.Transaction.Field, value: Boolean) = runBlocking {
         apiService.updateArticleField(id, field, value)
-    }
-
-    class WorkerFactory @Inject constructor(
-            syncWorkerComponentBuilder: SyncWorkerComponent.Builder
-    ) : SyncWorkerFactory(syncWorkerComponentBuilder) {
-
-        override fun createWorker(
-                appContext: Context, workerClassName: String, workerParameters: WorkerParameters
-        ): ListenableWorker? {
-            if (workerClassName != SendTransactionsWorker::class.java.name) {
-                return null
-            }
-
-            val syncWorkerComponent = createSyncWorkerComponent( workerParameters)
-            return with(syncWorkerComponent) {
-                SendTransactionsWorker(appContext, workerParameters,
-                dispatchers,
-                apiService,
-                databaseService)
-            }
-        }
     }
 }

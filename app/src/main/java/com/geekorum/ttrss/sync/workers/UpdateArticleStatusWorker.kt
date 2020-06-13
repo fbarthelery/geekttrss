@@ -22,14 +22,14 @@ package com.geekorum.ttrss.sync.workers
 
 import android.accounts.Account
 import android.content.Context
+import androidx.hilt.Assisted
+import androidx.hilt.work.WorkerInject
 import androidx.work.Data
-import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.Metadata
-import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.sync.DatabaseService
 import com.geekorum.ttrss.webapi.ApiCallException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -38,19 +38,19 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * Update the status of the latest articles of a Feed
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-class UpdateArticleStatusWorker(
-        context: Context,
-        workerParams: WorkerParameters,
-        private val dispatchers: CoroutineDispatchersProvider,
-        apiService: ApiService,
-        private val databaseService: DatabaseService
-) : FeedArticlesWorker(context, workerParams, apiService) {
+class UpdateArticleStatusWorker @WorkerInject constructor(
+    @Assisted context: Context,
+    @Assisted workerParams: WorkerParameters,
+    syncWorkerComponentBuilder: SyncWorkerComponent.Builder,
+    private val dispatchers: CoroutineDispatchersProvider
+) : FeedArticlesWorker(context, workerParams, syncWorkerComponentBuilder) {
+
+    private val databaseService: DatabaseService = syncWorkerComponent.databaseService
 
     companion object {
         const val PARAM_FEED_ID = "feed_id"
@@ -128,28 +128,6 @@ class UpdateArticleStatusWorker(
     private suspend fun updateArticleMetadata(articles: List<Article>) {
         val metadatas = articles.map { Metadata.fromArticle(it) }
         databaseService.updateArticlesMetadata(metadatas)
-    }
-
-
-    class WorkerFactory @Inject constructor(
-            syncWorkerComponentBuilder: SyncWorkerComponent.Builder
-    ) : SyncWorkerFactory(syncWorkerComponentBuilder) {
-
-        override fun createWorker(
-                appContext: Context, workerClassName: String, workerParameters: WorkerParameters
-        ): ListenableWorker? {
-            if (workerClassName != UpdateArticleStatusWorker::class.java.name) {
-                return null
-            }
-
-            val syncWorkerComponent = createSyncWorkerComponent( workerParameters)
-            return with(syncWorkerComponent) {
-                UpdateArticleStatusWorker(appContext, workerParameters,
-                        dispatchers,
-                        apiService,
-                        databaseService)
-            }
-        }
     }
 
 }

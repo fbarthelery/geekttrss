@@ -25,8 +25,9 @@ import android.content.Context
 import android.content.OperationApplicationException
 import android.os.RemoteException
 import android.security.NetworkSecurityPolicy
+import androidx.hilt.Assisted
+import androidx.hilt.work.WorkerInject
 import androidx.work.Data
-import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
@@ -34,7 +35,6 @@ import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleWithAttachments
 import com.geekorum.ttrss.data.ArticlesTags
 import com.geekorum.ttrss.htmlparsers.ImageUrlExtractor
-import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.sync.BackgroundDataUsageManager
 import com.geekorum.ttrss.sync.DatabaseService
 import com.geekorum.ttrss.sync.HttpCacher
@@ -44,25 +44,24 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
+import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import timber.log.Timber
 import java.io.IOException
-import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
-import javax.inject.Inject
-
 
 /**
  * Collect all the new articles from a feed
  */
-class CollectNewArticlesWorker(
-        context: Context,
-        workerParams: WorkerParameters,
-        private val dispatchers: CoroutineDispatchersProvider,
-        apiService: ApiService,
-        private val databaseService: DatabaseService,
-        private val backgroundDataUsageManager: BackgroundDataUsageManager,
-        private val imageUrlExtractor: ImageUrlExtractor,
-        private val httpCacher: HttpCacher
-) : FeedArticlesWorker(context, workerParams, apiService) {
+class CollectNewArticlesWorker @WorkerInject constructor(
+    @Assisted context: Context,
+    @Assisted workerParams: WorkerParameters,
+    syncWorkerComponentBuilder: SyncWorkerComponent.Builder,
+    private val dispatchers: CoroutineDispatchersProvider,
+    private val backgroundDataUsageManager: BackgroundDataUsageManager,
+    private val imageUrlExtractor: ImageUrlExtractor,
+    private val httpCacher: HttpCacher
+) : FeedArticlesWorker(context, workerParams, syncWorkerComponentBuilder) {
+
+    private val databaseService: DatabaseService = syncWorkerComponent.databaseService
 
     companion object {
         const val PARAM_FEED_ID = "feed_id"
@@ -202,31 +201,6 @@ class CollectNewArticlesWorker(
             return false
         }
         return true
-    }
-
-
-    class WorkerFactory @Inject constructor(
-            syncWorkerComponentBuilder: SyncWorkerComponent.Builder
-    ) : SyncWorkerFactory(syncWorkerComponentBuilder) {
-
-        override fun createWorker(
-                appContext: Context, workerClassName: String, workerParameters: WorkerParameters
-        ): ListenableWorker? {
-            if (workerClassName != CollectNewArticlesWorker::class.java.name) {
-                return null
-            }
-
-            val syncWorkerComponent = createSyncWorkerComponent(workerParameters)
-            return with(syncWorkerComponent) {
-                CollectNewArticlesWorker(appContext, workerParameters,
-                        dispatchers,
-                        apiService,
-                        databaseService,
-                        backgroundDataUsageManager,
-                        imageUrlExtractor,
-                        httpCacher)
-            }
-        }
     }
 
 }
