@@ -27,12 +27,15 @@ import com.geekorum.ttrss.data.migrations.ALL_MIGRATIONS
 import com.geekorum.ttrss.providers.PurgeArticlesDao
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ApplicationComponent
 import javax.inject.Singleton
 
 /**
  * Provides some dependencies needed to access the room database.
  */
 @Module
+@InstallIn(ApplicationComponent::class)
 object ArticlesDatabaseModule {
     @Provides
     @Singleton

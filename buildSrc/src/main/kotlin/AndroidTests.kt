@@ -45,7 +45,7 @@ const val robolectricVersion = "4.3.1"
 internal fun Project.configureTests() {
     extensions.configure<BaseExtension> {
         defaultConfig {
-            testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+            testInstrumentationRunner = "com.geekorum.ttrss.HiltRunner"
             testInstrumentationRunnerArgument("clearPackageData", "true")
             testInstrumentationRunnerArgument("disableAnalytics", "true")
         }

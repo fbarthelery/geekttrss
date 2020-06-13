@@ -25,6 +25,7 @@ import com.geekorum.ttrss.AllFeaturesInstalledModule
 import com.geekorum.ttrss.Application
 import com.geekorum.ttrss.article_details.ResourcesWebFontProviderModule
 import com.geekorum.ttrss.core.ActualCoroutineDispatchersModule
+import com.geekorum.ttrss.data.ArticlesDatabaseModule
 import com.geekorum.ttrss.features_api.ManageFeedsDependencies
 import com.geekorum.ttrss.in_app_update.NoInAppUpdateModule
 import com.geekorum.ttrss.sync.workers.FaviKonModule
@@ -39,7 +40,7 @@ import javax.inject.Singleton
  * Main component for the application
  */
 //TODO: remove once tests are migrated to hilt
-@Component(modules = [FlavorLessModule::class, ActualCoroutineDispatchersModule::class, WorkerFactoryModule::class, FaviKonModule::class, ResourcesWebFontProviderModule::class, AllFeaturesInstalledModule::class, NoInAppUpdateModule::class])
+@Component(modules = [FlavorLessModule::class, ActualCoroutineDispatchersModule::class, ArticlesDatabaseModule::class, AssistedFactoriesModule::class, WorkerFactoryModule::class, FaviKonModule::class, ResourcesWebFontProviderModule::class, AllFeaturesInstalledModule::class, NoInAppUpdateModule::class])
 @Singleton
 interface ApplicationComponent : AndroidInjector<Application?>, ManageFeedsDependencies {
     @Component.Builder

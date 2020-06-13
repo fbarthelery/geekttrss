@@ -52,8 +52,7 @@ abstract class WorkersModule
 
 @Subcomponent(modules = [
     NetworkLoginModule::class,
-    TinyrssApiModule::class,
-    DatabaseAccessModule::class
+    TinyrssApiModule::class
 ])
 @PerAccount
 interface SyncWorkerComponent {
@@ -62,11 +61,7 @@ interface SyncWorkerComponent {
     val apiService: ApiService
     val serverInformation: ServerInformation
     val databaseService: DatabaseService
-    val dispatchers: CoroutineDispatchersProvider
     val feedIconSynchronizer: FeedIconSynchronizer
-    val backgroundDataUsageManager: BackgroundDataUsageManager
-    val imageUrlExtractor: ImageUrlExtractor
-    val httpCacher: HttpCacher
 
     @Subcomponent.Builder
     interface Builder {

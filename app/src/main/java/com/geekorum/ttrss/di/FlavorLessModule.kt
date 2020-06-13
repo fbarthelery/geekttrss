@@ -43,7 +43,6 @@ import dagger.Module
     DefaultNightModeModule::class,
     BackgroundJobsModule::class,
     NetworkModule::class,
-    ArticlesDatabaseModule::class,
     SettingsModule::class,
     LogcatLoggingModule::class,
     AndroidTinyrssAccountManagerModule::class,

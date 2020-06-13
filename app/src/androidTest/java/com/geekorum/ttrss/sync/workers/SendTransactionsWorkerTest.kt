@@ -20,56 +20,122 @@
  */
 package com.geekorum.ttrss.sync.workers
 
+import android.accounts.Account
+import android.accounts.AccountManager
+import android.app.Application
 import android.content.Context
+import androidx.hilt.work.HiltWorkerFactory
+import androidx.room.Room
+import androidx.sqlite.db.SupportSQLiteOpenHelper
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.ListenableWorker
-import androidx.work.WorkerFactory
-import androidx.work.WorkerParameters
 import androidx.work.testing.TestListenableWorkerBuilder
+import androidx.work.workDataOf
+import com.geekorum.ttrss.accounts.AndroidTinyrssAccountManager
+import com.geekorum.ttrss.accounts.NetworkLoginModule
+import com.geekorum.ttrss.accounts.PerAccount
+import com.geekorum.ttrss.accounts.ServerInformation
+import com.geekorum.ttrss.accounts.TinyrssAccountTokenRetriever
+import com.geekorum.ttrss.core.ActualCoroutineDispatchersModule
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
+import com.geekorum.ttrss.data.AccountInfoDao
 import com.geekorum.ttrss.data.Article
+import com.geekorum.ttrss.data.ArticleDao
+import com.geekorum.ttrss.data.ArticlesDatabase
+import com.geekorum.ttrss.data.ArticlesDatabaseModule
+import com.geekorum.ttrss.data.FeedsDao
+import com.geekorum.ttrss.data.SynchronizationDao
 import com.geekorum.ttrss.data.Transaction
+import com.geekorum.ttrss.data.TransactionsDao
+import com.geekorum.ttrss.data.migrations.ALL_MIGRATIONS
+import com.geekorum.ttrss.network.ApiService
+import com.geekorum.ttrss.network.TinyrssApiModule
 import com.geekorum.ttrss.providers.ArticlesContract.Transaction.Field
 import com.geekorum.ttrss.providers.ArticlesContract.Transaction.Field.STARRED
 import com.geekorum.ttrss.providers.ArticlesContract.Transaction.Field.UNREAD
+import com.geekorum.ttrss.providers.PurgeArticlesDao
+import com.geekorum.ttrss.sync.DatabaseAccessModule
+import com.geekorum.ttrss.sync.DatabaseService
+import com.geekorum.ttrss.sync.FeedIconSynchronizer
+import com.geekorum.ttrss.webapi.LoggedRequestInterceptorFactory
+import com.geekorum.ttrss.webapi.TokenRetriever
 import com.google.common.truth.Truth.assertThat
+import dagger.Binds
+import dagger.BindsInstance
+import dagger.Module
+import dagger.Provides
+import dagger.Subcomponent
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ApplicationComponent
+import dagger.hilt.android.testing.BindValue
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import dagger.hilt.android.testing.UninstallModules
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.setMain
+import org.junit.Rule
 import org.junit.Test
+import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
+@HiltAndroidTest
+@UninstallModules(ActualCoroutineDispatchersModule::class, WorkersModule::class, DatabaseAccessModule::class)
 class SendTransactionsWorkerTest {
     private lateinit var workerBuilder: TestListenableWorkerBuilder<SendTransactionsWorker>
     private lateinit var apiService: MyMockApiService
     private lateinit var databaseService: MockDatabaseService
     private val testCoroutineDispatcher = TestCoroutineDispatcher()
 
+    @JvmField
+    @BindValue
+    val dispatchers = CoroutineDispatchersProvider(main = testCoroutineDispatcher,
+        io = testCoroutineDispatcher,
+        computation = testCoroutineDispatcher)
+
+    @Module(subcomponents = [FakeSyncWorkerComponent::class])
+    @InstallIn(ApplicationComponent::class)
+    abstract class FakeWorkersModule {
+        @Binds
+        abstract fun bindsSyncWorkerComponentBuilder(builder: FakeSyncWorkerComponent.Builder): SyncWorkerComponent.Builder
+    }
+
+    @Module
+    @InstallIn(ApplicationComponent::class)
+    inner class MockModule {
+        @Provides
+        fun providesApiService(): ApiService = apiService
+        @Provides
+        fun providesDatabaseService(): DatabaseService = databaseService
+    }
+
+    @Inject
+    lateinit var hiltWorkerFactory: HiltWorkerFactory
+
+    @get:Rule
+    var hiltRule = HiltAndroidRule(this)
+
     @BeforeTest
     fun setUp() {
+        hiltRule.inject()
         Dispatchers.setMain(testCoroutineDispatcher)
 
         val applicationContext: Context = ApplicationProvider.getApplicationContext()
         apiService = MyMockApiService()
         databaseService = MockDatabaseService()
         workerBuilder = TestListenableWorkerBuilder(applicationContext)
-        workerBuilder.setWorkerFactory(object : WorkerFactory() {
-            override fun createWorker(
-                    appContext: Context, workerClassName: String, workerParameters: WorkerParameters
-            ): ListenableWorker? {
-                val dispatchers = CoroutineDispatchersProvider(main = testCoroutineDispatcher,
-                        io = testCoroutineDispatcher,
-                        computation = testCoroutineDispatcher)
-
-                return SendTransactionsWorker(appContext, workerParameters, dispatchers,
-                        apiService, databaseService)
-            }
-        })
+        val inputData = workDataOf(
+            SyncWorkerFactory.PARAM_ACCOUNT_NAME to "account.name",
+            SyncWorkerFactory.PARAM_ACCOUNT_TYPE to AndroidTinyrssAccountManager.ACCOUNT_TYPE
+        )
+        workerBuilder.setInputData(inputData)
+        workerBuilder.setWorkerFactory(hiltWorkerFactory)
     }
 
     @AfterTest
@@ -110,4 +176,27 @@ class SendTransactionsWorkerTest {
             called++
         }
     }
+}
+
+
+@Subcomponent(modules = [
+    FakeNetworkLoginModule::class
+])
+interface FakeSyncWorkerComponent : SyncWorkerComponent {
+    @Subcomponent.Builder
+    interface Builder : SyncWorkerComponent.Builder
+}
+
+@Module
+object FakeNetworkLoginModule {
+
+    @Provides
+    fun providesServerInformation(accountManager: AndroidTinyrssAccountManager, account: Account): ServerInformation {
+        return object: ServerInformation() {
+            override val apiUrl: String = "https://test.exemple.com/"
+            override val basicHttpAuthUsername: String? = null
+            override val basicHttpAuthPassword: String? = null
+        }
+    }
+
 }
