@@ -22,11 +22,9 @@ package com.geekorum.ttrss.sync.workers
 
 import android.accounts.Account
 import android.content.Context
-import androidx.work.CoroutineWorker
-import androidx.work.ListenableWorker
-import androidx.work.Worker
+import androidx.hilt.Assisted
+import androidx.hilt.work.WorkerInject
 import androidx.work.WorkerParameters
-import com.geekorum.ttrss.data.Account as DataAccount
 import com.geekorum.ttrss.accounts.ServerInformation
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.data.AccountInfo
@@ -36,20 +34,22 @@ import com.geekorum.ttrss.sync.DatabaseService
 import com.geekorum.ttrss.webapi.ApiCallException
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
+import com.geekorum.ttrss.data.Account as DataAccount
 
 /**
  * Update account information from the network to the local database.
  */
-class UpdateAccountInfoWorker(
-        context: Context,
-        workerParams: WorkerParameters,
-        private val dispatchers: CoroutineDispatchersProvider,
-        private val account: Account,
-        private val serverInformation: ServerInformation,
-        private val apiService: ApiService,
-        private val databaseService: DatabaseService
-) : CoroutineWorker(context, workerParams) {
+class UpdateAccountInfoWorker @WorkerInject constructor(
+    @Assisted context: Context,
+    @Assisted workerParams: WorkerParameters,
+    syncWorkerComponentBuilder: SyncWorkerComponent.Builder,
+    private val dispatchers: CoroutineDispatchersProvider
+) : BaseSyncWorker(context, workerParams, syncWorkerComponentBuilder) {
+
+    private val account: Account = syncWorkerComponent.account
+    private val serverInformation: ServerInformation = syncWorkerComponent.serverInformation
+    private val apiService: ApiService = syncWorkerComponent.apiService
+    private val databaseService: DatabaseService = syncWorkerComponent.databaseService
 
     override suspend fun doWork(): Result = withContext(dispatchers.io) {
         try {
@@ -77,31 +77,6 @@ class UpdateAccountInfoWorker(
         return currentInfo.copy(
                 serverVersion = serverInfoResult.serverVersion ?: currentInfo.serverVersion,
                 apiLevel = serverInfoResult.apiLevel ?: currentInfo.apiLevel)
-    }
-
-
-
-    class WorkerFactory @Inject constructor(
-            syncWorkerComponentBuilder: SyncWorkerComponent.Builder
-    ) : SyncWorkerFactory(syncWorkerComponentBuilder) {
-
-        override fun createWorker(
-                appContext: Context, workerClassName: String, workerParameters: WorkerParameters
-        ): ListenableWorker? {
-            if (workerClassName != UpdateAccountInfoWorker::class.java.name) {
-                return null
-            }
-
-            val syncWorkerComponent = createSyncWorkerComponent(workerParameters)
-            return with(syncWorkerComponent) {
-                UpdateAccountInfoWorker(appContext, workerParameters,
-                        dispatchers,
-                        account,
-                        serverInformation,
-                        apiService,
-                        databaseService)
-            }
-        }
     }
 
 

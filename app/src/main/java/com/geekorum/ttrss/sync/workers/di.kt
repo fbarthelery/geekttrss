@@ -45,18 +45,14 @@ import dagger.BindsInstance
 import dagger.Module
 import dagger.Provides
 import dagger.Subcomponent
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ApplicationComponent
 import dagger.multibindings.IntoMap
 import okhttp3.OkHttpClient
 
 
 @Module(includes = [WorkerInjectionModule::class], subcomponents = [SyncWorkerComponent::class])
 abstract class WorkersModule {
-
-    @Binds
-    @IntoMap
-    @WorkerKey(UpdateAccountInfoWorker::class)
-    abstract fun providesUpdateAccountInfoWorkerFactory(
-            workerFactory: UpdateAccountInfoWorker.WorkerFactory): WorkerFactory
 
     @Binds
     @IntoMap
@@ -93,8 +89,7 @@ abstract class WorkersModule {
 @Subcomponent(modules = [
     NetworkLoginModule::class,
     TinyrssApiModule::class,
-    DatabaseAccessModule::class,
-    FaviKonModule::class
+    DatabaseAccessModule::class
 ])
 @PerAccount
 interface SyncWorkerComponent {
@@ -120,6 +115,7 @@ interface SyncWorkerComponent {
 }
 
 @Module
+@InstallIn(ApplicationComponent::class)
 internal object FaviKonModule {
 
     @Provides

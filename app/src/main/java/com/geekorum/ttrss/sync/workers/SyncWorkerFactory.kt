@@ -21,6 +21,8 @@
 package com.geekorum.ttrss.sync.workers
 
 import android.accounts.Account
+import android.content.Context
+import androidx.work.CoroutineWorker
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 
@@ -49,5 +51,31 @@ abstract class SyncWorkerFactory(
         return syncWorkerComponentBuilder
                 .seedAccount(account)
                 .build()
+    }
+}
+
+abstract class BaseSyncWorker(
+    appContext: Context,
+    workerParameters: WorkerParameters,
+    syncWorkerComponentBuilder: SyncWorkerComponent.Builder
+) : CoroutineWorker(appContext, workerParameters) {
+    protected val syncWorkerComponent: SyncWorkerComponent = createSyncWorkerComponent(
+        workerParameters, syncWorkerComponentBuilder
+    )
+
+    companion object {
+        const val PARAM_ACCOUNT_NAME = "account_name"
+        const val PARAM_ACCOUNT_TYPE = "account_type"
+    }
+
+    private fun createSyncWorkerComponent(workerParameters: WorkerParameters, syncWorkerComponentBuilder: SyncWorkerComponent.Builder): SyncWorkerComponent {
+        val account = with(workerParameters.inputData) {
+            val accountName = getString(PARAM_ACCOUNT_NAME)
+            val accountType = getString(PARAM_ACCOUNT_TYPE)
+            Account(accountName, accountType)
+        }
+        return syncWorkerComponentBuilder
+            .seedAccount(account)
+            .build()
     }
 }

@@ -20,6 +20,7 @@
  */
 package com.geekorum.ttrss.background_job
 
+import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import androidx.work.DelegatingWorkerFactory
 import androidx.work.WorkerFactory
@@ -40,11 +41,9 @@ abstract class BackgroundJobsModule {
     @IntoSet
     internal abstract fun providesBackgroundJobsInitializer(initializer: BackgroundJobManagerInitializer): AppInitializer
 
-    @Module
     companion object {
 
         @Provides
-        @JvmStatic
         fun provideWorkManagerConfiguration(workerFactory: WorkerFactory): Configuration {
             return Configuration.Builder()
                 .setWorkerFactory(workerFactory)
@@ -52,12 +51,13 @@ abstract class BackgroundJobsModule {
         }
 
         @Provides
-        @JvmStatic
         internal fun providesApplicationWorkerFactory(
+            hiltWorkerFactory: HiltWorkerFactory,
             applicationFactories: MutableSet<WorkerFactory>,
             featuresWorkerFactory: FeaturesWorkerFactory
         ): WorkerFactory {
             return DelegatingWorkerFactory().apply {
+                addFactory(hiltWorkerFactory)
                 applicationFactories.forEach(this::addFactory)
                 addFactory(featuresWorkerFactory)
             }

@@ -36,6 +36,7 @@ import dagger.Provides
 import dagger.Subcomponent
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ServiceComponent
+import dagger.hilt.migration.DisableInstallInCheck
 
 /**
  * Dependency injection pieces for the Sync functionality.
@@ -73,6 +74,7 @@ internal interface SyncComponent {
 }
 
 @Module
+@DisableInstallInCheck
 internal object AccountPreferenceModule {
 
     @Provides
@@ -82,6 +84,7 @@ internal object AccountPreferenceModule {
 }
 
 @Module
+@DisableInstallInCheck
 internal abstract class DatabaseAccessModule {
     @Binds
     abstract fun providesDatabaseService(synchronizationFacade: SynchronizationFacade): DatabaseService

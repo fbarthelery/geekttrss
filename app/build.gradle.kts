@@ -181,6 +181,8 @@ dependencies {
     kapt("com.squareup.inject:assisted-inject-processor-dagger2:0.5.2")
     val hiltVersion = "2.28-alpha"
     implementation("com.google.dagger:hilt-android:$hiltVersion")
+    implementation("androidx.hilt:hilt-work:1.0.0-alpha01")
+    kapt("androidx.hilt:hilt-compiler:1.0.0-alpha01")
     kapt("com.google.dagger:hilt-android-compiler:$hiltVersion")
 
 

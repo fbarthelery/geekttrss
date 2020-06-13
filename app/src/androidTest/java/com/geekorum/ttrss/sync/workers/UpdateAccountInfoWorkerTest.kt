@@ -30,8 +30,13 @@ import androidx.work.testing.TestListenableWorkerBuilder
 import com.geekorum.ttrss.accounts.ServerInformation
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.data.AccountInfo
+import com.geekorum.ttrss.htmlparsers.ImageUrlExtractor
+import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.network.ServerInfo
-import com.geekorum.ttrss.data.Account as DataAccount
+import com.geekorum.ttrss.sync.BackgroundDataUsageManager
+import com.geekorum.ttrss.sync.DatabaseService
+import com.geekorum.ttrss.sync.FeedIconSynchronizer
+import com.geekorum.ttrss.sync.HttpCacher
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -42,6 +47,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.Test
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
+import com.geekorum.ttrss.data.Account as DataAccount
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class UpdateAccountInfoWorkerTest {
@@ -71,9 +77,31 @@ class UpdateAccountInfoWorkerTest {
                     override val basicHttpAuthUsername: String? = null
                     override val basicHttpAuthPassword: String? = null
                 }
+                val syncComponentBuilder = object : SyncWorkerComponent.Builder {
+                    override fun seedAccount(account: Account): SyncWorkerComponent.Builder {
+                        return this
+                    }
 
-                return UpdateAccountInfoWorker(appContext, workerParameters, dispatchers,
-                        account, serverInformation, apiService, databaseService)
+                    override fun build(): SyncWorkerComponent = object : SyncWorkerComponent {
+                        override val account: Account = account
+                        override val apiService: ApiService = this@UpdateAccountInfoWorkerTest.apiService
+                        override val serverInformation: ServerInformation = serverInformation
+                        override val databaseService: DatabaseService = this@UpdateAccountInfoWorkerTest.databaseService
+                        override val dispatchers: CoroutineDispatchersProvider = dispatchers
+                        override val feedIconSynchronizer: FeedIconSynchronizer
+                            get() = TODO("not implemented")
+                        override val backgroundDataUsageManager: BackgroundDataUsageManager
+                            get() = TODO("not implemented")
+                        override val imageUrlExtractor: ImageUrlExtractor
+                            get() = TODO("not implemented")
+                        override val httpCacher: HttpCacher
+                            get() = TODO("not implemented")
+
+                    }
+                }
+
+                return UpdateAccountInfoWorker(appContext, workerParameters, syncComponentBuilder,
+                    dispatchers)
             }
         })
     }
