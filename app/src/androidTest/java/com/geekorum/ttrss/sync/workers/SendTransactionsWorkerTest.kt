@@ -57,6 +57,7 @@ import com.geekorum.ttrss.providers.PurgeArticlesDao
 import com.geekorum.ttrss.sync.DatabaseAccessModule
 import com.geekorum.ttrss.sync.DatabaseService
 import com.geekorum.ttrss.sync.FeedIconSynchronizer
+import com.geekorum.ttrss.sync.workers.UpdateArticleStatusWorker.Companion.getInputData
 import com.geekorum.ttrss.webapi.LoggedRequestInterceptorFactory
 import com.geekorum.ttrss.webapi.TokenRetriever
 import com.google.common.truth.Truth.assertThat
@@ -119,7 +120,7 @@ class SendTransactionsWorkerTest {
     lateinit var hiltWorkerFactory: HiltWorkerFactory
 
     @get:Rule
-    var hiltRule = HiltAndroidRule(this)
+    val hiltRule = HiltAndroidRule(this)
 
     @BeforeTest
     fun setUp() {
@@ -130,11 +131,6 @@ class SendTransactionsWorkerTest {
         apiService = MyMockApiService()
         databaseService = MockDatabaseService()
         workerBuilder = TestListenableWorkerBuilder(applicationContext)
-        val inputData = workDataOf(
-            SyncWorkerFactory.PARAM_ACCOUNT_NAME to "account.name",
-            SyncWorkerFactory.PARAM_ACCOUNT_TYPE to AndroidTinyrssAccountManager.ACCOUNT_TYPE
-        )
-        workerBuilder.setInputData(inputData)
         workerBuilder.setWorkerFactory(hiltWorkerFactory)
     }
 
@@ -156,6 +152,12 @@ class SendTransactionsWorkerTest {
         databaseService.insertTransaction(
                 Transaction(id = 2, articleId = 2, field = STARRED.toString(), value = false))
         assertThat(databaseService.getTransactions()).hasSize(2)
+
+        val inputData = workDataOf(
+            BaseSyncWorker.PARAM_ACCOUNT_NAME to "account.name",
+            BaseSyncWorker.PARAM_ACCOUNT_TYPE to AndroidTinyrssAccountManager.ACCOUNT_TYPE
+        )
+        workerBuilder.setInputData(inputData)
 
         val worker = workerBuilder.build()
         val result = worker.doWork()
