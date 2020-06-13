@@ -24,25 +24,23 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
-import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
-import com.geekorum.ttrss.core.BaseFragment
-import com.geekorum.ttrss.core.activityViewModels
 import com.geekorum.ttrss.articles_list.ActivityViewModel
 import com.geekorum.ttrss.articles_list.ArticlesListAdapter
 import com.geekorum.ttrss.articles_list.CardEventHandler
 import com.geekorum.ttrss.articles_list.setupCardSpacing
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.databinding.FragmentArticlesSearchBinding
-import javax.inject.Inject
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * Display search results
  */
-class ArticlesSearchFragment @Inject constructor(
-    savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator
-) : BaseFragment(savedStateVmFactoryCreator) {
+@AndroidEntryPoint
+class ArticlesSearchFragment : Fragment() {
 
     lateinit var binding: FragmentArticlesSearchBinding
     private val activityViewModel: ActivityViewModel by activityViewModels()

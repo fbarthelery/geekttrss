@@ -21,19 +21,23 @@
 package com.geekorum.ttrss.articles_list.search
 
 import androidx.annotation.MainThread
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
+import com.geekorum.ttrss.articles_list.ArticleListActivityComponent
 import com.geekorum.ttrss.articles_list.ArticlesRepository
 import com.geekorum.ttrss.data.Article
 import javax.inject.Inject
 
-class SearchViewModel @Inject constructor(
-    private val articlesRepository: ArticlesRepository
+class SearchViewModel @ViewModelInject constructor(
+    componentFactory: ArticleListActivityComponent.Factory
 ) : ViewModel() {
+
+    private val articlesRepository: ArticlesRepository = componentFactory.newComponent().articleRepository
 
     private val searchQuery = MutableLiveData<String>().apply { value = "" }
 
