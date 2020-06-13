@@ -21,16 +21,9 @@
 package com.geekorum.ttrss.di
 
 import com.geekorum.geekdroid.dagger.AndroidFrameworkModule
-import com.geekorum.ttrss.DefaultNightModeModule
-import com.geekorum.ttrss.accounts.AndroidTinyrssAccountManagerModule
-import com.geekorum.ttrss.background_job.BackgroundJobsModule
 import com.geekorum.ttrss.core.CoreFactoriesModule
-import com.geekorum.ttrss.data.ArticlesDatabaseModule
-import com.geekorum.ttrss.debugtools.StrictModeModule
-import com.geekorum.ttrss.logging.LogcatLoggingModule
-import com.geekorum.ttrss.on_demand_modules.OnDemandModules
-import com.geekorum.ttrss.settings.SettingsModule
 import dagger.Module
+import dagger.android.support.AndroidSupportInjectionModule
 
 /**
  * Base module who includes all the modules common to all flavor of the applicatio
@@ -38,18 +31,12 @@ import dagger.Module
 @Module(includes = [
     CoreFactoriesModule::class,
     AndroidFrameworkModule::class,
-    AndroidBindingsModule::class,
-    ViewModelsModule::class,
-    DefaultNightModeModule::class,
-    BackgroundJobsModule::class,
-    NetworkModule::class,
-    SettingsModule::class,
-    LogcatLoggingModule::class,
-    AndroidTinyrssAccountManagerModule::class,
-    StrictModeModule::class,
-    OnDemandModules::class,
+    AndroidSupportInjectionModule::class,
+//    AndroidBindingsModule::class,
+    com.geekorum.geekdroid.dagger.ViewModelsModule::class,
+//    ViewModelsModule::class,
     com.geekorum.ttrss.article_details.ActivitiesInjectorModule::class,
-    com.geekorum.ttrss.articles_list.ActivitiesInjectorModule::class,
+//    com.geekorum.ttrss.articles_list.ActivitiesInjectorModule::class,
     com.geekorum.ttrss.accounts.ServicesInjectorModule::class,
     com.geekorum.ttrss.add_feed.AndroidInjectorsModule::class,
     com.geekorum.ttrss.providers.AndroidInjectorsModule::class

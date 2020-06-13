@@ -73,7 +73,8 @@ open class InjectableBaseActivity : BatteryFriendlyActivity() {
         super.onCreate(savedInstanceState)
     }
 
-    override fun getDefaultViewModelProviderFactory(): ViewModelProvider.Factory = viewModelsFactory
+    //TODO remove once hilt migration is complete
+//    override fun getDefaultViewModelProviderFactory(): ViewModelProvider.Factory = viewModelsFactory
 
     /**
      * Inject required field into the activity.

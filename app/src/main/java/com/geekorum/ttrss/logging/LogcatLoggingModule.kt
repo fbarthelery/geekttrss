@@ -22,6 +22,8 @@ package com.geekorum.ttrss.logging
 
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ApplicationComponent
 import dagger.multibindings.IntoSet
 import timber.log.Timber
 
@@ -29,6 +31,7 @@ import timber.log.Timber
  * Provides logging output to Logcat
  */
 @Module(includes = [TimberModule::class])
+@InstallIn(ApplicationComponent::class)
 object LogcatLoggingModule {
 
     @Provides @IntoSet

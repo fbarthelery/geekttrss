@@ -29,6 +29,8 @@ import com.geekorum.ttrss.debugtools.withStrictMode
 import com.geekorum.ttrss.logging.RetrofitInvocationLogger
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ApplicationComponent
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -44,6 +46,7 @@ private const val TAG_PICASSO = 2
 private const val TAG_COIL = 3
 
 @Module
+@InstallIn(ApplicationComponent::class)
 object NetworkModule {
 
     @Provides

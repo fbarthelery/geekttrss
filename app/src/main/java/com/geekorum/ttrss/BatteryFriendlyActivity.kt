@@ -27,6 +27,7 @@ import android.os.PowerManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.distinctUntilChanged
@@ -66,7 +67,7 @@ class ForceNightModeViewModel(
     private val lowBatteryLiveData: LiveData<Boolean>
 ) : ViewModel() {
 
-    @Inject
+    @ViewModelInject
     constructor(application: Application, powerManager: PowerManager) : this(
         BatterySaverLiveData(application, powerManager), LowBatteryLiveData(application)
     )

@@ -34,15 +34,19 @@ import dagger.multibindings.IntoMap;
 @Module(includes = com.geekorum.geekdroid.dagger.ViewModelsModule.class)
 public abstract class ViewModelsModule {
 
+/*
     @Binds
     @IntoMap
     @ViewModelKey(TtrssAccountViewModel.class)
     public abstract ViewModel getTtrssAccountViewModel(TtrssAccountViewModel ttrssAccountViewModel);
+*/
 
+/*
     @Binds
     @IntoMap
     @ViewModelKey(ForceNightModeViewModel.class)
     public abstract ViewModel getForceNightViewModel(ForceNightModeViewModel ttrssAccountViewModel);
+*/
 
 
 }

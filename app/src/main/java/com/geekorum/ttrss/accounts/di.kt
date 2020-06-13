@@ -41,6 +41,7 @@ import javax.inject.Scope
 import kotlin.annotation.AnnotationRetention.RUNTIME
 import com.geekorum.ttrss.webapi.TokenRetriever
 import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ApplicationComponent
 import dagger.hilt.android.components.ServiceComponent
 
 /**
@@ -58,6 +59,7 @@ import dagger.hilt.android.components.ServiceComponent
 annotation class PerAccount
 
 @Module
+@InstallIn(ApplicationComponent::class)
 object AndroidTinyrssAccountManagerModule {
 
     private const val KEY_ALIAS = "com.geekorum.geekttrss.accounts.AccountManagerKey"

@@ -28,7 +28,9 @@ import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.articles_list.ArticleListActivity
 import com.geekorum.ttrss.articles_list.TtrssAccountViewModel
 import com.geekorum.ttrss.core.BaseActivity
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : BaseActivity() {
 
     private val accountViewModel: TtrssAccountViewModel by viewModels()
