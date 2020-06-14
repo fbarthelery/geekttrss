@@ -25,6 +25,7 @@ import android.view.inputmethod.EditorInfo
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.databinding.InverseMethod
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
@@ -46,7 +47,7 @@ import javax.inject.Inject
 /**
  * ViewModel for LoginActivity
  */
-internal class LoginViewModel @Inject constructor(
+internal class LoginViewModel @ViewModelInject constructor(
     private val accountManager: TinyrssAccountManager,
     private val networkComponentBuilder: AuthenticatorNetworkComponent.Builder,
     private val dispatchers: CoroutineDispatchersProvider

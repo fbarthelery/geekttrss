@@ -22,27 +22,21 @@ package com.geekorum.ttrss.accounts
 
 import android.accounts.Account
 import android.accounts.AccountManager
-import android.app.Activity
-import android.content.Context
-import androidx.lifecycle.ViewModel
-import com.geekorum.geekdroid.dagger.ViewModelKey
 import com.geekorum.geekdroid.security.SecretEncryption
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.network.TinyrssApiModule
 import com.geekorum.ttrss.webapi.LoggedRequestInterceptorFactory
 import com.geekorum.ttrss.webapi.TinyRssApi
-import dagger.Binds
+import com.geekorum.ttrss.webapi.TokenRetriever
 import dagger.Module
 import dagger.Provides
 import dagger.Subcomponent
-import dagger.android.ContributesAndroidInjector
-import dagger.multibindings.IntoMap
-import javax.inject.Scope
-import kotlin.annotation.AnnotationRetention.RUNTIME
-import com.geekorum.ttrss.webapi.TokenRetriever
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ApplicationComponent
 import dagger.hilt.android.components.ServiceComponent
+import dagger.hilt.migration.DisableInstallInCheck
+import javax.inject.Scope
+import kotlin.annotation.AnnotationRetention.RUNTIME
 
 /**
  * Dependency injection pieces for the account authenticator functionality.
@@ -77,19 +71,9 @@ object AndroidTinyrssAccountManagerModule {
     }
 }
 
-/**
- * Provides the Services injectors subcomponents.
- */
-@Module
-abstract class ServicesInjectorModule {
-
-    @ContributesAndroidInjector(modules = [AuthenticatorActivityModule::class, ViewModelsModule::class])
-    internal abstract fun contributesLoginActivityInjector(): LoginActivity
-
-}
-
 
 @Module
+@DisableInstallInCheck
 object NetworkLoginModule {
 
     @Provides
@@ -121,13 +105,8 @@ object NetworkLoginModule {
 internal object AuthenticatorServiceModule
 
 @Module(subcomponents = [AuthenticatorNetworkComponent::class])
-internal object AuthenticatorActivityModule {
-    @Provides
-    fun providesContext(activity: Activity): Context {
-        return activity
-    }
-}
-
+@InstallIn(ApplicationComponent::class)
+internal object AuthenticatorActivityModule
 
 @Subcomponent(modules = [TinyRssServerInformationModule::class, TinyrssApiModule::class])
 internal interface AuthenticatorNetworkComponent {
@@ -142,6 +121,7 @@ internal interface AuthenticatorNetworkComponent {
 }
 
 @Module
+@DisableInstallInCheck
 internal class TinyRssServerInformationModule(val serverInformation: ServerInformation) {
     @Provides
     fun providesServerInformation(): ServerInformation {
@@ -150,11 +130,3 @@ internal class TinyRssServerInformationModule(val serverInformation: ServerInfor
 
 }
 
-@Module
-private abstract class ViewModelsModule {
-    @Binds
-    @IntoMap
-    @ViewModelKey(LoginViewModel::class)
-    abstract fun getLoginViewModel(loginViewModel: LoginViewModel): ViewModel
-
-}

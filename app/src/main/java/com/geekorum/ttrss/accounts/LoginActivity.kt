@@ -38,11 +38,13 @@ import com.geekorum.ttrss.databinding.ActivityLoginAccountBinding
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
 import dagger.android.AndroidInjection
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 /**
  * A Login screen to a Tinytinyrss server.
  */
+@AndroidEntryPoint
 class LoginActivity : AccountAuthenticatorAppCompatActivity() {
 
     companion object {
@@ -55,15 +57,11 @@ class LoginActivity : AccountAuthenticatorAppCompatActivity() {
     @Inject
     lateinit var accountManager: AndroidTinyrssAccountManager
 
-    @Inject
-    internal lateinit var viewModelFactory: DaggerDelegateViewModelsFactory
-
     private lateinit var binding: ActivityLoginAccountBinding
 
-    private val loginViewModel: LoginViewModel by viewModels { viewModelFactory }
+    private val loginViewModel: LoginViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidInjection.inject(this)
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login_account)
         binding.lifecycleOwner = this

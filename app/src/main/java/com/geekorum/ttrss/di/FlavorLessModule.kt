@@ -35,7 +35,6 @@ import dagger.android.support.AndroidSupportInjectionModule
 //    AndroidBindingsModule::class,
     com.geekorum.geekdroid.dagger.ViewModelsModule::class,
 //    ViewModelsModule::class,
-    com.geekorum.ttrss.accounts.ServicesInjectorModule::class,
     com.geekorum.ttrss.add_feed.AndroidInjectorsModule::class,
     com.geekorum.ttrss.providers.AndroidInjectorsModule::class
 ])
