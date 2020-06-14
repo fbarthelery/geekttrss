@@ -37,6 +37,7 @@ import com.geekorum.ttrss.articles_list.ArticleListActivity
 import com.geekorum.ttrss.databinding.ActivityArticleDetailBinding
 import com.geekorum.ttrss.databinding.ToolbarArticleDetailsBinding
 import com.geekorum.ttrss.session.SessionActivity
+import dagger.hilt.android.AndroidEntryPoint
 
 /**
  * An activity representing a single Article detail screen. This
@@ -44,6 +45,7 @@ import com.geekorum.ttrss.session.SessionActivity
  * item details are presented side-by-side with a list of items
  * in a [ArticleListActivity].
  */
+@AndroidEntryPoint
 class ArticleDetailActivity : SessionActivity() {
 
     private lateinit var binding: ActivityArticleDetailBinding

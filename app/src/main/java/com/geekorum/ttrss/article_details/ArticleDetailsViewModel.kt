@@ -26,6 +26,8 @@ import android.content.ContextWrapper
 import android.net.Uri
 import androidx.core.app.ShareCompat
 import androidx.core.net.toUri
+import androidx.hilt.Assisted
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -33,12 +35,10 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
-import com.geekorum.geekdroid.dagger.ViewModelAssistedFactory
 import com.geekorum.ttrss.articles_list.ArticlesRepository
+import com.geekorum.ttrss.session.SessionActivityComponent
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.network.TtRssBrowserLauncher
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
 import kotlinx.coroutines.flow.onEach
 
 private const val STATE_ARTICLE_ID = "article_id"
@@ -46,11 +46,13 @@ private const val STATE_ARTICLE_ID = "article_id"
 /**
  * [ViewModel] for [ArticleDetailActivity] and [ArticleDetailFragment].
  */
-class ArticleDetailsViewModel @AssistedInject constructor(
+class ArticleDetailsViewModel @ViewModelInject constructor(
     @Assisted private val state: SavedStateHandle,
-    private val articlesRepository: ArticlesRepository,
-    private val browserLauncher: TtRssBrowserLauncher
+    private val browserLauncher: TtRssBrowserLauncher,
+    componentFactory: SessionActivityComponent.Factory
 ) : ViewModel() {
+
+    private val articlesRepository: ArticlesRepository = componentFactory.newComponent().articleRepository
 
     private val articleId = state.getLiveData<Long>(STATE_ARTICLE_ID)
 
@@ -128,11 +130,6 @@ class ArticleDetailsViewModel @AssistedInject constructor(
         article.value?.let {
             articlesRepository.setArticleUnread(it.id, unread)
         }
-    }
-
-    @AssistedInject.Factory
-    interface Factory : ViewModelAssistedFactory<ArticleDetailsViewModel> {
-        override fun create(state: SavedStateHandle): ArticleDetailsViewModel
     }
 
 }

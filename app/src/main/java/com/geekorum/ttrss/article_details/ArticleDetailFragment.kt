@@ -43,17 +43,17 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.net.toUri
 import androidx.core.view.doOnNextLayout
 import androidx.core.widget.NestedScrollView
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
-import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
 import com.geekorum.geekdroid.network.OkHttpWebViewClient
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.articles_list.ArticleListActivity
-import com.geekorum.ttrss.core.BaseFragment
-import com.geekorum.ttrss.core.activityViewModels
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.databinding.FragmentArticleDetailBinding
 import com.geekorum.ttrss.debugtools.withStrictMode
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import okhttp3.OkHttpClient
@@ -68,11 +68,11 @@ import kotlin.math.max
  * in two-pane mode (on tablets) or a [com.geekorum.ttrss.article_details.ArticleDetailActivity]
  * on handsets.
  */
+@AndroidEntryPoint
 class ArticleDetailFragment @Inject constructor(
-    savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator,
     private val okHttpClient: OkHttpClient,
     private val webFontProvider: WebFontProvider
-) : BaseFragment(savedStateVmFactoryCreator) {
+) : Fragment() {
 
     private lateinit var binding: FragmentArticleDetailBinding
     private val articleDetailsViewModel: ArticleDetailsViewModel by activityViewModels()

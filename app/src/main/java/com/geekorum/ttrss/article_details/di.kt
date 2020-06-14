@@ -22,22 +22,13 @@
 
 package com.geekorum.ttrss.article_details
 
-import android.accounts.Account
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModel
 import com.geekorum.geekdroid.dagger.FragmentKey
-import com.geekorum.geekdroid.dagger.ViewModelAssistedFactory
-import com.geekorum.geekdroid.dagger.ViewModelKey
-import com.geekorum.ttrss.accounts.NetworkLoginModule
-import com.geekorum.ttrss.accounts.PerAccount
-import com.geekorum.ttrss.di.AssistedFactoriesModule
-import com.geekorum.ttrss.network.TinyrssApiModule
 import dagger.Binds
 import dagger.Module
-import dagger.Provides
-import dagger.android.ContributesAndroidInjector
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.components.ApplicationComponent
 import dagger.multibindings.IntoMap
 
 
@@ -45,38 +36,12 @@ import dagger.multibindings.IntoMap
  * Dependency injection pieces for the article_details functionality
  */
 
+
 /**
- * Provides the ViewModels of the article_details components.
+ * Provides the Fragments injectors.
  */
 @Module
-abstract class ViewModelsModule {
-    @Binds
-    @IntoMap
-    @ViewModelKey(ArticleDetailsViewModel::class)
-    abstract fun getArticleDetailsViewModel(articleDetailsViewModel: ArticleDetailsViewModel.Factory): ViewModelAssistedFactory<out ViewModel>
-
-}
-
-/**
- * Provides the Activities injectors subcomponents.
- */
-@Module
-abstract class ActivitiesInjectorModule {
-    @ContributesAndroidInjector(modules = [
-        AssistedFactoriesModule::class,
-        NetworkLoginModule::class,
-        TinyrssApiModule::class,
-        SelectedAccountModule::class,
-        FragmentsInjectorModule::class])
-    @PerAccount
-    internal abstract fun contributesArticleDetailsActivityInjector(): ArticleDetailActivity
-
-}
-
-/**
- * Provides the Fragments injectors subcomponents.
- */
-@Module(includes = [ViewModelsModule::class])
+@InstallIn(ActivityComponent::class)
 abstract class FragmentsInjectorModule {
 
     @Binds
@@ -87,15 +52,9 @@ abstract class FragmentsInjectorModule {
 }
 
 @Module
+@InstallIn(ApplicationComponent::class)
 abstract class ResourcesWebFontProviderModule {
 
     @Binds
     internal abstract fun bindsWebFontProvider(webFontProvider: ResourcesWebFontProvider): WebFontProvider
-}
-
-@Module
-object SelectedAccountModule {
-
-    @Provides
-    fun providesAccount(articleDetailActivity: ArticleDetailActivity) : Account = articleDetailActivity.account!!
 }
