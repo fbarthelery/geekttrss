@@ -32,10 +32,7 @@ import dagger.android.support.AndroidSupportInjectionModule
     CoreFactoriesModule::class,
     AndroidFrameworkModule::class,
     AndroidSupportInjectionModule::class,
-//    AndroidBindingsModule::class,
     com.geekorum.geekdroid.dagger.ViewModelsModule::class,
-//    ViewModelsModule::class,
     com.geekorum.ttrss.add_feed.AndroidInjectorsModule::class,
-    com.geekorum.ttrss.providers.AndroidInjectorsModule::class
 ])
 object FlavorLessModule

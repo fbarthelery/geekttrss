@@ -22,6 +22,7 @@ package com.geekorum.ttrss.on_demand_modules
 
 import android.app.Activity
 import androidx.annotation.StringRes
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -43,7 +44,7 @@ import timber.log.Timber
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
-class InstallModuleViewModel @Inject constructor(
+class InstallModuleViewModel @ViewModelInject constructor(
     private val moduleManager: OnDemandModuleManager
 ) : ViewModel() {
 

@@ -21,6 +21,8 @@
 package com.geekorum.ttrss.providers
 
 import android.content.Context
+import androidx.hilt.Assisted
+import androidx.hilt.work.WorkerInject
 import androidx.work.ListenableWorker
 import androidx.work.Worker
 import androidx.work.WorkerFactory
@@ -30,9 +32,9 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 
-class PurgeArticlesWorker(
-    appContext: Context,
-    params: WorkerParameters,
+class PurgeArticlesWorker @WorkerInject constructor(
+    @Assisted appContext: Context,
+    @Assisted params: WorkerParameters,
     private val purgeArticlesDao: PurgeArticlesDao
 ) : Worker(appContext, params) {
     override fun doWork(): Result {

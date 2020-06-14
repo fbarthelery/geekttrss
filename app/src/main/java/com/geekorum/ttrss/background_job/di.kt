@@ -31,10 +31,13 @@ import com.geekorum.ttrss.features_api.FeaturesWorkerFactory
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ApplicationComponent
 import dagger.multibindings.IntoSet
 
 
-@Module(includes = [AppInitializersModule::class, WorkerInjectionModule::class])
+@Module(includes = [AppInitializersModule::class])
+@InstallIn(ApplicationComponent::class)
 abstract class BackgroundJobsModule {
 
     @Binds
@@ -53,12 +56,10 @@ abstract class BackgroundJobsModule {
         @Provides
         internal fun providesApplicationWorkerFactory(
             hiltWorkerFactory: HiltWorkerFactory,
-            applicationFactories: MutableSet<WorkerFactory>,
             featuresWorkerFactory: FeaturesWorkerFactory
         ): WorkerFactory {
             return DelegatingWorkerFactory().apply {
                 addFactory(hiltWorkerFactory)
-                applicationFactories.forEach(this::addFactory)
                 addFactory(featuresWorkerFactory)
             }
         }

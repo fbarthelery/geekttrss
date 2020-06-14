@@ -21,6 +21,7 @@
 package com.geekorum.ttrss.di
 
 import androidx.hilt.work.WorkerFactoryModule
+import com.geekorum.geekdroid.dagger.AppInitializersModule
 import com.geekorum.ttrss.AllFeaturesInstalledModule
 import com.geekorum.ttrss.Application
 import com.geekorum.ttrss.article_details.ResourcesWebFontProviderModule
