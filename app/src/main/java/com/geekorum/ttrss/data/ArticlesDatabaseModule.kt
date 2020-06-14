@@ -80,4 +80,9 @@ object ArticlesDatabaseModule {
     internal fun providesAccountInfoDao(database: ArticlesDatabase): AccountInfoDao {
         return database.accountInfoDao()
     }
+
+    @Provides
+    internal fun providesManageFeedsDao(database: ArticlesDatabase) : ManageFeedsDao {
+        return database.manageFeedsDao()
+    }
 }

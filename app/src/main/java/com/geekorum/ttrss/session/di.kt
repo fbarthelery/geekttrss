@@ -55,7 +55,7 @@ class SessionActivityModule
     AssistedFactoriesModule::class,
     TinyrssApiModule::class,
     NetworkLoginModule::class,
-    AccountModule::class
+    SessionAccountModule::class
 ])
 @PerAccount
 interface SessionActivityComponent {
@@ -72,10 +72,10 @@ interface SessionActivityComponent {
 
 @Module
 @DisableInstallInCheck
-internal class AccountModule {
+class SessionAccountModule {
+
     @Provides
     fun providesAccount(activity: Activity) : Account {
         return (activity as SessionActivity).account!!
     }
 }
-

@@ -26,12 +26,13 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
-import com.geekorum.ttrss.core.BaseActivity
 import com.geekorum.ttrss.Features
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.add_feed.StartInstallFragmentDirections.Companion.actionInstallManageFeed
+import com.geekorum.ttrss.core.BaseActivity
 import com.geekorum.ttrss.manage_feeds.add_feed.CompleteInstallFragmentDirections.Companion.actionAddFeed
 import com.geekorum.ttrss.on_demand_modules.OnDemandModuleManager
+import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -39,6 +40,7 @@ import javax.inject.Inject
 /**
  * Install the [Features.MANAGE_FEEDS] feature module if necessary then launch [AddFeedActivity] activity
  */
+@AndroidEntryPoint
 class AddFeedLauncherActivity : BaseActivity() {
     @Inject
     lateinit var moduleManager: OnDemandModuleManager
@@ -81,6 +83,7 @@ class AddFeedLauncherActivity : BaseActivity() {
  *   - the default progress install fragment of navigation doesn't allow us to monitor the installation
  *   - the destination is an Activity which doesn't trigger OnDestinationChangeListener
  */
+@AndroidEntryPoint
 class AddFeedInstallerActivity : BaseActivity() {
     private var hasShownLauncherFragment = false
 

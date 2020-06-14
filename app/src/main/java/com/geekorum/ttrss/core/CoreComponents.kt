@@ -60,21 +60,11 @@ open class InjectableBaseActivity : BatteryFriendlyActivity() {
     @Inject
     lateinit var daggerDelegateFragmentFactory: FragmentFactory
 
-    @Inject
-    lateinit var savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator
-
-    val viewModelsFactory: ViewModelProvider.Factory by lazy {
-        savedStateVmFactoryCreator.create(this, intent?.extras)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         inject()
         supportFragmentManager.fragmentFactory = daggerDelegateFragmentFactory
         super.onCreate(savedInstanceState)
     }
-
-    //TODO remove once hilt migration is complete
-//    override fun getDefaultViewModelProviderFactory(): ViewModelProvider.Factory = viewModelsFactory
 
     /**
      * Inject required field into the activity.
