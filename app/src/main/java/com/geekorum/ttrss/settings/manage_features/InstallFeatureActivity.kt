@@ -34,12 +34,14 @@ import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.CANCELED
 import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.FAILED
 import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.INSTALLED
 import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.REQUIRES_USER_CONFIRMATION
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
  * Quick and dirty InstallFeatureActivity
  */
+@AndroidEntryPoint
 class InstallFeatureActivity : BaseActivity() {
 
     companion object {

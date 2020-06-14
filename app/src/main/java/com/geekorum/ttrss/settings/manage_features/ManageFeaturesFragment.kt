@@ -25,6 +25,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -34,11 +35,11 @@ import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
 import com.geekorum.ttrss.core.BaseFragment
 import com.geekorum.ttrss.databinding.FragmentManageFeaturesBinding
 import com.geekorum.ttrss.databinding.ItemFeatureBinding
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
-class ManageFeaturesFragment @Inject constructor(
-    savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator
-) : BaseFragment(savedStateVmFactoryCreator) {
+@AndroidEntryPoint
+class ManageFeaturesFragment : Fragment() {
 
     lateinit var binding: FragmentManageFeaturesBinding
     private val viewModel: ManageFeaturesViewModel by viewModels()

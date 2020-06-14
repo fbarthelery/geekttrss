@@ -25,34 +25,30 @@ import android.content.SharedPreferences
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
 import com.geekorum.geekdroid.dagger.FragmentKey
-import com.geekorum.ttrss.settings.manage_features.InstallFeatureActivity
-import com.geekorum.ttrss.settings.manage_features.ManageFeaturesModule
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
-import dagger.android.ContributesAndroidInjector
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.components.ApplicationComponent
 import dagger.multibindings.IntoMap
 
-@Module(includes = [SettingsInitializerModule::class, ManageFeaturesModule::class])
+@Module
+@InstallIn(ActivityComponent::class)
 abstract class SettingsModule {
-
-    @ContributesAndroidInjector
-    abstract fun contributesSettingsActivityInjector(): SettingsActivity
-
-    @ContributesAndroidInjector
-    abstract fun contributesInstallFeatureActivityInjector(): InstallFeatureActivity
 
     @Binds
     @IntoMap
     @FragmentKey(SettingsActivity.SettingsFragment::class)
     abstract fun bindSettingsFragment(settingsFragment: SettingsActivity.SettingsFragment): Fragment
 
-    @Module
-    companion object {
+}
 
-        @Provides
-        fun providesApplicationPreferences(application: Application): SharedPreferences =
-            PreferenceManager.getDefaultSharedPreferences(application)
-    }
+@Module
+@InstallIn(ApplicationComponent::class)
+object ApplicationPreferencesModule {
 
+    @Provides
+    fun providesApplicationPreferences(application: Application): SharedPreferences =
+        PreferenceManager.getDefaultSharedPreferences(application)
 }
