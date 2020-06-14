@@ -20,16 +20,16 @@
  */
 @file:JvmName("Di")
 
-package com.geekorum.ttrss.articles_list
+package com.geekorum.ttrss.session
 
 import android.accounts.Account
 import android.app.Activity
 import com.geekorum.ttrss.accounts.NetworkLoginModule
 import com.geekorum.ttrss.accounts.PerAccount
+import com.geekorum.ttrss.articles_list.ArticlesRepository
 import com.geekorum.ttrss.di.AssistedFactoriesModule
 import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.network.TinyrssApiModule
-import com.geekorum.ttrss.session.SessionActivity
 import dagger.Module
 import dagger.Provides
 import dagger.Subcomponent
@@ -37,19 +37,18 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
 import dagger.hilt.migration.DisableInstallInCheck
 
-
 /**
- * Dependency injection pieces for the article_list functionality.
+ * Dependency injection pieces for a SessionActivity
  *
- * ArticleListActivity has a SubComponent of the ActivityComponent.
- * This component is bount to the lifecycle of the activity
+ * SessionActivity has a SubComponent of the ActivityComponent.
+ * This component is bound to the lifecycle of the activity
  *
- * ArticleListActivity's component provides the Account selected
+ * SessionActivity's  provides the selected Account to the component
  */
 
-@Module(subcomponents = [ArticleListActivityComponent::class])
+@Module(subcomponents = [SessionActivityComponent::class])
 @InstallIn(ActivityComponent::class)
-class ArticleListActivityModule
+class SessionActivityModule
 
 
 @Subcomponent(modules = [
@@ -59,7 +58,7 @@ class ArticleListActivityModule
     AccountModule::class
 ])
 @PerAccount
-interface ArticleListActivityComponent {
+interface SessionActivityComponent {
 
     val account: Account
     val apiService: ApiService
@@ -67,7 +66,7 @@ interface ArticleListActivityComponent {
 
     @Subcomponent.Factory
     interface Factory {
-        fun newComponent(): ArticleListActivityComponent
+        fun newComponent(): SessionActivityComponent
     }
 }
 

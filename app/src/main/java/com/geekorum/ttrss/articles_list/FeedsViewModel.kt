@@ -30,6 +30,7 @@ import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.network.ApiService
+import com.geekorum.ttrss.session.SessionActivityComponent
 import com.geekorum.ttrss.webapi.ApiCallException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
@@ -52,7 +53,7 @@ class FeedsViewModel @ViewModelInject constructor(
     @Assisted private val state: SavedStateHandle,
     private val dispatchers: CoroutineDispatchersProvider,
     private val feedsRepository: FeedsRepository,
-    componentFactory: ArticleListActivityComponent.Factory
+    componentFactory: SessionActivityComponent.Factory
 ) : ViewModel() {
 
     private val component = componentFactory.newComponent()

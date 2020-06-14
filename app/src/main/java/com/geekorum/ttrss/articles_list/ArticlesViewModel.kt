@@ -41,6 +41,7 @@ import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.session.Action
+import com.geekorum.ttrss.session.SessionActivityComponent
 import com.geekorum.ttrss.session.UndoManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.combine
@@ -55,7 +56,7 @@ private const val STATE_ORDER_MOST_RECENT_FIRST = "order_most_recent_first" // m
  */
 abstract class BaseArticlesViewModel(
     private val state: SavedStateHandle,
-    componentFactory: ArticleListActivityComponent.Factory
+    componentFactory: SessionActivityComponent.Factory
 ) : ViewModel() {
 
     protected val component = componentFactory.newComponent()
@@ -253,7 +254,7 @@ class ArticlesListViewModel @ViewModelInject constructor(
     @Assisted private val state: SavedStateHandle,
     private val feedsRepository: FeedsRepository,
     private val backgroundJobManager: BackgroundJobManager,
-    componentFactory: ArticleListActivityComponent.Factory
+    componentFactory: SessionActivityComponent.Factory
 ) : BaseArticlesViewModel(state, componentFactory) {
 
     val feedId = state.getLiveData(STATE_FEED_ID, Feed.FEED_ID_ALL_ARTICLES).apply {
@@ -326,7 +327,7 @@ class ArticlesListViewModel @ViewModelInject constructor(
 class ArticlesListByTagViewModel @ViewModelInject constructor(
     @Assisted private val state: SavedStateHandle,
     private val backgroundJobManager: BackgroundJobManager,
-    componentFactory: ArticleListActivityComponent.Factory
+    componentFactory: SessionActivityComponent.Factory
 ) : BaseArticlesViewModel(state, componentFactory) {
 
     val tag = state.getLiveData<String>(STATE_TAG).apply {
