@@ -25,25 +25,16 @@ import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
-import com.geekorum.ttrss.applicationComponent
-import com.geekorum.ttrss.manage_feeds.DaggerManageFeedComponent
+import com.geekorum.ttrss.manage_feeds.BaseSessionActivity
 import com.geekorum.ttrss.manage_feeds.R
 import com.geekorum.ttrss.manage_feeds.databinding.ActivitySubscribeToFeedBinding
-import com.geekorum.ttrss.session.SessionActivity
 
 
-class SubscribeToFeedActivity : SessionActivity() {
+class SubscribeToFeedActivity : BaseSessionActivity() {
 
     private lateinit var binding: ActivitySubscribeToFeedBinding
     private val viewModel: SubscribeToFeedViewModel by viewModels()
     private lateinit var navController: NavController
-
-    override fun inject() {
-        val manageFeedComponent = DaggerManageFeedComponent.builder()
-            .manageFeedsDependencies(applicationComponent)
-            .build()
-        manageFeedComponent.activityInjector.inject(this)
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

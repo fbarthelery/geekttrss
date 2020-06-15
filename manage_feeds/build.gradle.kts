@@ -69,16 +69,14 @@ dependencies {
     implementation(enforcedPlatform(kotlin("bom")))
     implementation(kotlin("stdlib-jdk8"))
 
-    val daggerVersion = "2.27"
+    val daggerVersion = "2.28"
     implementation(enforcedDaggerPlatform(daggerVersion))
     kapt(enforcedDaggerPlatform(daggerVersion))
     implementation("com.google.dagger:dagger:$daggerVersion")
-    implementation("com.google.dagger:dagger-android:$daggerVersion")
-    implementation("com.google.dagger:dagger-android-support:$daggerVersion")
     kapt("com.google.dagger:dagger-compiler:$daggerVersion")
-    kapt("com.google.dagger:dagger-android-processor:$daggerVersion")
     kaptTest("com.google.dagger:dagger-compiler:$daggerVersion")
-    kaptTest("com.google.dagger:dagger-android-processor:$daggerVersion")
+    implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha01")
+    kapt("androidx.hilt:hilt-compiler:1.0.0-alpha01")
 
     //geekdroid
     implementation("com.geekorum.geekdroid:geekdroid:geekttrss-1.5.1")

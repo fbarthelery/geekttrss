@@ -18,20 +18,25 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.geekorum.ttrss.manage_feeds.workers
+package com.geekorum.ttrss.manage_feeds
 
-import androidx.annotation.Keep
-import androidx.work.WorkerFactory
-import com.geekorum.ttrss.di.ApplicationComponentEntryPoint
-import com.geekorum.ttrss.features_api.WorkerFactoryProvider
-import com.geekorum.ttrss.manage_feeds.DaggerManageFeedComponent
+import androidx.lifecycle.ViewModelProvider
+import com.geekorum.ttrss.applicationComponent
+import com.geekorum.ttrss.session.SessionActivity
 
-@Keep
-class ManageFeedWorkersProvider : WorkerFactoryProvider {
-    override fun getWorkerFactories(appComponent: ApplicationComponentEntryPoint): List<WorkerFactory> {
+open class BaseSessionActivity : SessionActivity() {
+    private lateinit var vmProviderFactory:  ViewModelProvider.Factory
+
+    override fun inject() {
         val manageFeedComponent = DaggerManageFeedComponent.builder()
-            .manageFeedsDependencies(appComponent)
+            .manageFeedsDependencies(applicationComponent)
             .build()
-        return listOf(manageFeedComponent.getWorkerFactory())
+        val activityComponent = manageFeedComponent
+            .createActivityComponent()
+            .newComponent(this)
+        activityComponent.inject(this)
+        vmProviderFactory = activityComponent.getActivityViewModelFactory().filterNotNull().first()
     }
+
+    override fun getDefaultViewModelProviderFactory(): ViewModelProvider.Factory = vmProviderFactory
 }

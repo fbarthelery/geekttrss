@@ -33,10 +33,10 @@ import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.geekorum.geekdroid.app.BottomSheetDialogActivity
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
-import com.geekorum.geekdroid.dagger.DaggerDelegateViewModelsFactory
 import com.geekorum.ttrss.applicationComponent
 import com.geekorum.ttrss.debugtools.withStrictMode
 import com.geekorum.ttrss.manage_feeds.DaggerManageFeedComponent
@@ -45,7 +45,6 @@ import com.geekorum.ttrss.manage_feeds.databinding.ActivityAddFeedBinding
 import kotlinx.coroutines.delay
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 import com.geekorum.ttrss.R as appR
 
 /**
@@ -57,8 +56,7 @@ import com.geekorum.ttrss.R as appR
  */
 class AddFeedActivity : BottomSheetDialogActivity() {
 
-    @Inject
-    internal lateinit var viewModelFactory: DaggerDelegateViewModelsFactory
+    private lateinit var viewModelFactory: ViewModelProvider.Factory
 
     private lateinit var feedAdapter: FeedAdapter
     private lateinit var accountsAdapter: AccountsAdapter
@@ -121,7 +119,11 @@ class AddFeedActivity : BottomSheetDialogActivity() {
         val manageFeedComponent = DaggerManageFeedComponent.builder()
             .manageFeedsDependencies(applicationComponent)
             .build()
-        manageFeedComponent.activityInjector.inject(this)
+        val activityComponent = manageFeedComponent
+            .createActivityComponent()
+            .newComponent(this)
+        activityComponent.inject(this)
+        viewModelFactory = activityComponent.getActivityViewModelFactory().filterNotNull().first()
     }
 
 }

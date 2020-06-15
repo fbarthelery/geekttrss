@@ -20,91 +20,73 @@
  */
 package com.geekorum.ttrss.manage_feeds
 
-import android.accounts.Account
 import android.app.Activity
 import android.app.Application
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModel
+import androidx.hilt.lifecycle.ViewModelFactoryModules
+import androidx.lifecycle.ViewModelProvider
 import androidx.work.WorkManager
 import androidx.work.WorkerFactory
-import com.geekorum.geekdroid.dagger.FragmentFactoriesModule
-import com.geekorum.geekdroid.dagger.FragmentKey
-import com.geekorum.geekdroid.dagger.ViewModelKey
+import com.geekorum.ttrss.ForceNightModeViewModel_HiltModule
+import com.geekorum.ttrss.articles_list.TtrssAccountViewModel_HiltModule
 import com.geekorum.ttrss.core.CoreFactoriesModule
-import com.geekorum.ttrss.accounts.PerAccount
-import com.geekorum.ttrss.data.ArticlesDatabase
 import com.geekorum.ttrss.di.FeatureScope
-import com.geekorum.ttrss.di.ViewModelsModule
 import com.geekorum.ttrss.features_api.ManageFeedsDependencies
+import com.geekorum.ttrss.manage_feeds.add_feed.AddFeedActivity
 import com.geekorum.ttrss.manage_feeds.add_feed.AddFeedModule
 import com.geekorum.ttrss.manage_feeds.workers.WorkerComponent
 import com.geekorum.ttrss.manage_feeds.workers.WorkersModule
-import dagger.Binds
+import com.geekorum.ttrss.session.SessionAccountModule
+import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
 import dagger.Provides
-import dagger.android.ContributesAndroidInjector
-import dagger.android.DispatchingAndroidInjector
-import dagger.android.support.AndroidSupportInjectionModule
-import dagger.multibindings.IntoMap
+import dagger.Subcomponent
+import dagger.hilt.android.internal.lifecycle.DefaultActivityViewModelFactory
 
 @Component(dependencies = [ManageFeedsDependencies::class],
-    modules = [AndroidInjectorsModule::class,
-        CoreFactoriesModule::class,
+    modules = [CoreFactoriesModule::class,
         WorkManagerModule::class,
+        ManageFeedActivityModule::class,
         AddFeedModule::class,
         WorkersModule::class])
 @FeatureScope
 interface ManageFeedComponent {
 
+    fun createActivityComponent(): ActivityComponent.Factory
+
     fun getWorkerFactory(): WorkerFactory
 
-    fun createWorkerComponent() : WorkerComponent.Builder
-
-    val activityInjector: DispatchingAndroidInjector<Activity>
-}
-
-@Module(includes = [AndroidSupportInjectionModule::class])
-abstract class AndroidInjectorsModule {
-
-    @ContributesAndroidInjector(modules = [FragmentFactoriesModule::class,
-        ViewModelsModule::class,
-        ManageFeedModule::class])
-    @PerAccount
-    internal abstract fun contributesManageFeedActivityInjector(): ManageFeedsActivity
+    fun createWorkerComponent(): WorkerComponent.Builder
 
 }
 
-@Module
-private abstract class ManageFeedModule {
-    @Binds
-    @IntoMap
-    @ViewModelKey(ManageFeedViewModel::class)
-    abstract fun bindManageFeedViewModel(vm: ManageFeedViewModel): ViewModel
+@Module(subcomponents = [ActivityComponent::class])
+interface ManageFeedActivityModule
 
-    @Binds
-    @IntoMap
-    @FragmentKey(ConfirmUnsubscribeFragment::class)
-    abstract fun bindConfirmUnsubscribeFragment(fragment: ConfirmUnsubscribeFragment): Fragment
+@Subcomponent(modules = [SessionAccountModule::class,
+    ForceNightModeViewModel_HiltModule::class,
+    TtrssAccountViewModel_HiltModule::class,
+    ViewModelFactoryModules.ActivityModule::class,
+    ManageFeedModule::class
+])
+interface ActivityComponent {
 
-    @Binds
-    @IntoMap
-    @FragmentKey(ManageFeedsFragment::class)
-    abstract fun bindManageFeedsFragment(fragment: ManageFeedsFragment): Fragment
-
-    @Module
-    companion object {
-
-        @Provides
-        @JvmStatic
-        fun providesFeedsDao(articlesDatabase: ArticlesDatabase) = articlesDatabase.manageFeedsDao()
-
-        @JvmStatic
-        @Provides
-        fun providesAccount(manageFeedsActivity: ManageFeedsActivity): Account = manageFeedsActivity.account!!
-
+    @Subcomponent.Factory
+    interface Factory {
+        fun newComponent(@BindsInstance activity: Activity): ActivityComponent
     }
+
+    // can't be injected because DefaultActivityViewModelFactory can't be applied on field
+    @DefaultActivityViewModelFactory
+    fun getActivityViewModelFactory(): Set<ViewModelProvider.Factory?>
+
+    // inject required to provide daggerDelegateFragmentFactory for fragment constructor injection.
+    fun inject(baseSessionActivity: BaseSessionActivity)
+    fun inject(addFeedActivity: AddFeedActivity)
 }
+
+@Module(includes = [ManageFeedViewModel_HiltModule::class])
+private class ManageFeedModule
 
 @Module
 object WorkManagerModule {

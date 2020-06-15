@@ -24,6 +24,7 @@ import android.accounts.Account
 import android.accounts.AccountManager
 import androidx.annotation.VisibleForTesting
 import androidx.databinding.ObservableBoolean
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -43,13 +44,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
 import java.io.IOException
-import javax.inject.Inject
 import com.geekorum.geekdroid.app.lifecycle.EmptyEvent.Companion.makeEmptyEvent as CompleteEvent
 
 /**
  * [ViewModel] to subscribe to a Feed
  */
-class AddFeedViewModel @Inject constructor(
+class AddFeedViewModel @ViewModelInject constructor(
     private val dispatchers: CoroutineDispatchersProvider,
     private val feedsFinder: FeedsFinder,
     private val workManager: WorkManager,

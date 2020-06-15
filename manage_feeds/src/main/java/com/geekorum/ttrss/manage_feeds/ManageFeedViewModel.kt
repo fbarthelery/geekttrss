@@ -22,6 +22,7 @@ package com.geekorum.ttrss.manage_feeds
 
 import android.accounts.Account
 import android.app.Application
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -37,12 +38,11 @@ import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.data.ManageFeedsDao
 import com.geekorum.ttrss.manage_feeds.workers.UnsubscribeWorker
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 /**
  * ViewModel to manage feeds
  */
-class ManageFeedViewModel @Inject constructor(
+class ManageFeedViewModel @ViewModelInject constructor(
     private val application: Application,
     private val account: Account,
     private val feedsDao: ManageFeedsDao

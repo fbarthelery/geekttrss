@@ -52,10 +52,8 @@ abstract class WorkersModule {
     @WorkerKey(SubscribeWorker::class)
     abstract fun providesSubscribeWorkerFactory(workerFactory: SubscribeWorker.Factory): WorkerFactory
 
-    @Module
     companion object {
         @Provides
-        @JvmStatic
         fun daggerWorkerFactory(moduleFactories: MutableSet<WorkerFactory>): WorkerFactory {
             return DelegatingWorkerFactory().apply {
                 moduleFactories.forEach(this::addFactory)

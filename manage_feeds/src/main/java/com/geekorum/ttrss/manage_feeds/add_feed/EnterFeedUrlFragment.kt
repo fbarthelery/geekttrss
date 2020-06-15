@@ -24,19 +24,15 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
-import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
-import com.geekorum.ttrss.core.BaseFragment
-import com.geekorum.ttrss.core.activityViewModels
 import com.geekorum.ttrss.manage_feeds.R
 import com.geekorum.ttrss.manage_feeds.databinding.FragmentAddFeedEnterUrlBinding
-import javax.inject.Inject
 
-class EnterFeedUrlFragment @Inject constructor(
-    savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator
-) : BaseFragment(savedStateVmFactoryCreator) {
+class EnterFeedUrlFragment : Fragment() {
 
     private lateinit var binding: FragmentAddFeedEnterUrlBinding
     private val viewModel: SubscribeToFeedViewModel by activityViewModels()

@@ -27,7 +27,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.updatePadding
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
@@ -38,22 +40,15 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import coil.api.load
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
-import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
 import com.geekorum.geekdroid.views.doOnApplyWindowInsets
-import com.geekorum.ttrss.applicationComponent
-import com.geekorum.ttrss.core.BaseDialogFragment
-import com.geekorum.ttrss.core.BaseFragment
-import com.geekorum.ttrss.core.activityViewModels
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.manage_feeds.databinding.ActivityManageFeedsBinding
 import com.geekorum.ttrss.manage_feeds.databinding.DialogUnsubscribeFeedBinding
 import com.geekorum.ttrss.manage_feeds.databinding.FragmentManageFeedsBinding
 import com.geekorum.ttrss.manage_feeds.databinding.ItemFeedBinding
-import com.geekorum.ttrss.session.SessionActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import javax.inject.Inject
 
-class ManageFeedsActivity : SessionActivity() {
+class ManageFeedsActivity : BaseSessionActivity() {
     private lateinit var binding: ActivityManageFeedsBinding
     private lateinit var navController: NavController
 
@@ -66,13 +61,6 @@ class ManageFeedsActivity : SessionActivity() {
             startSubscribeToFeed()
         }
         setupEdgeToEdge()
-    }
-
-    override fun inject() {
-        val manageFeedComponent = DaggerManageFeedComponent.builder()
-            .manageFeedsDependencies(applicationComponent)
-            .build()
-        manageFeedComponent.activityInjector.inject(this)
     }
 
     private fun startSubscribeToFeed() {
@@ -92,12 +80,10 @@ class ManageFeedsActivity : SessionActivity() {
     }
 }
 
-class ManageFeedsFragment @Inject constructor(
-    savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator
-) : BaseFragment(savedStateVmFactoryCreator) {
+class ManageFeedsFragment : Fragment() {
 
     private lateinit var binding: FragmentManageFeedsBinding
-    private val viewModel: ManageFeedViewModel by viewModels()
+    private val viewModel: ManageFeedViewModel by activityViewModels()
     private val adapter = FeedsAdapter()
 
     override fun onCreateView(
@@ -184,9 +170,7 @@ class ManageFeedsFragment @Inject constructor(
 
 }
 
-class ConfirmUnsubscribeFragment @Inject constructor(
-    savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator
-) : BaseDialogFragment(savedStateVmFactoryCreator) {
+class ConfirmUnsubscribeFragment : DialogFragment() {
 
     private val viewModel: ManageFeedViewModel by activityViewModels()
     private val args: ConfirmUnsubscribeFragmentArgs by navArgs()

@@ -24,16 +24,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
-import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
-import com.geekorum.ttrss.core.BaseFragment
 import com.geekorum.ttrss.manage_feeds.databinding.FragmentAddFeedDisplayErrorBinding
-import javax.inject.Inject
 
 
-class DisplayErrorFragment @Inject constructor(
-    savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator
-) : BaseFragment(savedStateVmFactoryCreator) {
+class DisplayErrorFragment : Fragment() {
 
     private lateinit var binding: FragmentAddFeedDisplayErrorBinding
 
