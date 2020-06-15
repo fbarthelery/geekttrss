@@ -121,6 +121,10 @@ kapt {
     }
 }
 
+hilt {
+    enableTransformForLocalTests = true
+}
+
 dependencies {
 
     implementation("androidx.core:core-ktx:1.2.0")
@@ -185,6 +189,8 @@ dependencies {
     implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha01")
     kapt("androidx.hilt:hilt-compiler:1.0.0-alpha01")
     kapt("com.google.dagger:hilt-android-compiler:$hiltVersion")
+    testImplementation("com.google.dagger:hilt-android-testing:2.28-alpha")
+    kaptTest("com.google.dagger:hilt-android-compiler:2.28-alpha")
     androidTestImplementation("com.google.dagger:hilt-android-testing:2.28-alpha")
     kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.28-alpha")
     kaptAndroidTest("com.google.dagger:hilt-android-compiler:$hiltVersion")

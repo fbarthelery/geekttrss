@@ -33,6 +33,8 @@ import java.util.Optional;
 import dagger.BindsOptionalOf;
 import dagger.Module;
 import dagger.Provides;
+import dagger.hilt.InstallIn;
+import dagger.hilt.android.components.ApplicationComponent;
 import kotlinx.serialization.json.Json;
 import okhttp3.Authenticator;
 import okhttp3.MediaType;
@@ -43,6 +45,7 @@ import retrofit2.Retrofit;
  * This module provides an {@link ApiService} to access a TinyRss server
  */
 @Module
+@InstallIn(ApplicationComponent.class)
 public abstract class TinyrssApiModule {
 
     @BindsOptionalOf

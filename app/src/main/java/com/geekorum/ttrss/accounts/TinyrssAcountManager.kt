@@ -72,7 +72,7 @@ interface TinyrssAccountManager {
 /**
  * Implementation of [TinyrssAccountManager] on Android platform
  */
-class AndroidTinyrssAccountManager @Inject constructor(
+class AndroidTinyrssAccountManager(
     private val accountManager: AccountManager,
     private val secretCipher: SecretCipher
 ) : TinyrssAccountManager {

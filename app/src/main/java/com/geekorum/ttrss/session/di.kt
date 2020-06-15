@@ -53,7 +53,6 @@ class SessionActivityModule
 
 @Subcomponent(modules = [
     AssistedFactoriesModule::class,
-    TinyrssApiModule::class,
     NetworkLoginModule::class,
     SessionAccountModule::class
 ])
