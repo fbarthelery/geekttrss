@@ -23,7 +23,6 @@ package com.geekorum.ttrss
 import android.app.Application
 import android.content.Intent
 import android.content.pm.ActivityInfo
-import android.os.Bundle
 import android.os.PowerManager
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_UNSPECIFIED
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_YES
@@ -31,25 +30,29 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.core.content.getSystemService
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.google.common.truth.Truth.assertThat
-import dagger.Module
-import dagger.android.AndroidInjection
-import dagger.android.ContributesAndroidInjector
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import dagger.hilt.android.testing.HiltTestApplication
 import io.mockk.mockk
 import io.mockk.verifySequence
 import org.junit.Rule
 import org.junit.runner.RunWith
 import org.robolectric.Shadows
+import org.robolectric.annotation.Config
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
+@HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
+@Config(application = HiltTestApplication::class)
 class BatteryFriendlyActivityTest {
+    @get:Rule val hiltRule = HiltAndroidRule(this)
+
     val application: Application = ApplicationProvider.getApplicationContext()
 
     @BeforeTest
@@ -161,34 +164,11 @@ class ForceNightModeViewModelTest {
     }
 }
 
+@AndroidEntryPoint
 class BatteryFriendlyActivityRecordNightModeChanged : BatteryFriendlyActivity() {
     var nightMode: Int  = MODE_NIGHT_UNSPECIFIED
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        AndroidInjection.inject(this)
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onNightModeChanged(mode: Int) {
         nightMode = mode
     }
-
-    override fun getDefaultViewModelProviderFactory(): ViewModelProvider.Factory {
-        return object : ViewModelProvider.Factory {
-            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                return ForceNightModeViewModel(application,
-                    application.getSystemService()!!
-                ) as T
-            }
-        }
-    }
-}
-
-
-@Module
-abstract class BatteryFriendlyActivityTestModule {
-
-    @ContributesAndroidInjector
-    internal abstract fun contributesBatteryFriendlyActivityInjector(): BatteryFriendlyActivityRecordNightModeChanged
-
 }

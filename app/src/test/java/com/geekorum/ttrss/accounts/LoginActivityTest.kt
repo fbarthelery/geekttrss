@@ -21,7 +21,6 @@
 package com.geekorum.ttrss.accounts
 
 import android.content.Intent
-import androidx.lifecycle.ViewModel
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.core.app.launchActivity
 import androidx.test.espresso.Espresso.onView
@@ -29,20 +28,28 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isEnabled
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.geekorum.geekdroid.dagger.ViewModelKey
 import com.geekorum.ttrss.R
 import dagger.Module
 import dagger.Provides
-import dagger.android.ContributesAndroidInjector
-import dagger.multibindings.IntoMap
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ApplicationComponent
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import dagger.hilt.android.testing.HiltTestApplication
+import dagger.hilt.android.testing.UninstallModules
 import io.mockk.mockk
 import org.hamcrest.Matchers.not
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.annotation.Config
 
+@HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
+@Config(application = HiltTestApplication::class)
+@UninstallModules(AndroidTinyrssAccountManagerModule::class)
 class LoginActivityTest {
+    @get:Rule val hiltRule = HiltAndroidRule(this)
 
     @Test
     @Config(qualifiers = "w800dp")
@@ -67,31 +74,17 @@ class LoginActivityTest {
         }
     }
 
-}
+    @Module
+    @InstallIn(ApplicationComponent::class)
+    internal object MocksModule {
+        @Provides
+        fun providesAndroidTinyrssAccountManager(): AndroidTinyrssAccountManager = mockk()
 
-@Module
-internal abstract class LoginActivityTestModule {
-
-    @ContributesAndroidInjector(modules = [MocksModule::class])
-    internal abstract fun contributesLoginActivityInjector(): LoginActivity
-
-}
-
-@Module
-internal object MocksModule {
-    @Provides
-    fun providesAndroidTinyrssAccountManager(): AndroidTinyrssAccountManager = mockk()
-
-    @Provides
-    fun providesTinyrssAccountManager(androidTinyrssAccountManager: AndroidTinyrssAccountManager): TinyrssAccountManager {
-        return androidTinyrssAccountManager
-    }
-
-    @Provides
-    @IntoMap
-    @ViewModelKey(LoginViewModel::class)
-    fun getLoginViewModel(accountManager: TinyrssAccountManager): ViewModel {
-        return LoginViewModel(accountManager, mockk(relaxed = true), mockk(relaxed = true))
+        @Provides
+        fun providesTinyrssAccountManager(androidTinyrssAccountManager: AndroidTinyrssAccountManager): TinyrssAccountManager {
+            return androidTinyrssAccountManager
+        }
     }
 
 }
+
