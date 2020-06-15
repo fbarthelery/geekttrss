@@ -22,6 +22,8 @@ package com.geekorum.ttrss.manage_feeds.workers
 
 import android.accounts.Account
 import android.content.Context
+import androidx.hilt.Assisted
+import androidx.hilt.work.WorkerInject
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.ListenableWorker
@@ -33,13 +35,13 @@ import javax.inject.Inject
 /**
  * Background worker to unsubscribe from a feed.
  */
-class UnsubscribeWorker(
-    appContext: Context,
-    private val params: WorkerParameters,
-    private val apiService: ManageFeedService
-) : CoroutineWorker(
-    appContext, params
-) {
+class UnsubscribeWorker @WorkerInject constructor(
+    @Assisted appContext: Context,
+    @Assisted private val params: WorkerParameters
+) : BaseManageFeedWorker(appContext, params) {
+
+    private val apiService: ManageFeedService = workerComponent.getManageFeedService()
+
     override suspend fun doWork(): Result {
         val feedId = params.inputData.getLong("feed_id", -1)
         if (feedId == -1L) {
@@ -69,30 +71,6 @@ class UnsubscribeWorker(
         }
     }
 
-
-    class Factory @Inject constructor() : ManageFeedWorkerFactory() {
-
-        override fun createWorker(
-            appContext: Context, workerClassName: String, workerParameters: WorkerParameters
-        ): ListenableWorker? {
-            if (workerClassName != UnsubscribeWorker::class.java.name) {
-                return null
-            }
-            val account = with(workerParameters.inputData) {
-                val accountName = getString("account_name")
-                val accountType = getString("account_type")
-                Account(accountName, accountType)
-            }
-
-            val manageFeedComponent = createManageFeedComponent(appContext)
-            val apiService = manageFeedComponent.createWorkerComponent()
-                .setAccount(account)
-                .build()
-                .getManageFeedService()
-
-            return UnsubscribeWorker(appContext, workerParameters, apiService)
-        }
-    }
 }
 
 

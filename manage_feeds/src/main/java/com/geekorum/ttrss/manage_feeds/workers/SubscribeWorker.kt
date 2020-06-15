@@ -22,20 +22,24 @@ package com.geekorum.ttrss.manage_feeds.workers
 
 import android.accounts.Account
 import android.content.Context
+import androidx.hilt.Assisted
+import androidx.hilt.work.WorkerInject
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.geekorum.ttrss.sync.FeedIconSynchronizer
 import com.geekorum.ttrss.webapi.ApiCallException
 import timber.log.Timber
 import javax.inject.Inject
 
-class SubscribeWorker(
-    contex: Context,
-    params: WorkerParameters,
-    private val apiService: ManageFeedService
-) : CoroutineWorker(contex, params) {
+class SubscribeWorker @WorkerInject constructor(
+    @Assisted context: Context,
+    @Assisted params: WorkerParameters
+) : BaseManageFeedWorker(context, params) {
+
+    private val apiService: ManageFeedService = workerComponent.getManageFeedService()
 
     override suspend fun doWork(): Result {
         val feedUrl = requireNotNull(inputData.getString("url"))
@@ -70,30 +74,6 @@ class SubscribeWorker(
                 "login" to feedLogin,
                 "password" to feedPassword
             )
-        }
-    }
-
-
-    class Factory @Inject constructor() : ManageFeedWorkerFactory() {
-
-        override fun createWorker(
-            appContext: Context, workerClassName: String, workerParameters: WorkerParameters
-        ): ListenableWorker? {
-            if (workerClassName != SubscribeWorker::class.java.name) {
-                return null
-            }
-            val account = with(workerParameters.inputData) {
-                val accountName = getString("account_name")
-                val accountType = getString("account_type")
-                Account(accountName, accountType)
-            }
-
-            val manageFeedComponent = createManageFeedComponent(appContext)
-            val apiService = manageFeedComponent.createWorkerComponent()
-                .setAccount(account)
-                .build()
-                .getManageFeedService()
-            return SubscribeWorker(appContext, workerParameters, apiService)
         }
     }
 

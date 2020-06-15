@@ -76,6 +76,7 @@ dependencies {
     kapt("com.google.dagger:dagger-compiler:$daggerVersion")
     kaptTest("com.google.dagger:dagger-compiler:$daggerVersion")
     implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha01")
+    implementation("androidx.hilt:hilt-work:1.0.0-alpha01")
     kapt("androidx.hilt:hilt-compiler:1.0.0-alpha01")
 
     //geekdroid
