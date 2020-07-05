@@ -21,6 +21,7 @@
 package com.geekorum.ttrss.sync.workers
 
 import android.accounts.Account
+import android.app.Application
 import android.content.Context
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.test.core.app.ApplicationProvider
@@ -30,13 +31,14 @@ import com.geekorum.ttrss.core.ActualCoroutineDispatchersModule
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleWithAttachments
-import com.geekorum.ttrss.htmlparsers.ImageUrlExtractor
+import com.geekorum.ttrss.data.ArticlesDatabase
+import com.geekorum.ttrss.data.Category
+import com.geekorum.ttrss.data.DiskDatabaseModule
+import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.network.ApiService
-import com.geekorum.ttrss.sync.BackgroundDataUsageManager
-import com.geekorum.ttrss.sync.DatabaseAccessModule
+import com.geekorum.ttrss.network.TinyrssApiModule
 import com.geekorum.ttrss.sync.DatabaseService
 import com.google.common.truth.Truth.assertThat
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -47,30 +49,35 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.asExecutor
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.setMain
 import org.junit.Rule
 import org.junit.Test
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltAndroidTest
-@UninstallModules(ActualCoroutineDispatchersModule::class, WorkersModule::class, DatabaseAccessModule::class)
+@UninstallModules(ActualCoroutineDispatchersModule::class,
+    WorkersModule::class,
+    TinyrssApiModule::class,
+    DiskDatabaseModule::class)
 class CollectNewArticlesWorkerTest {
     private lateinit var workerBuilder: TestListenableWorkerBuilder<CollectNewArticlesWorker>
     private lateinit var apiService: MockApiService
-    private lateinit var databaseService: MockDatabaseService
-    private lateinit var backgroundDataUsageManager: BackgroundDataUsageManager
 
     private val testCoroutineDispatcher = TestCoroutineDispatcher()
 
     @Inject
     lateinit var hiltWorkerFactory: HiltWorkerFactory
+    @Inject
+    lateinit var databaseService: DatabaseService
 
     @get:Rule
     val hiltRule = HiltAndroidRule(this)
@@ -81,23 +88,17 @@ class CollectNewArticlesWorkerTest {
         io = testCoroutineDispatcher,
         computation = testCoroutineDispatcher)
 
-    @Module(subcomponents = [FakeSyncWorkerComponent::class])
-    @InstallIn(ApplicationComponent::class)
-    abstract class FakeWorkersModule {
-        @Binds
-        abstract fun bindsSyncWorkerComponentBuilder(builder: FakeSyncWorkerComponent.Builder): SyncWorkerComponent.Builder
-    }
-
-    @Module
+    @Module(includes = [FakeSyncWorkersModule::class])
     @InstallIn(ApplicationComponent::class)
     inner class MockModule {
         @Provides
         fun providesApiService(): ApiService = apiService
-        @Provides
-        fun providesDatabaseService(): DatabaseService = databaseService
 
         @Provides
-        fun providesBackgroundDataUsageManager(): BackgroundDataUsageManager = backgroundDataUsageManager
+        @Singleton
+        internal fun providesAppDatabase(application: Application): ArticlesDatabase {
+           return buildInMemoryDatabase(application, dispatchers.io.asExecutor())
+        }
     }
 
 
@@ -107,8 +108,6 @@ class CollectNewArticlesWorkerTest {
         Dispatchers.setMain(testCoroutineDispatcher)
 
         apiService = MyMockApiService()
-        databaseService = MockDatabaseService()
-        backgroundDataUsageManager = MockBackgroundDataUsageManager()
 
         val applicationContext: Context = ApplicationProvider.getApplicationContext()
         workerBuilder = TestListenableWorkerBuilder(applicationContext)
@@ -122,12 +121,15 @@ class CollectNewArticlesWorkerTest {
     }
 
     @Test
-    fun testThatNewArticlesArePresentAfterRunningWorker() = testCoroutineDispatcher.runBlockingTest {
-        val inputData = CollectNewArticlesWorker.getInputData(
-                Account("account", "type"), 1)
-
+    fun testThatNewArticlesArePresentAfterRunningWorker() = runBlocking {
+        // prepare database
+        databaseService.insertCategories(listOf(Category(id = 1, title = "Dummy category")))
+        databaseService.insertFeeds(listOf(Feed(id =1 , title= "Dummy feed", catId = 1)))
         // no articles at the beginning
         assertThat(databaseService.getArticle(1)).isNull()
+
+        val inputData = CollectNewArticlesWorker.getInputData(
+                Account("account", "type"), 1)
 
         workerBuilder.setInputData(inputData)
         val worker = workerBuilder.build()
@@ -141,7 +143,7 @@ class CollectNewArticlesWorkerTest {
 
         override suspend fun getArticles(feedId: Long, sinceId: Long, offset: Int, showExcerpt: Boolean, showContent: Boolean, includeAttachments: Boolean): List<ArticleWithAttachments> {
             return if (offset == 0) {
-                val article = Article(id = 1, isUnread = true)
+                val article = Article(id = 1, isUnread = true, feedId = 1)
                 listOf(ArticleWithAttachments(article, emptyList()))
             } else {
                 emptyList()

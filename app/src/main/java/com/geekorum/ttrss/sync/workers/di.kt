@@ -51,8 +51,7 @@ import okhttp3.OkHttpClient
 abstract class WorkersModule
 
 @Subcomponent(modules = [
-    NetworkLoginModule::class,
-    TinyrssApiModule::class
+    NetworkLoginModule::class
 ])
 @PerAccount
 interface SyncWorkerComponent {

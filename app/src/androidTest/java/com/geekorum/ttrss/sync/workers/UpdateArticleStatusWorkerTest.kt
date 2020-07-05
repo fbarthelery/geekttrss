@@ -21,22 +21,24 @@
 package com.geekorum.ttrss.sync.workers
 
 import android.accounts.Account
+import android.app.Application
 import android.content.Context
 import androidx.hilt.work.HiltWorkerFactory
 import androidx.test.core.app.ApplicationProvider
 import androidx.work.ListenableWorker
-import androidx.work.WorkerFactory
-import androidx.work.WorkerParameters
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.geekorum.ttrss.core.ActualCoroutineDispatchersModule
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleWithAttachments
+import com.geekorum.ttrss.data.ArticlesDatabase
+import com.geekorum.ttrss.data.Category
+import com.geekorum.ttrss.data.DiskDatabaseModule
+import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.network.ApiService
-import com.geekorum.ttrss.sync.DatabaseAccessModule
+import com.geekorum.ttrss.network.TinyrssApiModule
 import com.geekorum.ttrss.sync.DatabaseService
 import com.google.common.truth.Truth.assertThat
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -47,26 +49,33 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.asExecutor
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.setMain
 import org.junit.Rule
 import org.junit.Test
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltAndroidTest
-@UninstallModules(ActualCoroutineDispatchersModule::class, WorkersModule::class, DatabaseAccessModule::class)
+@UninstallModules(ActualCoroutineDispatchersModule::class,
+    WorkersModule::class,
+    TinyrssApiModule::class,
+    DiskDatabaseModule::class)
 class UpdateArticleStatusWorkerTest {
     private lateinit var workerBuilder: TestListenableWorkerBuilder<UpdateArticleStatusWorker>
     private lateinit var apiService: MyMockApiService
-    private lateinit var databaseService: MockDatabaseService
     private val testCoroutineDispatcher = TestCoroutineDispatcher()
+
     @Inject
     lateinit var hiltWorkerFactory: HiltWorkerFactory
+    @Inject
+    lateinit var databaseService: DatabaseService
 
     @get:Rule
     val hiltRule = HiltAndroidRule(this)
@@ -77,31 +86,26 @@ class UpdateArticleStatusWorkerTest {
         io = testCoroutineDispatcher,
         computation = testCoroutineDispatcher)
 
-    @Module(subcomponents = [FakeSyncWorkerComponent::class])
-    @InstallIn(ApplicationComponent::class)
-    abstract class FakeWorkersModule {
-        @Binds
-        abstract fun bindsSyncWorkerComponentBuilder(builder: FakeSyncWorkerComponent.Builder): SyncWorkerComponent.Builder
-    }
-
-    @Module
+    @Module(includes = [FakeSyncWorkersModule::class])
     @InstallIn(ApplicationComponent::class)
     inner class MockModule {
         @Provides
         fun providesApiService(): ApiService = apiService
-        @Provides
-        fun providesDatabaseService(): DatabaseService = databaseService
-    }
 
+        @Provides
+        @Singleton
+        internal fun providesAppDatabase(application: Application): ArticlesDatabase {
+            return buildInMemoryDatabase(application, dispatchers.io.asExecutor())
+        }
+    }
 
     @BeforeTest
     fun setUp() {
         hiltRule.inject()
         Dispatchers.setMain(testCoroutineDispatcher)
 
-        val applicationContext: Context = ApplicationProvider.getApplicationContext()
         apiService = MyMockApiService()
-        databaseService = MockDatabaseService()
+        val applicationContext: Context = ApplicationProvider.getApplicationContext()
         workerBuilder = TestListenableWorkerBuilder(applicationContext)
         workerBuilder.setWorkerFactory(hiltWorkerFactory)
     }
@@ -114,15 +118,17 @@ class UpdateArticleStatusWorkerTest {
 
 
     @Test
-    fun testThatArticleStatusChangeAfterRunningWorker() = testCoroutineDispatcher.runBlockingTest {
-        val inputData = UpdateArticleStatusWorker.getInputData(
-                Account("account", "type"), 1)
-
+    fun testThatArticleStatusChangeAfterRunningWorker() = runBlocking {
+        // prepare database
+        databaseService.insertCategories(listOf(Category(id = 1, title = "Dummy category")))
+        databaseService.insertFeeds(listOf(Feed(id =1 , title= "Dummy feed", catId = 1)))
         // insert a article with status unread to false
-        databaseService.insertArticles(listOf(Article(id = 1, isUnread = false)))
+        databaseService.insertArticles(listOf(Article(id = 1, isUnread = false, feedId = 1)))
         val previous = databaseService.getArticle(1)!!
         assertThat(previous.isUnread).isEqualTo(false)
 
+        val inputData = UpdateArticleStatusWorker.getInputData(
+            Account("account", "type"), 1)
         workerBuilder.setInputData(inputData)
         val worker = workerBuilder.build()
         val result = worker.doWork()

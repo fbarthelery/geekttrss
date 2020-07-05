@@ -37,14 +37,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(ApplicationComponent::class)
 object ArticlesDatabaseModule {
-    @Provides
-    @Singleton
-    internal fun providesAppDatabase(application: Application?): ArticlesDatabase {
-        return Room.databaseBuilder(application!!, ArticlesDatabase::class.java, ArticlesDatabase.DATABASE_NAME)
-                .fallbackToDestructiveMigrationOnDowngrade()
-                .addMigrations(*ALL_MIGRATIONS.toTypedArray())
-                .build()
-    }
 
     @Provides
     internal fun providesRoomDbHelper(database: ArticlesDatabase): SupportSQLiteOpenHelper {
@@ -84,5 +76,19 @@ object ArticlesDatabaseModule {
     @Provides
     internal fun providesManageFeedsDao(database: ArticlesDatabase) : ManageFeedsDao {
         return database.manageFeedsDao()
+    }
+}
+
+@Module
+@InstallIn(ApplicationComponent::class)
+object DiskDatabaseModule {
+
+    @Provides
+    @Singleton
+    internal fun providesAppDatabase(application: Application?): ArticlesDatabase {
+        return Room.databaseBuilder(application!!, ArticlesDatabase::class.java, ArticlesDatabase.DATABASE_NAME)
+            .fallbackToDestructiveMigrationOnDowngrade()
+            .addMigrations(*ALL_MIGRATIONS.toTypedArray())
+            .build()
     }
 }

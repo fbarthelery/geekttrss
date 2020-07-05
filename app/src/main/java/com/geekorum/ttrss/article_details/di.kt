@@ -29,6 +29,7 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
 import dagger.hilt.android.components.ApplicationComponent
+import dagger.hilt.migration.DisableInstallInCheck
 import dagger.multibindings.IntoMap
 
 
@@ -52,7 +53,7 @@ abstract class FragmentsInjectorModule {
 }
 
 @Module
-@InstallIn(ApplicationComponent::class)
+@DisableInstallInCheck
 abstract class ResourcesWebFontProviderModule {
 
     @Binds

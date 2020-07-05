@@ -20,20 +20,27 @@
  */
 package com.geekorum.ttrss.sync.workers
 
-import com.geekorum.ttrss.data.AccountInfo
+import android.accounts.Account
+import android.app.Application
+import androidx.room.Room
+import com.geekorum.ttrss.accounts.AndroidTinyrssAccountManager
+import com.geekorum.ttrss.accounts.ServerInformation
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleWithAttachments
-import com.geekorum.ttrss.data.ArticlesTags
-import com.geekorum.ttrss.data.Attachment
+import com.geekorum.ttrss.data.ArticlesDatabase
 import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
-import com.geekorum.ttrss.data.Metadata
-import com.geekorum.ttrss.data.Transaction
+import com.geekorum.ttrss.data.migrations.ALL_MIGRATIONS
 import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.network.ServerInfo
 import com.geekorum.ttrss.providers.ArticlesContract
-import com.geekorum.ttrss.sync.BackgroundDataUsageManager
-import com.geekorum.ttrss.sync.DatabaseService
+import dagger.Binds
+import dagger.Module
+import dagger.Provides
+import dagger.Subcomponent
+import dagger.hilt.migration.DisableInstallInCheck
+import java.util.concurrent.Executor
+import java.util.concurrent.Executors
 
 
 internal open class MockApiService : ApiService {
@@ -69,117 +76,51 @@ internal open class MockApiService : ApiService {
 
 }
 
-internal open class MockDatabaseService: DatabaseService {
 
-    private var accountInfo: AccountInfo? = null
+@Subcomponent(modules = [
+    FakeNetworkLoginModule::class
+])
+interface FakeSyncWorkerComponent : SyncWorkerComponent {
+    @Subcomponent.Builder
+    interface Builder : SyncWorkerComponent.Builder
+}
 
-    private val articles = mutableListOf<Article>()
-    private val attachments = mutableListOf<Attachment>()
-    private val transactions = mutableListOf<Transaction>()
-    private val articlesTags = mutableListOf<ArticlesTags>()
+@Module(subcomponents = [FakeSyncWorkerComponent::class])
+@DisableInstallInCheck
+abstract class FakeSyncWorkersModule {
+    @Binds
+    abstract fun bindsSyncWorkerComponentBuilder(builder: FakeSyncWorkerComponent.Builder): SyncWorkerComponent.Builder
+}
 
-    override suspend fun <R> runInTransaction(block: suspend () -> R) {
-        block()
-    }
+@Module
+object FakeNetworkLoginModule {
 
-    override suspend fun insertFeeds(feeds: List<Feed>) {
-        TODO("not implemented")
-    }
-
-    override suspend fun deleteFeedsAndArticles(feeds: List<Feed>) {
-        TODO("not implemented")
-    }
-
-    override suspend fun getFeeds(): List<Feed> {
-        TODO("not implemented")
-    }
-
-    override suspend fun updateFeedIconUrl(feedId: Long, url: String) {
-        TODO("not implemented")
-    }
-
-    override suspend fun insertCategories(categories: List<Category>) {
-        TODO("not implemented")
-    }
-
-    override suspend fun deleteCategories(categories: List<Category>) {
-        TODO("not implemented")
-    }
-
-    override suspend fun getCategories(): List<Category> {
-        TODO("not implemented")
-    }
-
-    override suspend fun getTransactions(): List<Transaction> {
-        return transactions.toList()
-    }
-
-    override suspend fun deleteTransaction(transaction: Transaction) {
-        transactions.remove(transaction)
-    }
-
-    internal fun insertTransaction(transaction: Transaction) {
-        transactions.add(transaction)
-    }
-
-    override suspend fun getArticle(id: Long): Article? {
-        return articles.find { it.id == id }
-    }
-
-    override suspend fun getRandomArticleFromFeed(feedId: Long): Article? {
-        TODO("not implemented")
-    }
-
-    override suspend fun insertArticles(articles: List<Article>) {
-        this.articles.addAll(articles)
-    }
-
-    override suspend fun insertArticleTags(articlesTags: List<ArticlesTags>) {
-        this.articlesTags.addAll(articlesTags)
-    }
-
-    override suspend fun updateArticle(article: Article) {
-        val present = articles.first {
-            it.id == article.id
+    @Provides
+    fun providesServerInformation(accountManager: AndroidTinyrssAccountManager, account: Account): ServerInformation {
+        return object : ServerInformation() {
+            override val apiUrl: String = "https://test.exemple.com/"
+            override val basicHttpAuthUsername: String? = null
+            override val basicHttpAuthPassword: String? = null
         }
-        articles.remove(present)
-        articles.add(article)
-    }
-
-    override suspend fun getLatestArticleId(): Long? {
-        return articles.maxBy { it.id }?.id
-    }
-
-    override suspend fun getLatestArticleIdFromFeed(feedId: Long): Long? {
-        return articles.filter { it.feedId == feedId }.maxBy { it.id }?.id
-    }
-
-    override suspend fun updateArticlesMetadata(metadata: List<Metadata>) {
-        metadata.forEach { meta->
-            val present = articles.find { article->
-                article.id == meta.id
-            }
-            articles.remove(present)
-            present?.copy(isUnread= meta.isUnread)?.let {
-                articles.add(it)
-            }
-        }
-    }
-
-    override suspend fun getAccountInfo(username: String, apiUrl: String): AccountInfo? {
-        return accountInfo
-    }
-
-    override suspend fun insertAccountInfo(accountInfo: AccountInfo) {
-        this.accountInfo = accountInfo
-    }
-
-    override suspend fun insertAttachments(attachments: List<Attachment>) {
-        this.attachments += attachments
     }
 
 }
 
-internal open class MockBackgroundDataUsageManager : BackgroundDataUsageManager(null) {
-    override fun canDownloadArticleImages(): Boolean = false
+internal fun buildInMemoryDatabase(application: Application,
+                                   queryExecutor: Executor,
+                                   transactionExecutor: Executor = Executors.newSingleThreadExecutor()
+): ArticlesDatabase {
+    /*
+     * Due to a deadlock in room we need to provide a transactionExecutor running on separate
+     * thread. See
+     * https://medium.com/@eyalg/testing-androidx-room-kotlin-coroutines-2d1faa3e674f
+     * https://github.com/Kotlin/kotlinx.coroutines/pull/1206
+     * https://issuetracker.google.com/issues/135334849
+     */
+    return Room.inMemoryDatabaseBuilder(application, ArticlesDatabase::class.java)
+        .fallbackToDestructiveMigrationOnDowngrade()
+        .setQueryExecutor(queryExecutor)
+        .setTransactionExecutor(transactionExecutor)
+        .addMigrations(*ALL_MIGRATIONS.toTypedArray())
+        .build()
 }

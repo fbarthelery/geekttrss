@@ -72,8 +72,7 @@ interface WorkerComponent {
 
 @Module(includes = [
     TinyrssApiModule::class,
-    NetworkLoginModule::class,
-    AndroidTinyrssAccountManagerModule::class
+    NetworkLoginModule::class
 ])
 internal class ApiServiceModule {
 
