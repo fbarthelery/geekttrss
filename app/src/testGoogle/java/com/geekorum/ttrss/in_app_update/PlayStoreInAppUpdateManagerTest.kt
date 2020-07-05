@@ -27,9 +27,13 @@ import com.geekorum.ttrss.in_app_update.UpdateState.Status.DOWNLOADING
 import com.geekorum.ttrss.in_app_update.UpdateState.Status.FAILED
 import com.geekorum.ttrss.in_app_update.UpdateState.Status.PENDING
 import com.geekorum.ttrss.in_app_update.UpdateState.Status.UNKNOWN
+import com.geekorum.ttrss.logging.CrashlyticsLoggingModule
 import com.google.android.play.core.appupdate.testing.FakeAppUpdateManager
 import com.google.android.play.core.install.model.InstallErrorCode
 import com.google.common.truth.Truth.assertThat
+import dagger.hilt.android.testing.HiltAndroidTest
+import dagger.hilt.android.testing.HiltTestApplication
+import dagger.hilt.android.testing.UninstallModules
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -48,7 +52,10 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 
+@HiltAndroidTest
 @RunWith(AndroidJUnit4::class)
+@Config(application = HiltTestApplication::class)
+@UninstallModules(CrashlyticsLoggingModule::class)
 @OptIn(ExperimentalCoroutinesApi::class)
 class PlayStoreInAppUpdateManagerTest {
 

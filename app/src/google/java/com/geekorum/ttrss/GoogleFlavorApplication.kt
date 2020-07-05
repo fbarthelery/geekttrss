@@ -25,7 +25,6 @@ import android.os.StrictMode.allowThreadDiskReads
 import com.geekorum.geekdroid.dagger.AppInitializer
 import com.geekorum.ttrss.debugtools.StrictModeInitializer
 import com.geekorum.ttrss.debugtools.withStrictMode
-import com.geekorum.ttrss.di.DaggerGoogleFlavorApplicationComponent
 import com.google.android.play.core.splitcompat.SplitCompat
 
 class GoogleFlavorApplication : Application() {

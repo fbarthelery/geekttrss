@@ -24,6 +24,8 @@ import com.geekorum.geekdroid.firebase.logging.FirebaseCrashlyticsLoggingTree
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ApplicationComponent
 import dagger.multibindings.IntoSet
 import timber.log.Timber
 
@@ -31,6 +33,7 @@ import timber.log.Timber
  * Provides logging output to Crashlytics
  */
 @Module(includes = [TimberModule::class])
+@InstallIn(ApplicationComponent::class)
 class CrashlyticsLoggingModule {
     @Provides
     @IntoSet
