@@ -25,23 +25,28 @@ import android.content.ContentResolver
 import android.content.PeriodicSync
 import android.os.Bundle
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.work.testing.WorkManagerTestInitHelper
 import com.geekorum.geekdroid.security.SecretCipher
 import com.geekorum.geekdroid.security.SecretEncryption
 import com.geekorum.ttrss.background_job.BackgroundJobManager
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.sync.SyncContract
 import com.google.common.truth.Truth.assertThat
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 
 
-@RunWith(AndroidJUnit4::class)
+@HiltAndroidTest
 class AndroidTinyrssAccountManagerTest {
+
+    @get:Rule
+    val hiltRule = HiltAndroidRule(this)
 
     lateinit var accountManager: AndroidTinyrssAccountManager
     lateinit var androidAccountManager: AccountManager
@@ -52,6 +57,9 @@ class AndroidTinyrssAccountManagerTest {
 
     @Before
     fun setup() {
+        // sync get triggered during test and try to access WorkManager from HiltTestApplication
+        // provide a TestWorkManager
+        WorkManagerTestInitHelper.initializeTestWorkManager(ApplicationProvider.getApplicationContext())
         androidAccountManager = AccountManager.get(ApplicationProvider.getApplicationContext())
         secretCipher = SecretEncryption().getSecretCipher("instrumented test")
         accountManager = AndroidTinyrssAccountManager(androidAccountManager, secretCipher)

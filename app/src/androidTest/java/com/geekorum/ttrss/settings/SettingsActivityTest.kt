@@ -32,13 +32,19 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.geekorum.ttrss.R
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
 import org.hamcrest.`object`.HasToString.hasToString
+import org.junit.Rule
 import org.junit.runner.RunWith
 import kotlin.test.Test
 
 @RunWith(AndroidJUnit4::class)
+@HiltAndroidTest
 class SettingsActivityTest {
 
+    @get:Rule
+    val hiltRule = HiltAndroidRule(this)
 
     @Test
     fun testThatWeCanShowDependenciesOpenSourcesLicenses() {
