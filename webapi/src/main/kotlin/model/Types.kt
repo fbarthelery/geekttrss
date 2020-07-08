@@ -21,9 +21,15 @@
 package com.geekorum.ttrss.webapi.model
 
 import androidx.annotation.RequiresApi
+import kotlinx.serialization.Decoder
+import kotlinx.serialization.Encoder
+import kotlinx.serialization.ImplicitReflectionSerializer
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialDescriptor
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.Serializer
+import kotlinx.serialization.StructureKind
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
@@ -127,8 +133,8 @@ data class Headline(
     val flavorStream: String? = "",
     val attachments: List<Attachment> = emptyList(),
 
-    // unuseful
-    val labels: List<String> = emptyList(),
+    // unuseful for now
+    val labels: List<LabelInfo> = emptyList(),
     val lang: String? = ""
 
 ) {
@@ -138,6 +144,35 @@ data class Headline(
         LocalDateTime.ofEpochSecond(lastUpdatedTimestamp, 0, ZoneOffset.UTC)
     }
 
+}
+
+
+@Serializable(LabelInfo.OwnSerializer::class)
+data class LabelInfo(
+    val id: Long,
+    val title: String = "",
+    val foregroundColor: String = "",
+    val backgroundColor: String = ""
+) {
+    @Serializer(LabelInfo::class)
+    internal object OwnSerializer : KSerializer<LabelInfo> {
+        @OptIn(ImplicitReflectionSerializer::class)
+        override val descriptor: SerialDescriptor = SerialDescriptor(LabelInfo::class.qualifiedName!!, StructureKind.LIST)
+
+        override fun deserialize(decoder: Decoder): LabelInfo {
+            val contentDecoder = decoder.beginStructure(descriptor)
+            val id: Long = contentDecoder.decodeLongElement(descriptor, contentDecoder.decodeElementIndex(descriptor))
+            val title = contentDecoder.decodeStringElement(descriptor, contentDecoder.decodeElementIndex(descriptor))
+            val foregroundColor = contentDecoder.decodeStringElement(descriptor, contentDecoder.decodeElementIndex(descriptor))
+            val backgroundColor = contentDecoder.decodeStringElement(descriptor, contentDecoder.decodeElementIndex(descriptor))
+            contentDecoder.endStructure(descriptor)
+            return LabelInfo(id, title, foregroundColor, backgroundColor)
+        }
+
+        override fun serialize(encoder: Encoder, value: LabelInfo) {
+            TODO("not implemented")
+        }
+    }
 }
 
 /**
