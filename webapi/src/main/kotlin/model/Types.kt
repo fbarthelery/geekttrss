@@ -18,6 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
+@file:UseSerializers(Attachment.FixInvalidJson::class)
 package com.geekorum.ttrss.webapi.model
 
 import androidx.annotation.RequiresApi
@@ -30,6 +31,12 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Serializer
 import kotlinx.serialization.StructureKind
+import kotlinx.serialization.UseSerializers
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.JsonTransformingSerializer
+import kotlinx.serialization.json.longOrNull
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
@@ -209,4 +216,21 @@ data class Attachment(
         private val indexedWidth: Int = 0,
         @SerialName("7")
         private val indexedHeight: Int = 0
-)
+) {
+
+    @Serializer(Attachment::class)
+    internal object FixInvalidJson : JsonTransformingSerializer<Attachment>(
+        serializer(),
+        "FixInvalidJson") {
+        override fun readTransform(element: JsonElement): JsonElement {
+            val correctedJson = element.jsonObject.mapValues { (k, v) ->
+                when (k) {
+                    "duration", "4" -> JsonPrimitive(v.longOrNull ?: 0)
+                    else -> v
+                }
+            }
+            return JsonObject(correctedJson)
+        }
+    }
+
+}
