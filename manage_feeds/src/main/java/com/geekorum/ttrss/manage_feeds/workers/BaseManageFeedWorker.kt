@@ -26,10 +26,12 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.geekorum.ttrss.Application
 import com.geekorum.ttrss.manage_feeds.DaggerManageFeedComponent
+import com.geekorum.ttrss.sync.workers.SyncWorkerComponent
 
 abstract class BaseManageFeedWorker(
     context: Context,
-    params: WorkerParameters
+    params: WorkerParameters,
+    workerComponentBuilder: WorkerComponent.Builder
 ) : CoroutineWorker(context, params) {
 
     val account = with(params.inputData) {
@@ -38,14 +40,10 @@ abstract class BaseManageFeedWorker(
         Account(accountName, accountType)
     }
 
-    protected val workerComponent = createWorkerComponent(context)
+    protected val workerComponent = createWorkerComponent(context, workerComponentBuilder)
 
-    private fun createWorkerComponent(appContext: Context): WorkerComponent {
-        val appComponent = (appContext as Application).applicationComponent
-        val manageFeedComponent = DaggerManageFeedComponent.builder()
-            .manageFeedsDependencies(appComponent)
-            .build()
-        return manageFeedComponent.createWorkerComponent()
+    private fun createWorkerComponent(appContext: Context, workerComponentBuilder: WorkerComponent.Builder): WorkerComponent {
+        return workerComponentBuilder
             .setAccount(account)
             .build()
     }

@@ -20,7 +20,7 @@
  */
 package com.geekorum.ttrss.manage_feeds.add_feed
 
-import androidx.fragment.app.testing.launchFragmentInContainer
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
@@ -32,7 +32,6 @@ import androidx.test.espresso.matcher.ViewMatchers.withSpinnerText
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.WorkManager
-import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.manage_feeds.R
 import com.geekorum.ttrss.manage_feeds.add_feed.FeedsFinder.FeedResult
@@ -48,7 +47,7 @@ import com.google.android.material.R as matR
 
 @RunWith(AndroidJUnit4::class)
 class SelectFeedFragmentTest {
-    lateinit var viewModelFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator
+    lateinit var viewModelProvider: ViewModelProvider.Factory
     lateinit var subscribeToFeedViewModel: SubscribeToFeedViewModel
     lateinit var navController: NavController
     lateinit var workManager: WorkManager
@@ -59,8 +58,7 @@ class SelectFeedFragmentTest {
         val dispatchers = CoroutineDispatchersProvider(Dispatchers.Main, Dispatchers.IO, Dispatchers.Default)
         subscribeToFeedViewModel = SubscribeToFeedViewModel(dispatchers, mockk(), workManager, mockk())
         navController = mockk(relaxed = true)
-        viewModelFactoryCreator =
-            createDaggerDelegateSavedStateVMFactoryCreator(subscribeToFeedViewModel)
+        viewModelProvider = createViewModelFactoryFor(subscribeToFeedViewModel)
     }
 
     @Test
@@ -70,8 +68,10 @@ class SelectFeedFragmentTest {
             FeedResult(FeedsFinder.Source.HTML, "http://my.second.feed", title = "Second")
         )
 
-        val scenario = launchFragmentInContainer(themeResId = matR.style.Theme_MaterialComponents_Light) {
-            SelectFeedFragment(viewModelFactoryCreator)
+        val scenario = launchFragmentInViewModelProvidedActivity(
+            viewModelProviderFactory = viewModelProvider,
+            themeResId = matR.style.Theme_MaterialComponents_Light) {
+            SelectFeedFragment()
         }
 
         scenario.onFragment {
@@ -99,8 +99,10 @@ class SelectFeedFragmentTest {
             FeedResult(FeedsFinder.Source.HTML, "http://my.feed", title = "First")
         )
 
-        val scenario = launchFragmentInContainer(themeResId = matR.style.Theme_MaterialComponents_Light) {
-            SelectFeedFragment(viewModelFactoryCreator)
+        val scenario = launchFragmentInViewModelProvidedActivity(
+            viewModelProviderFactory = viewModelProvider,
+            themeResId = matR.style.Theme_MaterialComponents_Light) {
+            SelectFeedFragment()
         }
 
         scenario.onFragment {
@@ -123,8 +125,10 @@ class SelectFeedFragmentTest {
             FeedResult(FeedsFinder.Source.HTML, "http://my.feed", title = "First")
         )
 
-        val scenario = launchFragmentInContainer(themeResId = matR.style.Theme_MaterialComponents_Light) {
-            SelectFeedFragment(viewModelFactoryCreator)
+        val scenario = launchFragmentInViewModelProvidedActivity(
+            viewModelProviderFactory = viewModelProvider,
+            themeResId = matR.style.Theme_MaterialComponents_Light) {
+            SelectFeedFragment()
         }
 
         var expectedMessage = ""
@@ -149,8 +153,10 @@ class SelectFeedFragmentTest {
             FeedResult(FeedsFinder.Source.HTML, "http://my.second.feed", title = "Second")
         )
 
-        val scenario = launchFragmentInContainer(themeResId = matR.style.Theme_MaterialComponents_Light) {
-            SelectFeedFragment(viewModelFactoryCreator)
+        val scenario = launchFragmentInViewModelProvidedActivity(
+            viewModelProviderFactory = viewModelProvider,
+            themeResId = matR.style.Theme_MaterialComponents_Light) {
+            SelectFeedFragment()
         }
 
         var expectedMessage = ""

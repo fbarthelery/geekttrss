@@ -37,8 +37,9 @@ import javax.inject.Inject
  */
 class UnsubscribeWorker @WorkerInject constructor(
     @Assisted appContext: Context,
-    @Assisted private val params: WorkerParameters
-) : BaseManageFeedWorker(appContext, params) {
+    @Assisted private val params: WorkerParameters,
+    workerComponentBuilder: WorkerComponent.Builder
+) : BaseManageFeedWorker(appContext, params, workerComponentBuilder) {
 
     private val apiService: ManageFeedService = workerComponent.getManageFeedService()
 

@@ -20,6 +20,7 @@
  */
 package com.geekorum.ttrss.manage_feeds.workers
 
+import android.accounts.Account
 import com.geekorum.ttrss.webapi.ApiCallException
 
 
@@ -45,4 +46,18 @@ internal class MockManageFeedService : ManageFeedService {
         return subscribeToFeedResult
     }
 
+}
+
+internal class MockWorkerComponent(
+    private val manageFeedService: MockManageFeedService
+): WorkerComponent {
+    override fun getManageFeedService(): ManageFeedService = manageFeedService
+
+    class Builder(
+        private val manageFeedService: MockManageFeedService
+    ) : WorkerComponent.Builder {
+        override fun setAccount(account: Account): WorkerComponent.Builder = this
+
+        override fun build(): WorkerComponent = MockWorkerComponent(manageFeedService)
+    }
 }

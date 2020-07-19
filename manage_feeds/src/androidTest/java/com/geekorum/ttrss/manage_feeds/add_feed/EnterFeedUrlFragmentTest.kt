@@ -20,7 +20,7 @@
  */
 package com.geekorum.ttrss.manage_feeds.add_feed
 
-import androidx.fragment.app.testing.launchFragmentInContainer
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.test.espresso.Espresso.onView
@@ -28,7 +28,6 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.WorkManager
 import com.geekorum.geekdroid.app.lifecycle.Event
-import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.manage_feeds.R
 import com.google.android.material.textfield.TextInputLayout
@@ -46,7 +45,7 @@ import com.google.android.material.R as matR
 
 @RunWith(AndroidJUnit4::class)
 class EnterFeedUrlFragmentTest {
-    lateinit var viewModelFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator
+    lateinit var viewModelProvider: ViewModelProvider.Factory
     lateinit var subscribeToFeedViewModel: SubscribeToFeedViewModel
     lateinit var navController: NavController
     lateinit var workManager: WorkManager
@@ -57,14 +56,14 @@ class EnterFeedUrlFragmentTest {
         val dispatchers = CoroutineDispatchersProvider(Dispatchers.Main, Dispatchers.IO, Dispatchers.Default)
         subscribeToFeedViewModel = spyk(SubscribeToFeedViewModel(dispatchers, mockk(), workManager, mockk()))
         navController = mockk(relaxed = true)
-        viewModelFactoryCreator =
-            createDaggerDelegateSavedStateVMFactoryCreator(subscribeToFeedViewModel, SubscribeToFeedViewModel::class.java)
+        viewModelProvider = createViewModelFactoryFor(subscribeToFeedViewModel)
     }
 
     @Test
     fun testThatErrorEventSetErrorOnInputField() {
-        launchFragmentInContainer(themeResId = matR.style.Theme_MaterialComponents_Light) {
-            EnterFeedUrlFragment(viewModelFactoryCreator)
+        launchFragmentInViewModelProvidedActivity(viewModelProviderFactory = viewModelProvider,
+            themeResId = matR.style.Theme_MaterialComponents_Light) {
+            EnterFeedUrlFragment()
         }
 
         subscribeToFeedViewModel.submitUrl("invalid url")
@@ -80,8 +79,10 @@ class EnterFeedUrlFragmentTest {
 
     @Test
     fun testThatWhenIOErrorNavigateToDisplayError() {
-        val scenario = launchFragmentInContainer(themeResId = matR.style.Theme_MaterialComponents_Light) {
-            EnterFeedUrlFragment(viewModelFactoryCreator)
+        val scenario = launchFragmentInViewModelProvidedActivity(
+            viewModelProviderFactory = viewModelProvider,
+            themeResId = matR.style.Theme_MaterialComponents_Light) {
+            EnterFeedUrlFragment()
         }
 
         scenario.onFragment {
@@ -96,8 +97,10 @@ class EnterFeedUrlFragmentTest {
 
     @Test
     fun testThatWhenNoFeedsAreFoundNavigateToDisplayError() {
-        val scenario = launchFragmentInContainer(themeResId = matR.style.Theme_MaterialComponents_Light) {
-            EnterFeedUrlFragment(viewModelFactoryCreator)
+        val scenario = launchFragmentInViewModelProvidedActivity(
+            viewModelProviderFactory = viewModelProvider,
+            themeResId = matR.style.Theme_MaterialComponents_Light) {
+            EnterFeedUrlFragment()
         }
 
         scenario.onFragment {
@@ -113,8 +116,10 @@ class EnterFeedUrlFragmentTest {
 
     @Test
     fun testThatWhenManyFeedsAreFoundNavigateToSelectFeed() {
-        val scenario = launchFragmentInContainer(themeResId = matR.style.Theme_MaterialComponents_Light) {
-            EnterFeedUrlFragment(viewModelFactoryCreator)
+        val scenario = launchFragmentInViewModelProvidedActivity(
+            viewModelProviderFactory = viewModelProvider,
+            themeResId = matR.style.Theme_MaterialComponents_Light) {
+            EnterFeedUrlFragment()
         }
 
         scenario.onFragment {
@@ -129,8 +134,10 @@ class EnterFeedUrlFragmentTest {
 
     @Test
     fun testThatWhenOnlyOneFeedsFromUrlSubscribe() {
-        val scenario = launchFragmentInContainer(themeResId = matR.style.Theme_MaterialComponents_Light) {
-            EnterFeedUrlFragment(viewModelFactoryCreator)
+        val scenario = launchFragmentInViewModelProvidedActivity(
+            viewModelProviderFactory = viewModelProvider,
+            themeResId = matR.style.Theme_MaterialComponents_Light) {
+            EnterFeedUrlFragment()
         }
 
         scenario.onFragment {
@@ -147,8 +154,10 @@ class EnterFeedUrlFragmentTest {
 
     @Test
     fun testThatWhenOnlyOneFeedsFromHtmlSubscribe() {
-        val scenario = launchFragmentInContainer(themeResId = matR.style.Theme_MaterialComponents_Light) {
-            EnterFeedUrlFragment(viewModelFactoryCreator)
+        val scenario = launchFragmentInViewModelProvidedActivity(
+            viewModelProviderFactory = viewModelProvider,
+            themeResId = matR.style.Theme_MaterialComponents_Light) {
+            EnterFeedUrlFragment()
         }
 
         scenario.onFragment {

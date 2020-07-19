@@ -78,6 +78,11 @@ dependencies {
     implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha01")
     implementation("androidx.hilt:hilt-work:1.0.0-alpha01")
     kapt("androidx.hilt:hilt-compiler:1.0.0-alpha01")
+    val hiltVersion = "2.28-alpha"
+    testImplementation("com.google.dagger:hilt-android-testing:$hiltVersion")
+    kaptTest("com.google.dagger:hilt-android-compiler:$hiltVersion")
+    androidTestImplementation("com.google.dagger:hilt-android-testing:$hiltVersion")
+    kaptAndroidTest("com.google.dagger:hilt-android-compiler:$hiltVersion")
 
     //geekdroid
     implementation("com.geekorum.geekdroid:geekdroid:geekttrss-1.5.1")

@@ -50,7 +50,7 @@ class UnsubscribeWorkerTest {
             override fun createWorker(
                 appContext: Context, workerClassName: String, workerParameters: WorkerParameters
             ): ListenableWorker? {
-                return UnsubscribeWorker(appContext, workerParameters, apiService)
+                return UnsubscribeWorker(appContext, workerParameters, MockWorkerComponent.Builder(apiService))
             }
         })
     }

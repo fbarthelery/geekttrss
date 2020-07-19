@@ -36,8 +36,9 @@ import javax.inject.Inject
 
 class SubscribeWorker @WorkerInject constructor(
     @Assisted context: Context,
-    @Assisted params: WorkerParameters
-) : BaseManageFeedWorker(context, params) {
+    @Assisted params: WorkerParameters,
+    workerComponentBuilder: WorkerComponent.Builder
+) : BaseManageFeedWorker(context, params, workerComponentBuilder) {
 
     private val apiService: ManageFeedService = workerComponent.getManageFeedService()
 
