@@ -106,7 +106,7 @@ class StrictModeInitializer @Inject constructor() : AppInitializer {
 }
 
 
-@Module(includes = [AppInitializersModule::class, KotlinInitializerModule::class])
+@Module(includes = [AppInitializersModule::class])
 @InstallIn(ApplicationComponent::class)
 abstract class StrictModeModule {
     @Binds
@@ -130,6 +130,7 @@ class KotlinInitializer @Inject constructor() : AppInitializer {
 }
 
 @Module
+@InstallIn(ApplicationComponent::class)
 abstract class KotlinInitializerModule {
     @Binds
     @IntoSet

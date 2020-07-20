@@ -24,6 +24,7 @@ import com.geekorum.ttrss.on_demand_modules.ImmutableModuleManager
 import com.geekorum.ttrss.on_demand_modules.OnDemandModuleManager
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.migration.DisableInstallInCheck
 
 
 object Features {
@@ -33,6 +34,7 @@ object Features {
 }
 
 @Module
+@DisableInstallInCheck
 object AllFeaturesInstalledModule {
     @Provides
     fun providesOnDemandModuleManager(): OnDemandModuleManager {

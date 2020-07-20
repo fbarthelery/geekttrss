@@ -30,7 +30,7 @@ import timber.log.Timber
 /**
  * Provides logging output to Logcat
  */
-@Module(includes = [TimberModule::class])
+@Module
 @InstallIn(ApplicationComponent::class)
 object LogcatLoggingModule {
 

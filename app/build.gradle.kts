@@ -117,6 +117,8 @@ kapt {
     arguments {
         arg("room.schemaLocation", "$projectDir/schemas")
         arg("room.incremental", true)
+        // assisted inject create a module without hilt annotation. will be fixed in 0.5.3
+        arg("dagger.hilt.disableModulesHaveInstallInCheck", true)
     }
 }
 

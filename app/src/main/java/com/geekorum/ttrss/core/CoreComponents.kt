@@ -36,6 +36,8 @@ import dagger.Binds
 import dagger.Module
 import dagger.android.AndroidInjection
 import dagger.android.AndroidInjector
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ApplicationComponent
 import dagger.hilt.android.internal.migration.InjectedByHilt
 import dagger.hilt.android.migration.OptionalInjectCheck
 import javax.inject.Inject
@@ -108,6 +110,7 @@ open class BaseDialogFragment (
 
 
 @Module(includes = [FragmentFactoriesModule::class])
+@InstallIn(ApplicationComponent::class)
 abstract class CoreFactoriesModule {
 
     @Binds

@@ -18,20 +18,22 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.geekorum.ttrss.di;
+package com.geekorum.ttrss.di
 
-import com.geekorum.ttrss.MainActivity;
-import dagger.Module;
-import dagger.android.ContributesAndroidInjector;
-import dagger.android.support.AndroidSupportInjectionModule;
+import com.geekorum.geekdroid.dagger.AndroidFrameworkModule
+import com.geekorum.ttrss.core.CoreFactoriesModule
+import dagger.Module
+import dagger.android.support.AndroidSupportInjectionModule
+import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ApplicationComponent
 
 /**
- * Provides some binding modules to inject Android components.
+ * Install modules from external libraries
  */
-@Module(includes = {AndroidSupportInjectionModule.class})
-public abstract class AndroidBindingsModule {
-
-    @ContributesAndroidInjector
-    abstract MainActivity contributesMainActivityInjector();
-
-}
+@Module(includes = [
+    AndroidFrameworkModule::class,
+    AndroidSupportInjectionModule::class,
+    com.geekorum.geekdroid.dagger.ViewModelsModule::class
+])
+@InstallIn(ApplicationComponent::class)
+object ExternalsModule

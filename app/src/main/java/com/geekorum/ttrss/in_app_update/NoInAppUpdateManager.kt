@@ -23,6 +23,7 @@ package com.geekorum.ttrss.in_app_update
 import android.app.Activity
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.migration.DisableInstallInCheck
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -47,6 +48,7 @@ private class NoInAppUpdateManager: InAppUpdateManager {
 }
 
 @Module
+@DisableInstallInCheck
 object NoInAppUpdateModule {
 
     @Provides

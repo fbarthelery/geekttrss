@@ -27,7 +27,7 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ApplicationComponent
 
-@Module(includes = [FlavorLessModule::class,
+@Module(includes = [
     ResourcesWebFontProviderModule::class,
     AllFeaturesInstalledModule::class,
     NoInAppUpdateModule::class])
