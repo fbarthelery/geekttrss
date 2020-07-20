@@ -28,9 +28,9 @@ import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsPlugin
 
 plugins {
     id("com.android.application")
-    id("com.google.android.gms.oss-licenses-plugin")
     kotlin("android")
     kotlin("kapt")
+    id("com.google.android.gms.oss-licenses-plugin")
     id("com.geekorum.build.android-tests")
     id("com.geekorum.build.android-signing")
     id("com.geekorum.build.android-avdl")
@@ -117,7 +117,6 @@ kapt {
     arguments {
         arg("room.schemaLocation", "$projectDir/schemas")
         arg("room.incremental", true)
-        arg("dagger.hilt.disableModulesHaveInstallInCheck", true)
     }
 }
 
