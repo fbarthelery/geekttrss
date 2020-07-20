@@ -104,7 +104,20 @@ class GetArticlesJsonSerializationTest {
               ],
               "excerpt": "&hellip;",
               "content": "<html><body><header><h1 itemprop=\"mainEntityOfPage\">Images du jour 31\/10\/18 &ndash; Martinique &ndash; Philippot-<\/h1>\r\n        <p>\r\n        <span itemprop=\"dateCreated\">octobre 31st, 2018<\/span>                                    <\/p>\r\n        <\/header><div><p><img src=\"https:\/\/tinyrss.elyzion.net\/public.php?op=cached_image&amp;hash=daff495cb40939033ed3cbd5c20d0a8c7d37fc07\" alt=\"\" data-recalc-dims=\"1\"><img src=\"https:\/\/tinyrss.elyzion.net\/public.php?op=cached_image&amp;hash=473855ee3a04935e8c50c7f7ada769c2b0521bbe\" alt=\"\" data-recalc-dims=\"1\"><br>\nCe jour en #Martinique, une pinc&eacute;e de militants-es de Marine D&egrave;wo ont emp&ecirc;ch&eacute; la venue du d&eacute;put&eacute; europ&eacute;en Florian Philippot dans les studios de &laquo;&nbsp;RFO&nbsp;&raquo; Martinique La 1&egrave;re.&nbsp; On note la pr&eacute;sence d&eacute;termin&eacute;e et clairement affich&eacute;e de B&eacute;atrice Bellay la premi&egrave;re secr&eacute;taire de la F&eacute;d&eacute;ration socialiste de l&rsquo;&icirc;le.&nbsp; Comme quoi le kumquat.<\/p>\n<div><div data-a2a-url=\"http:\/\/www.bondamanjak.com\/images-jour-31-10-18-martinique-philippot\/\" data-a2a-title=\"Images du jour 31\/10\/18 &ndash; Martinique &ndash; Philippot-\"><a href=\"https:\/\/www.addtoany.com\/add_to\/facebook?linkurl=http%3A%2F%2Fwww.bondamanjak.com%2Fimages-jour-31-10-18-martinique-philippot%2F&amp;linkname=Images%20du%20jour%2031%2F10%2F18%20%E2%80%93%20Martinique%20%E2%80%93%20Philippot-\" title=\"Facebook\" rel=\"noreferrer\" target=\"_blank\"><\/a><a href=\"https:\/\/www.addtoany.com\/add_to\/twitter?linkurl=http%3A%2F%2Fwww.bondamanjak.com%2Fimages-jour-31-10-18-martinique-philippot%2F&amp;linkname=Images%20du%20jour%2031%2F10%2F18%20%E2%80%93%20Martinique%20%E2%80%93%20Philippot-\" title=\"Twitter\" rel=\"noreferrer\" target=\"_blank\"><\/a><a href=\"https:\/\/www.addtoany.com\/add_to\/google_plus?linkurl=http%3A%2F%2Fwww.bondamanjak.com%2Fimages-jour-31-10-18-martinique-philippot%2F&amp;linkname=Images%20du%20jour%2031%2F10%2F18%20%E2%80%93%20Martinique%20%E2%80%93%20Philippot-\" title=\"Google+\" rel=\"noreferrer\" target=\"_blank\"><\/a><a href=\"https:\/\/www.addtoany.com\/add_to\/whatsapp?linkurl=http%3A%2F%2Fwww.bondamanjak.com%2Fimages-jour-31-10-18-martinique-philippot%2F&amp;linkname=Images%20du%20jour%2031%2F10%2F18%20%E2%80%93%20Martinique%20%E2%80%93%20Philippot-\" title=\"WhatsApp\" rel=\"noreferrer\" target=\"_blank\"><\/a><a href=\"https:\/\/www.addtoany.com\/share\" rel=\"noreferrer\" target=\"_blank\"><\/a><\/div><\/div><\/div>\r\n<!-- start:tags -->\r\n<!-- end:tags --><!-- start:article footer --><!-- end:article footer --><div itemprop=\"publisher\" itemscope=\"\" itemtype=\"https:\/\/schema.org\/Organization\">\r\n    <div itemprop=\"logo\" itemscope=\"\" itemtype=\"https:\/\/schema.org\/ImageObject\">\r\n      <\/div>\r\n    <\/div>\r\n\r\n\r<\/body><\/html>\n",
-              "labels": [],
+              "labels": [
+                [
+                  -1029,
+                  "Beem",
+                  "#7fff00",
+                  "#000000"
+                ],
+                [
+                  -1028,
+                  "other",
+                  "#7fff00",
+                  "#0000ff"
+                ]
+              ],
               "feed_title": "Bondamanjak",
               "comments_count": 0,
               "comments_link": "http:\/\/www.bondamanjak.com\/images-jour-31-10-18-martinique-philippot\/#respond",
@@ -159,6 +172,24 @@ class GetArticlesJsonSerializationTest {
                   "post_id" : 694227,
                   "title" : "",
                   "width" : 0
+                },
+                {
+                   "0" : 189026,
+                   "1" : "http://0.gravatar.com/avatar/0c686ee27e835834c44ad17115185e12?s=96&d=identicon&r=PG",
+                   "2" : "",
+                   "3" : "",
+                   "4" : "",
+                   "5" : 499753,
+                   "6" : 0,
+                   "7" : 0,
+                   "content_type" : "",
+                   "content_url" : "http://0.gravatar.com/avatar/0c686ee27e835834c44ad17115185e12?s=96&d=identicon&r=PG",
+                   "duration" : "",
+                   "height" : 0,
+                   "id" : 189026,
+                   "post_id" : 499753,
+                   "title" : "",
+                   "width" : 0
                 }
               ],
               "author" : "rands",
@@ -216,7 +247,8 @@ class GetArticlesJsonSerializationTest {
                         "socialiste"),
                     excerpt = "&hellip;",
                     content = "<html><body><header><h1 itemprop=\"mainEntityOfPage\">Images du jour 31/10/18 &ndash; Martinique &ndash; Philippot-</h1>\r\n        <p>\r\n        <span itemprop=\"dateCreated\">octobre 31st, 2018</span>                                    </p>\r\n        </header><div><p><img src=\"https://tinyrss.elyzion.net/public.php?op=cached_image&amp;hash=daff495cb40939033ed3cbd5c20d0a8c7d37fc07\" alt=\"\" data-recalc-dims=\"1\"><img src=\"https://tinyrss.elyzion.net/public.php?op=cached_image&amp;hash=473855ee3a04935e8c50c7f7ada769c2b0521bbe\" alt=\"\" data-recalc-dims=\"1\"><br>\nCe jour en #Martinique, une pinc&eacute;e de militants-es de Marine D&egrave;wo ont emp&ecirc;ch&eacute; la venue du d&eacute;put&eacute; europ&eacute;en Florian Philippot dans les studios de &laquo;&nbsp;RFO&nbsp;&raquo; Martinique La 1&egrave;re.&nbsp; On note la pr&eacute;sence d&eacute;termin&eacute;e et clairement affich&eacute;e de B&eacute;atrice Bellay la premi&egrave;re secr&eacute;taire de la F&eacute;d&eacute;ration socialiste de l&rsquo;&icirc;le.&nbsp; Comme quoi le kumquat.</p>\n<div><div data-a2a-url=\"http://www.bondamanjak.com/images-jour-31-10-18-martinique-philippot/\" data-a2a-title=\"Images du jour 31/10/18 &ndash; Martinique &ndash; Philippot-\"><a href=\"https://www.addtoany.com/add_to/facebook?linkurl=http%3A%2F%2Fwww.bondamanjak.com%2Fimages-jour-31-10-18-martinique-philippot%2F&amp;linkname=Images%20du%20jour%2031%2F10%2F18%20%E2%80%93%20Martinique%20%E2%80%93%20Philippot-\" title=\"Facebook\" rel=\"noreferrer\" target=\"_blank\"></a><a href=\"https://www.addtoany.com/add_to/twitter?linkurl=http%3A%2F%2Fwww.bondamanjak.com%2Fimages-jour-31-10-18-martinique-philippot%2F&amp;linkname=Images%20du%20jour%2031%2F10%2F18%20%E2%80%93%20Martinique%20%E2%80%93%20Philippot-\" title=\"Twitter\" rel=\"noreferrer\" target=\"_blank\"></a><a href=\"https://www.addtoany.com/add_to/google_plus?linkurl=http%3A%2F%2Fwww.bondamanjak.com%2Fimages-jour-31-10-18-martinique-philippot%2F&amp;linkname=Images%20du%20jour%2031%2F10%2F18%20%E2%80%93%20Martinique%20%E2%80%93%20Philippot-\" title=\"Google+\" rel=\"noreferrer\" target=\"_blank\"></a><a href=\"https://www.addtoany.com/add_to/whatsapp?linkurl=http%3A%2F%2Fwww.bondamanjak.com%2Fimages-jour-31-10-18-martinique-philippot%2F&amp;linkname=Images%20du%20jour%2031%2F10%2F18%20%E2%80%93%20Martinique%20%E2%80%93%20Philippot-\" title=\"WhatsApp\" rel=\"noreferrer\" target=\"_blank\"></a><a href=\"https://www.addtoany.com/share\" rel=\"noreferrer\" target=\"_blank\"></a></div></div></div>\r\n<!-- start:tags -->\r\n<!-- end:tags --><!-- start:article footer --><!-- end:article footer --><div itemprop=\"publisher\" itemscope=\"\" itemtype=\"https://schema.org/Organization\">\r\n    <div itemprop=\"logo\" itemscope=\"\" itemtype=\"https://schema.org/ImageObject\">\r\n      </div>\r\n    </div>\r\n\r\n\r</body></html>\n",
-                    labels = emptyList(),
+                    labels = listOf(LabelInfo(-1029, "Beem", "#7fff00", "#000000"),
+                        LabelInfo(-1028, "other", "#7fff00", "#0000ff")),
                     feedTitle = "Bondamanjak",
                     nbComments = 0,
                     commentsLink = "http://www.bondamanjak.com/images-jour-31-10-18-martinique-philippot/#respond",
@@ -265,7 +297,20 @@ class GetArticlesJsonSerializationTest {
                                             duration = 0, indexedDuration = 0,
                                             width = 0, indexedWidth = 0,
                                             height = 0, indexedHeight = 0
+                                            ),
+                                Attachment(id = 189026,
+                                    indexedId = 189026,
+                                    postId = 499753,
+                                    indexedPostId = 499753,
+                                    contentUrl = "http://0.gravatar.com/avatar/0c686ee27e835834c44ad17115185e12?s=96&d=identicon&r=PG",
+                                    indexedContentUrl = "http://0.gravatar.com/avatar/0c686ee27e835834c44ad17115185e12?s=96&d=identicon&r=PG",
+                                    contentType = "", indexedContentType = "",
+                                    title = "", indexedTitle = "",
+                                    duration = 0, indexedDuration = 0,
+                                    width = 0, indexedWidth = 0,
+                                    height = 0, indexedHeight = 0
                                             )
+
                             )
                     )
             ))

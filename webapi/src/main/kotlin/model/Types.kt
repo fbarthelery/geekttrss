@@ -18,12 +18,25 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
+@file:UseSerializers(Attachment.FixInvalidJson::class)
 package com.geekorum.ttrss.webapi.model
 
 import androidx.annotation.RequiresApi
+import kotlinx.serialization.Decoder
+import kotlinx.serialization.Encoder
+import kotlinx.serialization.ImplicitReflectionSerializer
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialDescriptor
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Serializer
+import kotlinx.serialization.StructureKind
+import kotlinx.serialization.UseSerializers
+import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
+import kotlinx.serialization.json.JsonTransformingSerializer
+import kotlinx.serialization.json.longOrNull
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 
@@ -127,8 +140,8 @@ data class Headline(
     val flavorStream: String? = "",
     val attachments: List<Attachment> = emptyList(),
 
-    // unuseful
-    val labels: List<String> = emptyList(),
+    // unuseful for now
+    val labels: List<LabelInfo> = emptyList(),
     val lang: String? = ""
 
 ) {
@@ -138,6 +151,35 @@ data class Headline(
         LocalDateTime.ofEpochSecond(lastUpdatedTimestamp, 0, ZoneOffset.UTC)
     }
 
+}
+
+
+@Serializable(LabelInfo.OwnSerializer::class)
+data class LabelInfo(
+    val id: Long,
+    val title: String = "",
+    val foregroundColor: String = "",
+    val backgroundColor: String = ""
+) {
+    @Serializer(LabelInfo::class)
+    internal object OwnSerializer : KSerializer<LabelInfo> {
+        @OptIn(ImplicitReflectionSerializer::class)
+        override val descriptor: SerialDescriptor = SerialDescriptor(LabelInfo::class.qualifiedName!!, StructureKind.LIST)
+
+        override fun deserialize(decoder: Decoder): LabelInfo {
+            val contentDecoder = decoder.beginStructure(descriptor)
+            val id: Long = contentDecoder.decodeLongElement(descriptor, contentDecoder.decodeElementIndex(descriptor))
+            val title = contentDecoder.decodeStringElement(descriptor, contentDecoder.decodeElementIndex(descriptor))
+            val foregroundColor = contentDecoder.decodeStringElement(descriptor, contentDecoder.decodeElementIndex(descriptor))
+            val backgroundColor = contentDecoder.decodeStringElement(descriptor, contentDecoder.decodeElementIndex(descriptor))
+            contentDecoder.endStructure(descriptor)
+            return LabelInfo(id, title, foregroundColor, backgroundColor)
+        }
+
+        override fun serialize(encoder: Encoder, value: LabelInfo) {
+            TODO("not implemented")
+        }
+    }
 }
 
 /**
@@ -174,4 +216,21 @@ data class Attachment(
         private val indexedWidth: Int = 0,
         @SerialName("7")
         private val indexedHeight: Int = 0
-)
+) {
+
+    @Serializer(Attachment::class)
+    internal object FixInvalidJson : JsonTransformingSerializer<Attachment>(
+        serializer(),
+        "FixInvalidJson") {
+        override fun readTransform(element: JsonElement): JsonElement {
+            val correctedJson = element.jsonObject.mapValues { (k, v) ->
+                when (k) {
+                    "duration", "4" -> JsonPrimitive(v.longOrNull ?: 0)
+                    else -> v
+                }
+            }
+            return JsonObject(correctedJson)
+        }
+    }
+
+}
