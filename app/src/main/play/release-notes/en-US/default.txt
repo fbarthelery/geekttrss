@@ -1,3 +1,1 @@
-Allow to sort the articles by most recent first or oldest first
-Add a setting to select the In app browser engine
-Display most unread tags
+Fix issue preventing Http authentication to work

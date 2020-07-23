@@ -48,7 +48,7 @@ android {
         targetSdkVersion(29)
         val major = 1
         val minor = 5
-        val patch = 1
+        val patch = 2
         versionCode = computeChangesetVersionCode(major, minor, patch)
         versionName = "$major.$minor.$patch"
         buildConfigField("String", "REPOSITORY_CHANGESET", "\"${getChangeSet()}\"")
@@ -139,8 +139,8 @@ dependencies {
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.5.0")
 
     //geekdroid
-    implementation("com.geekorum.geekdroid:geekdroid:geekttrss-1.5.1")
-    add("googleImplementation", "com.geekorum.geekdroid:geekdroid-firebase:geekttrss-1.5.1")
+    implementation("com.geekorum.geekdroid:geekdroid:geekttrss-1.5.2")
+    add("googleImplementation", "com.geekorum.geekdroid:geekdroid-firebase:geekttrss-1.5.2")
 
     implementation(project(":htmlparsers"))
     implementation(project(":webapi"))

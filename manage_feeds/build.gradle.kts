@@ -81,7 +81,7 @@ dependencies {
     kaptTest("com.google.dagger:dagger-android-processor:$daggerVersion")
 
     //geekdroid
-    implementation("com.geekorum.geekdroid:geekdroid:geekttrss-1.5.1")
+    implementation("com.geekorum.geekdroid:geekdroid:geekttrss-1.5.2")
 
     implementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.3.7"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")

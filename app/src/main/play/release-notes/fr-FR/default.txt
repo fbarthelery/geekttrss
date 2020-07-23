@@ -1,3 +1,1 @@
-Possibilité de choisir l'ordre d'affichage des articles: du plus récent au plus vieux ou inversement
-Ajout d'un paramètre pour sélectionner le moteur web
-Affichage des étiquettes les moins lues
+Correction d'un bug empechant l'utilisation de l'authentication Http
