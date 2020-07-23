@@ -60,6 +60,8 @@ interface TinyrssAccountManager {
      */
     fun addAccount(account: Account, password: String): Boolean
 
+    fun updateServerInformation(account: Account, serverInformation: ServerInformation)
+
     /**
      * Initialize synchronisation jobs for an account.
      */
@@ -124,7 +126,7 @@ class AndroidTinyrssAccountManager @Inject constructor(
         }
     }
 
-    fun updateServerInformation(account: Account, serverInformation: ServerInformation) {
+    override fun updateServerInformation(account: Account, serverInformation: ServerInformation) {
         val androidAccount = android.accounts.Account(account.username, ACCOUNT_TYPE)
         val encryptedPassword = serverInformation.basicHttpAuthPassword?.let { encrypt(it) }
         accountManager.run {

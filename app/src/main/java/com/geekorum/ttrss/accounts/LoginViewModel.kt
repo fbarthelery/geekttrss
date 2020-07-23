@@ -205,6 +205,8 @@ internal class LoginViewModel @Inject constructor(
             val account = Account(username, httpUrl!!.toString())
             val success = accountManager.addAccount(account, password)
             if (success) {
+                val serverInformation = DataServerInformation(account.url, http_auth_username, http_auth_password)
+                accountManager.updateServerInformation(account, serverInformation)
                 accountManager.initializeAccountSync(account)
                 return@withContext account
             }
