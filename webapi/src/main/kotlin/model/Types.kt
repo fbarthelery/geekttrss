@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-@file:UseSerializers(Attachment.FixInvalidJson::class)
 package com.geekorum.ttrss.webapi.model
 
 import androidx.annotation.RequiresApi
@@ -31,11 +30,11 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Serializer
 import kotlinx.serialization.StructureKind
-import kotlinx.serialization.UseSerializers
+import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.JsonTransformingSerializer
+import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.longOrNull
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -56,6 +55,7 @@ data class Feed(
     val url: String = "",
 
     @SerialName("unread")
+    @Serializable(DefaultNullableIntSerializer::class)
     val nbUnreadArticles: Int = 0,
 
     @SerialName("has_icon")
@@ -197,6 +197,8 @@ data class Attachment(
         @SerialName("content_type")
         val contentType: String = "",
         val title: String = "",
+
+        @Serializable(DefaultNullableLongSerializer::class)
         val duration: Long = 0,
         val width: Int = 0,
         val height: Int = 0,
@@ -208,7 +210,9 @@ data class Attachment(
         private val indexedContentType: String = "",
         @SerialName("3")
         private val indexedTitle: String = "",
+
         @SerialName("4")
+        @Serializable(DefaultNullableLongSerializer::class)
         private val indexedDuration: Long = 0,
         @SerialName("5")
         private val indexedPostId: Long = 0,
@@ -216,21 +220,23 @@ data class Attachment(
         private val indexedWidth: Int = 0,
         @SerialName("7")
         private val indexedHeight: Int = 0
-) {
+)
 
-    @Serializer(Attachment::class)
-    internal object FixInvalidJson : JsonTransformingSerializer<Attachment>(
-        serializer(),
-        "FixInvalidJson") {
-        override fun readTransform(element: JsonElement): JsonElement {
-            val correctedJson = element.jsonObject.mapValues { (k, v) ->
-                when (k) {
-                    "duration", "4" -> JsonPrimitive(v.longOrNull ?: 0)
-                    else -> v
-                }
-            }
-            return JsonObject(correctedJson)
-        }
+
+/**
+ * An Int serializer that replace null value with default 0.
+ */
+object DefaultNullableIntSerializer : JsonTransformingSerializer<Int>(Int.serializer(), "DefaultNullableIntSerializer"){
+    override fun readTransform(element: JsonElement): JsonElement {
+        return JsonPrimitive(element.intOrNull ?: 0)
     }
+}
 
+/**
+ * A Long serializer that replace null value with default 0.
+ */
+object DefaultNullableLongSerializer : JsonTransformingSerializer<Long>(Long.serializer(), "DefaultNullableLongSerializer"){
+    override fun readTransform(element: JsonElement): JsonElement {
+        return JsonPrimitive(element.longOrNull ?: 0)
+    }
 }
