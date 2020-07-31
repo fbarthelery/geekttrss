@@ -85,7 +85,7 @@ dependencies {
     kaptAndroidTest("com.google.dagger:hilt-android-compiler:$hiltVersion")
 
     //geekdroid
-    implementation("com.geekorum.geekdroid:geekdroid:geekttrss-1.5.1")
+    implementation("com.geekorum.geekdroid:geekdroid:geekttrss-1.5.2")
 
     implementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.3.7"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")

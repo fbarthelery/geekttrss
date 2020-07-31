@@ -136,6 +136,7 @@ class LoginViewModelTest {
     @Test
     fun checkDoLoginWithSuccessSendCompleteEvent() = testCoroutineDispatcher.runBlockingTest {
         every { accountManager.addAccount(any(), any()) } returns true
+        every { accountManager.updateServerInformation(any(), any()) } just Runs
         every { accountManager.initializeAccountSync(any()) } just Runs
         coEvery { tinyRssApi.login(any()) } returns successLoginResponse
 

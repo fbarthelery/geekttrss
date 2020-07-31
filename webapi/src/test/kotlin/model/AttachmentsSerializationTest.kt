@@ -72,7 +72,8 @@ class AttachmentsSerializationTest {
                 }
              ]
         """.trimIndent()
-        val result = Json.parse(Attachment.FixInvalidJson.list, jsonString)
+        val serializer = getSerializer<Attachment>()
+        val result = Json.parse(serializer.list, jsonString)
         val expected = listOf(
             Attachment(id = 313085,
                 indexedId = 313085,
