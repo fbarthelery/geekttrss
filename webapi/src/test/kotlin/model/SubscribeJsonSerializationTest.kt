@@ -22,11 +22,9 @@ package com.geekorum.ttrss.webapi.model
 
 import com.geekorum.ttrss.webapi.model.UnsubscribeFeedResponsePayload.Content
 import com.google.common.truth.Truth
-import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import org.junit.Test
 
-@OptIn(UnstableDefault::class)
 class SubscribeToFeedJsonSerializationTest {
     @Test
     fun testThatSubscribeToFeedRequestPayloadDoCorrectJson() {
@@ -38,7 +36,7 @@ class SubscribeToFeedJsonSerializationTest {
         }
 
         val serializer = getSerializer<SubscribeToFeedRequestPayload>()
-        val result = Json.stringify(serializer, payload)
+        val result = Json.encodeToString(serializer, payload)
         Truth.assertThat(result).isEqualTo("""
             {"sid":"SESSION_ID","feed_url":"http://my.feed.url/feed","category_id":2,"login":"user","password":"password","op":"subscribeToFeed"}
         """.trimIndent())
@@ -61,7 +59,7 @@ class SubscribeToFeedJsonSerializationTest {
             }
         """.trimIndent()
         val serializer = getSerializer<SubscribeToFeedResponsePayload>()
-        val result = Json.parse(serializer, jsonString)
+        val result = Json.decodeFromString(serializer, jsonString)
         val expected = SubscribeToFeedResponsePayload(
             sequence = 2,
             status = 1,
@@ -83,7 +81,7 @@ class SubscribeToFeedJsonSerializationTest {
             }
         """.trimIndent()
         val serializer = getSerializer<SubscribeToFeedResponsePayload>()
-        val result = Json.parse(serializer, jsonString)
+        val result = Json.decodeFromString(serializer, jsonString)
         val expected = SubscribeToFeedResponsePayload(
             sequence = 0,
             status = 1,
@@ -96,7 +94,6 @@ class SubscribeToFeedJsonSerializationTest {
 }
 
 
-@UnstableDefault
 class UnsubscribeFromFeedJsonSerializationTest {
     @Test
     fun testThatUnsubscribeFeedRequestPayloadDoCorrectJson() {
@@ -107,7 +104,7 @@ class UnsubscribeFromFeedJsonSerializationTest {
         }
 
         val serializer = getSerializer<UnsubscribeFeedRequestPayload>()
-        val result = Json.stringify(serializer, payload)
+        val result = Json.encodeToString(serializer, payload)
         Truth.assertThat(result).isEqualTo("""
             {"sid":"SESSION_ID","feed_id":42,"op":"unsubscribeFeed"}
         """.trimIndent())
@@ -126,7 +123,7 @@ class UnsubscribeFromFeedJsonSerializationTest {
             }
         """.trimIndent()
         val serializer = getSerializer<UnsubscribeFeedResponsePayload>()
-        val result = Json.parse(serializer, jsonString)
+        val result = Json.decodeFromString(serializer, jsonString)
         val expected = UnsubscribeFeedResponsePayload(
             sequence = 2,
             status = 1,
@@ -147,7 +144,7 @@ class UnsubscribeFromFeedJsonSerializationTest {
             }
         """.trimIndent()
         val serializer = getSerializer<UnsubscribeFeedResponsePayload>()
-        val result = Json.parse(serializer, jsonString)
+        val result = Json.decodeFromString(serializer, jsonString)
         val expected = UnsubscribeFeedResponsePayload(
             sequence = 0,
             status = 1,

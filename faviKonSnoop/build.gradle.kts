@@ -31,7 +31,7 @@ dependencies {
     api("com.squareup.okio:okio:2.6.0")
     implementation("javax.inject:javax.inject:1")
     implementation("org.jsoup:jsoup:1.10.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC")
 
     testImplementation("com.google.truth:truth:1.0")
     testImplementation(kotlin("test-junit"))

@@ -32,11 +32,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.map
-import androidx.lifecycle.observe
 import androidx.lifecycle.switchMap
 import com.geekorum.geekdroid.battery.BatterySaverLiveData
 import com.geekorum.geekdroid.battery.LowBatteryLiveData
-import javax.inject.Inject
 
 /**
  * An [android.app.Activity] who switch to Night mode when battery is low or in saving mode.

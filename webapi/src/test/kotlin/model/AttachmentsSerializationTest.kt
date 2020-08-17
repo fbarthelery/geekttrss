@@ -21,13 +21,11 @@
 package com.geekorum.ttrss.webapi.model
 
 import com.google.common.truth.Truth.assertThat
-import kotlinx.serialization.UnstableDefault
-import kotlinx.serialization.builtins.list
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 
 
-@OptIn(UnstableDefault::class)
 class AttachmentsSerializationTest {
 
     @Test
@@ -73,7 +71,7 @@ class AttachmentsSerializationTest {
              ]
         """.trimIndent()
         val serializer = getSerializer<Attachment>()
-        val result = Json.parse(serializer.list, jsonString)
+        val result = Json.decodeFromString(ListSerializer(serializer), jsonString)
         val expected = listOf(
             Attachment(id = 313085,
                 indexedId = 313085,

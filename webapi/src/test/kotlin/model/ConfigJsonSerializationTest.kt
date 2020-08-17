@@ -21,11 +21,9 @@
 package com.geekorum.ttrss.webapi.model
 
 import com.google.common.truth.Truth.assertThat
-import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 
-@OptIn(UnstableDefault::class)
 class GetConfigJsonSerializationTest {
 
     @Test
@@ -34,7 +32,7 @@ class GetConfigJsonSerializationTest {
             sessionId = "SESSION_ID"
         }
         val serializer = getSerializer<GetConfigRequestPayload>()
-        val result = Json.stringify(serializer, payload)
+        val result = Json.encodeToString(serializer, payload)
         assertThat(result).isEqualTo("""
             {"sid":"SESSION_ID","op":"getConfig"}
         """.trimIndent())
@@ -55,7 +53,7 @@ class GetConfigJsonSerializationTest {
             }
         """.trimIndent()
         val serializer = getSerializer<GetConfigResponsePayload>()
-        val result = Json.parse(serializer, jsonString)
+        val result = Json.decodeFromString(serializer, jsonString)
         val expected = GetConfigResponsePayload(
             sequence = 0,
             status = 0,
@@ -79,7 +77,7 @@ class GetConfigJsonSerializationTest {
             }
         """.trimIndent()
         val serializer = getSerializer<ListResponsePayload<Headline>>()
-        val result = Json.parse(serializer, jsonString)
+        val result = Json.decodeFromString(serializer, jsonString)
         val expected = GetConfigResponsePayload(
             sequence = 2,
             status = 1,

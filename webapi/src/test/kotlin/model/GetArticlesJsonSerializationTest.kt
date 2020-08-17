@@ -21,11 +21,9 @@
 package com.geekorum.ttrss.webapi.model
 
 import com.google.common.truth.Truth.assertThat
-import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 
-@OptIn(UnstableDefault::class)
 class GetArticlesJsonSerializationTest {
 
     @Test
@@ -44,7 +42,7 @@ class GetArticlesJsonSerializationTest {
             sessionId = "SESSION_ID"
         }
         val serializer = getSerializer<GetArticlesRequestPayload>()
-        val result = Json.stringify(serializer, payload)
+        val result = Json.encodeToString(serializer, payload)
         assertThat(result).isEqualTo("""
             {"sid":"SESSION_ID","feed_id":256,"view_mode":"all_articles","show_content":true,"show_excerpt":false,"include_attachments":true,"skip":10,"since_id":200,"limit":10,"order_by":"title","op":"getHeadlines"}
         """.trimIndent())
@@ -221,7 +219,7 @@ class GetArticlesJsonSerializationTest {
         }
 """.trimIndent()
         val serializer = getSerializer<ListResponsePayload<Headline>>()
-        val result = Json.parse(serializer, jsonString)
+        val result = Json.decodeFromString(serializer, jsonString)
         val expected = ListResponsePayload(
             sequence = 2,
             status = 1,
@@ -330,7 +328,7 @@ class GetArticlesJsonSerializationTest {
             }
         """.trimIndent()
         val serializer = getSerializer<ListResponsePayload<Headline>>()
-        val result = Json.parse(serializer, jsonString)
+        val result = Json.decodeFromString(serializer, jsonString)
         val expected = ListResponsePayload<Headline>(
             sequence = 2,
             status = 1,

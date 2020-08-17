@@ -21,15 +21,15 @@
 package com.geekorum.ttrss.webapi.model
 
 import androidx.annotation.Keep
-import kotlinx.serialization.CompositeDecoder
-import kotlinx.serialization.Decoder
-import kotlinx.serialization.Encoder
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Serializer
 import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
+import kotlinx.serialization.encoding.CompositeDecoder
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 
 /**
  * Request Payload to subscribe to a new feed
@@ -101,7 +101,7 @@ data class SubscribeToFeedResponsePayload(
             var status = 0
             loop@ while (true) {
                 when (val i = contentDecoder.decodeElementIndex(descriptor)) {
-                    CompositeDecoder.READ_DONE -> break@loop
+                    CompositeDecoder.DECODE_DONE -> break@loop
                     0 -> seq = contentDecoder.decodeNullableSerializableElement(descriptor, i,
                         Int.serializer().nullable)
                     1 -> status = contentDecoder.decodeIntElement(descriptor, i)
@@ -185,7 +185,7 @@ data class UnsubscribeFeedResponsePayload(
             var status = 0
             loop@ while (true) {
                 when (val i = contentDecoder.decodeElementIndex(descriptor)) {
-                    CompositeDecoder.READ_DONE -> break@loop
+                    CompositeDecoder.DECODE_DONE -> break@loop
                     0 -> seq = contentDecoder.decodeNullableSerializableElement(descriptor, i,
                         Int.serializer().nullable)
                     1 -> status = contentDecoder.decodeIntElement(descriptor, i)

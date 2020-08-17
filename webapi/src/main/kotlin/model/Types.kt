@@ -21,20 +21,16 @@
 package com.geekorum.ttrss.webapi.model
 
 import androidx.annotation.RequiresApi
-import kotlinx.serialization.Decoder
-import kotlinx.serialization.Encoder
-import kotlinx.serialization.ImplicitReflectionSerializer
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerialDescriptor
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Serializer
-import kotlinx.serialization.StructureKind
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.JsonTransformingSerializer
+import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.jsonArray
+import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.longOrNull
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -141,7 +137,7 @@ data class Headline(
     val attachments: List<Attachment> = emptyList(),
 
     // unuseful for now
-    val labels: List<LabelInfo> = emptyList(),
+    val labels: List<@Serializable(LabelInfo.LabelInfoAsListSerializer::class) LabelInfo> = emptyList(),
     val lang: String? = ""
 
 ) {
@@ -154,30 +150,23 @@ data class Headline(
 }
 
 
-@Serializable(LabelInfo.OwnSerializer::class)
+@Serializable
 data class LabelInfo(
     val id: Long,
     val title: String = "",
     val foregroundColor: String = "",
     val backgroundColor: String = ""
 ) {
-    @Serializer(LabelInfo::class)
-    internal object OwnSerializer : KSerializer<LabelInfo> {
-        @OptIn(ImplicitReflectionSerializer::class)
-        override val descriptor: SerialDescriptor = SerialDescriptor(LabelInfo::class.qualifiedName!!, StructureKind.LIST)
 
-        override fun deserialize(decoder: Decoder): LabelInfo {
-            val contentDecoder = decoder.beginStructure(descriptor)
-            val id: Long = contentDecoder.decodeLongElement(descriptor, contentDecoder.decodeElementIndex(descriptor))
-            val title = contentDecoder.decodeStringElement(descriptor, contentDecoder.decodeElementIndex(descriptor))
-            val foregroundColor = contentDecoder.decodeStringElement(descriptor, contentDecoder.decodeElementIndex(descriptor))
-            val backgroundColor = contentDecoder.decodeStringElement(descriptor, contentDecoder.decodeElementIndex(descriptor))
-            contentDecoder.endStructure(descriptor)
-            return LabelInfo(id, title, foregroundColor, backgroundColor)
-        }
-
-        override fun serialize(encoder: Encoder, value: LabelInfo) {
-            TODO("not implemented")
+    internal object LabelInfoAsListSerializer : JsonTransformingSerializer<LabelInfo>(LabelInfo.serializer()) {
+        override fun transformDeserialize(element: JsonElement): JsonElement {
+            return buildJsonObject {
+                val array = element.jsonArray
+                put("id", array[0])
+                put("title", array[1])
+                put("foregroundColor", array[2])
+                put("backgroundColor", array[3])
+            }
         }
     }
 }
@@ -226,17 +215,17 @@ data class Attachment(
 /**
  * An Int serializer that replace null value with default 0.
  */
-object DefaultNullableIntSerializer : JsonTransformingSerializer<Int>(Int.serializer(), "DefaultNullableIntSerializer"){
-    override fun readTransform(element: JsonElement): JsonElement {
-        return JsonPrimitive(element.intOrNull ?: 0)
+object DefaultNullableIntSerializer : JsonTransformingSerializer<Int>(Int.serializer()) {
+    override fun transformDeserialize(element: JsonElement): JsonElement {
+        return JsonPrimitive(element.jsonPrimitive.intOrNull ?: 0)
     }
 }
 
 /**
  * A Long serializer that replace null value with default 0.
  */
-object DefaultNullableLongSerializer : JsonTransformingSerializer<Long>(Long.serializer(), "DefaultNullableLongSerializer"){
-    override fun readTransform(element: JsonElement): JsonElement {
-        return JsonPrimitive(element.longOrNull ?: 0)
+object DefaultNullableLongSerializer : JsonTransformingSerializer<Long>(Long.serializer()) {
+    override fun transformDeserialize(element: JsonElement): JsonElement {
+        return JsonPrimitive(element.jsonPrimitive.longOrNull ?: 0)
     }
 }

@@ -24,7 +24,6 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.core.view.children
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.observe
 import androidx.navigation.NavController
 import androidx.navigation.dynamicfeatures.DynamicGraphNavigator
 import com.geekorum.ttrss.R

@@ -29,7 +29,6 @@ import dagger.hilt.InstallIn
 
 
 @Module(includes = [
-    FlavorLessModule::class,
     GoogleFontsWebFontProviderModule::class,
     PlayStoreInstallModule::class,
     PlayStoreInAppUpdateModule::class,

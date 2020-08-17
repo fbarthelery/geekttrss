@@ -21,11 +21,9 @@
 package com.geekorum.ttrss.webapi.model
 
 import com.google.common.truth.Truth.assertThat
-import kotlinx.serialization.UnstableDefault
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 
-@OptIn(UnstableDefault::class)
 class GetVersionJsonSerializationTest {
 
     @Test
@@ -34,7 +32,7 @@ class GetVersionJsonSerializationTest {
             sessionId = "SESSION_ID"
         }
         val serializer = getSerializer<GetVersionRequestPayload>()
-        val result = Json.stringify(serializer, payload)
+        val result = Json.encodeToString(serializer, payload)
         assertThat(result).isEqualTo("""
             {"sid":"SESSION_ID","op":"getVersion"}
         """.trimIndent())
@@ -46,7 +44,7 @@ class GetVersionJsonSerializationTest {
             {"seq":0,"status":0,"content":{"version":"19.8"}}
         """.trimIndent()
         val serializer = getSerializer<GetVersionResponsePayload>()
-        val result = Json.parse(serializer, jsonString)
+        val result = Json.decodeFromString(serializer, jsonString)
         val expected = GetVersionResponsePayload(
             sequence = 0,
             status = 0,
@@ -67,7 +65,7 @@ class GetVersionJsonSerializationTest {
             }
         """.trimIndent()
         val serializer = getSerializer<ListResponsePayload<Headline>>()
-        val result = Json.parse(serializer, jsonString)
+        val result = Json.decodeFromString(serializer, jsonString)
         val expected = GetVersionResponsePayload(
             sequence = 2,
             status = 1,
@@ -80,7 +78,6 @@ class GetVersionJsonSerializationTest {
 }
 
 
-@OptIn(UnstableDefault::class)
 class GetApiLevelJsonSerializationTest {
 
     @Test
@@ -89,7 +86,7 @@ class GetApiLevelJsonSerializationTest {
             sessionId = "SESSION_ID"
         }
         val serializer = getSerializer<GetApiLevelRequestPayload>()
-        val result = Json.stringify(serializer, payload)
+        val result = Json.encodeToString(serializer, payload)
         assertThat(result).isEqualTo("""
             {"sid":"SESSION_ID","op":"getApiLevel"}
         """.trimIndent())
@@ -101,7 +98,7 @@ class GetApiLevelJsonSerializationTest {
             {"seq":0,"status":0,"content":{"level":14}}
         """.trimIndent()
         val serializer = getSerializer<GetApiLevelResponsePayload>()
-        val result = Json.parse(serializer, jsonString)
+        val result = Json.decodeFromString(serializer, jsonString)
         val expected = GetApiLevelResponsePayload(
             sequence = 0,
             status = 0,
@@ -122,7 +119,7 @@ class GetApiLevelJsonSerializationTest {
             }
         """.trimIndent()
         val serializer = getSerializer<GetApiLevelResponsePayload>()
-        val result = Json.parse(serializer, jsonString)
+        val result = Json.decodeFromString(serializer, jsonString)
         val expected = GetApiLevelResponsePayload(
             sequence = 2,
             status = 1,

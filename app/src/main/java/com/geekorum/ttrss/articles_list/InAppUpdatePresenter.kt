@@ -26,7 +26,6 @@ import android.view.View
 import androidx.core.graphics.drawable.IconCompat
 import androidx.core.view.doOnNextLayout
 import androidx.core.view.updatePadding
-import androidx.lifecycle.observe
 import com.geekorum.geekdroid.views.banners.BannerContainer
 import com.geekorum.geekdroid.views.banners.BannerSpec
 import com.geekorum.geekdroid.views.banners.buildBanner

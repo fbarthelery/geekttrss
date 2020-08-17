@@ -23,7 +23,6 @@ package com.geekorum.ttrss.articles_list
 import android.view.View
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.observe
 import com.geekorum.ttrss.R
 
 /**

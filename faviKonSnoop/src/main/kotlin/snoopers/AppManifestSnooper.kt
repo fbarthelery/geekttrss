@@ -22,13 +22,11 @@ package com.geekorum.favikonsnoop.snoopers
 
 import com.geekorum.favikonsnoop.FaviconInfo
 import com.geekorum.favikonsnoop.Snooper
-import kotlinx.serialization.ImplicitReflectionSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.parse
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Request
@@ -82,7 +80,7 @@ class AppManifestSnooper internal constructor(
             .get()
             .build()
         val response = okHttpClient.newCall(request).execute()
-        return response.use { response ->
+        return response.use {
             if (response.isSuccessful) {
                 response.body?.string()?.let {
                     webAppManifestParser.parseManifest(it)
@@ -129,12 +127,11 @@ data class ImageResource(
 )
 
 internal class WebAppManifestParser(
-    private val  json: Json = Json(JsonConfiguration.Stable)
+    private val  json: Json = Json.Default
 ) {
-    @OptIn(ImplicitReflectionSerializer::class)
     fun parseManifest(content: String): WebAppManifest? {
         return try {
-            json.parse(content)
+            json.decodeFromString<WebAppManifest>(content)
         } catch (e: SerializationException) {
             null
         }

@@ -26,7 +26,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.manage_feeds.R

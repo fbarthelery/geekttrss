@@ -22,20 +22,21 @@
 package com.geekorum.ttrss.webapi.model
 
 import androidx.annotation.Keep
-import kotlinx.serialization.CompositeDecoder
-import kotlinx.serialization.Decoder
-import kotlinx.serialization.Encoder
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerialDescriptor
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.Serializer
 import kotlinx.serialization.Transient
-import kotlinx.serialization.builtins.list
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
-import kotlinx.serialization.json.JsonDecodingException
+import kotlinx.serialization.descriptors.SerialDescriptor
+import kotlinx.serialization.descriptors.buildClassSerialDescriptor
+import kotlinx.serialization.encoding.CompositeDecoder
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
 
 /* Requests */
 
@@ -132,7 +133,7 @@ data class ListContent<T>(
         val contentSerializer: KSerializer<E>
     ) : KSerializer<ListContent<E>> {
 
-        override val descriptor: SerialDescriptor = SerialDescriptor("ListContentSerializer") {
+        override val descriptor: SerialDescriptor = buildClassSerialDescriptor("ListContentSerializer") {
             element("error", Error.serializer().descriptor, isOptional = true)
         }
 
@@ -150,7 +151,7 @@ data class ListContent<T>(
             var error: Error? = null
             loop@ while (true) {
                 when (val i = contentDecoder.decodeElementIndex(descriptor)) {
-                    CompositeDecoder.READ_DONE -> break@loop
+                    CompositeDecoder.DECODE_DONE -> break@loop
                     0 -> error = contentDecoder.decodeNullableSerializableElement(descriptor, i,
                         Error.serializer().nullable)
                 }
@@ -160,11 +161,11 @@ data class ListContent<T>(
         }
 
         private fun deserializeList(input: Decoder): ListContent<E>? {
-            val listSerializer = contentSerializer.list
+            val listSerializer = ListSerializer(contentSerializer)
             return try {
                 val list = listSerializer.deserialize(input)
                 ListContent(list)
-            } catch (e: JsonDecodingException) {
+            } catch (e: SerializationException) {
                 null
             }
         }
@@ -195,7 +196,7 @@ data class ListResponsePayload<T>(
         val contentSerializer: KSerializer<E>
     ) : KSerializer<ListResponsePayload<E>> {
 
-        override val descriptor: SerialDescriptor = SerialDescriptor("ListResponsePayloadSerializer") {
+        override val descriptor: SerialDescriptor = buildClassSerialDescriptor("ListResponsePayloadSerializer") {
             element("seq", Int.serializer().descriptor, isOptional = true)
             element("status", Int.serializer().descriptor, isOptional = true)
             element("content", ListContent.serializer(contentSerializer).descriptor)
@@ -212,7 +213,7 @@ data class ListResponsePayload<T>(
             var status = 0
             loop@ while (true) {
                 when (val i = contentDecoder.decodeElementIndex(descriptor)) {
-                    CompositeDecoder.READ_DONE -> break@loop
+                    CompositeDecoder.DECODE_DONE -> break@loop
                     0 -> seq = contentDecoder.decodeNullableSerializableElement(descriptor, i,
                         Int.serializer().nullable)
                     1 -> status = contentDecoder.decodeIntElement(descriptor, i)

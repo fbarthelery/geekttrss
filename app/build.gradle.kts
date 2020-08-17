@@ -143,7 +143,7 @@ dependencies {
     // androidx others
     implementation("androidx.browser:browser:1.2.0")
 
-    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.5.0")
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.6.0")
 
     //geekdroid
     implementation("com.geekorum.geekdroid:geekdroid:geekttrss-1.5.2")
@@ -206,7 +206,7 @@ dependencies {
     implementation(enforcedPlatform(kotlin("bom")))
     implementation(kotlin("stdlib-jdk8"))
 
-    val coroutinesVersion = "1.3.7"
+    val coroutinesVersion = "1.3.9"
     implementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:$coroutinesVersion"))
     testImplementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:$coroutinesVersion"))
     androidTestImplementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:$coroutinesVersion"))

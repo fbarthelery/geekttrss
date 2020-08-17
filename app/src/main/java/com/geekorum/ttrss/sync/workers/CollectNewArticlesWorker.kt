@@ -92,7 +92,7 @@ class CollectNewArticlesWorker @WorkerInject constructor(
         val latestId = getLatestArticleId()
 
         val articles = getArticles(feedId, latestId, 0)
-        val latestReceivedId = articles.maxBy { it.article.id }?.article?.id
+        val latestReceivedId = articles.maxByOrNull { it.article.id }?.article?.id
         val difference = (latestReceivedId ?: latestId) - latestId
         if (difference > 1000) {
             collectNewArticlesGradually()
