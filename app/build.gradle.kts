@@ -128,16 +128,16 @@ hilt {
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.2.0")
-    implementation("androidx.fragment:fragment-ktx:1.2.4")
+    implementation("androidx.core:core-ktx:1.3.1")
+    implementation("androidx.fragment:fragment-ktx:1.2.5")
     implementation("androidx.activity:activity-ktx:1.1.0")
 
     // androidx ui
-    implementation("androidx.drawerlayout:drawerlayout:1.1.0-beta01")
+    implementation("androidx.drawerlayout:drawerlayout:1.1.0")
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")
     implementation("androidx.recyclerview:recyclerview:1.1.0")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.1.0")
-    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.0.0")
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation("androidx.preference:preference-ktx:1.1.1")
 
     // androidx others
@@ -186,9 +186,9 @@ dependencies {
     kapt("com.squareup.inject:assisted-inject-processor-dagger2:0.5.2")
     val hiltVersion = "2.28-alpha"
     implementation("com.google.dagger:hilt-android:$hiltVersion")
-    implementation("androidx.hilt:hilt-work:1.0.0-alpha01")
-    implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha01")
-    kapt("androidx.hilt:hilt-compiler:1.0.0-alpha01")
+    implementation("androidx.hilt:hilt-work:1.0.0-alpha02")
+    implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha02")
+    kapt("androidx.hilt:hilt-compiler:1.0.0-alpha02")
     kapt("com.google.dagger:hilt-android-compiler:$hiltVersion")
     testImplementation("com.google.dagger:hilt-android-testing:$hiltVersion")
     kaptTest("com.google.dagger:hilt-android-compiler:$hiltVersion")
@@ -225,7 +225,7 @@ dependencies {
     add("googleImplementation", "com.google.android.play:core-ktx:1.7.0")
 
     // api dependencies for features modules
-    api("androidx.appcompat:appcompat:1.1.0")
+    api("androidx.appcompat:appcompat:1.2.0")
     api("androidx.work:work-runtime-ktx:$workVersion")
     api("androidx.room:room-runtime:$roomVersion")
     api("androidx.room:room-ktx:$roomVersion")
@@ -241,7 +241,7 @@ dependencies {
 
     // fragment testing declare some activities and resources that needs to be in the apk
     // we don't use it. here but it is used in feature modules
-    debugImplementation("androidx.fragment:fragment-testing:1.2.4")
+    debugImplementation("androidx.fragment:fragment-testing:1.2.5")
 
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.4")
 }

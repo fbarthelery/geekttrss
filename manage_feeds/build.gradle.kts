@@ -75,9 +75,9 @@ dependencies {
     implementation("com.google.dagger:dagger:$daggerVersion")
     kapt("com.google.dagger:dagger-compiler:$daggerVersion")
     kaptTest("com.google.dagger:dagger-compiler:$daggerVersion")
-    implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha01")
-    implementation("androidx.hilt:hilt-work:1.0.0-alpha01")
-    kapt("androidx.hilt:hilt-compiler:1.0.0-alpha01")
+    implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha02")
+    implementation("androidx.hilt:hilt-work:1.0.0-alpha02")
+    kapt("androidx.hilt:hilt-compiler:1.0.0-alpha02")
     val hiltVersion = "2.28-alpha"
     testImplementation("com.google.dagger:hilt-android-testing:$hiltVersion")
     kaptTest("com.google.dagger:hilt-android-compiler:$hiltVersion")
@@ -97,9 +97,9 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")
     implementation("androidx.recyclerview:recyclerview:1.1.0")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.1.0")
-    implementation("com.google.android.material:material:1.1.0")
+    implementation("com.google.android.material:material:1.2.0")
 
-    implementation("androidx.core:core-ktx:1.2.0")
+    implementation("androidx.core:core-ktx:1.3.1")
 
     val lifecycleVersion = "2.2.0"
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
@@ -112,18 +112,18 @@ dependencies {
 
     implementation("io.coil-kt:coil:1.0.0-rc1")
 
-    androidTestImplementation("androidx.work:work-testing:2.3.4")
+    androidTestImplementation("androidx.work:work-testing:2.4.0")
     dualTestImplementation("androidx.arch.core:core-testing:2.1.0")
-    androidTestImplementation("com.squareup.okhttp3:mockwebserver:4.1.0")
+    androidTestImplementation("com.squareup.okhttp3:mockwebserver:4.6.0")
 
-    debugImplementation("androidx.fragment:fragment-testing:1.2.4")
+    debugImplementation("androidx.fragment:fragment-testing:1.2.5")
 
     // the test apk need these dependencies because they provide some of its resources
     // likely due to manifest merging with :app manifest
-    androidTestImplementation("androidx.fragment:fragment-testing:1.2.4")
-    androidTestImplementation("com.squareup.leakcanary:leakcanary-android:2.0-beta-2")
+    androidTestImplementation("androidx.fragment:fragment-testing:1.2.5")
+    androidTestImplementation("com.squareup.leakcanary:leakcanary-android:2.4")
     androidTestImplementation("com.google.android.gms:play-services-oss-licenses:17.0.0")
-    androidTestImplementation("com.google.android.play:core-ktx:1.7.0")
+    androidTestImplementation("com.google.android.play:core-ktx:1.8.1")
 
     // used in test through geekdroid
     androidTestImplementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.2.0")
