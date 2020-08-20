@@ -37,7 +37,6 @@ import com.geekorum.ttrss.R
 import com.geekorum.ttrss.databinding.ActivityLoginAccountBinding
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputLayout
-import dagger.android.AndroidInjection
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

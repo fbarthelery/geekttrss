@@ -21,9 +21,7 @@
 package com.geekorum.ttrss.di
 
 import com.geekorum.geekdroid.dagger.AndroidFrameworkModule
-import com.geekorum.ttrss.core.CoreFactoriesModule
 import dagger.Module
-import dagger.android.support.AndroidSupportInjectionModule
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ApplicationComponent
 
@@ -32,7 +30,6 @@ import dagger.hilt.android.components.ApplicationComponent
  */
 @Module(includes = [
     AndroidFrameworkModule::class,
-    AndroidSupportInjectionModule::class,
     com.geekorum.geekdroid.dagger.ViewModelsModule::class
 ])
 @InstallIn(ApplicationComponent::class)

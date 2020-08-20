@@ -34,12 +34,8 @@ import com.geekorum.geekdroid.dagger.FragmentFactoriesModule
 import com.geekorum.ttrss.BatteryFriendlyActivity
 import dagger.Binds
 import dagger.Module
-import dagger.android.AndroidInjection
-import dagger.android.AndroidInjector
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ApplicationComponent
-import dagger.hilt.android.internal.migration.InjectedByHilt
-import dagger.hilt.android.migration.OptionalInjectCheck
 import javax.inject.Inject
 
 
@@ -70,14 +66,9 @@ open class InjectableBaseActivity : BatteryFriendlyActivity() {
 
     /**
      * Inject required field into the activity.
-     * Default method use Dagger [AndroidInjection]
+     * Default method use Dagger Hilt but can be overriden
      */
-    protected open fun inject() {
-        //TODO remove once migration to hilt is complete
-        if (this !is InjectedByHilt || !OptionalInjectCheck.wasInjectedByHilt(this)) {
-            AndroidInjection.inject(this)
-        }
-    }
+    protected open fun inject() {}
 }
 
 // BaseActivity is flavor dependant but extends InjectableBaseActivity

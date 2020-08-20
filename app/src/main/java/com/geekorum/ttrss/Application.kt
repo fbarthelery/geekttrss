@@ -28,17 +28,16 @@ import com.geekorum.geekdroid.dagger.AppInitializer
 import com.geekorum.geekdroid.dagger.initialize
 import com.geekorum.ttrss.debugtools.StrictModeInitializer
 import com.geekorum.ttrss.di.ApplicationComponentEntryPoint
-import dagger.android.AndroidInjector
-import dagger.android.support.DaggerApplication
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
+import android.app.Application as AndroidApplication
 
 /**
  * Initialize global component for the TTRSS application.
  */
 @HiltAndroidApp
-open class Application : DaggerApplication(), Configuration.Provider, ImageLoaderFactory {
+open class Application : AndroidApplication(), Configuration.Provider, ImageLoaderFactory {
 
     @Inject
     lateinit var appInitializers: MutableSet<AppInitializer>
@@ -66,8 +65,6 @@ open class Application : DaggerApplication(), Configuration.Provider, ImageLoade
         result.addAll(initializers)
         return result.distinct()
     }
-
-    override fun applicationInjector(): AndroidInjector<Application> = applicationComponent
 
     override fun getWorkManagerConfiguration(): Configuration = workManagerConfig
 

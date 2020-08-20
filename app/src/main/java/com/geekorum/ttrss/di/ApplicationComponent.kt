@@ -20,13 +20,11 @@
  */
 package com.geekorum.ttrss.di
 
-import com.geekorum.ttrss.Application
 import com.geekorum.ttrss.features_api.ManageFeedsDependencies
-import dagger.android.AndroidInjector
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 
 
 @EntryPoint
 @InstallIn(dagger.hilt.android.components.ApplicationComponent::class)
-interface ApplicationComponentEntryPoint : AndroidInjector<Application>, ManageFeedsDependencies
+interface ApplicationComponentEntryPoint : ManageFeedsDependencies
