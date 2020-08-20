@@ -157,7 +157,7 @@ dependencies {
     implementation("com.google.android.material:material:1.2.0-alpha06")
     implementation("com.squareup.okhttp3:logging-interceptor:4.6.0")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.6.0")
-    implementation("io.coil-kt:coil:0.10.0")
+    implementation("io.coil-kt:coil:1.0.0-rc1")
     implementation("com.google.android.gms:play-services-oss-licenses:17.0.0")
 
     implementation("org.jsoup:jsoup:1.10.2")

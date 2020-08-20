@@ -23,7 +23,6 @@ package com.geekorum.ttrss.di
 import android.app.Application
 import android.os.StrictMode.allowThreadDiskWrites
 import coil.ImageLoader
-import coil.ImageLoaderBuilder
 import com.geekorum.geekdroid.network.TaggedSocketFactory
 import com.geekorum.ttrss.debugtools.withStrictMode
 import com.geekorum.ttrss.logging.RetrofitInvocationLogger
@@ -96,7 +95,7 @@ object NetworkModule {
     @Provides
     @Singleton
     internal fun providesImageLoader(application: Application, okHttpClient: OkHttpClient): ImageLoader {
-        return ImageLoaderBuilder(application)
+        return ImageLoader.Builder(application)
             .okHttpClient {
                 val socketFactory = TaggedSocketFactory(okHttpClient.socketFactory, TAG_COIL)
                 okHttpClient.newBuilder()

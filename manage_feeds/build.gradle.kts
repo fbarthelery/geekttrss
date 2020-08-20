@@ -110,7 +110,7 @@ dependencies {
     implementation(project(":htmlparsers"))
     implementation(project(":webapi"))
 
-    implementation("io.coil-kt:coil:0.10.0")
+    implementation("io.coil-kt:coil:1.0.0-rc1")
 
     androidTestImplementation("androidx.work:work-testing:2.3.4")
     dualTestImplementation("androidx.arch.core:core-testing:2.1.0")
