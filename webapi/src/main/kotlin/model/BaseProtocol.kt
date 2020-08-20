@@ -18,11 +18,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-@file:OptIn(InternalSerializationApi::class)
+@file:OptIn(ExperimentalSerializationApi::class)
 package com.geekorum.ttrss.webapi.model
 
 import androidx.annotation.Keep
-import kotlinx.serialization.InternalSerializationApi
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -193,7 +193,7 @@ data class ListResponsePayload<T>(
 
     @Serializer(ListResponsePayload::class)
     internal class OwnSerializer<E>(
-        val contentSerializer: KSerializer<E>
+        private val contentSerializer: KSerializer<E>
     ) : KSerializer<ListResponsePayload<E>> {
 
         override val descriptor: SerialDescriptor = buildClassSerialDescriptor("ListResponsePayloadSerializer") {
@@ -202,7 +202,7 @@ data class ListResponsePayload<T>(
             element("content", ListContent.serializer(contentSerializer).descriptor)
         }
 
-        override fun serialize(encoder: Encoder, obj: ListResponsePayload<E>) {
+        override fun serialize(encoder: Encoder, value: ListResponsePayload<E>) {
             TODO("not implemented")
         }
 

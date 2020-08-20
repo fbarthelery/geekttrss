@@ -30,10 +30,10 @@ dependencies {
 
     implementation("androidx.annotation:annotation:1.1.0")
     implementation("javax.inject:javax.inject:1")
-    implementation("com.squareup.retrofit2:retrofit:2.6.1")
+    implementation("com.squareup.retrofit2:retrofit:2.8.1")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:1.0.0-RC")
 
-    implementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.3.6"))
+    implementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.3.9"))
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core")
 
 

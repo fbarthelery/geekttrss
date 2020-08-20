@@ -18,9 +18,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
+@file:OptIn(ExperimentalSerializationApi::class)
 package com.geekorum.ttrss.webapi.model
 
 import androidx.annotation.Keep
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
