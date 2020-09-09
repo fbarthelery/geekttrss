@@ -45,6 +45,7 @@ import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 /**
@@ -91,7 +92,11 @@ abstract class BaseArticlesListFragment() : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         setupEdgeToEdge()
-        articlesViewModel.articles.observe(this) { articles -> adapter.submitList(articles) }
+        viewLifecycleOwner.lifecycleScope.launch {
+            articlesViewModel.articles.collectLatest {
+                adapter.submitData(it)
+            }
+        }
 
         articlesViewModel.getPendingArticlesSetUnread().observe(viewLifecycleOwner) { nbArticles ->
             if (nbArticles > 0) {

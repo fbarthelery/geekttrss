@@ -31,6 +31,7 @@ import android.widget.PopupMenu
 import androidx.core.app.ShareCompat
 import androidx.core.view.doOnPreDraw
 import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
@@ -52,15 +53,7 @@ internal fun RecyclerView.setupCardSpacing() {
 internal open class ArticlesListAdapter(
     private val layoutInflater: LayoutInflater,
     private val eventHandler: CardEventHandler
-) : PagedListAdapter<Article, HeadlinesBindingViewHolder>(ARTICLE_DIFF_CALLBACK) {
-
-    init {
-        setHasStableIds(true)
-    }
-
-    override fun getItemId(position: Int): Long {
-        return getItem(position)?.id ?: RecyclerView.NO_ID
-    }
+) : PagingDataAdapter<Article, HeadlinesBindingViewHolder>(ARTICLE_DIFF_CALLBACK) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HeadlinesBindingViewHolder {
         val binding = HeadlinesRowBinding.inflate(layoutInflater, parent, false)

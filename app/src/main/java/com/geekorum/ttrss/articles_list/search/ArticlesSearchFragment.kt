@@ -64,11 +64,11 @@ class ArticlesSearchFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        activityViewModel.searchQuery.observe(this) {
+        activityViewModel.searchQuery.observe(viewLifecycleOwner) {
             searchViewModel.setSearchQuery(it)
         }
-        searchViewModel.articles.observe(this) {
-            adapter.submitList(it)
+        searchViewModel.articles.observe(viewLifecycleOwner) {
+            adapter.submitData(viewLifecycleOwner.lifecycle, it)
         }
     }
 

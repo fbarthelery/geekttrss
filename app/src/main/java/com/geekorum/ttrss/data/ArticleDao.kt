@@ -21,6 +21,7 @@
 package com.geekorum.ttrss.data
 
 import androidx.paging.DataSource
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
@@ -34,72 +35,72 @@ interface ArticleDao {
     fun getArticleById(id: Long): Flow<Article?>
 
     @Query("SELECT * FROM articles ORDER BY last_time_update DESC")
-    fun getAllArticles(): DataSource.Factory<Int, Article>
+    fun getAllArticles(): PagingSource<Int, Article>
     @Query("SELECT * FROM articles ORDER BY last_time_update")
-    fun getAllArticlesOldestFirst(): DataSource.Factory<Int, Article>
+    fun getAllArticlesOldestFirst(): PagingSource<Int, Article>
 
     @Query("SELECT * FROM articles WHERE unread=1 ORDER BY last_time_update DESC")
-    fun getAllUnreadArticles(): DataSource.Factory<Int, Article>
+    fun getAllUnreadArticles(): PagingSource<Int, Article>
     @Query("SELECT * FROM articles WHERE unread=1 ORDER BY last_time_update")
-    fun getAllUnreadArticlesOldestFirst(): DataSource.Factory<Int, Article>
+    fun getAllUnreadArticlesOldestFirst(): PagingSource<Int, Article>
 
     @Query("SELECT * FROM articles WHERE feed_id=:feedId ORDER BY last_time_update DESC ")
-    fun getAllArticlesForFeed(feedId: Long): DataSource.Factory<Int, Article>
+    fun getAllArticlesForFeed(feedId: Long): PagingSource<Int, Article>
     @Query("SELECT * FROM articles WHERE feed_id=:feedId ORDER BY last_time_update")
-    fun getAllArticlesForFeedOldestFirst(feedId: Long): DataSource.Factory<Int, Article>
+    fun getAllArticlesForFeedOldestFirst(feedId: Long): PagingSource<Int, Article>
 
     @Query("SELECT * FROM articles WHERE feed_id=:feedId AND unread=1 ORDER BY last_time_update DESC")
-    fun getAllUnreadArticlesForFeed(feedId: Long): DataSource.Factory<Int, Article>
+    fun getAllUnreadArticlesForFeed(feedId: Long): PagingSource<Int, Article>
     @Query("SELECT * FROM articles WHERE feed_id=:feedId AND unread=1 ORDER BY last_time_update")
-    fun getAllUnreadArticlesForFeedOldestFirst(feedId: Long): DataSource.Factory<Int, Article>
+    fun getAllUnreadArticlesForFeedOldestFirst(feedId: Long): PagingSource<Int, Article>
 
     @Query("SELECT articles.* FROM articles " +
         " JOIN articles_tags ON (articles_tags.article_id = articles._id)" +
         " WHERE articles_tags.tag=:tag ORDER BY last_time_update DESC")
-    fun getAllArticlesForTag(tag: String): DataSource.Factory<Int, Article>
+    fun getAllArticlesForTag(tag: String): PagingSource<Int, Article>
     @Query("SELECT articles.* FROM articles " +
         " JOIN articles_tags ON (articles_tags.article_id = articles._id)" +
         " WHERE articles_tags.tag=:tag ORDER BY last_time_update")
-    fun getAllArticlesForTagOldestFirst(tag: String): DataSource.Factory<Int, Article>
+    fun getAllArticlesForTagOldestFirst(tag: String): PagingSource<Int, Article>
 
     @Query("SELECT articles.* FROM articles " +
         " JOIN articles_tags ON (articles_tags.article_id = articles._id)" +
         " WHERE articles_tags.tag=:tag AND unread=1 ORDER BY last_time_update DESC")
-    fun getAllUnreadArticlesForTag(tag: String): DataSource.Factory<Int, Article>
+    fun getAllUnreadArticlesForTag(tag: String): PagingSource<Int, Article>
     @Query("SELECT articles.* FROM articles " +
         " JOIN articles_tags ON (articles_tags.article_id = articles._id)" +
         " WHERE articles_tags.tag=:tag AND unread=1 ORDER BY last_time_update")
-    fun getAllUnreadArticlesForTagOldestFirst(tag: String): DataSource.Factory<Int, Article>
+    fun getAllUnreadArticlesForTagOldestFirst(tag: String): PagingSource<Int, Article>
 
     @Query("SELECT * FROM articles WHERE marked=1 ORDER BY last_time_update DESC")
-    fun getAllStarredArticles(): DataSource.Factory<Int, Article>
+    fun getAllStarredArticles(): PagingSource<Int, Article>
     @Query("SELECT * FROM articles WHERE marked=1 ORDER BY last_time_update")
-    fun getAllStarredArticlesOldestFirst(): DataSource.Factory<Int, Article>
+    fun getAllStarredArticlesOldestFirst(): PagingSource<Int, Article>
 
     @Query("SELECT * FROM articles WHERE marked=1 AND unread=1 ORDER BY last_time_update DESC")
-    fun getAllUnreadStarredArticles(): DataSource.Factory<Int, Article>
+    fun getAllUnreadStarredArticles(): PagingSource<Int, Article>
     @Query("SELECT * FROM articles WHERE marked=1 AND unread=1 ORDER BY last_time_update")
-    fun getAllUnreadStarredArticlesOldestFirst(): DataSource.Factory<Int, Article>
+    fun getAllUnreadStarredArticlesOldestFirst(): PagingSource<Int, Article>
 
     @Query("SELECT * FROM articles WHERE published=1 ORDER BY last_time_update DESC")
-    fun getAllPublishedArticles(): DataSource.Factory<Int, Article>
+    fun getAllPublishedArticles(): PagingSource<Int, Article>
     @Query("SELECT * FROM articles WHERE published=1 ORDER BY last_time_update")
-    fun getAllPublishedArticlesOldestFirst(): DataSource.Factory<Int, Article>
+    fun getAllPublishedArticlesOldestFirst(): PagingSource<Int, Article>
 
     @Query("SELECT * FROM articles WHERE published=1 AND unread=1 ORDER BY last_time_update DESC")
-    fun getAllUnreadPublishedArticles(): DataSource.Factory<Int, Article>
+    fun getAllUnreadPublishedArticles(): PagingSource<Int, Article>
     @Query("SELECT * FROM articles WHERE published=1 AND unread=1 ORDER BY last_time_update")
-    fun getAllUnreadPublishedArticlesOldestFirst(): DataSource.Factory<Int, Article>
+    fun getAllUnreadPublishedArticlesOldestFirst(): PagingSource<Int, Article>
 
     @Query("SELECT * FROM articles WHERE last_time_update>=:time ORDER BY last_time_update DESC")
-    fun getAllArticlesUpdatedAfterTime(time: Long): DataSource.Factory<Int, Article>
+    fun getAllArticlesUpdatedAfterTime(time: Long): PagingSource<Int, Article>
     @Query("SELECT * FROM articles WHERE last_time_update>=:time ORDER BY last_time_update")
-    fun getAllArticlesUpdatedAfterTimeOldestFirst(time: Long): DataSource.Factory<Int, Article>
+    fun getAllArticlesUpdatedAfterTimeOldestFirst(time: Long): PagingSource<Int, Article>
 
     @Query("SELECT * FROM articles WHERE last_time_update>=:time AND unread=1 ORDER BY last_time_update DESC")
-    fun getAllUnreadArticlesUpdatedAfterTime(time: Long): DataSource.Factory<Int, Article>
+    fun getAllUnreadArticlesUpdatedAfterTime(time: Long): PagingSource<Int, Article>
     @Query("SELECT * FROM articles WHERE last_time_update>=:time AND unread=1 ORDER BY last_time_update")
-    fun getAllUnreadArticlesUpdatedAfterTimeOldestFirst(time: Long): DataSource.Factory<Int, Article>
+    fun getAllUnreadArticlesUpdatedAfterTimeOldestFirst(time: Long): PagingSource<Int, Article>
 
     @Query("UPDATE articles SET transiant_unread=:isUnread WHERE _id=:articleId")
     suspend fun updateArticleTransientUnread(articleId: Long, isUnread: Boolean)
@@ -113,7 +114,7 @@ interface ArticleDao {
     @Query("SELECT articles.* FROM ArticleFTS JOIN articles ON (ArticleFTS.rowid = _id) "
         + "WHERE ArticleFTS MATCH :query "
         + "ORDER BY last_time_update DESC")
-    fun searchArticles(query: String?): DataSource.Factory<Int, Article>
+    fun searchArticles(query: String?): PagingSource<Int, Article>
 
     @Query("SELECT tag  FROM articles_tags " +
         " JOIN articles ON (articles_tags.article_id = articles._id)" +

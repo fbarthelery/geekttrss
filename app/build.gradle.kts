@@ -116,7 +116,6 @@ android {
 kapt {
     arguments {
         arg("room.schemaLocation", "$projectDir/schemas")
-        arg("room.incremental", true)
         // assisted inject create a module without hilt annotation. will be fixed in 0.5.3
         arg("dagger.hilt.disableModulesHaveInstallInCheck", true)
     }
@@ -191,7 +190,7 @@ dependencies {
     kaptAndroidTest("com.google.dagger:hilt-android-compiler:$hiltVersion")
 
 
-    val roomVersion = "2.2.0"
+    val roomVersion = "2.3.0-alpha02"
     kapt("androidx.room:room-compiler:$roomVersion")
     androidTestImplementation("androidx.room:room-testing:$roomVersion")
 
@@ -224,7 +223,7 @@ dependencies {
     api("androidx.work:work-runtime-ktx:$workVersion")
     api("androidx.room:room-runtime:$roomVersion")
     api("androidx.room:room-ktx:$roomVersion")
-    api("androidx.paging:paging-runtime-ktx:2.1.2")
+    api("androidx.paging:paging-runtime-ktx:3.0.0-alpha06")
     api("com.squareup.retrofit2:retrofit:2.8.1")
     api("com.squareup.okhttp3:okhttp:4.6.0")
     api("com.jakewharton.timber:timber:4.7.1")

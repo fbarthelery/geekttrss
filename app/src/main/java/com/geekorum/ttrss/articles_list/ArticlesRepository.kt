@@ -21,6 +21,7 @@
 package com.geekorum.ttrss.articles_list
 
 import androidx.paging.DataSource
+import androidx.paging.PagingSource
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleDao
@@ -49,60 +50,60 @@ class ArticlesRepository
     private val setFieldActionFactory: SetArticleFieldAction.Factory
 ) {
 
-    fun getAllArticles(): DataSource.Factory<Int, Article> = articleDao.getAllArticles()
-    fun getAllArticlesOldestFirst(): DataSource.Factory<Int, Article> = articleDao.getAllArticlesOldestFirst()
+    fun getAllArticles(): PagingSource<Int, Article> = articleDao.getAllArticles()
+    fun getAllArticlesOldestFirst(): PagingSource<Int, Article> = articleDao.getAllArticlesOldestFirst()
 
-    fun getAllUnreadArticles(): DataSource.Factory<Int, Article> {
+    fun getAllUnreadArticles(): PagingSource<Int, Article> {
         return articleDao.getAllUnreadArticles()
     }
-    fun getAllUnreadArticlesOldestFirst(): DataSource.Factory<Int, Article> {
+    fun getAllUnreadArticlesOldestFirst(): PagingSource<Int, Article> {
         return articleDao.getAllUnreadArticlesOldestFirst()
     }
 
-    fun getAllPublishedArticles(): DataSource.Factory<Int, Article> = articleDao.getAllPublishedArticles()
-    fun getAllPublishedArticlesOldestFirst(): DataSource.Factory<Int, Article> = articleDao.getAllPublishedArticlesOldestFirst()
+    fun getAllPublishedArticles(): PagingSource<Int, Article> = articleDao.getAllPublishedArticles()
+    fun getAllPublishedArticlesOldestFirst(): PagingSource<Int, Article> = articleDao.getAllPublishedArticlesOldestFirst()
 
-    fun getAllUnreadPublishedArticles(): DataSource.Factory<Int, Article> = articleDao.getAllUnreadPublishedArticles()
-    fun getAllUnreadPublishedArticlesOldestFirst(): DataSource.Factory<Int, Article> = articleDao.getAllUnreadPublishedArticlesOldestFirst()
+    fun getAllUnreadPublishedArticles(): PagingSource<Int, Article> = articleDao.getAllUnreadPublishedArticles()
+    fun getAllUnreadPublishedArticlesOldestFirst(): PagingSource<Int, Article> = articleDao.getAllUnreadPublishedArticlesOldestFirst()
 
-    fun getAllStarredArticles(): DataSource.Factory<Int, Article> = articleDao.getAllStarredArticles()
-    fun getAllStarredArticlesOldestFirst(): DataSource.Factory<Int, Article> = articleDao.getAllStarredArticlesOldestFirst()
+    fun getAllStarredArticles(): PagingSource<Int, Article> = articleDao.getAllStarredArticles()
+    fun getAllStarredArticlesOldestFirst(): PagingSource<Int, Article> = articleDao.getAllStarredArticlesOldestFirst()
 
-    fun getAllUnreadStarredArticles(): DataSource.Factory<Int, Article> = articleDao.getAllUnreadStarredArticles()
-    fun getAllUnreadStarredArticlesOldestFirst(): DataSource.Factory<Int, Article> = articleDao.getAllUnreadStarredArticlesOldestFirst()
+    fun getAllUnreadStarredArticles(): PagingSource<Int, Article> = articleDao.getAllUnreadStarredArticles()
+    fun getAllUnreadStarredArticlesOldestFirst(): PagingSource<Int, Article> = articleDao.getAllUnreadStarredArticlesOldestFirst()
 
-    fun getAllArticlesForFeed(feedId: Long): DataSource.Factory<Int, Article> = articleDao.getAllArticlesForFeed(feedId)
-    fun getAllArticlesForFeedOldestFirst(feedId: Long): DataSource.Factory<Int, Article> = articleDao.getAllArticlesForFeedOldestFirst(feedId)
+    fun getAllArticlesForFeed(feedId: Long): PagingSource<Int, Article> = articleDao.getAllArticlesForFeed(feedId)
+    fun getAllArticlesForFeedOldestFirst(feedId: Long): PagingSource<Int, Article> = articleDao.getAllArticlesForFeedOldestFirst(feedId)
 
-    fun getAllUnreadArticlesForFeed(feedId: Long): DataSource.Factory<Int, Article> {
+    fun getAllUnreadArticlesForFeed(feedId: Long): PagingSource<Int, Article> {
         return articleDao.getAllUnreadArticlesForFeed(feedId)
     }
-    fun getAllUnreadArticlesForFeedOldestFirst(feedId: Long): DataSource.Factory<Int, Article> {
+    fun getAllUnreadArticlesForFeedOldestFirst(feedId: Long): PagingSource<Int, Article> {
         return articleDao.getAllUnreadArticlesForFeedOldestFirst(feedId)
     }
 
-    fun getAllArticlesForTag(tag: String): DataSource.Factory<Int, Article> = articleDao.getAllArticlesForTag(tag)
-    fun getAllArticlesForTagOldestFirst(tag: String): DataSource.Factory<Int, Article> = articleDao.getAllArticlesForTagOldestFirst(tag)
+    fun getAllArticlesForTag(tag: String): PagingSource<Int, Article> = articleDao.getAllArticlesForTag(tag)
+    fun getAllArticlesForTagOldestFirst(tag: String): PagingSource<Int, Article> = articleDao.getAllArticlesForTagOldestFirst(tag)
 
-    fun getAllUnreadArticlesForTag(tag: String): DataSource.Factory<Int, Article> {
+    fun getAllUnreadArticlesForTag(tag: String): PagingSource<Int, Article> {
         return articleDao.getAllUnreadArticlesForTag(tag)
     }
-    fun getAllUnreadArticlesForTagOldestFirst(tag: String): DataSource.Factory<Int, Article> {
+    fun getAllUnreadArticlesForTagOldestFirst(tag: String): PagingSource<Int, Article> {
         return articleDao.getAllUnreadArticlesForTagOldestFirst(tag)
     }
 
-    fun getAllArticlesUpdatedAfterTime(time: Long): DataSource.Factory<Int, Article> {
+    fun getAllArticlesUpdatedAfterTime(time: Long): PagingSource<Int, Article> {
         return articleDao.getAllArticlesUpdatedAfterTime(time)
     }
-    fun getAllArticlesUpdatedAfterTimeOldestFirst(time: Long): DataSource.Factory<Int, Article> {
+    fun getAllArticlesUpdatedAfterTimeOldestFirst(time: Long): PagingSource<Int, Article> {
         return articleDao.getAllArticlesUpdatedAfterTimeOldestFirst(time)
     }
 
-    fun getAllUnreadArticlesUpdatedAfterTime(time: Long): DataSource.Factory<Int, Article> {
+    fun getAllUnreadArticlesUpdatedAfterTime(time: Long): PagingSource<Int, Article> {
         return articleDao.getAllUnreadArticlesUpdatedAfterTime(time)
     }
 
-    fun getAllUnreadArticlesUpdatedAfterTimeOldestFirst(time: Long): DataSource.Factory<Int, Article> {
+    fun getAllUnreadArticlesUpdatedAfterTimeOldestFirst(time: Long): PagingSource<Int, Article> {
         return articleDao.getAllUnreadArticlesUpdatedAfterTimeOldestFirst(time)
     }
 
@@ -120,7 +121,7 @@ class ArticlesRepository
         setStarredAction.execute()
     }
 
-    fun searchArticles(query: String): DataSource.Factory<Int, Article> {
+    fun searchArticles(query: String): PagingSource<Int, Article> {
         return articleDao.searchArticles(query)
     }
 

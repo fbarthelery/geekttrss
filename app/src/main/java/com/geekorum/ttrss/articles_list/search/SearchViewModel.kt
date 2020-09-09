@@ -28,6 +28,10 @@ import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
 import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.liveData
 import com.geekorum.ttrss.session.SessionActivityComponent
 import com.geekorum.ttrss.articles_list.ArticlesRepository
 import com.geekorum.ttrss.data.Article
@@ -40,9 +44,11 @@ class SearchViewModel @ViewModelInject constructor(
 
     private val searchQuery = MutableLiveData<String>().apply { value = "" }
 
-    val articles: LiveData<PagedList<Article>> = Transformations.switchMap(searchQuery) {
+    val articles: LiveData<PagingData<Article>> = Transformations.switchMap(searchQuery) {
         val factory = articlesRepository.searchArticles(it)
-        LivePagedListBuilder(factory, 50).build()
+        Pager(PagingConfig(pageSize = 50)) {
+            factory
+        }.liveData
     }
 
     @MainThread
