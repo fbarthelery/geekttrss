@@ -31,7 +31,6 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
-import androidx.paging.PagedList
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -113,24 +112,6 @@ abstract class BaseArticlesViewModel(
     fun undoSetUnreadActions() {
         unreadActionUndoManager.undoAll()
         _pendingArticlesSetUnread.value = unreadActionUndoManager.nbActions
-    }
-
-    // TODO replace with PagerAdapter.onRefreshFlow
-    protected inner class PageBoundaryCallback<T : Any> : PagedList.BoundaryCallback<T>() {
-        override fun onZeroItemsLoaded() {
-            if (shouldRefreshOnZeroItems) {
-                shouldRefreshOnZeroItems = false
-                refresh()
-            }
-        }
-
-        override fun onItemAtFrontLoaded(itemAtFront: T) {
-            shouldRefreshOnZeroItems = true
-        }
-
-        override fun onItemAtEndLoaded(itemAtEnd: T) {
-            shouldRefreshOnZeroItems = true
-        }
     }
 
     protected interface ArticlesAccess {

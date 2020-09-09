@@ -30,6 +30,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -46,6 +47,8 @@ import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 /**
@@ -58,6 +61,7 @@ abstract class BaseArticlesListFragment() : Fragment() {
 
     protected abstract val articlesViewModel: BaseArticlesViewModel
     private val activityViewModel: ActivityViewModel by activityViewModels()
+    private var shouldRefreshOnZeroItem = false //initial state is not loading and empty
 
     private val unreadSnackbar: Snackbar by lazy {
         Snackbar.make(binding.root, "", Snackbar.LENGTH_LONG).apply {
@@ -97,6 +101,15 @@ abstract class BaseArticlesListFragment() : Fragment() {
                 adapter.submitData(it)
             }
         }
+
+        adapter.loadStateFlow.onEach {
+            (it.refresh as? LoadState.NotLoading)?.let {
+                if (adapter.itemCount == 0 && shouldRefreshOnZeroItem) {
+                    articlesViewModel.refresh()
+                }
+                shouldRefreshOnZeroItem = adapter.itemCount > 0
+            }
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         articlesViewModel.getPendingArticlesSetUnread().observe(viewLifecycleOwner) { nbArticles ->
             if (nbArticles > 0) {
