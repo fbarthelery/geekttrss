@@ -20,7 +20,6 @@
  */
 package com.geekorum.ttrss.articles_list
 
-import androidx.paging.DataSource
 import androidx.paging.PagingSource
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.data.Article

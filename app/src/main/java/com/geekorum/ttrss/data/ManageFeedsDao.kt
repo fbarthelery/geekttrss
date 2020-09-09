@@ -20,7 +20,7 @@
  */
 package com.geekorum.ttrss.data
 
-import androidx.paging.DataSource
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Query
 
@@ -28,7 +28,7 @@ import androidx.room.Query
 interface ManageFeedsDao {
 
     @get:Query("SELECT * FROM feeds WHERE is_subscribed == 1 ORDER BY title")
-    val allSubscribedFeeds: DataSource.Factory<Int, Feed>
+    val allSubscribedFeeds: PagingSource<Int, Feed>
 
     @Query("UPDATE feeds SET is_subscribed=:isSubscribed WHERE _id=:feedId")
     suspend fun updateIsSubscribedFeed(feedId: Long, isSubscribed: Boolean)

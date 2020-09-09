@@ -27,8 +27,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.LivePagedListBuilder
-import androidx.paging.PagedList
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import androidx.work.Constraints
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
@@ -37,6 +38,7 @@ import com.geekorum.geekdroid.app.lifecycle.Event
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.data.ManageFeedsDao
 import com.geekorum.ttrss.manage_feeds.workers.UnsubscribeWorker
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 /**
@@ -51,8 +53,10 @@ class ManageFeedViewModel @ViewModelInject constructor(
     private val _feedClickedEvent = MutableLiveData<Event<Feed>>()
     val feedClickedEvent: LiveData<Event<Feed>> = _feedClickedEvent
 
-    val feeds: LiveData<PagedList<Feed>> by lazy {
-        LivePagedListBuilder(feedsDao.allSubscribedFeeds, 40).build()
+    val feeds: Flow<PagingData<Feed>> by lazy {
+        Pager(PagingConfig(40)) {
+            feedsDao.allSubscribedFeeds
+        }.flow
     }
 
     fun unsubscribeFeed(feedId: Long) {

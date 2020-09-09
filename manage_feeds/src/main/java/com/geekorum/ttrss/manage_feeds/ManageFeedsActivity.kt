@@ -30,11 +30,12 @@ import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.paging.PagedListAdapter
+import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
@@ -46,6 +47,8 @@ import com.geekorum.ttrss.manage_feeds.databinding.DialogUnsubscribeFeedBinding
 import com.geekorum.ttrss.manage_feeds.databinding.FragmentManageFeedsBinding
 import com.geekorum.ttrss.manage_feeds.databinding.ItemFeedBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class ManageFeedsActivity : BaseSessionActivity() {
     private lateinit var binding: ActivityManageFeedsBinding
@@ -95,8 +98,10 @@ class ManageFeedsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.recyclerView.adapter = adapter
 
-        viewModel.feeds.observe(this) {
-            adapter.submitList(it)
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.feeds.collectLatest {
+                adapter.submitData(it)
+            }
         }
 
         viewModel.feedClickedEvent.observe(viewLifecycleOwner, EventObserver {
@@ -119,7 +124,7 @@ class ManageFeedsFragment : Fragment() {
     }
 
 
-    private inner class FeedsAdapter : PagedListAdapter<Feed, FeedViewHolder>(DiffFeed) {
+    private inner class FeedsAdapter : PagingDataAdapter<Feed, FeedViewHolder>(DiffFeed) {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedViewHolder {
             val itemFeedBinding = ItemFeedBinding.inflate(layoutInflater, parent, false)
             return FeedViewHolder(itemFeedBinding)
