@@ -94,10 +94,10 @@ dependencies {
     implementation("androidx.activity:activity-ktx:1.1.0")
 
     // androidx UI
-    implementation("androidx.constraintlayout:constraintlayout:1.1.3")
+    implementation("androidx.constraintlayout:constraintlayout:2.0.1")
     implementation("androidx.recyclerview:recyclerview:1.1.0")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.1.0")
-    implementation("com.google.android.material:material:1.2.0")
+    implementation("com.google.android.material:material:1.2.1")
 
     implementation("androidx.core:core-ktx:1.3.1")
 

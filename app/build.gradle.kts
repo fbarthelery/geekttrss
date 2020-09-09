@@ -133,8 +133,8 @@ dependencies {
     implementation("androidx.activity:activity-ktx:1.1.0")
 
     // androidx ui
-    implementation("androidx.drawerlayout:drawerlayout:1.1.0")
-    implementation("androidx.constraintlayout:constraintlayout:1.1.3")
+    implementation("androidx.drawerlayout:drawerlayout:1.1.1")
+    implementation("androidx.constraintlayout:constraintlayout:2.0.1")
     implementation("androidx.recyclerview:recyclerview:1.1.0")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.1.0")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
@@ -143,7 +143,7 @@ dependencies {
     // androidx others
     implementation("androidx.browser:browser:1.2.0")
 
-    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.6.0")
+    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.7.0")
 
     //geekdroid
     implementation("com.geekorum.geekdroid:geekdroid:geekttrss-1.5.2")
@@ -153,8 +153,7 @@ dependencies {
     implementation(project(":webapi"))
     implementation(project(":faviKonSnoop"))
 
-    // alpha for bugfix in chip. TODO remove when 1.2.0 is out
-    implementation("com.google.android.material:material:1.2.0-alpha06")
+    implementation("com.google.android.material:material:1.2.1")
     implementation("com.squareup.okhttp3:logging-interceptor:4.6.0")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.6.0")
     implementation("io.coil-kt:coil:1.0.0-rc1")
@@ -230,7 +229,7 @@ dependencies {
     api("com.squareup.okhttp3:okhttp:4.6.0")
     api("com.jakewharton.timber:timber:4.7.1")
 
-    val navigationVersion = "2.3.0-alpha01"
+    val navigationVersion = "2.3.0"
     api("androidx.navigation:navigation-fragment-ktx:$navigationVersion")
     api("androidx.navigation:navigation-ui-ktx:$navigationVersion")
     api("androidx.navigation:navigation-dynamic-features-fragment:$navigationVersion")
