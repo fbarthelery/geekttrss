@@ -62,6 +62,7 @@ abstract class BaseArticlesListFragment() : Fragment() {
     protected abstract val articlesViewModel: BaseArticlesViewModel
     private val activityViewModel: ActivityViewModel by activityViewModels()
     private var shouldRefreshOnZeroItem = false //initial state is not loading and empty
+    private var hasLoadedDataAtLeastOnce = false
 
     private val unreadSnackbar: Snackbar by lazy {
         Snackbar.make(binding.root, "", Snackbar.LENGTH_LONG).apply {
@@ -103,11 +104,18 @@ abstract class BaseArticlesListFragment() : Fragment() {
         }
 
         adapter.loadStateFlow.onEach {
-            (it.refresh as? LoadState.NotLoading)?.let {
-                if (adapter.itemCount == 0 && shouldRefreshOnZeroItem) {
-                    articlesViewModel.refresh()
+            when (it.refresh) {
+                is LoadState.NotLoading -> {
+                    if (adapter.itemCount == 0 && shouldRefreshOnZeroItem) {
+                        articlesViewModel.refresh()
+                    }
+                    shouldRefreshOnZeroItem = adapter.itemCount > 0
+                    if (hasLoadedDataAtLeastOnce) {
+                        articlesViewModel.setHaveZeroArticle(adapter.itemCount == 0)
+                    }
                 }
-                shouldRefreshOnZeroItem = adapter.itemCount > 0
+                LoadState.Loading -> hasLoadedDataAtLeastOnce = true
+                is LoadState.Error -> Unit
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
 

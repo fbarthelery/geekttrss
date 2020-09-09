@@ -28,7 +28,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
-import androidx.lifecycle.asLiveData
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -48,7 +47,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 
 private const val STATE_NEED_UNREAD = "need_unread"
@@ -73,12 +71,12 @@ abstract class BaseArticlesViewModel(
     private var shouldRefreshOnZeroItems = true
     private val unreadActionUndoManager = UndoManager<Action>()
 
-    // default value in databinding is False for boolean and 0 for int
-    // we can't test size() == 0 in layout file because the default value will make the test true
-    // and will briefly show the empty view
-    // TODO
-    val haveZeroArticles: LiveData<Boolean>
-        get() = flowOf(false).asLiveData()
+    private val _haveZeroArticle = MutableLiveData<Boolean>()
+    val haveZeroArticles: LiveData<Boolean?> = _haveZeroArticle
+
+    fun setHaveZeroArticle(value: Boolean) {
+        _haveZeroArticle.value = value
+    }
 
     abstract fun refresh()
 

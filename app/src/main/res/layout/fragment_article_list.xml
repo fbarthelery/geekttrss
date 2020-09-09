@@ -51,8 +51,8 @@
                       android:gravity="center"
                       android:textAppearance="?textAppearanceHeadline4"
                       android:padding="@dimen/activity_horizontal_margin"
-                      android:text="@{safeUnbox(fragmentViewModel.refreshing) ? @string/fragment_articles_list_no_articles_and_sync_lbl : @string/fragment_articles_list_no_articles_lbl}"
-                      android:visibility="@{safeUnbox(fragmentViewModel.haveZeroArticles) ? View.VISIBLE : View.GONE}"
+                      android:text="@{safeUnbox(fragmentViewModel.refreshing) ? @string/fragment_articles_list_no_articles_and_sync_lbl : @string/fragment_articles_list_no_articles_lbl, default=`Refreshing`}"
+                      android:visibility="@{(fragmentViewModel.haveZeroArticles ?? false) ? View.VISIBLE : View.GONE, default=gone}"
                     />
 
             <androidx.recyclerview.widget.RecyclerView
@@ -67,7 +67,7 @@
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     android:orientation="vertical"
                     tools:listitem="@layout/headlines_row"
-                    android:visibility="@{fragmentViewModel.haveZeroArticles ? View.INVISIBLE : View.VISIBLE}"
+                    android:visibility="@{(fragmentViewModel.haveZeroArticles ?? false) ? View.INVISIBLE : View.VISIBLE, default=visible}"
                     />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
