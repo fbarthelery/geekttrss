@@ -27,6 +27,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.geekorum.ttrss.articles_list.ActivityViewModel
 import com.geekorum.ttrss.articles_list.ArticlesListAdapter
 import com.geekorum.ttrss.articles_list.CardEventHandler
@@ -34,6 +35,8 @@ import com.geekorum.ttrss.articles_list.setupCardSpacing
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.databinding.FragmentArticlesSearchBinding
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 /**
  * Display search results
@@ -67,8 +70,10 @@ class ArticlesSearchFragment : Fragment() {
         activityViewModel.searchQuery.observe(viewLifecycleOwner) {
             searchViewModel.setSearchQuery(it)
         }
-        searchViewModel.articles.observe(viewLifecycleOwner) {
-            adapter.submitData(viewLifecycleOwner.lifecycle, it)
+        viewLifecycleOwner.lifecycleScope.launch {
+            searchViewModel.articles.collectLatest {
+                adapter.submitData(it)
+            }
         }
     }
 

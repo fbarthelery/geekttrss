@@ -68,7 +68,6 @@ abstract class BaseArticlesViewModel(
 
     abstract val isRefreshing: LiveData<Boolean>
 
-    private var shouldRefreshOnZeroItems = true
     private val unreadActionUndoManager = UndoManager<Action>()
 
     private val _haveZeroArticle = MutableLiveData<Boolean>()

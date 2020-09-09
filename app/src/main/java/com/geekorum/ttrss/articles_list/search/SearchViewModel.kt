@@ -22,20 +22,20 @@ package com.geekorum.ttrss.articles_list.search
 
 import androidx.annotation.MainThread
 import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
-import androidx.paging.LivePagedListBuilder
-import androidx.paging.PagedList
+import androidx.lifecycle.asFlow
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import androidx.paging.liveData
-import com.geekorum.ttrss.session.SessionActivityComponent
 import com.geekorum.ttrss.articles_list.ArticlesRepository
 import com.geekorum.ttrss.data.Article
+import com.geekorum.ttrss.session.SessionActivityComponent
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapLatest
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class SearchViewModel @ViewModelInject constructor(
     componentFactory: SessionActivityComponent.Factory
 ) : ViewModel() {
@@ -44,11 +44,10 @@ class SearchViewModel @ViewModelInject constructor(
 
     private val searchQuery = MutableLiveData<String>().apply { value = "" }
 
-    val articles: LiveData<PagingData<Article>> = Transformations.switchMap(searchQuery) {
-        val factory = articlesRepository.searchArticles(it)
+    val articles: Flow<PagingData<Article>> = searchQuery.asFlow().flatMapLatest {
         Pager(PagingConfig(pageSize = 50)) {
-            factory
-        }.liveData
+            articlesRepository.searchArticles(it)
+        }.flow
     }
 
     @MainThread
