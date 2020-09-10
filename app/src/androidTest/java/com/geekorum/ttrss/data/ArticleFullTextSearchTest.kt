@@ -23,9 +23,11 @@ package com.geekorum.ttrss.data
 import android.database.sqlite.SQLiteDatabase
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.core.content.contentValuesOf
-import androidx.lifecycle.Observer
-import androidx.paging.LivePagedListBuilder
-import androidx.paging.PagedList
+import androidx.paging.AsyncPagingDataDiffer
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListUpdateCallback
 import androidx.room.Room
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.test.core.app.ApplicationProvider
@@ -33,6 +35,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.geekorum.ttrss.data.ArticlesDatabase.Tables
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.runner.RunWith
 import kotlin.test.BeforeTest
@@ -81,14 +88,21 @@ class ArticleFullTextSearchTest {
         )
 
         val articleDao = database.articleDao()
-        val factory = articleDao.searchArticles("linux")
-        val livedata = LivePagedListBuilder(factory, 10).build()
-
-        val observer = Observer<PagedList<Article>> {
-            assertThat(it).containsExactly(expected)
+        val differ = AsyncPagingDataDiffer(ARTICLE_DIFF_CALLBACK, NoOpUpdateCallback)
+        val pager = Pager(PagingConfig(10)) {
+            articleDao.searchArticles("linux")
         }
-        livedata.observeForever(observer)
-        livedata.removeObserver(observer)
+
+        runBlocking {
+            val submitJob = launch {
+                val data = pager.flow.first()
+                differ.submitData(data)
+            }
+            // wait for the load: initial notLoading, Loading, notLoading
+            differ.loadStateFlow.take(3).collect()
+            submitJob.cancel()
+        }
+        assertThat(differ.snapshot()).containsExactly(expected)
     }
 
 
@@ -152,5 +166,29 @@ class ArticleFullTextSearchTest {
             ArticlesContract.Article.CONTENT_EXCERPT to "a content excerpt"
         )
         db.insert(Tables.ARTICLES, SQLiteDatabase.CONFLICT_NONE, values)
+    }
+}
+
+private val ARTICLE_DIFF_CALLBACK = object : DiffUtil.ItemCallback<Article>() {
+    override fun areItemsTheSame(oldItem: Article, newItem: Article): Boolean {
+        return oldItem.id == newItem.id
+    }
+
+    override fun areContentsTheSame(oldItem: Article, newItem: Article): Boolean {
+        return oldItem == newItem
+    }
+}
+
+private val NoOpUpdateCallback = object : ListUpdateCallback {
+    override fun onInserted(position: Int, count: Int) {
+    }
+
+    override fun onRemoved(position: Int, count: Int) {
+    }
+
+    override fun onMoved(fromPosition: Int, toPosition: Int) {
+    }
+
+    override fun onChanged(position: Int, count: Int, payload: Any?) {
     }
 }
