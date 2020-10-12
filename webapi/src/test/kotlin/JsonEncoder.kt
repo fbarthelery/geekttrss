@@ -18,25 +18,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
+package com.geekorum.ttrss.webapi
 
-plugins {
-    kotlin("jvm")
-    kotlin("plugin.serialization")
-}
+import kotlinx.serialization.json.Json
 
-dependencies {
-    implementation(kotlin("stdlib-jdk8"))
-    implementation(enforcedPlatform(kotlin("bom")))
-
-    implementation("androidx.annotation:annotation:1.1.0")
-    implementation("javax.inject:javax.inject:1")
-    implementation("com.squareup.retrofit2:retrofit:2.8.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.0")
-
-    implementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.3.9"))
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-core")
-
-
-    testImplementation("com.google.truth:truth:1.0")
-    testImplementation(kotlin("test-junit"))
-}
+/**
+ * Json encoder for tests
+ */
+val Json = Json { encodeDefaults = true }

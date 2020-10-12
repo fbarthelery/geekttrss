@@ -20,9 +20,9 @@
  */
 package com.geekorum.ttrss.webapi.model
 
+import com.geekorum.ttrss.webapi.Json
 import com.geekorum.ttrss.webapi.model.UnsubscribeFeedResponsePayload.Content
 import com.google.common.truth.Truth
-import kotlinx.serialization.json.Json
 import org.junit.Test
 
 class SubscribeToFeedJsonSerializationTest {

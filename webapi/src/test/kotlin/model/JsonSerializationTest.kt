@@ -20,10 +20,10 @@
  */
 package com.geekorum.ttrss.webapi.model
 
+import com.geekorum.ttrss.webapi.Json
 import com.geekorum.ttrss.webapi.model.Error.NOT_LOGGED_IN
 import com.google.common.truth.Truth.assertThat
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
 import kotlin.reflect.typeOf
 import kotlin.test.Test

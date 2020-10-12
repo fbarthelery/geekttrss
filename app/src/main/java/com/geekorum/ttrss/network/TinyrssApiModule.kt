@@ -72,7 +72,10 @@ abstract class TinyrssApiModule {
                 val serverAuthenticator = BasicAuthAuthenticator(basicHttpAuthUsername, basicHttpAuthPassword)
                 okHttpClient = okHttpClient.newBuilder().authenticator(serverAuthenticator).build()
             }
-            retrofitBuilder.addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
+            val jsonConverterFactory = Json {
+                encodeDefaults = true
+            }.asConverterFactory("application/json".toMediaType())
+            retrofitBuilder.addConverterFactory(jsonConverterFactory)
                 .client(okHttpClient)
             val retrofit = retrofitBuilder.build()
             return retrofit.create(TinyRssApi::class.java)

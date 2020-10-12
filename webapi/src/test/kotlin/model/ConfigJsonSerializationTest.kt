@@ -20,8 +20,8 @@
  */
 package com.geekorum.ttrss.webapi.model
 
+import com.geekorum.ttrss.webapi.Json
 import com.google.common.truth.Truth.assertThat
-import kotlinx.serialization.json.Json
 import kotlin.test.Test
 
 class GetConfigJsonSerializationTest {
