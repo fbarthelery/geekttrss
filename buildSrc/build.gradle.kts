@@ -39,7 +39,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.android.tools.build:gradle:4.0.0")
+    implementation("com.android.tools.build:gradle:4.1.1")
     implementation("gradle.plugin.com.hierynomus.gradle.plugins:license-gradle-plugin:0.15.0")
     implementation("com.github.triplet.gradle:play-publisher:2.7.5")
     implementation("com.geekorum.gradle.avdl:flydroid:0.0.2")

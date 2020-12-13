@@ -30,7 +30,7 @@ import org.gradle.kotlin.dsl.dependencies
  * Configure java version compile options based on minSdkVersion value
  */
 fun BaseExtension.configureJavaVersion() {
-    val api = defaultConfig.minSdkVersion.apiLevel
+    val api = defaultConfig.minSdkVersion?.apiLevel ?: 1
     val version = when {
         api >= 24 -> JavaVersion.VERSION_1_8
         api >= 19 -> JavaVersion.VERSION_1_7

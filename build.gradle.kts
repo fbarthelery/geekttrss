@@ -42,7 +42,7 @@ plugins {
 
 
 // some extra properties
-extra["compileSdkVersion"] = "android-29"
+extra["compileSdkVersion"] = "android-30"
 
 allprojects {
     repositories {
