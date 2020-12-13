@@ -87,6 +87,7 @@
     <!-- article list items -->
     <string name="mark_as_read">Mark as read</string>
     <string name="mark_as_unread">Mark as unread</string>
+    <string name="feed_icon_content_description">Feed icon</string>
     <string name="open_article_in_browser">View article in browser</string>
     <plurals name="undo_set_articles_read_text">
         <item quantity="one">%d article marked as read</item>

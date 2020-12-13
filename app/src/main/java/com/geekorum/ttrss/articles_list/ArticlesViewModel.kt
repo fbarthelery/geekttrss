@@ -28,6 +28,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -48,6 +49,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
 
 private const val STATE_NEED_UNREAD = "need_unread"
@@ -68,6 +70,7 @@ abstract class BaseArticlesViewModel(
     private val _pendingArticlesSetUnread = MutableLiveData<Int>().apply { value = 0 }
 
     abstract val isRefreshing: LiveData<Boolean>
+    abstract val isMultiFeed: LiveData<Boolean>
 
     private val unreadActionUndoManager = UndoManager<Action>()
 
@@ -248,6 +251,10 @@ class ArticlesListViewModel @ViewModelInject constructor(
         value = value
     }
 
+    override val isMultiFeed: LiveData<Boolean> = feedId.asFlow().mapLatest {
+        Feed.isVirtualFeed(it)
+    }.asLiveData()
+
     override val articles: Flow<PagingData<ArticleWithFeed>> = feedId.asFlow().flatMapLatest {
         feedsRepository.getFeedById(it)
     }.flatMapLatest {
@@ -319,6 +326,8 @@ class ArticlesListByTagViewModel @ViewModelInject constructor(
         // https://issuetracker.google.com/issues/129989646
         value = value
     }
+
+    override val isMultiFeed: LiveData<Boolean> = MutableLiveData(true)
 
     private val account: Account = component.account
 

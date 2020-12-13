@@ -30,7 +30,6 @@ import android.view.ViewGroup
 import android.widget.PopupMenu
 import androidx.core.app.ShareCompat
 import androidx.core.view.doOnPreDraw
-import androidx.paging.PagedListAdapter
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -40,6 +39,7 @@ import com.geekorum.ttrss.BR
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleWithFeed
+import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.databinding.HeadlinesRowBinding
 import kotlin.math.roundToInt
 
@@ -56,6 +56,8 @@ internal open class ArticlesListAdapter(
     private val eventHandler: CardEventHandler
 ) : PagingDataAdapter<ArticleWithFeed, HeadlinesBindingViewHolder>(ARTICLE_DIFF_CALLBACK) {
 
+    var displayFeedName = false
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HeadlinesBindingViewHolder {
         val binding = HeadlinesRowBinding.inflate(layoutInflater, parent, false)
         return HeadlinesBindingViewHolder(binding)
@@ -65,6 +67,12 @@ internal open class ArticlesListAdapter(
         with(holder) {
             val articleWithFeed = getItem(position)
             setArticle(articleWithFeed?.article)
+            setFeedIcon(articleWithFeed?.feed?.feedIconUrl)
+            if (displayFeedName) {
+                setFeedName(articleWithFeed?.feed)
+            } else {
+                setAuthor(articleWithFeed?.article?.author)
+            }
             setHandler(eventHandler)
             setPosition(position)
         }
@@ -78,6 +86,35 @@ internal class HeadlinesBindingViewHolder(val binding: HeadlinesRowBinding) :
     fun setArticle(article: Article?) {
         binding.setVariable(BR.article, article)
         setArticleFlavorImage(article?.flavorImageUri)
+    }
+
+    fun setFeedIcon(feedIconUrl: String?) {
+        if (feedIconUrl == null) {
+            binding.feedIcon.setImageResource(R.drawable.ic_rss_feed_orange)
+        } else {
+            binding.feedIcon.load(feedIconUrl)
+        }
+    }
+
+    fun setAuthor(author: String?) {
+        if (!author.isNullOrBlank()) {
+            binding.author.text = binding.author.resources.getString(R.string.author_formatted, author)
+        } else {
+            binding.author.text = ""
+        }
+    }
+
+    fun setFeedName(feed: Feed?) {
+        val feedName = if (feed?.displayTitle?.isBlank() == true) {
+            feed.title
+        } else {
+            feed?.displayTitle
+        }
+        if (!feedName.isNullOrBlank()) {
+            binding.author.text = feedName
+        } else {
+            binding.author.text = ""
+        }
     }
 
     fun setHandler(cardEventHandler: CardEventHandler) {

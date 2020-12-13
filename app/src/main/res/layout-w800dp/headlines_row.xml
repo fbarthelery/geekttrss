@@ -130,11 +130,25 @@
                 tools:text="@tools:sample/lorem/random"
                 />
 
+        <ImageView
+            android:id="@+id/feed_icon"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/author"
+            app:layout_constraintTop_toBottomOf="@+id/excerpt"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:src="@drawable/ic_rss_feed_orange"
+            android:contentDescription="@string/feed_icon_content_description"
+            />
+
         <TextView
                 android:id="@+id/author"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/feed_icon"
                 app:layout_constraintEnd_toStartOf="@+id/open"
                 app:layout_constraintTop_toBottomOf="@+id/excerpt"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -142,7 +156,6 @@
                 android:ellipsize="end"
                 android:gravity="center_vertical"
                 android:maxLines="1"
-                android:text="@{!TextUtils.isEmpty(article.author) ? @string/author_formatted(article.author) : ``}"
                 tools:text="@tools:sample/full_names"
                 android:textAppearance="?textAppearanceCaption"
              />
@@ -153,7 +166,7 @@
                     app:layout_constraintEnd_toStartOf="@+id/marked"
                     app:layout_constraintTop_toBottomOf="@+id/excerpt"
                     android:onClick="@{(v) -> handler.onOpenButtonClicked(v, article)}"
-                    android:tint="?colorControlNormal"
+                    app:tint="?colorControlNormal"
                     android:src="@drawable/ic_action_web_site"
                     android:contentDescription="@string/open_article_in_browser"
                     android:background="?attr/selectableItemBackground"

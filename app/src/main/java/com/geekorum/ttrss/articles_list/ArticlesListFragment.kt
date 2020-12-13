@@ -119,6 +119,10 @@ abstract class BaseArticlesListFragment() : Fragment() {
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
 
+        articlesViewModel.isMultiFeed.observe(viewLifecycleOwner) {
+            adapter.displayFeedName = it
+        }
+
         articlesViewModel.getPendingArticlesSetUnread().observe(viewLifecycleOwner) { nbArticles ->
             if (nbArticles > 0) {
                 updateUnreadSnackbar(nbArticles)
