@@ -171,7 +171,7 @@ dependencies {
     dualTestImplementation("androidx.arch.core:core-testing:2.1.0")
 
     // dagger
-    val daggerVersion = "2.28.3"
+    val daggerVersion = "2.30.1"
     implementation(enforcedDaggerPlatform(daggerVersion))
     kapt(enforcedDaggerPlatform(daggerVersion))
     implementation("com.google.dagger:dagger:$daggerVersion")

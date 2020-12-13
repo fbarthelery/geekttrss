@@ -27,6 +27,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import com.geekorum.ttrss.session.SessionActivityComponent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -36,7 +37,7 @@ import kotlinx.coroutines.flow.flowOf
 /**
  * [ViewModel] for to display the list of tags
  */
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 class TagsViewModel @ViewModelInject constructor(
     @Assisted private val state: SavedStateHandle,
     componentFactory: SessionActivityComponent.Factory

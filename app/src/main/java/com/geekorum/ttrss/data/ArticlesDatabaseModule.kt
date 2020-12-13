@@ -28,14 +28,14 @@ import com.geekorum.ttrss.providers.PurgeArticlesDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ApplicationComponent
+import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 /**
  * Provides some dependencies needed to access the room database.
  */
 @Module
-@InstallIn(ApplicationComponent::class)
+@InstallIn(SingletonComponent::class)
 object ArticlesDatabaseModule {
 
     @Provides
@@ -80,7 +80,7 @@ object ArticlesDatabaseModule {
 }
 
 @Module
-@InstallIn(ApplicationComponent::class)
+@InstallIn(SingletonComponent::class)
 object DiskDatabaseModule {
 
     @Provides

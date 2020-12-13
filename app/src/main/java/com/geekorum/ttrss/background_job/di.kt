@@ -32,12 +32,12 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ApplicationComponent
+import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 
 
 @Module(includes = [AppInitializersModule::class])
-@InstallIn(ApplicationComponent::class)
+@InstallIn(SingletonComponent::class)
 abstract class BackgroundJobsModule {
 
     @Binds

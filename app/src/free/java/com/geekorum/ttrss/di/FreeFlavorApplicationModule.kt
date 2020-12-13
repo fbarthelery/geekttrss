@@ -25,11 +25,11 @@ import com.geekorum.ttrss.article_details.ResourcesWebFontProviderModule
 import com.geekorum.ttrss.in_app_update.NoInAppUpdateModule
 import dagger.Module
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ApplicationComponent
+import dagger.hilt.components.SingletonComponent
 
 @Module(includes = [
     ResourcesWebFontProviderModule::class,
     AllFeaturesInstalledModule::class,
     NoInAppUpdateModule::class])
-@InstallIn(ApplicationComponent::class)
+@InstallIn(SingletonComponent::class)
 interface FreeFlavorApplicationModule

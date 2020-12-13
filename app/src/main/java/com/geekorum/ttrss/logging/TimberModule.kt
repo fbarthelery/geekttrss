@@ -26,7 +26,7 @@ import com.geekorum.geekdroid.dagger.AppInitializersModule
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ApplicationComponent
+import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 import dagger.multibindings.Multibinds
 import timber.log.Timber
@@ -36,7 +36,7 @@ import javax.inject.Inject
  * Declare multibindings for [Timber.Tree]
  */
 @Module(includes = [AppInitializersModule::class])
-@InstallIn(ApplicationComponent::class)
+@InstallIn(SingletonComponent::class)
 abstract class TimberModule {
 
     @Multibinds

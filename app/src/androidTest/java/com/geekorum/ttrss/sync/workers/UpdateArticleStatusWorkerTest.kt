@@ -42,11 +42,11 @@ import com.google.common.truth.Truth.assertThat
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ApplicationComponent
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
+import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.asExecutor
@@ -87,7 +87,7 @@ class UpdateArticleStatusWorkerTest {
         computation = testCoroutineDispatcher)
 
     @Module(includes = [FakeSyncWorkersModule::class])
-    @InstallIn(ApplicationComponent::class)
+    @InstallIn(SingletonComponent::class)
     inner class MockModule {
         @Provides
         fun providesApiService(): ApiService = apiService

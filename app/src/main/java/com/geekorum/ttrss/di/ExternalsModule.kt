@@ -23,7 +23,7 @@ package com.geekorum.ttrss.di
 import com.geekorum.geekdroid.dagger.AndroidFrameworkModule
 import dagger.Module
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ApplicationComponent
+import dagger.hilt.components.SingletonComponent
 
 /**
  * Install modules from external libraries
@@ -32,5 +32,5 @@ import dagger.hilt.android.components.ApplicationComponent
     AndroidFrameworkModule::class,
     com.geekorum.geekdroid.dagger.ViewModelsModule::class
 ])
-@InstallIn(ApplicationComponent::class)
+@InstallIn(SingletonComponent::class)
 object ExternalsModule

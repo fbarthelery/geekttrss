@@ -32,8 +32,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.Subcomponent
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ApplicationComponent
 import dagger.hilt.android.components.ServiceComponent
+import dagger.hilt.components.SingletonComponent
 import dagger.hilt.migration.DisableInstallInCheck
 import javax.inject.Scope
 import kotlin.annotation.AnnotationRetention.RUNTIME
@@ -53,7 +53,7 @@ import kotlin.annotation.AnnotationRetention.RUNTIME
 annotation class PerAccount
 
 @Module
-@InstallIn(ApplicationComponent::class)
+@InstallIn(SingletonComponent::class)
 object AndroidTinyrssAccountManagerModule {
 
     private const val KEY_ALIAS = "com.geekorum.geekttrss.accounts.AccountManagerKey"
@@ -105,7 +105,7 @@ object NetworkLoginModule {
 internal object AuthenticatorServiceModule
 
 @Module(subcomponents = [AuthenticatorNetworkComponent::class])
-@InstallIn(ApplicationComponent::class)
+@InstallIn(SingletonComponent::class)
 internal object AuthenticatorActivityModule
 
 @Subcomponent(modules = [TinyRssServerInformationModule::class, TinyrssApiModule::class])

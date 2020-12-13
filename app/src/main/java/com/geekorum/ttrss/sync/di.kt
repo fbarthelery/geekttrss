@@ -21,23 +21,18 @@
 package com.geekorum.ttrss.sync
 
 import android.accounts.Account
-import android.content.Context
-import android.content.SharedPreferences
 import com.geekorum.ttrss.accounts.NetworkLoginModule
 import com.geekorum.ttrss.accounts.PerAccount
 import com.geekorum.ttrss.data.plugins.SynchronizationFacade
 import com.geekorum.ttrss.di.AssistedFactoriesModule
 import com.geekorum.ttrss.network.TinyrssApiModule
-import com.geekorum.ttrss.sync.workers.WorkersModule
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Module
-import dagger.Provides
 import dagger.Subcomponent
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ApplicationComponent
 import dagger.hilt.android.components.ServiceComponent
-import dagger.hilt.migration.DisableInstallInCheck
+import dagger.hilt.components.SingletonComponent
 
 /**
  * Dependency injection pieces for the Sync functionality.
@@ -72,7 +67,7 @@ internal interface SyncComponent {
 
 
 @Module
-@InstallIn(ApplicationComponent::class)
+@InstallIn(SingletonComponent::class)
 internal abstract class DatabaseAccessModule {
     @Binds
     abstract fun providesDatabaseService(synchronizationFacade: SynchronizationFacade): DatabaseService

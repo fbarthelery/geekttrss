@@ -28,26 +28,20 @@ import com.geekorum.favikonsnoop.snoopers.WhatWgSnooper
 import com.geekorum.ttrss.accounts.NetworkLoginModule
 import com.geekorum.ttrss.accounts.PerAccount
 import com.geekorum.ttrss.accounts.ServerInformation
-import com.geekorum.ttrss.core.CoroutineDispatchersProvider
-import com.geekorum.ttrss.htmlparsers.ImageUrlExtractor
 import com.geekorum.ttrss.network.ApiService
-import com.geekorum.ttrss.network.TinyrssApiModule
-import com.geekorum.ttrss.sync.BackgroundDataUsageManager
-import com.geekorum.ttrss.sync.DatabaseAccessModule
 import com.geekorum.ttrss.sync.DatabaseService
 import com.geekorum.ttrss.sync.FeedIconSynchronizer
-import com.geekorum.ttrss.sync.HttpCacher
 import dagger.BindsInstance
 import dagger.Module
 import dagger.Provides
 import dagger.Subcomponent
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ApplicationComponent
+import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 
 
 @Module(subcomponents = [SyncWorkerComponent::class])
-@InstallIn(ApplicationComponent::class)
+@InstallIn(SingletonComponent::class)
 abstract class WorkersModule
 
 @Subcomponent(modules = [
@@ -73,7 +67,7 @@ interface SyncWorkerComponent {
 }
 
 @Module
-@InstallIn(ApplicationComponent::class)
+@InstallIn(SingletonComponent::class)
 internal object FaviKonModule {
 
     @Provides

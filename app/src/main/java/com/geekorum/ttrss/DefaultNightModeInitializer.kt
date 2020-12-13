@@ -31,7 +31,7 @@ import com.geekorum.ttrss.settings.SettingsActivity
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ApplicationComponent
+import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 
 
@@ -47,7 +47,7 @@ class DefaultNightModeInitializer : AppInitializer {
 }
 
 @Module(includes = [AppInitializersModule::class])
-@InstallIn(ApplicationComponent::class)
+@InstallIn(SingletonComponent::class)
 object DefaultNightModeModule {
 
     @Provides

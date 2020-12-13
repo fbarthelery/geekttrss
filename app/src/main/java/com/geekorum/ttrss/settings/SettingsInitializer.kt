@@ -29,7 +29,7 @@ import com.geekorum.ttrss.debugtools.withStrictMode
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ApplicationComponent
+import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 import javax.inject.Inject
 
@@ -43,7 +43,7 @@ class SettingsInitializer @Inject constructor() : AppInitializer {
 }
 
 @Module
-@InstallIn(ApplicationComponent::class)
+@InstallIn(SingletonComponent::class)
 abstract class SettingsInitializerModule {
     @Binds
     @IntoSet

@@ -238,6 +238,7 @@ abstract class BaseArticlesViewModel(
 /**
  * ViewModel for [ArticlesListFragment]
  */
+@OptIn(ExperimentalCoroutinesApi::class)
 class ArticlesListViewModel @ViewModelInject constructor(
     @Assisted private val state: SavedStateHandle,
     private val feedsRepository: FeedsRepository,

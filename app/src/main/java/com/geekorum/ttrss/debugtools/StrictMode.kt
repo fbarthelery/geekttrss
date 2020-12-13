@@ -33,7 +33,7 @@ import com.geekorum.ttrss.BuildConfig
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ApplicationComponent
+import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 import kotlinx.coroutines.Dispatchers
 import timber.log.Timber
@@ -107,7 +107,7 @@ class StrictModeInitializer @Inject constructor() : AppInitializer {
 
 
 @Module(includes = [AppInitializersModule::class])
-@InstallIn(ApplicationComponent::class)
+@InstallIn(SingletonComponent::class)
 abstract class StrictModeModule {
     @Binds
     @IntoSet
@@ -130,7 +130,7 @@ class KotlinInitializer @Inject constructor() : AppInitializer {
 }
 
 @Module
-@InstallIn(ApplicationComponent::class)
+@InstallIn(SingletonComponent::class)
 abstract class KotlinInitializerModule {
     @Binds
     @IntoSet

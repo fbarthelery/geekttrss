@@ -34,8 +34,7 @@ import com.geekorum.geekdroid.dagger.FragmentKey
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityComponent
-import dagger.hilt.android.components.ApplicationComponent
+import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoMap
 import timber.log.Timber
 import javax.inject.Inject
@@ -66,7 +65,7 @@ class OnDemandModuleNavHostFragment @Inject constructor(
 }
 
 @Module(includes = [FragmentFactoriesModule::class])
-@InstallIn(ActivityComponent::class)
+@InstallIn(SingletonComponent::class)
 abstract class OnDemandModules {
     @Binds
     @IntoMap

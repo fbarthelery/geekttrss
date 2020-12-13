@@ -35,7 +35,7 @@ import com.geekorum.ttrss.BatteryFriendlyActivity
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ApplicationComponent
+import dagger.hilt.components.SingletonComponent
 import javax.inject.Inject
 
 
@@ -101,7 +101,7 @@ open class BaseDialogFragment (
 
 
 @Module(includes = [FragmentFactoriesModule::class])
-@InstallIn(ApplicationComponent::class)
+@InstallIn(SingletonComponent::class)
 abstract class CoreFactoriesModule {
 
     @Binds

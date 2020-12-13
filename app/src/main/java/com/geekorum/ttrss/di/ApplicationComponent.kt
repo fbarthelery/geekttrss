@@ -23,8 +23,9 @@ package com.geekorum.ttrss.di
 import com.geekorum.ttrss.features_api.ManageFeedsDependencies
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 
 
 @EntryPoint
-@InstallIn(dagger.hilt.android.components.ApplicationComponent::class)
+@InstallIn(SingletonComponent::class)
 interface ApplicationComponentEntryPoint : ManageFeedsDependencies
