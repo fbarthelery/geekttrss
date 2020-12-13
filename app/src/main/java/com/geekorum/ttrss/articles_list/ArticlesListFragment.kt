@@ -25,6 +25,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -88,9 +89,10 @@ abstract class BaseArticlesListFragment() : Fragment() {
     }
 
     private fun setupEdgeToEdge() {
-        binding.articleList.doOnApplyWindowInsets { view, insets, padding ->
-            view.updatePadding(bottom = padding.bottom + insets.systemWindowInsetBottom)
-            insets
+        binding.articleList.doOnApplyWindowInsets { view, windowInsets, padding ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.updatePadding(bottom = padding.bottom + insets.bottom)
+            windowInsets
         }
     }
 

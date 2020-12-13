@@ -23,14 +23,13 @@ package com.geekorum.ttrss.article_details
 import android.annotation.SuppressLint
 import android.content.ContentUris
 import android.os.Bundle
-import android.view.View
 import androidx.activity.viewModels
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.os.bundleOf
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.marginBottom
 import androidx.core.view.updateLayoutParams
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.commit
 import com.geekorum.geekdroid.views.doOnApplyWindowInsets
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.articles_list.ArticleListActivity
@@ -72,17 +71,17 @@ class ArticleDetailActivity : SessionActivity() {
 
     @SuppressLint("RestrictedApi")
     private fun setUpEdgeToEdge() {
-        binding.root.systemUiVisibility =
-            View.SYSTEM_UI_FLAG_LAYOUT_STABLE or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         val fabInitialBottomMargin = binding.fab.marginBottom
-        binding.root.doOnApplyWindowInsets { view, insets, initialPadding ->
-            initialPadding.top += insets.systemWindowInsetTop
+        binding.root.doOnApplyWindowInsets { view, windowInsets, initialPadding ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            initialPadding.top += insets.top
             initialPadding.applyToView(view)
             // we don't want to apply bottom padding on the whole view group, so we only update fab margin
             binding.fab.updateLayoutParams<CoordinatorLayout.LayoutParams> {
-                bottomMargin = fabInitialBottomMargin + insets.systemWindowInsetBottom
+                bottomMargin = fabInitialBottomMargin + insets.bottom
             }
-            insets
+            windowInsets
         }
     }
 

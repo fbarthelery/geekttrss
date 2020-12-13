@@ -22,10 +22,10 @@ package com.geekorum.ttrss.articles_list
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import androidx.activity.viewModels
 import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.get
 import androidx.core.view.updatePadding
@@ -130,8 +130,7 @@ class ArticleListActivity : SessionActivity() {
     }
 
     private fun setupEdgeToEdge() {
-        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
-                View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         // the appBar doesn't redraw statusBarForeground correctly. force it
         binding.appBar.addOnOffsetChangedListener(
@@ -140,13 +139,14 @@ class ArticleListActivity : SessionActivity() {
             })
 
         // banner container
-        ViewCompat.setOnApplyWindowInsetsListener(binding.bannerContainer) { view, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.bannerContainer) { view, windowInsets ->
             // consume top padding since we are not on top of screen
-            val noTopInsets = WindowInsetsCompat.Builder().setSystemWindowInsets(
-                Insets.of(insets.systemWindowInsetLeft,
-                0,
-                insets.systemWindowInsetRight,
-                insets.systemWindowInsetBottom)
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val noTopInsets = WindowInsetsCompat.Builder().setInsets(WindowInsetsCompat.Type.systemBars(),
+                Insets.of(insets.left,
+                    0,
+                    insets.right,
+                    insets.bottom)
             ).build()
             WindowInsetsCompat.toWindowInsetsCompat(
                 view.onApplyWindowInsets(noTopInsets.toWindowInsets())
@@ -156,10 +156,11 @@ class ArticleListActivity : SessionActivity() {
         // navigation view
         val innerView = binding.navigationView[0]
         val innerViewInitialPaddingBottom = innerView.paddingBottom
-        binding.navigationView.doOnApplyWindowInsets { _, insets, _ ->
+        binding.navigationView.doOnApplyWindowInsets { _, windowInsets, _ ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
             innerView.updatePadding(
-                bottom = innerViewInitialPaddingBottom + insets.systemWindowInsetBottom)
-            insets
+                bottom = innerViewInitialPaddingBottom + insets.bottom)
+            windowInsets
         }
     }
 
@@ -167,7 +168,7 @@ class ArticleListActivity : SessionActivity() {
         setupSearch()
         setupSortOrder()
         val appBarConfiguration = AppBarConfiguration.Builder(R.id.articlesListFragment, R.id.articlesListByTagFragment)
-            .setDrawerLayout(drawerLayout)
+            .setOpenableLayout(drawerLayout)
             .build()
         binding.toolbar.setupWithNavController(navController, appBarConfiguration)
         appBarPresenter = AppBarPresenter(binding.appBar, binding.toolbar, binding.tagsList, binding.tagsGroup,

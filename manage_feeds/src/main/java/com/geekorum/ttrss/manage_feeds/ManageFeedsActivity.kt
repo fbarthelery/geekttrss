@@ -25,6 +25,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
@@ -71,8 +73,8 @@ class ManageFeedsActivity : BaseSessionActivity() {
     }
 
     private fun setupEdgeToEdge() {
-        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
-            View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
 
         // CollapsingToolbar consumes the insets by default.
         // override it to not consume them so that they can be dispathed to the recycler view
@@ -111,9 +113,10 @@ class ManageFeedsFragment : Fragment() {
     }
 
     private fun setupEdgeToEdge() {
-        binding.recyclerView.doOnApplyWindowInsets { view, insets, padding ->
-            view.updatePadding(bottom = padding.bottom + insets.systemWindowInsetBottom)
-            insets
+        binding.recyclerView.doOnApplyWindowInsets { view, windowInsets, padding ->
+            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.updatePadding(bottom = padding.bottom + insets.bottom)
+            windowInsets
         }
     }
 

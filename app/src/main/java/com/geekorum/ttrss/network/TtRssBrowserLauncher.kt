@@ -53,15 +53,14 @@ class TtRssBrowserLauncher @Inject constructor(
             val darkColorScheme = CustomTabColorSchemeParams.Builder()
                 .setToolbarColor(context.getColor(R.color.material_blue_grey_300))
                 .build()
-            val defaultColor = context.getColor(R.color.material_blue_grey_500)
 
-            addDefaultShareMenuItem()
-                .setToolbarColor(defaultColor)
+            setShareState(CustomTabsIntent.SHARE_STATE_ON)
+                .setDefaultColorSchemeParams(lightColorScheme)
                 .setShowTitle(true)
                 .setColorScheme(CustomTabsIntent.COLOR_SCHEME_SYSTEM)
                 .setColorSchemeParams(CustomTabsIntent.COLOR_SCHEME_LIGHT, lightColorScheme)
                 .setColorSchemeParams(CustomTabsIntent.COLOR_SCHEME_DARK, darkColorScheme)
-                .enableUrlBarHiding()
+                .setUrlBarHidingEnabled(true)
         }
     }
 
