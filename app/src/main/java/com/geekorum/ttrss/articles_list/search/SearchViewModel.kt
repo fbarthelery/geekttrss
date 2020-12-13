@@ -30,6 +30,7 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import com.geekorum.ttrss.articles_list.ArticlesRepository
 import com.geekorum.ttrss.data.Article
+import com.geekorum.ttrss.data.ArticleWithFeed
 import com.geekorum.ttrss.session.SessionActivityComponent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -44,7 +45,7 @@ class SearchViewModel @ViewModelInject constructor(
 
     private val searchQuery = MutableLiveData<String>().apply { value = "" }
 
-    val articles: Flow<PagingData<Article>> = searchQuery.asFlow().flatMapLatest {
+    val articles: Flow<PagingData<ArticleWithFeed>> = searchQuery.asFlow().flatMapLatest {
         Pager(PagingConfig(pageSize = 50)) {
             articlesRepository.searchArticles(it)
         }.flow

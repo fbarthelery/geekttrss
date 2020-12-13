@@ -173,9 +173,9 @@ abstract class BaseArticlesListFragment() : Fragment() {
     ) : ArticlesListAdapter(layoutInflater, eventHandler), ChangeReadDecoration.ArticleProvider {
 
         override fun getArticle(item: RecyclerView.ViewHolder): Article? {
-            val position = item.adapterPosition
+            val position = item.bindingAdapterPosition
             return if (position != RecyclerView.NO_POSITION) {
-                getItem(position)
+                getItem(position)?.article
             } else null
         }
     }

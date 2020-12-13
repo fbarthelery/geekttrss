@@ -135,16 +135,16 @@
              />
 
         <ImageView
-                    android:id="@+id/open"
-                    app:layout_constraintStart_toEndOf="@+id/author"
-                    app:layout_constraintEnd_toStartOf="@+id/marked"
-                    app:layout_constraintTop_toBottomOf="@+id/excerpt"
-                    android:onClick="@{(v) -> handler.onOpenButtonClicked(v, article)}"
+                android:id="@+id/open"
+                app:layout_constraintStart_toEndOf="@+id/author"
+                app:layout_constraintEnd_toStartOf="@+id/marked"
+                app:layout_constraintTop_toBottomOf="@+id/excerpt"
+                android:onClick="@{(v) -> handler.onOpenButtonClicked(v, article)}"
                     android:tint="?colorControlNormal"
-                    android:src="@drawable/ic_action_web_site"
-                    android:contentDescription="@string/open_article_in_browser"
-                    android:background="?attr/selectableItemBackground"
-                    style="@style/HeadlineCardFooterButton" />
+                android:src="@drawable/ic_action_web_site"
+                android:contentDescription="@string/open_article_in_browser"
+                android:background="?attr/selectableItemBackground"
+                style="@style/HeadlineCardFooterButton" />
 
         <com.geekorum.geekdroid.views.CheckableImageView
                 android:id="@+id/marked"

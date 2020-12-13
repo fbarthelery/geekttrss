@@ -157,6 +157,14 @@ data class ArticleContentIndexed(
     var author: String = "")
 
 
+data class ArticleWithFeed(
+    @Embedded
+    val article: Article,
+    @Relation(parentColumn = "feed_id", entityColumn = BaseColumns._ID)
+    val feed: Feed
+)
+
+
 @Entity
 @Fts4(contentEntity = Article::class)
 data class ArticleFTS(

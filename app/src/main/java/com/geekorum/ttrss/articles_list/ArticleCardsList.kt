@@ -39,6 +39,7 @@ import com.geekorum.geekdroid.views.recyclerview.SpacingItemDecoration
 import com.geekorum.ttrss.BR
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Article
+import com.geekorum.ttrss.data.ArticleWithFeed
 import com.geekorum.ttrss.databinding.HeadlinesRowBinding
 import kotlin.math.roundToInt
 
@@ -53,7 +54,7 @@ internal fun RecyclerView.setupCardSpacing() {
 internal open class ArticlesListAdapter(
     private val layoutInflater: LayoutInflater,
     private val eventHandler: CardEventHandler
-) : PagingDataAdapter<Article, HeadlinesBindingViewHolder>(ARTICLE_DIFF_CALLBACK) {
+) : PagingDataAdapter<ArticleWithFeed, HeadlinesBindingViewHolder>(ARTICLE_DIFF_CALLBACK) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HeadlinesBindingViewHolder {
         val binding = HeadlinesRowBinding.inflate(layoutInflater, parent, false)
@@ -62,8 +63,8 @@ internal open class ArticlesListAdapter(
 
     override fun onBindViewHolder(holder: HeadlinesBindingViewHolder, position: Int) {
         with(holder) {
-            val article = getItem(position)
-            setArticle(article)
+            val articleWithFeed = getItem(position)
+            setArticle(articleWithFeed?.article)
             setHandler(eventHandler)
             setPosition(position)
         }
@@ -150,12 +151,12 @@ abstract class CardEventHandler(
     }
 }
 
-private val ARTICLE_DIFF_CALLBACK = object : DiffUtil.ItemCallback<Article>() {
-    override fun areItemsTheSame(oldItem: Article, newItem: Article): Boolean {
-        return oldItem.id == newItem.id
+private val ARTICLE_DIFF_CALLBACK = object : DiffUtil.ItemCallback<ArticleWithFeed>() {
+    override fun areItemsTheSame(oldItem: ArticleWithFeed, newItem: ArticleWithFeed): Boolean {
+        return oldItem.article.id == newItem.article.id
     }
 
-    override fun areContentsTheSame(oldItem: Article, newItem: Article): Boolean {
+    override fun areContentsTheSame(oldItem: ArticleWithFeed, newItem: ArticleWithFeed): Boolean {
         return oldItem == newItem
     }
 }

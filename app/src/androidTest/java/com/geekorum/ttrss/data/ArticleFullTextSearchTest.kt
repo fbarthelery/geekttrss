@@ -169,12 +169,12 @@ class ArticleFullTextSearchTest {
     }
 }
 
-private val ARTICLE_DIFF_CALLBACK = object : DiffUtil.ItemCallback<Article>() {
-    override fun areItemsTheSame(oldItem: Article, newItem: Article): Boolean {
-        return oldItem.id == newItem.id
+private val ARTICLE_DIFF_CALLBACK = object : DiffUtil.ItemCallback<ArticleWithFeed>() {
+    override fun areItemsTheSame(oldItem: ArticleWithFeed, newItem: ArticleWithFeed): Boolean {
+        return oldItem.article.id == newItem.article.id
     }
 
-    override fun areContentsTheSame(oldItem: Article, newItem: Article): Boolean {
+    override fun areContentsTheSame(oldItem: ArticleWithFeed, newItem: ArticleWithFeed): Boolean {
         return oldItem == newItem
     }
 }

@@ -256,7 +256,7 @@ class ArticleDetailFragment @Inject constructor(
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
         super.onViewStateRestored(savedInstanceState)
-        binding.articleContent.restoreState(savedInstanceState)
+        savedInstanceState?.let { binding.articleContent.restoreState(it) }
     }
 
     override fun onStop() {

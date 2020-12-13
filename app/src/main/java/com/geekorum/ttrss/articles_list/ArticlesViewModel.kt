@@ -38,6 +38,7 @@ import androidx.paging.cachedIn
 import com.geekorum.geekdroid.accounts.SyncInProgressLiveData
 import com.geekorum.ttrss.background_job.BackgroundJobManager
 import com.geekorum.ttrss.data.Article
+import com.geekorum.ttrss.data.ArticleWithFeed
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.session.Action
@@ -62,7 +63,7 @@ abstract class BaseArticlesViewModel(
 
     protected val component = componentFactory.newComponent()
     private val articlesRepository = component.articleRepository
-    abstract val articles: Flow<PagingData<Article>>
+    abstract val articles: Flow<PagingData<ArticleWithFeed>>
 
     private val _pendingArticlesSetUnread = MutableLiveData<Int>().apply { value = 0 }
 
@@ -112,12 +113,12 @@ abstract class BaseArticlesViewModel(
     }
 
     protected interface ArticlesAccess {
-        val starredArticles: PagingSource<Int, Article>
-        val publishedArticles: PagingSource<Int, Article>
-        val freshArticles: PagingSource<Int, Article>
-        val allArticles: PagingSource<Int, Article>
-        fun articlesForFeed(feedId: Long): PagingSource<Int, Article>
-        fun articlesForTag(tag: String): PagingSource<Int, Article>
+        val starredArticles: PagingSource<Int, ArticleWithFeed>
+        val publishedArticles: PagingSource<Int, ArticleWithFeed>
+        val freshArticles: PagingSource<Int, ArticleWithFeed>
+        val allArticles: PagingSource<Int, ArticleWithFeed>
+        fun articlesForFeed(feedId: Long): PagingSource<Int, ArticleWithFeed>
+        fun articlesForTag(tag: String): PagingSource<Int, ArticleWithFeed>
     }
 
     protected fun getArticleAccess(mostRecentFirst: Boolean, needUnread: Boolean): ArticlesAccess = when {
@@ -129,102 +130,102 @@ abstract class BaseArticlesViewModel(
     }
 
     class UnreadMostRecentAccess(private val articlesRepository: ArticlesRepository) : ArticlesAccess {
-        override val starredArticles: PagingSource<Int, Article>
+        override val starredArticles: PagingSource<Int, ArticleWithFeed>
             get() = articlesRepository.getAllUnreadStarredArticles()
 
-        override val publishedArticles: PagingSource<Int, Article>
+        override val publishedArticles: PagingSource<Int, ArticleWithFeed>
             get() = articlesRepository.getAllUnreadPublishedArticles()
 
-        override val freshArticles: PagingSource<Int, Article>
+        override val freshArticles: PagingSource<Int, ArticleWithFeed>
             get() {
                 val freshTimeSec = System.currentTimeMillis() / 1000 - 3600 * 36
                 return articlesRepository.getAllUnreadArticlesUpdatedAfterTime(freshTimeSec)
             }
 
-        override val allArticles: PagingSource<Int, Article>
+        override val allArticles: PagingSource<Int, ArticleWithFeed>
             get() =  articlesRepository.getAllUnreadArticles()
 
-        override fun articlesForFeed(feedId: Long): PagingSource<Int, Article> {
+        override fun articlesForFeed(feedId: Long): PagingSource<Int, ArticleWithFeed> {
             return articlesRepository.getAllUnreadArticlesForFeed(feedId)
         }
 
-        override fun articlesForTag(tag: String): PagingSource<Int, Article> {
+        override fun articlesForTag(tag: String): PagingSource<Int, ArticleWithFeed> {
             return articlesRepository.getAllUnreadArticlesForTag(tag)
         }
     }
 
     class UnreadOldestAccess(private val articlesRepository: ArticlesRepository) : ArticlesAccess {
-        override val starredArticles: PagingSource<Int, Article>
+        override val starredArticles: PagingSource<Int, ArticleWithFeed>
             get() = articlesRepository.getAllUnreadStarredArticlesOldestFirst()
 
-        override val publishedArticles: PagingSource<Int, Article>
+        override val publishedArticles: PagingSource<Int, ArticleWithFeed>
             get() = articlesRepository.getAllUnreadPublishedArticlesOldestFirst()
 
-        override val freshArticles: PagingSource<Int, Article>
+        override val freshArticles: PagingSource<Int, ArticleWithFeed>
             get() {
                 val freshTimeSec = System.currentTimeMillis() / 1000 - 3600 * 36
                 return articlesRepository.getAllUnreadArticlesUpdatedAfterTimeOldestFirst(freshTimeSec)
             }
 
-        override val allArticles: PagingSource<Int, Article>
+        override val allArticles: PagingSource<Int, ArticleWithFeed>
             get() =  articlesRepository.getAllUnreadArticlesOldestFirst()
 
-        override fun articlesForFeed(feedId: Long): PagingSource<Int, Article> {
+        override fun articlesForFeed(feedId: Long): PagingSource<Int, ArticleWithFeed> {
             return articlesRepository.getAllUnreadArticlesForFeedOldestFirst(feedId)
         }
 
-        override fun articlesForTag(tag: String): PagingSource<Int, Article> {
+        override fun articlesForTag(tag: String): PagingSource<Int, ArticleWithFeed> {
             return articlesRepository.getAllUnreadArticlesForTagOldestFirst(tag)
         }
     }
 
 
     class MostRecentAccess(private val articlesRepository: ArticlesRepository) : ArticlesAccess {
-        override val starredArticles: PagingSource<Int, Article>
+        override val starredArticles: PagingSource<Int, ArticleWithFeed>
             get() = articlesRepository.getAllStarredArticles()
 
-        override val publishedArticles: PagingSource<Int, Article>
+        override val publishedArticles: PagingSource<Int, ArticleWithFeed>
             get() = articlesRepository.getAllPublishedArticles()
 
-        override val freshArticles: PagingSource<Int, Article>
+        override val freshArticles: PagingSource<Int, ArticleWithFeed>
             get() {
                 val freshTimeSec = System.currentTimeMillis() / 1000 - 3600 * 36
                 return articlesRepository.getAllArticlesUpdatedAfterTime(freshTimeSec)
             }
 
-        override val allArticles: PagingSource<Int, Article>
+        override val allArticles: PagingSource<Int, ArticleWithFeed>
             get() =  articlesRepository.getAllArticles()
 
-        override fun articlesForFeed(feedId: Long): PagingSource<Int, Article> {
+        override fun articlesForFeed(feedId: Long): PagingSource<Int, ArticleWithFeed> {
             return articlesRepository.getAllArticlesForFeed(feedId)
         }
 
-        override fun articlesForTag(tag: String): PagingSource<Int, Article> {
+        override fun articlesForTag(tag: String): PagingSource<Int, ArticleWithFeed> {
             return articlesRepository.getAllArticlesForTag(tag)
         }
     }
 
     class OldestFirstAccess(private val articlesRepository: ArticlesRepository) : ArticlesAccess {
-        override val starredArticles: PagingSource<Int, Article>
+        override val starredArticles: PagingSource<Int, ArticleWithFeed>
             get() = articlesRepository.getAllStarredArticlesOldestFirst()
 
-        override val publishedArticles: PagingSource<Int, Article>
+        override val publishedArticles: PagingSource<Int, ArticleWithFeed>
             get() = articlesRepository.getAllPublishedArticlesOldestFirst()
 
-        override val freshArticles: PagingSource<Int, Article>
+        override val freshArticles: PagingSource<Int, ArticleWithFeed>
             get() {
                 val freshTimeSec = System.currentTimeMillis() / 1000 - 3600 * 36
                 return articlesRepository.getAllArticlesUpdatedAfterTimeOldestFirst(freshTimeSec)
             }
 
-        override val allArticles: PagingSource<Int, Article>
+        override val allArticles: PagingSource<Int, ArticleWithFeed>
             get() =  articlesRepository.getAllArticlesOldestFirst()
 
-        override fun articlesForFeed(feedId: Long): PagingSource<Int, Article> {
+        override fun articlesForFeed(feedId: Long): PagingSource<Int, ArticleWithFeed> {
             return articlesRepository.getAllArticlesForFeedOldestFirst(feedId)
         }
 
-        override fun articlesForTag(tag: String): PagingSource<Int, Article> {
+        override fun articlesForTag(tag: String): PagingSource<Int, ArticleWithFeed> {
             return articlesRepository.getAllArticlesForTagOldestFirst(tag)
         }
     }
@@ -247,7 +248,7 @@ class ArticlesListViewModel @ViewModelInject constructor(
         value = value
     }
 
-    override val articles: Flow<PagingData<Article>> = feedId.asFlow().flatMapLatest {
+    override val articles: Flow<PagingData<ArticleWithFeed>> = feedId.asFlow().flatMapLatest {
         feedsRepository.getFeedById(it)
     }.flatMapLatest {
         checkNotNull(it)
@@ -268,7 +269,7 @@ class ArticlesListViewModel @ViewModelInject constructor(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private fun getArticlesForFeed(feed: Feed): Flow<PagingData<Article>> {
+    private fun getArticlesForFeed(feed: Feed): Flow<PagingData<ArticleWithFeed>> {
         val isMostRecentOrderFlow = state.getLiveData<Boolean>(STATE_ORDER_MOST_RECENT_FIRST).asFlow()
         val needUnreadFlow = state.getLiveData<Boolean>(STATE_NEED_UNREAD).asFlow()
         return isMostRecentOrderFlow.combine(needUnreadFlow) { mostRecentFirst, needUnread ->
@@ -321,7 +322,7 @@ class ArticlesListByTagViewModel @ViewModelInject constructor(
 
     private val account: Account = component.account
 
-    override val articles: Flow<PagingData<Article>> = tag.asFlow().flatMapLatest {
+    override val articles: Flow<PagingData<ArticleWithFeed>> = tag.asFlow().flatMapLatest {
         getArticlesForTag(it)
     }.cachedIn(viewModelScope)
 
@@ -332,7 +333,7 @@ class ArticlesListByTagViewModel @ViewModelInject constructor(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private fun getArticlesForTag(tag: String): Flow<PagingData<Article>> {
+    private fun getArticlesForTag(tag: String): Flow<PagingData<ArticleWithFeed>> {
         val isMostRecentOrderFlow = state.getLiveData<Boolean>(STATE_ORDER_MOST_RECENT_FIRST).asFlow()
         val needUnreadFlow = state.getLiveData<Boolean>(STATE_NEED_UNREAD).asFlow()
         return isMostRecentOrderFlow.combine(needUnreadFlow) { mostRecentFirst, needUnread ->
