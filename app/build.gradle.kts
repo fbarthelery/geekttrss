@@ -42,7 +42,7 @@ plugins {
 
 android {
     val compileSdkVersion: String by rootProject.extra
-    setCompileSdkVersion(compileSdkVersion)
+    compileSdkVersion(compileSdkVersion)
     defaultConfig {
         applicationId = "com.geekorum.ttrss"
         minSdkVersion(24)
@@ -127,22 +127,22 @@ hilt {
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.3.1")
+    implementation("androidx.core:core-ktx:1.3.2")
     implementation("androidx.fragment:fragment-ktx:1.2.5")
     implementation("androidx.activity:activity-ktx:1.1.0")
 
     // androidx ui
     implementation("androidx.drawerlayout:drawerlayout:1.1.1")
-    implementation("androidx.constraintlayout:constraintlayout:2.0.1")
+    implementation("androidx.constraintlayout:constraintlayout:2.0.4")
     implementation("androidx.recyclerview:recyclerview:1.1.0")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.1.0")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation("androidx.preference:preference-ktx:1.1.1")
 
     // androidx others
-    implementation("androidx.browser:browser:1.2.0")
+    implementation("androidx.browser:browser:1.3.0")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
 
     //geekdroid
@@ -156,7 +156,7 @@ dependencies {
     implementation("com.google.android.material:material:1.2.1")
     implementation("com.squareup.okhttp3:logging-interceptor:4.6.0")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.6.0")
-    implementation("io.coil-kt:coil:1.0.0-rc1")
+    implementation("io.coil-kt:coil:1.0.0")
     implementation("com.google.android.gms:play-services-oss-licenses:17.0.0")
 
     implementation("org.jsoup:jsoup:1.10.2")
@@ -195,13 +195,13 @@ dependencies {
     kapt("androidx.room:room-compiler:$roomVersion")
     androidTestImplementation("androidx.room:room-testing:$roomVersion")
 
-    val workVersion = "2.3.0"
+    val workVersion = "2.4.0"
     androidTestImplementation("androidx.work:work-testing:$workVersion")
 
     implementation(enforcedPlatform(kotlin("bom")))
     implementation(kotlin("stdlib-jdk8"))
 
-    val coroutinesVersion = "1.3.9"
+    val coroutinesVersion = "1.4.2"
     implementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:$coroutinesVersion"))
     testImplementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:$coroutinesVersion"))
     androidTestImplementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:$coroutinesVersion"))
@@ -211,7 +211,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
     androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
 
-    implementation(enforcedPlatform("com.google.firebase:firebase-bom:25.3.1"))
+    implementation(enforcedPlatform("com.google.firebase:firebase-bom:26.1.1"))
     add("googleImplementation", "com.google.firebase:firebase-crashlytics")
     // ensure that the free flavor don't get any firebase dependencies
     configurations["freeImplementation"].exclude(group = "com.google.firebase")
@@ -224,12 +224,12 @@ dependencies {
     api("androidx.work:work-runtime-ktx:$workVersion")
     api("androidx.room:room-runtime:$roomVersion")
     api("androidx.room:room-ktx:$roomVersion")
-    api("androidx.paging:paging-runtime-ktx:3.0.0-alpha06")
-    api("com.squareup.retrofit2:retrofit:2.8.1")
+    api("androidx.paging:paging-runtime-ktx:3.0.0-alpha10")
+    api("com.squareup.retrofit2:retrofit:2.9.0")
     api("com.squareup.okhttp3:okhttp:4.6.0")
     api("com.jakewharton.timber:timber:4.7.1")
 
-    val navigationVersion = "2.3.0"
+    val navigationVersion = "2.3.2"
     api("androidx.navigation:navigation-fragment-ktx:$navigationVersion")
     api("androidx.navigation:navigation-ui-ktx:$navigationVersion")
     api("androidx.navigation:navigation-dynamic-features-fragment:$navigationVersion")

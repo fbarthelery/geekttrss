@@ -32,11 +32,11 @@ plugins {
 
 android {
     val compileSdkVersion: String by rootProject.extra
-    setCompileSdkVersion(compileSdkVersion)
+    compileSdkVersion(compileSdkVersion)
 
     defaultConfig {
         minSdkVersion(24)
-        targetSdkVersion(28)
+        targetSdkVersion(29)
     }
 
     dataBinding {
@@ -87,19 +87,19 @@ dependencies {
     //geekdroid
     implementation("com.geekorum.geekdroid:geekdroid:geekttrss-1.5.2")
 
-    implementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.3.9"))
+    implementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.4.2"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
 
     implementation("androidx.activity:activity-ktx:1.1.0")
 
     // androidx UI
-    implementation("androidx.constraintlayout:constraintlayout:2.0.1")
+    implementation("androidx.constraintlayout:constraintlayout:2.0.4")
     implementation("androidx.recyclerview:recyclerview:1.1.0")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.1.0")
     implementation("com.google.android.material:material:1.2.1")
 
-    implementation("androidx.core:core-ktx:1.3.1")
+    implementation("androidx.core:core-ktx:1.3.2")
 
     val lifecycleVersion = "2.2.0"
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
@@ -110,7 +110,7 @@ dependencies {
     implementation(project(":htmlparsers"))
     implementation(project(":webapi"))
 
-    implementation("io.coil-kt:coil:1.0.0-rc1")
+    implementation("io.coil-kt:coil:1.0.0")
 
     androidTestImplementation("androidx.work:work-testing:2.4.0")
     dualTestImplementation("androidx.arch.core:core-testing:2.1.0")
