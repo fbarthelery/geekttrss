@@ -85,8 +85,8 @@ internal fun Project.configureTests() {
         dualTestImplementation("androidx.test.ext:truth:1.3.0-alpha01")
 
         // mock
-        testImplementation("io.mockk:mockk:1.9.3")
-        androidTestImplementation("io.mockk:mockk-android:1.9.3")
+        testImplementation("io.mockk:mockk:1.10.3")
+        androidTestImplementation("io.mockk:mockk-android:1.10.3")
         testImplementation("org.robolectric:robolectric:$robolectricVersion")
 
         constraints {

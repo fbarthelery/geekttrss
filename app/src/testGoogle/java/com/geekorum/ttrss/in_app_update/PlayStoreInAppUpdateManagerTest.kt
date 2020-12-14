@@ -20,6 +20,7 @@
  */
 package com.geekorum.ttrss.in_app_update
 
+import android.os.Looper
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.geekorum.ttrss.in_app_update.UpdateState.Status.DOWNLOADED
@@ -35,16 +36,22 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import dagger.hilt.android.testing.UninstallModules
 import io.mockk.mockk
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.setMain
+import kotlinx.coroutines.yield
 import org.junit.runner.RunWith
+import org.robolectric.Shadows
 import org.robolectric.annotation.Config
 import java.util.concurrent.Executors
 import kotlin.test.AfterTest
@@ -104,9 +111,9 @@ class PlayStoreInAppUpdateManagerTest {
             }
         }
 
-        fakeAppUpdateManager.setUpdateAvailable(1234)
-
-        val statesFinal = drivingFlow.distinctUntilChanged().toList()
+        val statesFinal = async {
+            drivingFlow.distinctUntilChanged().toList()
+        }.awaitRunningMainLooper()
         assertThat(statesFinal).containsExactly(
             UpdateState(UNKNOWN),
             UpdateState(PENDING, InstallErrorCode.NO_ERROR),
@@ -132,15 +139,26 @@ class PlayStoreInAppUpdateManagerTest {
             }
         }
 
-        fakeAppUpdateManager.setUpdateAvailable(1234)
-
-        val statesFinal = drivingFlow.distinctUntilChanged().toList()
+        val statesFinal = async {
+            drivingFlow.distinctUntilChanged().toList()
+        }.awaitRunningMainLooper()
         assertThat(statesFinal).containsExactly(
             UpdateState(UNKNOWN),
             UpdateState(PENDING, InstallErrorCode.NO_ERROR),
             UpdateState(DOWNLOADING, InstallErrorCode.NO_ERROR),
             UpdateState(FAILED, InstallErrorCode.ERROR_INSTALL_NOT_ALLOWED)
         )
+    }
+
+    private suspend fun <T> Deferred<T>.awaitRunningMainLooper(): T = coroutineScope {
+        val runMainLooperIdle = launch {
+            while(true) {
+                yield()
+                Shadows.shadowOf(Looper.getMainLooper()).idle()
+            }
+        }
+        invokeOnCompletion { runMainLooperIdle.cancel() }
+        await()
     }
 
 }
