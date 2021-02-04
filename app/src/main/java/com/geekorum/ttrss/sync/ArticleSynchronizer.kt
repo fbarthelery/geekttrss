@@ -46,8 +46,9 @@ import com.geekorum.ttrss.sync.workers.SyncWorkerFactory
 import com.geekorum.ttrss.sync.workers.UpdateAccountInfoWorker
 import com.geekorum.ttrss.sync.workers.UpdateArticleStatusWorker
 import com.geekorum.ttrss.webapi.ApiCallException
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
@@ -60,13 +61,13 @@ import java.util.UUID
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class ArticleSynchronizer @AssistedInject constructor(
-        application: Application,
-        @Assisted params: Bundle,
-        private val account: Account,
-        private val databaseService: DatabaseService
+    application: Application,
+    @Assisted params: Bundle,
+    private val account: Account,
+    private val databaseService: DatabaseService
 ) : CancellableSyncAdapter.CancellableSync() {
 
-    @AssistedInject.Factory
+    @AssistedFactory
     interface Factory {
         fun create(params: Bundle): ArticleSynchronizer
     }

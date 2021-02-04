@@ -27,9 +27,7 @@ import android.app.Activity
 import com.geekorum.ttrss.accounts.NetworkLoginModule
 import com.geekorum.ttrss.accounts.PerAccount
 import com.geekorum.ttrss.articles_list.ArticlesRepository
-import com.geekorum.ttrss.di.AssistedFactoriesModule
 import com.geekorum.ttrss.network.ApiService
-import com.geekorum.ttrss.network.TinyrssApiModule
 import dagger.Module
 import dagger.Provides
 import dagger.Subcomponent
@@ -52,7 +50,6 @@ class SessionActivityModule
 
 
 @Subcomponent(modules = [
-    AssistedFactoriesModule::class,
     NetworkLoginModule::class,
     SessionAccountModule::class
 ])

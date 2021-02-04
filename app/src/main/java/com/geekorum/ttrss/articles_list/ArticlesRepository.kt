@@ -30,8 +30,9 @@ import com.geekorum.ttrss.data.TransactionsDao
 import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.session.Action
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
@@ -200,9 +201,9 @@ internal class SetUnreadAction @AssistedInject internal constructor(
         }
     }
 
-    @AssistedInject.Factory
+    @AssistedFactory
     interface Factory {
-        fun createSetUnreadAction(articleId: Long, newValue: Boolean): Action
+        fun createSetUnreadAction(articleId: Long, newValue: Boolean): SetUnreadAction
     }
 }
 
@@ -226,9 +227,9 @@ internal class SetStarredAction @AssistedInject internal constructor(
         }
     }
 
-    @AssistedInject.Factory
+    @AssistedFactory
     interface Factory {
-        fun createSetStarredAction(articleId: Long, newValue: Boolean): Action
+        fun createSetStarredAction(articleId: Long, newValue: Boolean): SetStarredAction
     }
 
 }

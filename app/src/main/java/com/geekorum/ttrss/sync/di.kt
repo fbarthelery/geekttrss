@@ -24,7 +24,6 @@ import android.accounts.Account
 import com.geekorum.ttrss.accounts.NetworkLoginModule
 import com.geekorum.ttrss.accounts.PerAccount
 import com.geekorum.ttrss.data.plugins.SynchronizationFacade
-import com.geekorum.ttrss.di.AssistedFactoriesModule
 import com.geekorum.ttrss.network.TinyrssApiModule
 import dagger.Binds
 import dagger.BindsInstance
@@ -47,7 +46,6 @@ private object SyncComponentModule
 
 
 @Subcomponent(modules = [
-    AssistedFactoriesModule::class,
     NetworkLoginModule::class, TinyrssApiModule::class
 ])
 @PerAccount

@@ -171,14 +171,12 @@ dependencies {
     dualTestImplementation("androidx.arch.core:core-testing:2.1.0")
 
     // dagger
-    val daggerVersion = "2.30.1"
+    val daggerVersion = "2.31.2"
     implementation(enforcedDaggerPlatform(daggerVersion))
     kapt(enforcedDaggerPlatform(daggerVersion))
     implementation("com.google.dagger:dagger:$daggerVersion")
     kapt("com.google.dagger:dagger-compiler:$daggerVersion")
     kaptTest("com.google.dagger:dagger-compiler:$daggerVersion")
-    implementation("com.squareup.inject:assisted-inject-annotations-dagger2:0.5.2")
-    kapt("com.squareup.inject:assisted-inject-processor-dagger2:0.5.2")
     val hiltVersion = "$daggerVersion-alpha"
     implementation("com.google.dagger:hilt-android:$hiltVersion")
     implementation("androidx.hilt:hilt-work:1.0.0-alpha02")
