@@ -22,12 +22,8 @@ package com.geekorum.ttrss.manage_feeds.workers
 
 import android.accounts.Account
 import androidx.hilt.work.HiltWorkerFactory
-import androidx.hilt.work.WorkerFactoryModule
-import androidx.work.DelegatingWorkerFactory
+import androidx.hilt.work.HiltWrapper_WorkerFactoryModule
 import androidx.work.WorkerFactory
-import com.geekorum.geekdroid.dagger.WorkerInjectionModule
-import com.geekorum.geekdroid.dagger.WorkerKey
-import com.geekorum.ttrss.accounts.AndroidTinyrssAccountManagerModule
 import com.geekorum.ttrss.accounts.NetworkLoginModule
 import com.geekorum.ttrss.accounts.PerAccount
 import com.geekorum.ttrss.network.TinyrssApiModule
@@ -38,14 +34,15 @@ import dagger.BindsInstance
 import dagger.Module
 import dagger.Provides
 import dagger.Subcomponent
-import dagger.multibindings.IntoMap
+import dagger.hilt.migration.DisableInstallInCheck
 
 
-@Module(subcomponents = [WorkerComponent::class], includes = [WorkerInjectionModule::class,
-    WorkerFactoryModule::class,
+@Module(subcomponents = [WorkerComponent::class], includes = [
+    HiltWrapper_WorkerFactoryModule::class,
     SubscribeWorker_HiltModule::class,
     UnsubscribeWorker_HiltModule::class
 ])
+@DisableInstallInCheck
 abstract class WorkersModule {
 
     @Binds
@@ -74,6 +71,7 @@ interface WorkerComponent {
     TinyrssApiModule::class,
     NetworkLoginModule::class
 ])
+@DisableInstallInCheck
 internal class ApiServiceModule {
 
     @Provides

@@ -22,19 +22,17 @@ package com.geekorum.ttrss.manage_feeds.workers
 
 import android.accounts.Account
 import android.content.Context
-import androidx.hilt.Assisted
-import androidx.hilt.work.WorkerInject
-import androidx.work.CoroutineWorker
+import androidx.hilt.work.HiltWorker
 import androidx.work.Data
-import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.geekorum.ttrss.sync.FeedIconSynchronizer
 import com.geekorum.ttrss.webapi.ApiCallException
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import timber.log.Timber
-import javax.inject.Inject
 
-class SubscribeWorker @WorkerInject constructor(
+@HiltWorker
+class SubscribeWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     workerComponentBuilder: WorkerComponent.Builder

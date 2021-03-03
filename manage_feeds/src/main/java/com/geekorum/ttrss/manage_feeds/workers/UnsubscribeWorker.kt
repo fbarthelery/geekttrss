@@ -22,20 +22,19 @@ package com.geekorum.ttrss.manage_feeds.workers
 
 import android.accounts.Account
 import android.content.Context
-import androidx.hilt.Assisted
-import androidx.hilt.work.WorkerInject
-import androidx.work.CoroutineWorker
+import androidx.hilt.work.HiltWorker
 import androidx.work.Data
-import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.geekorum.ttrss.webapi.ApiCallException
-import javax.inject.Inject
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 
 /**
  * Background worker to unsubscribe from a feed.
  */
-class UnsubscribeWorker @WorkerInject constructor(
+@HiltWorker
+class UnsubscribeWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted private val params: WorkerParameters,
     workerComponentBuilder: WorkerComponent.Builder

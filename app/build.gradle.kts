@@ -181,12 +181,12 @@ dependencies {
     implementation("com.google.dagger:hilt-android:$hiltVersion")
     implementation("androidx.hilt:hilt-work:1.0.0-alpha02")
     implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha02")
-    kapt("androidx.hilt:hilt-compiler:1.0.0-alpha02")
-    kapt("com.google.dagger:hilt-android-compiler:$hiltVersion")
+    kapt("androidx.hilt:hilt-compiler:1.0.0-alpha03")
+    kapt("com.google.dagger:hilt-compiler:$hiltVersion")
     testImplementation("com.google.dagger:hilt-android-testing:$hiltVersion")
-    kaptTest("com.google.dagger:hilt-android-compiler:$hiltVersion")
+    kaptTest("com.google.dagger:hilt-compiler:$hiltVersion")
     androidTestImplementation("com.google.dagger:hilt-android-testing:$hiltVersion")
-    kaptAndroidTest("com.google.dagger:hilt-android-compiler:$hiltVersion")
+    kaptAndroidTest("com.google.dagger:hilt-compiler:$hiltVersion")
 
 
     val roomVersion = "2.3.0-alpha02"

@@ -76,13 +76,14 @@ dependencies {
     kapt("com.google.dagger:dagger-compiler:$daggerVersion")
     kaptTest("com.google.dagger:dagger-compiler:$daggerVersion")
     implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha02")
-    implementation("androidx.hilt:hilt-work:1.0.0-alpha02")
-    kapt("androidx.hilt:hilt-compiler:1.0.0-alpha02")
+    implementation("androidx.hilt:hilt-work:1.0.0-alpha03")
     val hiltVersion = "$daggerVersion-alpha"
     testImplementation("com.google.dagger:hilt-android-testing:$hiltVersion")
-    kaptTest("com.google.dagger:hilt-android-compiler:$hiltVersion")
     androidTestImplementation("com.google.dagger:hilt-android-testing:$hiltVersion")
-    kaptAndroidTest("com.google.dagger:hilt-android-compiler:$hiltVersion")
+    kapt("com.google.dagger:hilt-compiler:$hiltVersion")
+    kapt("androidx.hilt:hilt-compiler:1.0.0-alpha03")
+    kaptTest("com.google.dagger:hilt-compiler:$hiltVersion")
+    kaptAndroidTest("com.google.dagger:hilt-compiler:$hiltVersion")
 
     //geekdroid
     implementation("com.geekorum.geekdroid:geekdroid:geekttrss-1.5.2")

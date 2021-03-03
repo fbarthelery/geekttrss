@@ -42,6 +42,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.Subcomponent
 import dagger.hilt.android.internal.lifecycle.DefaultActivityViewModelFactory
+import dagger.hilt.migration.DisableInstallInCheck
 
 @Component(dependencies = [ManageFeedsDependencies::class],
     modules = [CoreFactoriesModule::class,
@@ -61,6 +62,7 @@ interface ManageFeedComponent {
 }
 
 @Module(subcomponents = [ActivityComponent::class])
+@DisableInstallInCheck
 interface ManageFeedActivityModule
 
 @Subcomponent(modules = [SessionAccountModule::class,
@@ -86,9 +88,11 @@ interface ActivityComponent {
 }
 
 @Module(includes = [ManageFeedViewModel_HiltModule::class])
+@DisableInstallInCheck
 private class ManageFeedModule
 
 @Module
+@DisableInstallInCheck
 object WorkManagerModule {
     @Provides
     fun provideWorkManager(application: Application): WorkManager = WorkManager.getInstance(application)

@@ -21,14 +21,18 @@
 package com.geekorum.ttrss.manage_feeds.add_feed
 
 import dagger.Module
+import dagger.hilt.migration.DisableInstallInCheck
 
 @Module(includes = [
     SubscribeToFeedActivityModule::class,
     AddFeedActivityModule::class])
+@DisableInstallInCheck
 abstract class AddFeedModule
 
 @Module(includes = [SubscribeToFeedViewModel_HiltModule::class])
+@DisableInstallInCheck
 private abstract class SubscribeToFeedActivityModule
 
 @Module(includes = [AddFeedViewModel_HiltModule::class])
+@DisableInstallInCheck
 private abstract class AddFeedActivityModule
