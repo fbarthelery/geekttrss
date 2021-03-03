@@ -30,6 +30,9 @@ import com.geekorum.ttrss.ForceNightModeViewModel_HiltModule
 import com.geekorum.ttrss.articles_list.TtrssAccountViewModel_HiltModule
 import com.geekorum.ttrss.core.CoreFactoriesModule
 import com.geekorum.ttrss.di.FeatureScope
+import com.geekorum.ttrss.features_api.DynamicFeatureViewModelComponent
+import com.geekorum.ttrss.features_api.DynamicFeatureViewModelFactory
+import com.geekorum.ttrss.features_api.DynamicFeatureViewModelModule
 import com.geekorum.ttrss.features_api.ManageFeedsDependencies
 import com.geekorum.ttrss.manage_feeds.add_feed.AddFeedActivity
 import com.geekorum.ttrss.manage_feeds.add_feed.AddFeedModule
@@ -65,7 +68,9 @@ interface ManageFeedComponent {
 @DisableInstallInCheck
 interface ManageFeedActivityModule
 
-@Subcomponent(modules = [SessionAccountModule::class,
+@Subcomponent(modules = [
+    SessionAccountModule::class,
+    DynamicFeatureViewModelModule::class,
     ForceNightModeViewModel_HiltModule::class,
     TtrssAccountViewModel_HiltModule::class,
     ViewModelFactoryModules.ActivityModule::class,
@@ -78,9 +83,8 @@ interface ActivityComponent {
         fun newComponent(@BindsInstance activity: Activity): ActivityComponent
     }
 
-    // can't be injected because DefaultActivityViewModelFactory can't be applied on field
-    @DefaultActivityViewModelFactory
-    fun getActivityViewModelFactory(): Set<ViewModelProvider.Factory?>
+    val dynamicFeatureViewModelFactory: DynamicFeatureViewModelFactory
+
 
     // inject required to provide daggerDelegateFragmentFactory for fragment constructor injection.
     fun inject(baseSessionActivity: BaseSessionActivity)

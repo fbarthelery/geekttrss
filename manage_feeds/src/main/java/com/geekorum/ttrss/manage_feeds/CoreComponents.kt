@@ -35,7 +35,7 @@ open class BaseSessionActivity : SessionActivity() {
             .createActivityComponent()
             .newComponent(this)
         activityComponent.inject(this)
-        vmProviderFactory = activityComponent.getActivityViewModelFactory().filterNotNull().first()
+        vmProviderFactory = activityComponent.dynamicFeatureViewModelFactory.fromActivity(this)
     }
 
     override fun getDefaultViewModelProviderFactory(): ViewModelProvider.Factory = vmProviderFactory

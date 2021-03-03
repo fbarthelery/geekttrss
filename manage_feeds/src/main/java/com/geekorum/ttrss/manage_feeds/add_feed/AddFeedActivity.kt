@@ -123,7 +123,7 @@ class AddFeedActivity : BottomSheetDialogActivity() {
             .createActivityComponent()
             .newComponent(this)
         activityComponent.inject(this)
-        viewModelFactory = activityComponent.getActivityViewModelFactory().filterNotNull().first()
+        viewModelFactory = activityComponent.dynamicFeatureViewModelFactory.fromActivity(this)
     }
 
 }
