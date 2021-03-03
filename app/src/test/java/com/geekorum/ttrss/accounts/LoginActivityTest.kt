@@ -32,11 +32,11 @@ import com.geekorum.ttrss.R
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ApplicationComponent
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import dagger.hilt.android.testing.UninstallModules
+import dagger.hilt.components.SingletonComponent
 import io.mockk.mockk
 import org.hamcrest.Matchers.not
 import org.junit.Rule
@@ -75,7 +75,7 @@ class LoginActivityTest {
     }
 
     @Module
-    @InstallIn(ApplicationComponent::class)
+    @InstallIn(SingletonComponent::class)
     internal object MocksModule {
         @Provides
         fun providesAndroidTinyrssAccountManager(): AndroidTinyrssAccountManager = mockk()

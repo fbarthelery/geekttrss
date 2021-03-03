@@ -26,6 +26,7 @@ import com.geekorum.ttrss.in_app_update.PlayStoreInAppUpdateModule
 import com.geekorum.ttrss.on_demand_modules.PlayStoreInstallModule
 import dagger.Module
 import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 
 
 @Module(includes = [
@@ -34,5 +35,5 @@ import dagger.hilt.InstallIn
     PlayStoreInAppUpdateModule::class,
     GmsSecurityProviderModule::class
 ])
-@InstallIn(dagger.hilt.android.components.ApplicationComponent::class)
+@InstallIn(SingletonComponent::class)
 interface GoogleFlavorApplicationModule

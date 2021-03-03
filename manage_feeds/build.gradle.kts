@@ -69,7 +69,7 @@ dependencies {
     implementation(enforcedPlatform(kotlin("bom")))
     implementation(kotlin("stdlib-jdk8"))
 
-    val daggerVersion = "2.31.2"
+    val daggerVersion = "2.33"
     implementation(enforcedDaggerPlatform(daggerVersion))
     kapt(enforcedDaggerPlatform(daggerVersion))
     implementation("com.google.dagger:dagger:$daggerVersion")
@@ -77,7 +77,7 @@ dependencies {
     kaptTest("com.google.dagger:dagger-compiler:$daggerVersion")
     implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha02")
     implementation("androidx.hilt:hilt-work:1.0.0-alpha03")
-    val hiltVersion = "$daggerVersion-alpha"
+    val hiltVersion = "$daggerVersion-beta"
     testImplementation("com.google.dagger:hilt-android-testing:$hiltVersion")
     androidTestImplementation("com.google.dagger:hilt-android-testing:$hiltVersion")
     kapt("com.google.dagger:hilt-compiler:$hiltVersion")
