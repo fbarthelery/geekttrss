@@ -179,7 +179,7 @@ dependencies {
     kaptTest("com.google.dagger:dagger-compiler:$daggerVersion")
     val hiltVersion = "$daggerVersion-beta"
     implementation("com.google.dagger:hilt-android:$hiltVersion")
-    implementation("androidx.hilt:hilt-work:1.0.0-alpha02")
+    implementation("androidx.hilt:hilt-work:1.0.0-alpha03")
     implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha02")
     kapt("androidx.hilt:hilt-compiler:1.0.0-alpha03")
     kapt("com.google.dagger:hilt-compiler:$hiltVersion")

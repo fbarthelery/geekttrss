@@ -21,24 +21,23 @@
 package com.geekorum.ttrss.sync.workers
 
 import android.content.Context
-import androidx.hilt.Assisted
-import androidx.hilt.work.WorkerInject
-import androidx.work.CoroutineWorker
-import androidx.work.ListenableWorker
+import androidx.hilt.work.HiltWorker
 import androidx.work.WorkerParameters
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.sync.DatabaseService
 import com.geekorum.ttrss.webapi.ApiCallException
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * Synchronize feeds list and categories.
  */
-class SyncFeedsWorker @WorkerInject constructor(
+@HiltWorker
+class SyncFeedsWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
     syncWorkerComponentBuilder: SyncWorkerComponent.Builder,

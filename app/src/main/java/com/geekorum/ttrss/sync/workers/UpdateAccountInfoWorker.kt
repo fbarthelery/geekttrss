@@ -22,8 +22,7 @@ package com.geekorum.ttrss.sync.workers
 
 import android.accounts.Account
 import android.content.Context
-import androidx.hilt.Assisted
-import androidx.hilt.work.WorkerInject
+import androidx.hilt.work.HiltWorker
 import androidx.work.WorkerParameters
 import com.geekorum.ttrss.accounts.ServerInformation
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
@@ -32,6 +31,8 @@ import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.network.ServerInfo
 import com.geekorum.ttrss.sync.DatabaseService
 import com.geekorum.ttrss.webapi.ApiCallException
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import com.geekorum.ttrss.data.Account as DataAccount
@@ -39,7 +40,8 @@ import com.geekorum.ttrss.data.Account as DataAccount
 /**
  * Update account information from the network to the local database.
  */
-class UpdateAccountInfoWorker @WorkerInject constructor(
+@HiltWorker
+class UpdateAccountInfoWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
     syncWorkerComponentBuilder: SyncWorkerComponent.Builder,

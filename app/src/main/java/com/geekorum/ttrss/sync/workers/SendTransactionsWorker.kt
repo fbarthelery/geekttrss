@@ -21,26 +21,24 @@
 package com.geekorum.ttrss.sync.workers
 
 import android.content.Context
-import androidx.hilt.Assisted
-import androidx.hilt.work.WorkerInject
-import androidx.work.CoroutineWorker
-import androidx.work.ListenableWorker
+import androidx.hilt.work.HiltWorker
 import androidx.work.WorkerParameters
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.sync.DatabaseService
 import com.geekorum.ttrss.webapi.ApiCallException
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.yield
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * Send the saved transactions to the tinyrss service.
  */
-class SendTransactionsWorker @WorkerInject constructor(
+@HiltWorker
+class SendTransactionsWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
     syncWorkerComponentBuilder: SyncWorkerComponent.Builder,

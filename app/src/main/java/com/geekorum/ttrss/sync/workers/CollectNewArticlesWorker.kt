@@ -25,8 +25,7 @@ import android.content.Context
 import android.content.OperationApplicationException
 import android.os.RemoteException
 import android.security.NetworkSecurityPolicy
-import androidx.hilt.Assisted
-import androidx.hilt.work.WorkerInject
+import androidx.hilt.work.HiltWorker
 import androidx.work.Data
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
@@ -39,6 +38,8 @@ import com.geekorum.ttrss.sync.BackgroundDataUsageManager
 import com.geekorum.ttrss.sync.DatabaseService
 import com.geekorum.ttrss.sync.HttpCacher
 import com.geekorum.ttrss.webapi.ApiCallException
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -51,7 +52,8 @@ import java.io.IOException
 /**
  * Collect all the new articles from a feed
  */
-class CollectNewArticlesWorker @WorkerInject constructor(
+@HiltWorker
+class CollectNewArticlesWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
     syncWorkerComponentBuilder: SyncWorkerComponent.Builder,

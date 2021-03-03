@@ -21,14 +21,15 @@
 package com.geekorum.ttrss.sync.workers
 
 import android.content.Context
-import androidx.hilt.Assisted
-import androidx.hilt.work.WorkerInject
+import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.sync.FeedIconSynchronizer
 import com.geekorum.ttrss.webapi.ApiCallException
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
@@ -37,7 +38,8 @@ import javax.inject.Inject
 /**
  * Synchronize icon url info for every feeds.
  */
-class SyncFeedsIconWorker @WorkerInject constructor(
+@HiltWorker
+class SyncFeedsIconWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
     syncWorkerComponentBuilder: SyncWorkerComponent.Builder,

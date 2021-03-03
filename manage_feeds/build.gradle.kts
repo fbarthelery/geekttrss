@@ -75,7 +75,7 @@ dependencies {
     implementation("com.google.dagger:dagger:$daggerVersion")
     kapt("com.google.dagger:dagger-compiler:$daggerVersion")
     kaptTest("com.google.dagger:dagger-compiler:$daggerVersion")
-    implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha02")
+    implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03")
     implementation("androidx.hilt:hilt-work:1.0.0-alpha03")
     val hiltVersion = "$daggerVersion-beta"
     testImplementation("com.google.dagger:hilt-android-testing:$hiltVersion")

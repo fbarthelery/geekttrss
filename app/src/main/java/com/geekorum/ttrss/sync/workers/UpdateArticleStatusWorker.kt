@@ -22,8 +22,7 @@ package com.geekorum.ttrss.sync.workers
 
 import android.accounts.Account
 import android.content.Context
-import androidx.hilt.Assisted
-import androidx.hilt.work.WorkerInject
+import androidx.hilt.work.HiltWorker
 import androidx.work.Data
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
@@ -32,6 +31,8 @@ import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.Metadata
 import com.geekorum.ttrss.sync.DatabaseService
 import com.geekorum.ttrss.webapi.ApiCallException
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
@@ -43,7 +44,8 @@ import timber.log.Timber
  * Update the status of the latest articles of a Feed
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-class UpdateArticleStatusWorker @WorkerInject constructor(
+@HiltWorker
+class UpdateArticleStatusWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
     syncWorkerComponentBuilder: SyncWorkerComponent.Builder,
