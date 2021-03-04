@@ -21,7 +21,9 @@
     along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
 
 -->
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <import type="android.view.Gravity" />
         <variable name="isSwipeToRight" type="boolean" />
@@ -32,10 +34,11 @@
               android:text="@{ article.transientUnread ? @string/mark_as_read : @string/mark_as_unread }"
               android:drawableStart="@{ isSwipeToRight ? @drawable/ic_archive : null }"
               android:drawableEnd="@{ !isSwipeToRight ? @drawable/ic_archive : null }"
-              android:drawableTint="?colorAccent"
+              app:drawableTint="?colorAccent"
               android:drawablePadding="8dp"
               android:padding="@dimen/activity_horizontal_margin"
               android:gravity="@{ Gravity.CENTER_VERTICAL | (isSwipeToRight ? Gravity.START : Gravity.END) }"
-              android:textAppearance="@style/TextAppearance.AppCompat.Caption"/>
+              android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+              tools:ignore="UseCompatTextViewDrawableXml" /> <!-- we use databinding -->
 
 </layout>

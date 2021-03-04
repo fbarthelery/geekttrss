@@ -49,7 +49,7 @@ class EnterFeedUrlFragment : Fragment() {
         binding.viewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
 
-        viewModel.invalidUrlEvent.observe(this, EventObserver {
+        viewModel.invalidUrlEvent.observe(viewLifecycleOwner, EventObserver {
             binding.feedUrl.error = "Invalid url"
         })
 
@@ -77,7 +77,7 @@ class EnterFeedUrlFragment : Fragment() {
             }
         }
 
-        viewModel.ioErrorEvent.observe(this, EventObserver {
+        viewModel.ioErrorEvent.observe(viewLifecycleOwner, EventObserver {
             val action = EnterFeedUrlFragmentDirections.actionDisplayError(
                 R.string.fragment_display_error_io_error)
             navController.navigate(action)

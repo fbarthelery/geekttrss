@@ -113,7 +113,6 @@ inline class PlayInstallStatus(private val value: Int) {
 @Module
 object PlayStoreInAppUpdateModule {
 
-    @JvmStatic
     @Provides
     fun providesInAppUpdateManager(application: Application): InAppUpdateManager {
         val appUpdateManager = AppUpdateManagerFactory.create(application)

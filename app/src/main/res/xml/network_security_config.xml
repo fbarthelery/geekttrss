@@ -21,12 +21,13 @@
     along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
 
 -->
-<network-security-config>
+<network-security-config xmlns:tools="http://schemas.android.com/tools">
     <base-config>
         <trust-anchors>
             <certificates src="system"/>
             <!-- also trust user added CA -->
-            <certificates src="user"/>
+            <certificates src="user"
+                tools:ignore="AcceptsUserCertificates" />
         </trust-anchors>
     </base-config>
 </network-security-config>

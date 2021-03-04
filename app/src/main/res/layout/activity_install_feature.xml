@@ -36,7 +36,7 @@
         <ImageView
                 android:id="@+id/module_logo"
                 android:layout_width="200dp" android:layout_height="200dp"
-                android:tint="?colorPrimary"
+                app:tint="?colorPrimary"
                 app:layout_constraintBottom_toTopOf="@+id/install_status"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

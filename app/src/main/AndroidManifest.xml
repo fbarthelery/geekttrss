@@ -121,10 +121,10 @@
             android:name="com.geekorum.ttrss.providers.ArticlesProvider"
             android:exported="false"/>
 
-        <!-- Disable WorkManagerInitializer and initialize manually in Application -->
+        <!-- Remove WorkManagerInitializer and initialize manually in Application -->
         <provider android:name="androidx.work.impl.WorkManagerInitializer"
                   android:authorities="${applicationId}.workmanager-init"
-                  android:enabled="false"/>
+                  tools:node="remove"/>
 
         <!-- Preloaded downloaded fonts -->
         <meta-data
