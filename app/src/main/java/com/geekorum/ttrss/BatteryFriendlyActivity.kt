@@ -27,7 +27,6 @@ import android.os.PowerManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.distinctUntilChanged
@@ -35,6 +34,8 @@ import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import com.geekorum.geekdroid.battery.BatterySaverLiveData
 import com.geekorum.geekdroid.battery.LowBatteryLiveData
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
 /**
  * An [android.app.Activity] who switch to Night mode when battery is low or in saving mode.
@@ -60,12 +61,13 @@ open class BatteryFriendlyActivity : AppCompatActivity() {
 /**
  * Observe the system to know if we should force night mode on all activities
  */
+@HiltViewModel
 class ForceNightModeViewModel(
     private val batterySaverLiveData: LiveData<Boolean>,
     private val lowBatteryLiveData: LiveData<Boolean>
 ) : ViewModel() {
 
-    @ViewModelInject
+    @Inject
     constructor(application: Application, powerManager: PowerManager) : this(
         BatterySaverLiveData(application, powerManager), LowBatteryLiveData(application)
     )

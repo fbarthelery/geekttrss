@@ -23,7 +23,9 @@
 package com.geekorum.ttrss.session
 
 import android.accounts.Account
-import android.app.Activity
+import android.accounts.AccountManager
+import android.app.Application
+import com.geekorum.geekdroid.accounts.AccountSelector
 import com.geekorum.ttrss.accounts.NetworkLoginModule
 import com.geekorum.ttrss.accounts.PerAccount
 import com.geekorum.ttrss.articles_list.ArticlesRepository
@@ -32,8 +34,10 @@ import dagger.Module
 import dagger.Provides
 import dagger.Subcomponent
 import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.components.ActivityRetainedComponent
+import dagger.hilt.components.SingletonComponent
 import dagger.hilt.migration.DisableInstallInCheck
+import javax.inject.Singleton
 
 /**
  * Dependency injection pieces for a SessionActivity
@@ -45,9 +49,17 @@ import dagger.hilt.migration.DisableInstallInCheck
  */
 
 @Module(subcomponents = [SessionActivityComponent::class])
-@InstallIn(ActivityComponent::class)
+@InstallIn(ActivityRetainedComponent::class)
 class SessionActivityModule
 
+@Module
+@InstallIn(SingletonComponent::class)
+object AccountSelectorModule {
+    @Singleton
+    @Provides
+    fun bindsAccountSelector(application: Application, accountManager: AccountManager) =
+        AccountSelector(application, accountManager)
+}
 
 @Subcomponent(modules = [
     NetworkLoginModule::class,
@@ -71,7 +83,7 @@ interface SessionActivityComponent {
 class SessionAccountModule {
 
     @Provides
-    fun providesAccount(activity: Activity) : Account {
-        return (activity as SessionActivity).account!!
+    fun providesAccount(accountSelector: AccountSelector) : Account {
+        return accountSelector.savedAccount!!
     }
 }

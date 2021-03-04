@@ -24,8 +24,6 @@ import android.accounts.Account
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.net.toUri
-import androidx.hilt.Assisted
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -35,6 +33,8 @@ import com.geekorum.geekdroid.app.lifecycle.Event
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.network.TtRssBrowserLauncher
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
 private const val STATE_FEED_ID = "feed_id"
 private const val STATE_ACCOUNT = "account"
@@ -47,8 +47,9 @@ private const val PREF_SORT_ORDER = "sort_order"
 /**
  * [ViewModel] for the [ArticleListActivity]
  */
-class ActivityViewModel @ViewModelInject constructor(
-    @Assisted private val state: SavedStateHandle,
+@HiltViewModel
+class ActivityViewModel @Inject constructor(
+    private val state: SavedStateHandle,
     private val browserLauncher: TtRssBrowserLauncher,
     private val prefs: SharedPreferences
 ) : ViewModel() {

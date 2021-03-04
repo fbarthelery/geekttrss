@@ -25,7 +25,6 @@ import android.view.inputmethod.EditorInfo
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.databinding.InverseMethod
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModel
@@ -36,6 +35,7 @@ import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.webapi.ApiCallException
 import com.geekorum.ttrss.webapi.checkStatus
 import com.geekorum.ttrss.webapi.model.LoginRequestPayload
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
@@ -47,7 +47,8 @@ import javax.inject.Inject
 /**
  * ViewModel for LoginActivity
  */
-internal class LoginViewModel @ViewModelInject constructor(
+@HiltViewModel
+internal class LoginViewModel @Inject constructor(
     private val accountManager: TinyrssAccountManager,
     private val networkComponentBuilder: AuthenticatorNetworkComponent.Builder,
     private val dispatchers: CoroutineDispatchersProvider

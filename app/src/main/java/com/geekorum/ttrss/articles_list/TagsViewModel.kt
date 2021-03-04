@@ -20,12 +20,11 @@
  */
 package com.geekorum.ttrss.articles_list
 
-import androidx.hilt.Assisted
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import com.geekorum.ttrss.session.SessionActivityComponent
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
@@ -33,13 +32,15 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import javax.inject.Inject
 
 /**
  * [ViewModel] for to display the list of tags
  */
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-class TagsViewModel @ViewModelInject constructor(
-    @Assisted private val state: SavedStateHandle,
+@HiltViewModel
+class TagsViewModel @Inject constructor(
+    private val state: SavedStateHandle,
     componentFactory: SessionActivityComponent.Factory
 ) : ViewModel() {
 

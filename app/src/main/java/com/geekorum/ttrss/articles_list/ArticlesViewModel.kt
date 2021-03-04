@@ -21,8 +21,6 @@
 package com.geekorum.ttrss.articles_list
 
 import android.accounts.Account
-import androidx.hilt.Assisted
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -38,19 +36,20 @@ import androidx.paging.PagingSource
 import androidx.paging.cachedIn
 import com.geekorum.geekdroid.accounts.SyncInProgressLiveData
 import com.geekorum.ttrss.background_job.BackgroundJobManager
-import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleWithFeed
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.session.Action
 import com.geekorum.ttrss.session.SessionActivityComponent
 import com.geekorum.ttrss.session.UndoManager
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 private const val STATE_NEED_UNREAD = "need_unread"
 private const val STATE_ORDER_MOST_RECENT_FIRST = "order_most_recent_first" // most_recent_first, oldest_first
@@ -239,8 +238,9 @@ abstract class BaseArticlesViewModel(
  * ViewModel for [ArticlesListFragment]
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-class ArticlesListViewModel @ViewModelInject constructor(
-    @Assisted private val state: SavedStateHandle,
+@HiltViewModel
+class ArticlesListViewModel @Inject constructor(
+    private val state: SavedStateHandle,
     private val feedsRepository: FeedsRepository,
     private val backgroundJobManager: BackgroundJobManager,
     componentFactory: SessionActivityComponent.Factory
@@ -316,8 +316,9 @@ class ArticlesListViewModel @ViewModelInject constructor(
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class ArticlesListByTagViewModel @ViewModelInject constructor(
-    @Assisted private val state: SavedStateHandle,
+@HiltViewModel
+class ArticlesListByTagViewModel @Inject constructor(
+    private val state: SavedStateHandle,
     private val backgroundJobManager: BackgroundJobManager,
     componentFactory: SessionActivityComponent.Factory
 ) : BaseArticlesViewModel(state, componentFactory) {

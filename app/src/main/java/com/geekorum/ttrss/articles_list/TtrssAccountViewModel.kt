@@ -29,7 +29,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
@@ -38,6 +37,7 @@ import com.geekorum.geekdroid.accounts.AccountsListViewModel
 import com.geekorum.geekdroid.app.lifecycle.EmptyEvent
 import com.geekorum.ttrss.accounts.AccountAuthenticator
 import com.geekorum.ttrss.providers.ArticlesContract
+import dagger.hilt.android.lifecycle.HiltViewModel
 import timber.log.Timber
 import javax.inject.Inject
 import com.geekorum.geekdroid.app.lifecycle.EmptyEvent.Companion.makeEmptyEvent as NoAccountSelectedEvent
@@ -45,7 +45,8 @@ import com.geekorum.geekdroid.app.lifecycle.EmptyEvent.Companion.makeEmptyEvent 
 /**
  * ViewModel to contains the differents Accounts from the application
  */
-class TtrssAccountViewModel @ViewModelInject constructor(
+@HiltViewModel
+class TtrssAccountViewModel @Inject constructor(
     accountManager: AccountManager,
     accountSelector: AccountSelector
 ): AccountsListViewModel(accountManager, accountSelector, AccountAuthenticator.TTRSS_ACCOUNT_TYPE) {

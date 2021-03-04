@@ -21,22 +21,24 @@
 package com.geekorum.ttrss.in_app_update
 
 import android.app.Activity
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class InAppUpdateViewModel @ViewModelInject constructor(
+@HiltViewModel
+class InAppUpdateViewModel @Inject constructor(
     private val updateManager: InAppUpdateManager
 ) : ViewModel() {
 

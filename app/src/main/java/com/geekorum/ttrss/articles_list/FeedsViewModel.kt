@@ -20,8 +20,6 @@
  */
 package com.geekorum.ttrss.articles_list
 
-import androidx.hilt.Assisted
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
@@ -32,6 +30,7 @@ import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.session.SessionActivityComponent
 import com.geekorum.ttrss.webapi.ApiCallException
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -41,6 +40,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import javax.inject.Inject
 
 private const val STATE_ONLY_UNREAD = "only_unread"
 private const val STATE_SELECTED_CATEGORY_ID = "selected_category_id"
@@ -49,8 +49,9 @@ private const val STATE_SELECTED_CATEGORY_ID = "selected_category_id"
  * [ViewModel] for to display the list of feeds
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-class FeedsViewModel @ViewModelInject constructor(
-    @Assisted private val state: SavedStateHandle,
+@HiltViewModel
+class FeedsViewModel @Inject constructor(
+    private val state: SavedStateHandle,
     private val dispatchers: CoroutineDispatchersProvider,
     private val feedsRepository: FeedsRepository,
     componentFactory: SessionActivityComponent.Factory
@@ -108,7 +109,7 @@ class FeedsViewModel @ViewModelInject constructor(
         viewModelScope.launch {
             try {
                 refreshFeeds()
-            } catch(e: ApiCallException) {
+            } catch (e: ApiCallException) {
                 Timber.w(e, "Unable to refresh feeds and categories")
             }
         }

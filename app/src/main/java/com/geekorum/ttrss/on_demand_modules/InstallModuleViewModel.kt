@@ -22,7 +22,6 @@ package com.geekorum.ttrss.on_demand_modules
 
 import android.app.Activity
 import androidx.annotation.StringRes
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -37,6 +36,7 @@ import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.INSTALLE
 import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.INSTALLING
 import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.PENDING
 import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.REQUIRES_USER_CONFIRMATION
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -44,7 +44,8 @@ import timber.log.Timber
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
-class InstallModuleViewModel @ViewModelInject constructor(
+@HiltViewModel
+class InstallModuleViewModel @Inject constructor(
     private val moduleManager: OnDemandModuleManager
 ) : ViewModel() {
 

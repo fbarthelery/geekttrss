@@ -26,8 +26,6 @@ import android.content.ContextWrapper
 import android.net.Uri
 import androidx.core.app.ShareCompat
 import androidx.core.net.toUri
-import androidx.hilt.Assisted
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -36,18 +34,21 @@ import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.map
 import androidx.lifecycle.switchMap
 import com.geekorum.ttrss.articles_list.ArticlesRepository
-import com.geekorum.ttrss.session.SessionActivityComponent
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.network.TtRssBrowserLauncher
+import com.geekorum.ttrss.session.SessionActivityComponent
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
 private const val STATE_ARTICLE_ID = "article_id"
 
 /**
  * [ViewModel] for [ArticleDetailActivity] and [ArticleDetailFragment].
  */
-class ArticleDetailsViewModel @ViewModelInject constructor(
-    @Assisted private val state: SavedStateHandle,
+@HiltViewModel
+class ArticleDetailsViewModel @Inject constructor(
+    private val state: SavedStateHandle,
     private val browserLauncher: TtRssBrowserLauncher,
     componentFactory: SessionActivityComponent.Factory
 ) : ViewModel() {
