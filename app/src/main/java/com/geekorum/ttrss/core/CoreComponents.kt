@@ -22,14 +22,8 @@ package com.geekorum.ttrss.core
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentFactory
-import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import com.geekorum.geekdroid.dagger.DaggerDelegateFragmentFactory
-import com.geekorum.geekdroid.dagger.DaggerDelegateSavedStateVMFactory
 import com.geekorum.geekdroid.dagger.FragmentFactoriesModule
 import com.geekorum.ttrss.BatteryFriendlyActivity
 import dagger.Binds
@@ -38,17 +32,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Inject
 
-
-/* We can't rely on Activity default ViewModelProvider.Factory
- * During tests FragmentScenario don't allow us to override the Activity implementation
- * and change the default ViewModelProvider.Factory */
-inline fun <reified VM : ViewModel> BaseFragment.activityViewModels(): Lazy<VM> {
-    return activityViewModels { viewModelsFactory }
-}
-
-inline fun <reified VM : ViewModel> BaseDialogFragment.activityViewModels(): Lazy<VM> {
-    return activityViewModels { viewModelsFactory }
-}
 
 /**
  * As it supports Dagger injection, the Activity must have a corresponding [AndroidInjector]
@@ -72,32 +55,6 @@ open class InjectableBaseActivity : BatteryFriendlyActivity() {
 }
 
 // BaseActivity is flavor dependant but extends InjectableBaseActivity
-
-/**
- * Common base Fragment for the application.
- */
-open class BaseFragment (
-    private val savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator
-) : Fragment() {
-
-    val viewModelsFactory: ViewModelProvider.Factory by lazy {
-        savedStateVmFactoryCreator.create(this, arguments)
-    }
-
-    override fun getDefaultViewModelProviderFactory(): ViewModelProvider.Factory = viewModelsFactory
-
-}
-
-open class BaseDialogFragment (
-    private val savedStateVmFactoryCreator: DaggerDelegateSavedStateVMFactory.Creator
-) : DialogFragment() {
-
-    val viewModelsFactory: ViewModelProvider.Factory by lazy {
-        savedStateVmFactoryCreator.create(this, arguments)
-    }
-
-    override fun getDefaultViewModelProviderFactory(): ViewModelProvider.Factory = viewModelsFactory
-}
 
 
 @Module(includes = [FragmentFactoriesModule::class])
