@@ -21,7 +21,6 @@
 package com.geekorum.ttrss.manage_feeds.add_feed
 
 import android.accounts.Account
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -35,16 +34,19 @@ import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.htmlparsers.FeedInformation
 import com.geekorum.ttrss.manage_feeds.add_feed.FeedsFinder.FeedResult
 import com.geekorum.ttrss.manage_feeds.workers.SubscribeWorker
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import timber.log.Timber
 import java.io.IOException
+import javax.inject.Inject
 
 
 // open for mocking in androidTests
-open class SubscribeToFeedViewModel @ViewModelInject constructor(
+@HiltViewModel
+open class SubscribeToFeedViewModel @Inject constructor(
     private val dispatchers: CoroutineDispatchersProvider,
     private val feedsFinder: FeedsFinder,
     private val workManager: WorkManager,

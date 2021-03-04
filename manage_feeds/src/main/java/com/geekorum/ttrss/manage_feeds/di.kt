@@ -23,14 +23,12 @@ package com.geekorum.ttrss.manage_feeds
 import android.app.Activity
 import android.app.Application
 import androidx.hilt.lifecycle.ViewModelFactoryModules
-import androidx.lifecycle.ViewModelProvider
 import androidx.work.WorkManager
 import androidx.work.WorkerFactory
-import com.geekorum.ttrss.ForceNightModeViewModel_HiltModule
-import com.geekorum.ttrss.articles_list.TtrssAccountViewModel_HiltModule
+import com.geekorum.ttrss.ForceNightModeViewModel_HiltModules
+import com.geekorum.ttrss.articles_list.TtrssAccountViewModel_HiltModules
 import com.geekorum.ttrss.core.CoreFactoriesModule
 import com.geekorum.ttrss.di.FeatureScope
-import com.geekorum.ttrss.features_api.DynamicFeatureViewModelComponent
 import com.geekorum.ttrss.features_api.DynamicFeatureViewModelFactory
 import com.geekorum.ttrss.features_api.DynamicFeatureViewModelModule
 import com.geekorum.ttrss.features_api.ManageFeedsDependencies
@@ -44,7 +42,6 @@ import dagger.Component
 import dagger.Module
 import dagger.Provides
 import dagger.Subcomponent
-import dagger.hilt.android.internal.lifecycle.DefaultActivityViewModelFactory
 import dagger.hilt.migration.DisableInstallInCheck
 
 @Component(dependencies = [ManageFeedsDependencies::class],
@@ -71,10 +68,12 @@ interface ManageFeedActivityModule
 @Subcomponent(modules = [
     SessionAccountModule::class,
     DynamicFeatureViewModelModule::class,
-    ForceNightModeViewModel_HiltModule::class,
-    TtrssAccountViewModel_HiltModule::class,
+    ForceNightModeViewModel_HiltModules.BindsModule::class,
+    ForceNightModeViewModel_HiltModules.KeyModule::class,
+    TtrssAccountViewModel_HiltModules.BindsModule::class,
+    TtrssAccountViewModel_HiltModules.KeyModule::class,
     ViewModelFactoryModules.ActivityModule::class,
-    ManageFeedModule::class
+    ManageFeedModule::class,
 ])
 interface ActivityComponent {
 
@@ -91,7 +90,10 @@ interface ActivityComponent {
     fun inject(addFeedActivity: AddFeedActivity)
 }
 
-@Module(includes = [ManageFeedViewModel_HiltModule::class])
+@Module(includes = [
+    ManageFeedViewModel_HiltModules.BindsModule::class,
+    ManageFeedViewModel_HiltModules.KeyModule::class
+])
 @DisableInstallInCheck
 private class ManageFeedModule
 

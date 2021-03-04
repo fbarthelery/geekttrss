@@ -29,10 +29,16 @@ import dagger.hilt.migration.DisableInstallInCheck
 @DisableInstallInCheck
 abstract class AddFeedModule
 
-@Module(includes = [SubscribeToFeedViewModel_HiltModule::class])
+@Module(includes = [
+    SubscribeToFeedViewModel_HiltModules.BindsModule::class,
+    SubscribeToFeedViewModel_HiltModules.KeyModule::class,
+])
 @DisableInstallInCheck
 private abstract class SubscribeToFeedActivityModule
 
-@Module(includes = [AddFeedViewModel_HiltModule::class])
+@Module(includes = [
+    AddFeedViewModel_HiltModules.BindsModule::class,
+    AddFeedViewModel_HiltModules.KeyModule::class
+])
 @DisableInstallInCheck
 private abstract class AddFeedActivityModule
