@@ -127,9 +127,9 @@ hilt {
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.5.0-alpha05")
-    implementation("androidx.fragment:fragment-ktx:1.2.5")
-    implementation("androidx.activity:activity-ktx:1.1.0")
+    implementation("androidx.core:core-ktx:1.5.0-beta02")
+    implementation("androidx.fragment:fragment-ktx:1.3.0")
+    implementation("androidx.activity:activity-ktx:1.2.0")
 
     // androidx ui
     implementation("androidx.drawerlayout:drawerlayout:1.1.1")
@@ -142,7 +142,7 @@ dependencies {
     // androidx others
     implementation("androidx.browser:browser:1.3.0")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0-RC")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
 
     //geekdroid
@@ -153,7 +153,7 @@ dependencies {
     implementation(project(":webapi"))
     implementation(project(":faviKonSnoop"))
 
-    implementation("com.google.android.material:material:1.2.1")
+    implementation("com.google.android.material:material:1.3.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.6.0")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.6.0")
     implementation("io.coil-kt:coil:1.0.0")
@@ -180,7 +180,7 @@ dependencies {
     val hiltVersion = "$daggerVersion-beta"
     implementation("com.google.dagger:hilt-android:$hiltVersion")
     implementation("androidx.hilt:hilt-work:1.0.0-alpha03")
-    implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha02")
+    implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03")
     kapt("androidx.hilt:hilt-compiler:1.0.0-alpha03")
     kapt("com.google.dagger:hilt-compiler:$hiltVersion")
     testImplementation("com.google.dagger:hilt-android-testing:$hiltVersion")
@@ -223,7 +223,7 @@ dependencies {
     api("androidx.work:work-runtime-ktx:$workVersion")
     api("androidx.room:room-runtime:$roomVersion")
     api("androidx.room:room-ktx:$roomVersion")
-    api("androidx.paging:paging-runtime-ktx:3.0.0-alpha10")
+    api("androidx.paging:paging-runtime-ktx:3.0.0-beta01")
     api("com.squareup.retrofit2:retrofit:2.9.0")
     api("com.squareup.okhttp3:okhttp:4.6.0")
     api("com.jakewharton.timber:timber:4.7.1")
@@ -235,7 +235,7 @@ dependencies {
 
     // fragment testing declare some activities and resources that needs to be in the apk
     // we don't use it. here but it is used in feature modules
-    debugImplementation("androidx.fragment:fragment-testing:1.2.5")
+    debugImplementation("androidx.fragment:fragment-testing:1.3.0")
 
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.4")
 }

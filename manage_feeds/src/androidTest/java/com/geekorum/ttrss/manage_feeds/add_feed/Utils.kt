@@ -27,13 +27,16 @@ import android.os.Bundle
 import androidx.annotation.StyleRes
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.testing.FragmentScenario.EmptyFragmentActivity
 import androidx.fragment.testing.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import com.geekorum.ttrss.manage_feeds.ViewModelProvidedActivity
+
+/* Copied from androidx.fragment.app.testing.FragmentScenario.EmptyFragmentActivity.THEME_EXTRAS_BUNDLE_KEY */
+const val THEME_EXTRAS_BUNDLE_KEY = "androidx.fragment.app.testing.FragmentScenario" +
+    ".EmptyFragmentActivity.THEME_EXTRAS_BUNDLE_KEY"
 
 /**
  * launchFragmentInContainer from the androidx.fragment:fragment-testing library
@@ -57,7 +60,7 @@ internal inline fun <reified F : Fragment> launchFragmentInViewModelProvidedActi
             ApplicationProvider.getApplicationContext<Application>(),
             ViewModelProvidedActivity::class.java
         )
-    ).putExtra(EmptyFragmentActivity.THEME_EXTRAS_BUNDLE_KEY, themeResId)
+    ).putExtra(THEME_EXTRAS_BUNDLE_KEY, themeResId)
 
     val scenario = FragmentScenario(F::class.java,
         ActivityScenario.launch<ViewModelProvidedActivity>(startActivityIntent))
