@@ -65,7 +65,8 @@ class ArticleFullTextSearchTest {
 
     @Test
     fun testAnFTSSearchPagedList() {
-        val expected = Article(
+        val expected = ArticleWithFeed(
+            article = Article(
             id = 1,
             contentData = ArticleContentIndexed(
                 title = "Comment Linux est devenu un enjeu strategique pour la silicon valley",
@@ -85,7 +86,17 @@ class ArticleFullTextSearchTest {
             link = "article links",
             flavorImageUri = "article flavor image uri",
             contentExcerpt = "a content excerpt"
-        )
+        ),
+        feed = Feed(id = 1,
+            url = "feed url",
+            title = "feed title",
+            catId = 0,
+            displayTitle = "display title",
+            lastTimeUpdate = 0,
+            unreadCount = 2,
+            isSubscribed = true,
+            feedIconUrl = "http://exemple.com/1.ico"
+        ))
 
         val articleDao = database.articleDao()
         val differ = AsyncPagingDataDiffer(ARTICLE_DIFF_CALLBACK, NoOpUpdateCallback)

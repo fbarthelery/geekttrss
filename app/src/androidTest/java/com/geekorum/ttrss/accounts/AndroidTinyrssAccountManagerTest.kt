@@ -114,7 +114,7 @@ class AndroidTinyrssAccountManagerTest {
 
         accountManager.initializeAccountSync(modelAccount)
         // the system needs some time to initialize
-        runBlocking{ delay(500) }
+        runBlocking{ delay(1000) }
 
         val syncAutomatically = ContentResolver.getSyncAutomatically(androidAccount, ArticlesContract.AUTHORITY)
         assertThat(syncAutomatically).isTrue()
