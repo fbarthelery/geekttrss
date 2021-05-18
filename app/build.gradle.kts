@@ -171,22 +171,21 @@ dependencies {
     dualTestImplementation("androidx.arch.core:core-testing:2.1.0")
 
     // dagger
-    val daggerVersion = "2.33"
+    val daggerVersion = "2.35.1"
     implementation(enforcedDaggerPlatform(daggerVersion))
     kapt(enforcedDaggerPlatform(daggerVersion))
     implementation("com.google.dagger:dagger:$daggerVersion")
     kapt("com.google.dagger:dagger-compiler:$daggerVersion")
     kaptTest("com.google.dagger:dagger-compiler:$daggerVersion")
-    val hiltVersion = "$daggerVersion-beta"
-    implementation("com.google.dagger:hilt-android:$hiltVersion")
-    implementation("androidx.hilt:hilt-work:1.0.0-alpha03")
+    implementation("com.google.dagger:hilt-android:$daggerVersion")
+    implementation("androidx.hilt:hilt-work:1.0.0")
     implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03")
-    kapt("androidx.hilt:hilt-compiler:1.0.0-alpha03")
-    kapt("com.google.dagger:hilt-compiler:$hiltVersion")
-    testImplementation("com.google.dagger:hilt-android-testing:$hiltVersion")
-    kaptTest("com.google.dagger:hilt-compiler:$hiltVersion")
-    androidTestImplementation("com.google.dagger:hilt-android-testing:$hiltVersion")
-    kaptAndroidTest("com.google.dagger:hilt-compiler:$hiltVersion")
+    kapt("androidx.hilt:hilt-compiler:1.0.0")
+    kapt("com.google.dagger:hilt-compiler:$daggerVersion")
+    testImplementation("com.google.dagger:hilt-android-testing:$daggerVersion")
+    kaptTest("com.google.dagger:hilt-compiler:$daggerVersion")
+    androidTestImplementation("com.google.dagger:hilt-android-testing:$daggerVersion")
+    kaptAndroidTest("com.google.dagger:hilt-compiler:$daggerVersion")
 
 
     val roomVersion = "2.3.0-alpha02"

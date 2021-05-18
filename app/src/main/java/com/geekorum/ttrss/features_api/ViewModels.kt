@@ -24,100 +24,102 @@ import android.app.Application
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.AbstractSavedStateViewModelFactory
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.SavedStateViewModelFactory
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.*
 import androidx.savedstate.SavedStateRegistryOwner
 import dagger.BindsInstance
 import dagger.Module
 import dagger.Subcomponent
-import dagger.hilt.EntryPoints
-import dagger.hilt.android.components.ViewModelComponent
-import dagger.hilt.android.internal.builders.ViewModelComponentBuilder
-import dagger.hilt.android.internal.lifecycle.DefaultActivityViewModelFactory
-import dagger.hilt.android.internal.lifecycle.DefaultFragmentViewModelFactory
-import dagger.hilt.android.internal.lifecycle.HiltViewModelFactory
-import dagger.hilt.android.internal.lifecycle.HiltViewModelFactory.ViewModelFactoriesEntryPoint
 import dagger.hilt.android.internal.lifecycle.HiltViewModelMap
-import dagger.hilt.android.internal.lifecycle.HiltWrapper_HiltViewModelFactory_ViewModelModule
 import dagger.hilt.android.scopes.ViewModelScoped
+import dagger.hilt.migration.DisableInstallInCheck
 import dagger.multibindings.Multibinds
 import javax.inject.Inject
+import javax.inject.Provider
+
+/*
+ * Simplified Fork of [dagger.hilt.android.internal.lifecycle.DefaultViewModelFactories] from
+ * com.google.dagger:hilt-android:2.31.2 to not use hilt features (entrypoint)
+ */
 
 /**
- * Use [DynamicFeatureViewModelFactory.fromActivity] and [DynamicFeatureViewModelFactory.fromFragment]
- * to get the [ViewModelProvider.Factory] for your activity or fragment
+ * Modules and entry points for the default view model factory used by activities and fragments
+ * annotated with @AndroidEntryPoint.
+ *
+ *
+ * Entry points are used to acquire the factory because injected fields in the generated
+ * activities and fragments are ignored by Dagger when using the transform due to the generated
+ * class not being part of the hierarchy during compile time.
  */
-class DynamicFeatureViewModelFactory @Inject constructor(
-    private val application: Application,
-    @HiltViewModelMap.KeySet
-    private val keySet: Set<String>,
-    private val viewModelComponentBuilder: DynamicFeatureViewModelComponent.Builder,
-    @DefaultActivityViewModelFactory
-    private val defaultActivityFactorySet: MutableSet<ViewModelProvider.Factory?>,
-    @DefaultFragmentViewModelFactory
-    private val defaultFragmentFactorySet: MutableSet<ViewModelProvider.Factory?>
-) {
+object DefaultViewModelFactories {
 
-    private var defaultActivityFactory = getFactoryFromSet(defaultActivityFactorySet)
-    private var defaultFragmentFactory = getFactoryFromSet(defaultFragmentFactorySet)
+    /** Internal factory for the Hilt ViewModel Factory.  */
+    class InternalFactoryFactory @Inject constructor(
+        private val application: Application,
+        @param:HiltViewModelMap.KeySet
+        private val keySet: Set<String>,
+        private val viewModelComponentBuilder: ViewModelComponent.Builder,
+    ) {
 
-    fun fromActivity(activity: ComponentActivity): ViewModelProvider.Factory {
-        return getHiltViewModelFactory(activity,
-            if (activity.intent != null) activity.intent.extras else null,
-            defaultActivityFactory)
-    }
-
-    fun fromFragment(fragment: Fragment): ViewModelProvider.Factory {
-        return getHiltViewModelFactory(fragment, fragment.arguments, defaultFragmentFactory)
-    }
-
-    private fun getHiltViewModelFactory(
-        owner: SavedStateRegistryOwner,
-        defaultArgs: Bundle?,
-        extensionDelegate: ViewModelProvider.Factory?): ViewModelProvider.Factory {
-        val delegate = extensionDelegate
-            ?: SavedStateViewModelFactory(application, owner, defaultArgs)
-        return HiltDynamicFeatureViewModelFactory(
-            owner, defaultArgs, keySet, delegate, viewModelComponentBuilder)
-    }
-
-    private fun getFactoryFromSet(set: Set<ViewModelProvider.Factory?>): ViewModelProvider.Factory? {
-        // A multibinding set is used instead of BindsOptionalOf because Optional is not available in
-        // Android until API 24 and we don't want to have Guava as a transitive dependency.
-        if (set.isEmpty()) {
-            return null
+        fun fromActivity(activity: ComponentActivity, delegateFactory: ViewModelProvider.Factory): ViewModelProvider.Factory {
+            return getHiltViewModelFactory(activity,
+                activity.intent?.extras,
+                delegateFactory)
         }
-        check(set.size <= 1) { "At most one default view model factory is expected. Found $set" }
-        return set.iterator().next()
-            ?: throw IllegalStateException("Default view model factory must not be null.")
+
+        fun fromFragment(fragment: Fragment, delegateFactory: ViewModelProvider.Factory): ViewModelProvider.Factory {
+            return getHiltViewModelFactory(fragment, fragment.arguments, delegateFactory)
+        }
+
+        private fun getHiltViewModelFactory(
+            owner: SavedStateRegistryOwner,
+            defaultArgs: Bundle?,
+            extensionDelegate: ViewModelProvider.Factory?
+        ): ViewModelProvider.Factory {
+            val delegate = extensionDelegate
+                ?: SavedStateViewModelFactory(application, owner, defaultArgs)
+            return HiltViewModelFactory(
+                owner, defaultArgs, keySet, delegate, viewModelComponentBuilder)
+        }
+
     }
+
+    /** The activity module to declare the optional factories.  */
+    @Module(includes = [DynamicFeatureViewModelModule::class])
+    @DisableInstallInCheck
+    interface ActivityModule {
+        @Multibinds
+        @HiltViewModelMap.KeySet
+        fun viewModelKeys(): Set<String?>
+
+    }
+
 }
 
 /**
- * Fork of [HiltViewModelFactory] to not use [EntryPoints] and work with non Hilt generated component
+ * View Model Provider Factory for the Hilt Extension.
+ *
  */
-class HiltDynamicFeatureViewModelFactory(
-    private val owner: SavedStateRegistryOwner,
-    private val defaultArgs: Bundle?,
+private class HiltViewModelFactory(
+    owner: SavedStateRegistryOwner,
+    defaultArgs: Bundle?,
     private val hiltViewModelKeys: Set<String>,
     private val delegateFactory: ViewModelProvider.Factory,
-    private val viewModelComponentBuilder: DynamicFeatureViewModelComponent.Builder
-) : ViewModelProvider.Factory{
+    viewModelComponentBuilder: ViewModelComponent.Builder
+) : ViewModelProvider.Factory {
 
-    private val hiltViewModelFactory = object : AbstractSavedStateViewModelFactory(owner, defaultArgs) {
-        override fun <T : ViewModel?> create(
-            key: String, modelClass: Class<T>, handle: SavedStateHandle): T {
-            val component = viewModelComponentBuilder.savedStateHandle(handle).build()
-            val provider = checkNotNull(component.hiltViewModelMap[modelClass.name]) {
-                "Expected the @HiltViewModel-annotated class '${modelClass.name}' to be " +
-                    "available in the multi-binding of @HiltViewModelMap but none was found."
+    private val hiltViewModelFactory: AbstractSavedStateViewModelFactory =
+        object : AbstractSavedStateViewModelFactory(owner, defaultArgs) {
+            override fun <T : ViewModel?> create(
+                key: String, modelClass: Class<T>, handle: SavedStateHandle
+            ): T {
+                val component = viewModelComponentBuilder.savedStateHandle(handle).build()
+
+                val provider = component.hiltViewModelMap[modelClass.name]
+                    ?: throw IllegalStateException(
+                        "Expected the @HiltViewModel-annotated class '${modelClass.name}' to be available in the multi-binding of @HiltViewModelMap but none was found.")
+                return provider.get() as T
             }
-            return provider.get() as T
         }
-    }
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return if (hiltViewModelKeys.contains(modelClass.name)) {
@@ -128,41 +130,21 @@ class HiltDynamicFeatureViewModelFactory(
     }
 }
 
-/**
- * To add viewmodels, annotate them with @HiltViewModel and add the generated modules to your component
- * ex :
- * ```
- *
- *   @HiltViewModel
- *   class AddFeedViewModel @Inject constructor(
- *   ...
- *
- *   @Module(includes = [
- *       AddFeedViewModel_HiltModules.BindsModule::class,
- *      AddFeedViewModel_HiltModules.KeyModule::class
- *   ])
- * ```
- */
-@Module(subcomponents = [DynamicFeatureViewModelComponent::class])
-abstract class DynamicFeatureViewModelModule {
+//TODO put this under an ActivityRetained component
+// see hilt ActivityRetainedComponentManager
+@Module(subcomponents = [ViewModelComponent::class])
+@DisableInstallInCheck
+object DynamicFeatureViewModelModule
 
-    @Multibinds
-    @DefaultActivityViewModelFactory
-    abstract fun defaultActivityViewModelFactory(): MutableSet<ViewModelProvider.Factory?>
-
-    @Multibinds
-    @DefaultFragmentViewModelFactory
-    abstract fun defaultFragmentViewModelFactory(): MutableSet<ViewModelProvider.Factory?>
-}
-
-@Subcomponent(modules = [HiltWrapper_HiltViewModelFactory_ViewModelModule::class])
+@Subcomponent
 @ViewModelScoped
-interface DynamicFeatureViewModelComponent : ViewModelComponent,
-    ViewModelFactoriesEntryPoint {
+interface ViewModelComponent {
+    @get:HiltViewModelMap
+    val hiltViewModelMap: Map<String, Provider<ViewModel>>
 
     @Subcomponent.Builder
-    interface Builder : ViewModelComponentBuilder {
-        override fun savedStateHandle(@BindsInstance handle: SavedStateHandle): Builder
-        override fun build(): DynamicFeatureViewModelComponent
+    interface Builder {
+        fun savedStateHandle(@BindsInstance savedStateHandle: SavedStateHandle): Builder
+        fun build(): ViewModelComponent
     }
 }

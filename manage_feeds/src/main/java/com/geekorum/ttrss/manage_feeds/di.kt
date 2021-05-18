@@ -29,7 +29,7 @@ import com.geekorum.ttrss.ForceNightModeViewModel_HiltModules
 import com.geekorum.ttrss.articles_list.TtrssAccountViewModel_HiltModules
 import com.geekorum.ttrss.core.CoreFactoriesModule
 import com.geekorum.ttrss.di.FeatureScope
-import com.geekorum.ttrss.features_api.DynamicFeatureViewModelFactory
+import com.geekorum.ttrss.features_api.DefaultViewModelFactories
 import com.geekorum.ttrss.features_api.DynamicFeatureViewModelModule
 import com.geekorum.ttrss.features_api.ManageFeedsDependencies
 import com.geekorum.ttrss.manage_feeds.add_feed.AddFeedActivity
@@ -82,7 +82,7 @@ interface ActivityComponent {
         fun newComponent(@BindsInstance activity: Activity): ActivityComponent
     }
 
-    val dynamicFeatureViewModelFactory: DynamicFeatureViewModelFactory
+    val hiltViewModelFactoryFactory: DefaultViewModelFactories.InternalFactoryFactory
 
 
     // inject required to provide daggerDelegateFragmentFactory for fragment constructor injection.

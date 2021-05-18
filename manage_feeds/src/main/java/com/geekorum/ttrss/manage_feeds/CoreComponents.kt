@@ -25,18 +25,20 @@ import com.geekorum.ttrss.applicationComponent
 import com.geekorum.ttrss.session.SessionActivity
 
 open class BaseSessionActivity : SessionActivity() {
-    private lateinit var vmProviderFactory:  ViewModelProvider.Factory
+    private lateinit var activityComponent: ActivityComponent
 
     override fun inject() {
         val manageFeedComponent = DaggerManageFeedComponent.builder()
             .manageFeedsDependencies(applicationComponent)
             .build()
-        val activityComponent = manageFeedComponent
+        activityComponent = manageFeedComponent
             .createActivityComponent()
             .newComponent(this)
         activityComponent.inject(this)
-        vmProviderFactory = activityComponent.dynamicFeatureViewModelFactory.fromActivity(this)
     }
 
-    override fun getDefaultViewModelProviderFactory(): ViewModelProvider.Factory = vmProviderFactory
+    override fun getDefaultViewModelProviderFactory(): ViewModelProvider.Factory {
+        return activityComponent.hiltViewModelFactoryFactory.fromActivity(this,
+            super.getDefaultViewModelProviderFactory())
+    }
 }

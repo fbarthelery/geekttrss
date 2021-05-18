@@ -39,6 +39,7 @@ import com.geekorum.geekdroid.app.BottomSheetDialogActivity
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.applicationComponent
 import com.geekorum.ttrss.debugtools.withStrictMode
+import com.geekorum.ttrss.manage_feeds.ActivityComponent
 import com.geekorum.ttrss.manage_feeds.DaggerManageFeedComponent
 import com.geekorum.ttrss.manage_feeds.R
 import com.geekorum.ttrss.manage_feeds.databinding.ActivityAddFeedBinding
@@ -56,11 +57,11 @@ import com.geekorum.ttrss.R as appR
  */
 class AddFeedActivity : BottomSheetDialogActivity() {
 
-    private lateinit var viewModelFactory: ViewModelProvider.Factory
+    private lateinit var activityComponent: ActivityComponent
 
     private lateinit var feedAdapter: FeedAdapter
     private lateinit var accountsAdapter: AccountsAdapter
-    private val viewModel: AddFeedViewModel by viewModels { viewModelFactory }
+    private val viewModel: AddFeedViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         inject()
@@ -119,11 +120,15 @@ class AddFeedActivity : BottomSheetDialogActivity() {
         val manageFeedComponent = DaggerManageFeedComponent.builder()
             .manageFeedsDependencies(applicationComponent)
             .build()
-        val activityComponent = manageFeedComponent
+        activityComponent = manageFeedComponent
             .createActivityComponent()
             .newComponent(this)
         activityComponent.inject(this)
-        viewModelFactory = activityComponent.dynamicFeatureViewModelFactory.fromActivity(this)
+    }
+
+    override fun getDefaultViewModelProviderFactory(): ViewModelProvider.Factory {
+        return activityComponent.hiltViewModelFactoryFactory.fromActivity(this,
+            super.getDefaultViewModelProviderFactory())
     }
 
 }
