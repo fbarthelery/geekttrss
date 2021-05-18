@@ -28,6 +28,7 @@ import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.JsonTransformingSerializer
 import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.int
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonPrimitive
@@ -134,6 +135,9 @@ data class Headline(
 
     @SerialName("flavor_stream")
     val flavorStream: String? = "",
+    @SerialName("flavor_kind")
+    @Serializable(with = FlavorKind.OrdinalIntSerializer::class)
+    val flavorKind: FlavorKind = FlavorKind.NONE,
     val attachments: List<Attachment> = emptyList(),
 
     // unuseful for now
@@ -147,6 +151,30 @@ data class Headline(
         LocalDateTime.ofEpochSecond(lastUpdatedTimestamp, 0, ZoneOffset.UTC)
     }
 
+}
+
+@Serializable
+enum class FlavorKind {
+    NONE,
+    ALBUM,
+    VIDEO,
+    YOUTUBE;
+
+    /**
+     * Enum values are written as int
+     */
+    internal object OrdinalIntSerializer : JsonTransformingSerializer<FlavorKind>(serializer()) {
+        override fun transformDeserialize(element: JsonElement): JsonElement {
+            val enumOrdinal = element.jsonPrimitive.intOrNull ?: return element
+            val enumValue = values()[enumOrdinal]
+            return JsonPrimitive(enumValue.toString())
+        }
+
+        override fun transformSerialize(element: JsonElement): JsonElement {
+            val enumValue = valueOf(element.jsonPrimitive.content)
+            return JsonPrimitive(enumValue.ordinal)
+        }
+    }
 }
 
 

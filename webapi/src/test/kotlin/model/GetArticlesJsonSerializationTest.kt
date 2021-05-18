@@ -148,7 +148,8 @@ class GetArticlesJsonSerializationTest {
               "note": null,
               "lang": "",
               "flavor_image":"https:\/\/discourse.tt-rss.org\/user_avatar\/discourse.tt-rss.org\/fox\/40\/889_2.png",
-              "flavor_stream":""
+              "flavor_stream":"",
+              "flavor_kind": 1
             },
             {
               "always_display_attachments" : false,
@@ -266,7 +267,9 @@ class GetArticlesJsonSerializationTest {
                     author = "anonymous",
                     score = 0, note = null, lang = "",
                     flavorImage = "https://discourse.tt-rss.org/user_avatar/discourse.tt-rss.org/fox/40/889_2.png",
-                    flavorStream = ""),
+                    flavorStream = "",
+                    flavorKind = FlavorKind.ALBUM,
+                ),
                     Headline(id = 694227, unread = false, marked = false, published = false, lastUpdatedTimestamp = 1574440244,
                             isUpdated = false, title = "The One About Disney",
                             link = "https://randsinrepose.com/archives/the-one-about-disney/",
