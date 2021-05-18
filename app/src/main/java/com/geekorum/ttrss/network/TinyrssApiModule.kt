@@ -20,6 +20,7 @@
  */
 package com.geekorum.ttrss.network
 
+import com.geekorum.ttrss.BuildConfig
 import com.geekorum.ttrss.accounts.ServerInformation
 import com.geekorum.ttrss.webapi.BasicAuthAuthenticator
 import com.geekorum.ttrss.webapi.LoggedRequestInterceptorFactory
@@ -74,6 +75,7 @@ abstract class TinyrssApiModule {
             }
             val jsonConverterFactory = Json {
                 encodeDefaults = true
+                ignoreUnknownKeys = !BuildConfig.DEBUG
             }.asConverterFactory("application/json".toMediaType())
             retrofitBuilder.addConverterFactory(jsonConverterFactory)
                 .client(okHttpClient)
