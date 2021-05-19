@@ -25,8 +25,12 @@ import android.accounts.AccountManager
 import com.geekorum.geekdroid.accounts.AccountTokenRetriever
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.webapi.TokenRetriever
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.actor
+import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
+import kotlin.time.TimeMark
+import kotlin.time.TimeSource
 
 /**
  * An [AccountTokenRetriever] for Tinyrss.
@@ -36,17 +40,64 @@ internal class TinyrssAccountTokenRetriever(
     private val dispatchers: CoroutineDispatchersProvider,
     accountManager: AccountManager,
     account: Account
-) : AccountTokenRetriever(
+) : TokenRetriever, AccountTokenRetriever(
     accountManager,
     AccountAuthenticator.TTRSS_AUTH_TOKEN_SESSION_ID,
     account,
-    true), TokenRetriever {
+    true
+) {
 
-    override suspend fun getToken(): String = withContext(dispatchers.io) {
+    @OptIn(ObsoleteCoroutinesApi::class, DelicateCoroutinesApi::class, ExperimentalTime::class)
+    private val mailbox = GlobalScope.actor<Message>{
+        var lastMsg: Message? = null
+        var lastMsgTimeMark: TimeMark? = null
+        for (msg in channel) {
+            when {
+                msg is Message.GetToken -> {
+                    val result = runCatching {
+                        getTokenInternal()
+                    }
+                    msg.token.completeWith(result)
+                }
+                msg is Message.InvalidateToken && lastMsg == msg
+                -> {
+                    val invalidate = (lastMsgTimeMark == null || lastMsgTimeMark.elapsedNow() >= Duration.seconds(6))
+                    if (invalidate) {
+                        invalidateTokenInternal()
+                        lastMsgTimeMark = TimeSource.Monotonic.markNow()
+                    }
+                }
+            }
+            lastMsg = msg
+        }
+    }
+
+    override suspend fun getToken(): String {
+        val response = CompletableDeferred<String>()
+        val getMsg = Message.GetToken(response)
+        mailbox.send(getMsg)
+        return response.await()
+    }
+
+    override suspend fun invalidateToken() {
+        mailbox.send(Message.InvalidateToken)
+    }
+
+
+    private suspend fun getTokenInternal(): String = withContext(dispatchers.io) {
         try {
             super.getToken()
         } catch (e: com.geekorum.geekdroid.network.TokenRetriever.RetrieverException) {
             throw TokenRetriever.RetrieverException("unable to retrieve token from account", e)
         }
+    }
+
+    private suspend fun invalidateTokenInternal() {
+        super.invalidateToken()
+    }
+
+    private sealed class Message {
+        class GetToken(val token: CompletableDeferred<String>) : Message()
+        object InvalidateToken: Message()
     }
 }
