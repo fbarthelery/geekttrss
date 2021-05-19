@@ -79,6 +79,10 @@ class BackgroundJobManager @Inject constructor(
         return impl.isRefreshingStatus(feedId)
     }
 
+    fun cancelRefresh(account: Account) {
+        impl.cancelRefresh(account)
+    }
+
     fun setupPeriodicJobs() {
         setupPeriodicPurge()
     }
@@ -125,6 +129,9 @@ private class BackgroundJobManagerNougatImpl(
 private open class BackgroundJobManagerImpl internal constructor(
     protected var context: Context
 ) {
+    companion object {
+        const val WM_TAG_REFRESH_FEED =  "refresh-feed"
+    }
 
     fun refresh(account: Account) {
         val extras = Bundle()
@@ -144,23 +151,27 @@ private open class BackgroundJobManagerImpl internal constructor(
         val sendTransactionsRequest = OneTimeWorkRequestBuilder<SendTransactionsWorker>()
                 .setConstraints(constraints)
                 .setInputData(inputData)
+                .addTag(WM_TAG_REFRESH_FEED)
                 .build()
 
         val syncFeeds = OneTimeWorkRequestBuilder<SyncFeedsWorker>()
                 .setConstraints(constraints)
                 .setInputData(inputData)
+                .addTag(WM_TAG_REFRESH_FEED)
                 .build()
 
         inputData = CollectNewArticlesWorker.getInputData(account, feedId)
         val collectNewArticleRequest = OneTimeWorkRequestBuilder<CollectNewArticlesWorker>()
                 .setConstraints(constraints)
                 .setInputData(inputData)
+                .addTag(WM_TAG_REFRESH_FEED)
                 .build()
 
         inputData = UpdateArticleStatusWorker.getInputData(account, feedId)
         val updateStatusRequest = OneTimeWorkRequestBuilder<UpdateArticleStatusWorker>()
                 .setConstraints(constraints)
                 .setInputData(inputData)
+                .addTag(WM_TAG_REFRESH_FEED)
                 .build()
 
         val workName = "refresh-feed-$feedId"
@@ -210,6 +221,13 @@ private open class BackgroundJobManagerImpl internal constructor(
         WorkManager.getInstance(context)
             .enqueueUniquePeriodicWork(
                 BackgroundJobManager.PERIODIC_PURGE_JOB, ExistingPeriodicWorkPolicy.KEEP, request)
+    }
+
+    fun cancelRefresh(account: Account) {
+        Timber.i("Cancel refresh for $account")
+        ContentResolver.cancelSync(account, ArticlesContract.AUTHORITY)
+        WorkManager.getInstance(context)
+            .cancelAllWorkByTag(WM_TAG_REFRESH_FEED)
     }
 
 }

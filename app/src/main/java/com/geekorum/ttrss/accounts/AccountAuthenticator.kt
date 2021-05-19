@@ -32,6 +32,7 @@ import android.util.Log
 import androidx.core.os.bundleOf
 import com.geekorum.ttrss.BuildConfig
 import com.geekorum.ttrss.R
+import com.geekorum.ttrss.background_job.BackgroundJobManager
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.webapi.ApiCallException
 import com.geekorum.ttrss.webapi.checkStatus
@@ -41,10 +42,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-
 import java.io.IOException
 import java.util.concurrent.ExecutionException
-
 import javax.inject.Inject
 
 class AccountAuthenticator @Inject
@@ -52,6 +51,7 @@ internal constructor(
     @ApplicationContext private val context: Context,
     private val dispatchers: CoroutineDispatchersProvider,
     private val accountManager: AndroidTinyrssAccountManager,
+    private val backgroundJobManager: BackgroundJobManager,
     private val authenticatorBuilder: AuthenticatorNetworkComponent.Builder
 ) : AbstractAccountAuthenticator(context) {
 
@@ -108,6 +108,7 @@ internal constructor(
             )
         } catch (e: ApiCallException) {
             if (e.errorCode === ApiCallException.ApiError.LOGIN_FAILED) {
+                backgroundJobManager.cancelRefresh(account)
                 Timber.w("Login failed: Invalid credentials")
                 return getRevalidateCredentialResponse(account)
             }
