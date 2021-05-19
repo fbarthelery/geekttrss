@@ -91,15 +91,15 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
 
-    implementation("androidx.activity:activity-ktx:1.2.0")
+    implementation("androidx.activity:activity-ktx:1.2.3")
 
     // androidx UI
     implementation("androidx.constraintlayout:constraintlayout:2.0.4")
-    implementation("androidx.recyclerview:recyclerview:1.1.0")
+    implementation("androidx.recyclerview:recyclerview:1.2.0")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.1.0")
     implementation("com.google.android.material:material:1.3.0")
 
-    implementation("androidx.core:core-ktx:1.3.2")
+    implementation("androidx.core:core-ktx:1.5.0")
 
     val lifecycleVersion = "2.2.0"
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
@@ -110,22 +110,22 @@ dependencies {
     implementation(project(":htmlparsers"))
     implementation(project(":webapi"))
 
-    implementation("io.coil-kt:coil:1.0.0")
+    implementation("io.coil-kt:coil:1.2.0")
 
-    androidTestImplementation("androidx.work:work-testing:2.5.0")
+    androidTestImplementation("androidx.work:work-testing:2.6.0-alpha02")
     dualTestImplementation("androidx.arch.core:core-testing:2.1.0")
     androidTestImplementation("com.squareup.okhttp3:mockwebserver:4.6.0")
 
-    debugImplementation("androidx.fragment:fragment-testing:1.3.0")
+    debugImplementation("androidx.fragment:fragment-testing:1.3.4")
 
     // the test apk need these dependencies because they provide some of its resources
     // likely due to manifest merging with :app manifest
     androidTestImplementation("androidx.fragment:fragment-testing:1.3.0")
-    androidTestImplementation("com.squareup.leakcanary:leakcanary-android:2.4")
+    androidTestImplementation("com.squareup.leakcanary:leakcanary-android:2.7")
     androidTestImplementation("com.google.android.gms:play-services-oss-licenses:17.0.0")
     androidTestImplementation("com.google.android.play:core-ktx:1.8.1")
 
     // used in test through geekdroid
-    androidTestImplementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.3.0")
+    androidTestImplementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.3.1")
 
 }

@@ -27,13 +27,13 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(enforcedPlatform(kotlin("bom")))
 
-    api("com.squareup.okhttp3:okhttp:4.6.0")
-    api("com.squareup.okio:okio:2.9.0")
+    api("com.squareup.okhttp3:okhttp:4.9.1")
+    api("com.squareup.okio:okio:2.10.0")
     implementation("javax.inject:javax.inject:1")
     implementation("org.jsoup:jsoup:1.10.2")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
 
-    testImplementation("com.google.truth:truth:1.0")
+    testImplementation("com.google.truth:truth:1.1.2")
     testImplementation(kotlin("test-junit"))
-    testImplementation("io.mockk:mockk:1.10.3")
+    testImplementation("io.mockk:mockk:1.11.0")
 }
