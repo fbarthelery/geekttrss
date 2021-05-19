@@ -88,7 +88,7 @@ class ArticleDetailsViewModel @Inject constructor(
     fun openUrlInBrowser(context: Context, uri: Uri) = browserLauncher.launchUrl(context, uri)
 
     fun shareArticle(activity: Activity) {
-        val shareIntent = ShareCompat.IntentBuilder.from(activity)
+        val shareIntent = ShareCompat.IntentBuilder(activity)
         article.value?.let {
             shareIntent.setSubject(it.title)
                 .setHtmlText(it.content)

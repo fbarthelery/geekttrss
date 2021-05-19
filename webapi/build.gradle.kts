@@ -28,15 +28,15 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(enforcedPlatform(kotlin("bom")))
 
-    implementation("androidx.annotation:annotation:1.1.0")
+    implementation("androidx.annotation:annotation:1.2.0")
     implementation("javax.inject:javax.inject:1")
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0-RC")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.0")
 
-    implementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.4.2"))
+    implementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.5.0"))
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core")
 
 
-    testImplementation("com.google.truth:truth:1.0")
+    testImplementation("com.google.truth:truth:1.1.2")
     testImplementation(kotlin("test-junit"))
 }

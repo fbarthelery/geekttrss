@@ -53,7 +53,7 @@ class TagsViewModel @Inject constructor(
         .asLiveData()
 
     fun refresh() {
-        refreshTagsChannel.offer(Any())
+        refreshTagsChannel.trySend(Any())
     }
 
 }

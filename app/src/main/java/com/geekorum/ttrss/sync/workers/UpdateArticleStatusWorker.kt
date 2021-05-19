@@ -96,7 +96,7 @@ class UpdateArticleStatusWorker @AssistedInject constructor(
                 else offset < numberOfLatestArticlesToRefresh
             }
 
-            while (newRequestChannel.offer(offset)) {
+            while (newRequestChannel.trySend(offset).isSuccess) {
                 offset += 50
             }
 

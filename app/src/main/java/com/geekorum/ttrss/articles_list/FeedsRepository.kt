@@ -52,7 +52,7 @@ class FeedsRepository
 
     private suspend fun addSpecialFeeds(feeds: List<Feed>): List<Feed> {
         // add special feeds
-        val totalUnread = feeds.sumBy { it.unreadCount }
+        val totalUnread = feeds.sumOf { it.unreadCount }
         val allArticles = Feed.createVirtualFeedForId(Feed.FEED_ID_ALL_ARTICLES, totalUnread)
 
         //TODO calculate how much articles by special feeds

@@ -24,6 +24,7 @@ import com.geekorum.ttrss.data.Article
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
+import java.util.*
 import java.util.regex.Pattern
 
 private const val EXCERPT_MAX_LENGTH = 256
@@ -45,7 +46,7 @@ internal class ArticleAugmenter constructor(
         }
 
         flavorImageElement?.let { element ->
-            when (element.tagName().toLowerCase()) {
+            when (element.tagName().lowercase()) {
                 "iframe" -> {
                     val srcEmbed = element.attr("src")
 
@@ -82,8 +83,8 @@ internal class ArticleAugmenter constructor(
 
     private fun findFlavorImageElement(): Element? {
         val mediaList = articleDocument.select("img,video,iframe[src*=youtube.com/embed/]")
-        val iframe = mediaList.firstOrNull { element -> "iframe" == element.tagName().toLowerCase() }
-        val img = mediaList.firstOrNull { element -> "img" == element.tagName().toLowerCase() }
+        val iframe = mediaList.firstOrNull { element -> "iframe" == element.tagName().lowercase() }
+        val img = mediaList.firstOrNull { element -> "img" == element.tagName().lowercase() }
 
         return iframe ?: img
     }

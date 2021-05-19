@@ -179,7 +179,7 @@ abstract class CardEventHandler(
     }
 
     protected fun createShareIntent(activity: Activity, article: Article): Intent {
-        val shareIntent = ShareCompat.IntentBuilder.from(activity)
+        val shareIntent = ShareCompat.IntentBuilder(activity)
         shareIntent.setSubject(article.title)
             .setHtmlText(article.content)
             .setText(article.link)
