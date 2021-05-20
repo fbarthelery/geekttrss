@@ -21,19 +21,8 @@
 package com.geekorum.ttrss.articles_list
 
 import android.accounts.Account
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asFlow
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.switchMap
-import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.PagingSource
-import androidx.paging.cachedIn
+import androidx.lifecycle.*
+import androidx.paging.*
 import com.geekorum.geekdroid.accounts.SyncInProgressLiveData
 import com.geekorum.ttrss.background_job.BackgroundJobManager
 import com.geekorum.ttrss.data.ArticleWithFeed
@@ -44,11 +33,9 @@ import com.geekorum.ttrss.session.SessionActivityComponent
 import com.geekorum.ttrss.session.UndoManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 private const val STATE_NEED_UNREAD = "need_unread"
@@ -69,7 +56,7 @@ abstract class BaseArticlesViewModel(
     private val _pendingArticlesSetUnread = MutableLiveData<Int>().apply { value = 0 }
 
     abstract val isRefreshing: LiveData<Boolean>
-    abstract val isMultiFeed: LiveData<Boolean>
+    abstract val isMultiFeed: StateFlow<Boolean>
 
     private val unreadActionUndoManager = UndoManager<Action>()
 
@@ -241,35 +228,25 @@ abstract class BaseArticlesViewModel(
 @HiltViewModel
 class ArticlesListViewModel @Inject constructor(
     private val state: SavedStateHandle,
-    private val feedsRepository: FeedsRepository,
+    feedsRepository: FeedsRepository,
     private val backgroundJobManager: BackgroundJobManager,
     componentFactory: SessionActivityComponent.Factory
 ) : BaseArticlesViewModel(state, componentFactory) {
 
-    val feedId = state.getLiveData(STATE_FEED_ID, Feed.FEED_ID_ALL_ARTICLES).apply {
-        // workaround for out of sync values see
-        // https://issuetracker.google.com/issues/129989646
-        value = value
-    }
+    val feedId: Long = state[STATE_FEED_ID]!!
 
-    override val isMultiFeed: LiveData<Boolean> = feedId.asFlow().mapLatest {
-        Feed.isVirtualFeed(it)
-    }.asLiveData()
+    override val isMultiFeed: StateFlow<Boolean> = MutableStateFlow(Feed.isVirtualFeed(feedId))
 
-    override val articles: Flow<PagingData<ArticleWithFeed>> = feedId.asFlow().flatMapLatest {
-        feedsRepository.getFeedById(it)
-    }.flatMapLatest {
-        checkNotNull(it)
-        getArticlesForFeed(it)
-    }.cachedIn(viewModelScope)
+    override val articles: Flow<PagingData<ArticleWithFeed>> = feedsRepository.getFeedById(feedId)
+        .filterNotNull()
+        .flatMapLatest { getArticlesForFeed(it) }
+        .cachedIn(viewModelScope)
 
-    private var refreshJobName: MutableLiveData<String?> = MutableLiveData<String?>().apply {
-        value = null
-    }
+    private val refreshJobName = MutableStateFlow<String?>(null)
 
     private val account = component.account
 
-    override val isRefreshing: LiveData<Boolean> = refreshJobName.switchMap {
+    override val isRefreshing: LiveData<Boolean> = refreshJobName.asLiveData().switchMap {
         if (it == null)
             SyncInProgressLiveData(account, ArticlesContract.AUTHORITY)
         else
@@ -300,7 +277,6 @@ class ArticlesListViewModel @Inject constructor(
 
     override fun refresh() {
         viewModelScope.launch {
-            val feedId: Long = state[STATE_FEED_ID]!!
             if (Feed.isVirtualFeed(feedId)) {
                 backgroundJobManager.refresh(account)
             } else {
@@ -329,7 +305,7 @@ class ArticlesListByTagViewModel @Inject constructor(
         value = value
     }
 
-    override val isMultiFeed: LiveData<Boolean> = MutableLiveData(true)
+    override val isMultiFeed: StateFlow<Boolean> = MutableStateFlow(true)
 
     private val account: Account = component.account
 

@@ -121,9 +121,9 @@ abstract class BaseArticlesListFragment() : Fragment() {
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
 
-        articlesViewModel.isMultiFeed.observe(viewLifecycleOwner) {
+        articlesViewModel.isMultiFeed.onEach {
             adapter.displayFeedName = it
-        }
+        }.launchIn(viewLifecycleOwner.lifecycleScope)
 
         articlesViewModel.getPendingArticlesSetUnread().observe(viewLifecycleOwner) { nbArticles ->
             if (nbArticles > 0) {
