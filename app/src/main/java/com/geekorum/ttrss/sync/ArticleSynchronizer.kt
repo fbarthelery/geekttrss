@@ -84,11 +84,9 @@ class ArticleSynchronizer @AssistedInject constructor(
 
     override suspend fun sync() {
         try {
-            Timber.i("Start sync")
             syncInfoAndFeeds()
             collectNewArticles()
             updateArticlesStatus()
-            Timber.i("end sync after collect new articles")
         } catch (e: ApiCallException) {
             Timber.w(e, "unable to synchronize articles")
         } catch (e: RemoteException) {

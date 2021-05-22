@@ -119,6 +119,7 @@ class CollectNewArticlesWorker @AssistedInject constructor(
         databaseService.runInTransaction {
             while (articles.isNotEmpty()) {
                 insertArticles(articles)
+                offset += articles.size
                 cacheArticlesImages(articles.map { it.article } )
                 articles = getArticles(feedId, latestId, offset, includeAttachments = true)
             }

@@ -86,7 +86,6 @@ internal constructor(
         response: AccountAuthenticatorResponse, account: Account,
         authTokenType: String, options: Bundle?
     ): Bundle {
-        Timber.i("getAuthToken called")
         val ttRssAccount = accountManager.fromAndroidAccount(account)
         val password = try {
             accountManager.getPassword(ttRssAccount)
