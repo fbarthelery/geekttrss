@@ -81,7 +81,7 @@ class ArticleListActivity : SessionActivity() {
     private lateinit var fabPresenter: FabPresenter
     private lateinit var feedNavigationPresenter: FeedsNavigationMenuPresenter
     private lateinit var accountHeaderPresenter: AccountHeaderPresenter
-    private lateinit var drawerLayoutPresenter: DrawerLayoutPresenter
+    private var drawerLayoutPresenter: DrawerLayoutPresenter? = null
 
     @Inject
     lateinit var moduleManager: OnDemandModuleManager
@@ -212,7 +212,7 @@ class ArticleListActivity : SessionActivity() {
         val headerView = binding.navigationView.getHeaderView(0)
         accountHeaderPresenter = AccountHeaderPresenter(headerView, this, accountViewModel)
         drawerLayout?.let {
-            drawerLayoutPresenter = DrawerLayoutPresenter(it, navController, this)
+            drawerLayoutPresenter = DrawerLayoutPresenter(it, navController, this, this)
         }
     }
 

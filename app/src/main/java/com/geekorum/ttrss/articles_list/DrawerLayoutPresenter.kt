@@ -24,9 +24,15 @@ import android.view.View
 import androidx.activity.OnBackPressedDispatcherOwner
 import androidx.activity.addCallback
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.dynamicfeatures.DynamicGraphNavigator
 import com.geekorum.ttrss.R
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.collect
 
 /**
  * Controls the behavior of the [DrawerLayout]
@@ -34,7 +40,8 @@ import com.geekorum.ttrss.R
 internal class DrawerLayoutPresenter(
     private val drawerLayout: DrawerLayout,
     private val navController: NavController,
-    private val onBackPressedDispatcherOwner: OnBackPressedDispatcherOwner
+    private val onBackPressedDispatcherOwner: OnBackPressedDispatcherOwner,
+    private val lifecycleOwner: LifecycleOwner,
 ) {
 
     init {
@@ -55,18 +62,27 @@ internal class DrawerLayoutPresenter(
 
         val backPressedCallback = onBackPressedDispatcherOwner.onBackPressedDispatcher.addCallback(onBackPressedDispatcherOwner) {
             drawerLayout.closeDrawers()
-        }.apply {
-            isEnabled = drawerLayout.isOpen
+        }
+        lifecycleOwner.lifecycleScope.launchWhenStarted {
+            drawerLayout.isOpenFlow().collect { isOpen ->
+                backPressedCallback.isEnabled = isOpen
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalCoroutinesApi::class)
+private fun DrawerLayout.isOpenFlow() = callbackFlow<Boolean> {
+    channel.trySend(isOpen)
+    val listener = object : DrawerLayout.SimpleDrawerListener() {
+        override fun onDrawerClosed(drawerView: View) {
+            channel.trySend(false)
         }
 
-        drawerLayout.addDrawerListener(object : DrawerLayout.SimpleDrawerListener() {
-            override fun onDrawerClosed(drawerView: View) {
-                backPressedCallback.isEnabled = false
-            }
-
-            override fun onDrawerOpened(drawerView: View) {
-                backPressedCallback.isEnabled = true
-            }
-        })
+        override fun onDrawerOpened(drawerView: View) {
+            channel.trySend(true)
+        }
     }
+    addDrawerListener(listener)
+    awaitClose { removeDrawerListener(listener) }
 }
