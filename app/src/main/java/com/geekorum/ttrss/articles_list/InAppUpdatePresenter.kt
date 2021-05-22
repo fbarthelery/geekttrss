@@ -34,6 +34,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.graphics.drawable.IconCompat
 import androidx.core.view.doOnNextLayout
 import androidx.core.view.updatePadding
+import androidx.lifecycle.LifecycleOwner
 import com.geekorum.geekdroid.views.banners.BannerContainer
 import com.geekorum.geekdroid.views.banners.BannerSpec
 import com.geekorum.geekdroid.views.banners.buildBanner
@@ -51,7 +52,7 @@ private const val CODE_START_IN_APP_UPDATE = 1
  */
 class InAppUpdatePresenter(
     private val bannerContainer: BannerContainer,
-    private val activity: ArticleListActivity,
+    private val lifecyleOwner: LifecycleOwner,
     private val inAppUpdateViewModel: InAppUpdateViewModel,
     activityResultRegistry: ActivityResultRegistry,
 ) {
@@ -84,16 +85,17 @@ class InAppUpdatePresenter(
         registry: ActivityResultRegistry,
         callback: ActivityResultCallback<O>): ActivityResultLauncher<I> {
         return registry.register(
-            "in_app_update_presenter", activity, contract, callback)
+            "in_app_update_presenter", lifecyleOwner, contract, callback)
     }
 
     private fun setUpViewModels() {
-        inAppUpdateViewModel.isUpdateAvailable.observe(activity) {
+        inAppUpdateViewModel.isUpdateAvailable.observe(lifecyleOwner) {
             if (it) {
                 Timber.d("Update available")
-                val banner = buildBanner(activity) {
+                val context = bannerContainer.context
+                val banner = buildBanner(context) {
                     messageId = R.string.banner_update_msg
-                    icon = IconCompat.createWithResource(activity,
+                    icon = IconCompat.createWithResource(context,
                         R.mipmap.ic_launcher)
                     setPositiveButton(R.string.banner_update_btn) {
                         inAppUpdateViewModel.startUpdateFlow(intentSenderForResultStarter,
@@ -109,12 +111,13 @@ class InAppUpdatePresenter(
             }
         }
 
-        inAppUpdateViewModel.isUpdateReadyToInstall.observe(activity) {
+        inAppUpdateViewModel.isUpdateReadyToInstall.observe(lifecyleOwner) {
             if (it) {
                 Timber.d("Update ready to install")
-                val banner = buildBanner(activity) {
+                val context = bannerContainer.context
+                val banner = buildBanner(context) {
                     message = "Update ready to install"
-                    icon = IconCompat.createWithResource(activity,
+                    icon = IconCompat.createWithResource(context,
                         R.mipmap.ic_launcher)
                     setPositiveButton("Restart") {
                         hideBanner()
@@ -146,9 +149,9 @@ class InAppUpdatePresenter(
             }
         })
 
-        (bannerContainer.parent as? View)?.doOnNextLayout {
-            val fragmentContainerView = activity.findViewById<View>(R.id.middle_pane_layout)
-            fragmentContainerView.updatePadding(bottom = bannerContainer.height)
+        (bannerContainer.parent as? View)?.doOnNextLayout { parent ->
+            val fragmentContainerView = parent.findViewById<View>(R.id.middle_pane_layout)
+            fragmentContainerView?.updatePadding(bottom = bannerContainer.height)
         }
     }
 
@@ -156,7 +159,8 @@ class InAppUpdatePresenter(
         val behavior = BottomSheetBehavior.from(bannerContainer)
         behavior.isHideable = true
         behavior.state = BottomSheetBehavior.STATE_HIDDEN
-        val fragmentContainerView = activity.findViewById<View>(R.id.middle_pane_layout)
+        val parent = bannerContainer.parent as View?
+        val fragmentContainerView = parent?.findViewById<View>(R.id.middle_pane_layout)
         fragmentContainerView?.updatePadding(bottom = 0)
     }
 }
