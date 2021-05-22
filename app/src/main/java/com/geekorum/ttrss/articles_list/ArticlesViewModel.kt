@@ -260,6 +260,7 @@ class ArticlesListViewModel @Inject constructor(
         return isMostRecentOrderFlow.combine(needUnreadFlow) { mostRecentFirst, needUnread ->
             getArticleAccess(mostRecentFirst, needUnread)
         }.flatMapLatest { access ->
+            Timber.i("getArticlesForFeed create Pager")
             val config = PagingConfig(pageSize = 50)
             val pager = Pager(config) {
                 when {

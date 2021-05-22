@@ -84,6 +84,9 @@ class ArticleSynchronizer @AssistedInject constructor(
 
     override suspend fun sync() {
         try {
+            Timber.i("Start sync")
+            Timber.i("end sync")
+            return
             syncInfoAndFeeds()
             collectNewArticles()
             updateArticlesStatus()
