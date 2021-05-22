@@ -21,7 +21,6 @@
 package com.geekorum.ttrss.in_app_update
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.asFlow
 import com.google.common.truth.Truth.assertThat
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -68,7 +67,7 @@ class InAppUpdateViewModelTest {
     @Test
     fun testUpdateAvailable()= testCoroutineDispatcher.runBlockingTest {
         coEvery { updateManager.getUpdateAvailability() } returns UpdateAvailability.UPDATE_AVAILABLE
-        subject.isUpdateAvailable.asFlow()
+        subject.isUpdateAvailable
                 .take(1)
                 .collect {
                     assertThat(it).isTrue()
@@ -78,7 +77,7 @@ class InAppUpdateViewModelTest {
     @Test
     fun testNoUpdateAvailable() = testCoroutineDispatcher.runBlockingTest {
         coEvery { updateManager.getUpdateAvailability() } returns UpdateAvailability.NO_UPDATE
-        subject.isUpdateAvailable.asFlow()
+        subject.isUpdateAvailable
                 .take(1)
                 .collect {
                     assertThat(it).isFalse()
@@ -88,7 +87,7 @@ class InAppUpdateViewModelTest {
     @Test
     fun testAnUpdateIsAlreadyReadyToInstall() = testCoroutineDispatcher.runBlockingTest {
         coEvery { updateManager.getUpdateState() } returns UpdateState(UpdateState.Status.DOWNLOADED)
-        val updates = subject.isUpdateReadyToInstall.asFlow()
+        val updates = subject.isUpdateReadyToInstall
                 .take(1)
                 .toList()
         assertThat(updates).containsExactly(true)
@@ -104,7 +103,7 @@ class InAppUpdateViewModelTest {
             UpdateState(UpdateState.Status.DOWNLOADED)
         )
         val results = async {
-            subject.isUpdateReadyToInstall.asFlow()
+            subject.isUpdateReadyToInstall
                     .take(2)
                     .toList()
         }

@@ -20,12 +20,13 @@
  */
 package com.geekorum.ttrss.in_app_update
 
-import androidx.lifecycle.*
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -36,14 +37,14 @@ class InAppUpdateViewModel @Inject constructor(
     private val updateManager: InAppUpdateManager
 ) : ViewModel() {
 
-    val isUpdateAvailable: LiveData<Boolean> = liveData {
+    val isUpdateAvailable: Flow<Boolean> = flow {
         val result = updateManager.getUpdateAvailability()
         emit(result == UpdateAvailability.UPDATE_AVAILABLE)
     }
 
-    private val updateStateChannel = Channel<UpdateState>()
+    private val updateStateChannel = Channel<UpdateState>(Channel.CONFLATED)
 
-    private val updateState: LiveData<UpdateState> = liveData {
+    private val updateState: Flow<UpdateState> = flow {
         emit(updateManager.getUpdateState())
         for (state in updateStateChannel) {
             emit(state)
@@ -75,10 +76,6 @@ class InAppUpdateViewModel @Inject constructor(
 
     fun completeUpdate() {
         updateManager.completeUpdate()
-    }
-
-    override fun onCleared() {
-        updateStateChannel.close()
     }
 }
 

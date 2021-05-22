@@ -35,6 +35,7 @@ import androidx.core.graphics.drawable.IconCompat
 import androidx.core.view.doOnNextLayout
 import androidx.core.view.updatePadding
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import com.geekorum.geekdroid.views.banners.BannerContainer
 import com.geekorum.geekdroid.views.banners.BannerSpec
 import com.geekorum.geekdroid.views.banners.buildBanner
@@ -42,6 +43,8 @@ import com.geekorum.ttrss.R
 import com.geekorum.ttrss.in_app_update.InAppUpdateViewModel
 import com.geekorum.ttrss.in_app_update.IntentSenderForResultStarter
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import timber.log.Timber
 
 private const val CODE_START_IN_APP_UPDATE = 1
@@ -89,7 +92,7 @@ class InAppUpdatePresenter(
     }
 
     private fun setUpViewModels() {
-        inAppUpdateViewModel.isUpdateAvailable.observe(lifecyleOwner) {
+        inAppUpdateViewModel.isUpdateAvailable.onEach {
             if (it) {
                 Timber.d("Update available")
                 val context = bannerContainer.context
@@ -109,9 +112,9 @@ class InAppUpdatePresenter(
 
                 showBanner(banner)
             }
-        }
+        }.launchIn(lifecyleOwner.lifecycleScope)
 
-        inAppUpdateViewModel.isUpdateReadyToInstall.observe(lifecyleOwner) {
+        inAppUpdateViewModel.isUpdateReadyToInstall.onEach {
             if (it) {
                 Timber.d("Update ready to install")
                 val context = bannerContainer.context
@@ -127,7 +130,7 @@ class InAppUpdatePresenter(
 
                 showBanner(banner)
             }
-        }
+        }.launchIn(lifecyleOwner.lifecycleScope)
     }
 
     private fun showBanner(bannerSpec: BannerSpec) {
