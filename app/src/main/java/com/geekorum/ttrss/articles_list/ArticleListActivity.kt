@@ -20,15 +20,10 @@
  */
 package com.geekorum.ttrss.articles_list
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.core.graphics.Insets
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.get
-import androidx.core.view.updatePadding
+import androidx.core.view.*
 import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
@@ -46,7 +41,6 @@ import com.geekorum.ttrss.on_demand_modules.OnDemandModuleManager
 import com.geekorum.ttrss.session.SessionActivity
 import com.google.android.material.appbar.AppBarLayout
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
 import javax.inject.Inject
 
 /**
@@ -59,9 +53,6 @@ import javax.inject.Inject
  */
 @AndroidEntryPoint
 class ArticleListActivity : SessionActivity() {
-    companion object {
-        internal const val CODE_START_IN_APP_UPDATE = 1
-    }
 
     private lateinit var binding: ActivityArticleListBinding
     private val drawerLayout: DrawerLayout?
@@ -115,7 +106,11 @@ class ArticleListActivity : SessionActivity() {
             activityViewModel = this@ArticleListActivity.activityViewModel
         }
 
-        inAppUpdatePresenter = InAppUpdatePresenter(binding.bannerContainer, this, inAppUpdateViewModel)
+        inAppUpdatePresenter = InAppUpdatePresenter(
+            binding.bannerContainer,
+            this,
+            inAppUpdateViewModel,
+            activityResultRegistry)
 
         navController = findNavController(R.id.middle_pane_layout)
 
@@ -214,12 +209,6 @@ class ArticleListActivity : SessionActivity() {
         drawerLayout?.let {
             drawerLayoutPresenter = DrawerLayoutPresenter(it, navController, this, this)
         }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        Timber.d("activity result $requestCode result $resultCode")
-        super.onActivityResult(requestCode, resultCode, data)
-        inAppUpdatePresenter.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun setupSearch() {

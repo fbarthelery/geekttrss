@@ -20,13 +20,7 @@
  */
 package com.geekorum.ttrss.in_app_update
 
-import android.app.Activity
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.distinctUntilChanged
-import androidx.lifecycle.liveData
-import androidx.lifecycle.map
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
@@ -62,13 +56,13 @@ class InAppUpdateViewModel @Inject constructor(
 
     private var updateJob: Job? = null
 
-    fun startUpdateFlow(activity: Activity, requestCode: Int) {
+    fun startUpdateFlow(intentSenderForResultStarter: IntentSenderForResultStarter, requestCode: Int) {
         if (updateJob?.isActive == true) {
             return
         }
 
         updateJob = viewModelScope.launch {
-            updateManager.startUpdate(activity, requestCode).collect {
+            updateManager.startUpdate(intentSenderForResultStarter, requestCode).collect {
                 updateStateChannel.send(it)
             }
         }
