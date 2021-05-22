@@ -55,6 +55,7 @@ class UpdateAccountInfoWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result = withContext(dispatchers.io) {
         try {
+            Timber.i("start update account info")
             updateAccountInfo()
             Result.success()
         } catch (e: ApiCallException) {
