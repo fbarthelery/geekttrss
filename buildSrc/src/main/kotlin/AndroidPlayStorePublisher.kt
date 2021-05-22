@@ -27,11 +27,6 @@ import org.gradle.api.Project
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.get
-import org.gradle.kotlin.dsl.getByType
-import org.gradle.kotlin.dsl.getValue
-import org.gradle.kotlin.dsl.provideDelegate
-import org.gradle.kotlin.dsl.registering
 import org.gradle.kotlin.dsl.the
 
 
@@ -44,22 +39,22 @@ import org.gradle.kotlin.dsl.the
 internal fun Project.configureAndroidPlayStorePublisher(): Unit {
     apply(plugin = "com.github.triplet.play")
     configure<PlayPublisherExtension> {
-        defaultToAppBundles = true
-        track = properties.getOrDefault("PLAY_STORE_TRACK", "internal") as String
-        fromTrack = properties.getOrDefault("PLAY_STORE_FROM_TRACK", "internal") as String
-        serviceAccountCredentials = file(properties["PLAY_STORE_JSON_KEY_FILE"]!!)
+        defaultToAppBundles.set(true)
+        track.set(properties.getOrDefault("PLAY_STORE_TRACK", "internal") as String)
+        fromTrack.set(properties.getOrDefault("PLAY_STORE_FROM_TRACK", "internal") as String)
+        serviceAccountCredentials.set(file(properties["PLAY_STORE_JSON_KEY_FILE"]!!))
     }
 
     val android = the<AppExtension>() as ExtensionAware
 
     android.extensions.configure<NamedDomainObjectContainer<PlayPublisherExtension>> {
         register("free") {
-            isEnabled = false
+            enabled.set(false)
         }
         register("google") {
             // we always build the release as a separate step when publishing
             // use artifactDir to be sure that publish don't rebuild it
-            artifactDir = file("$buildDir/outputs/bundle/googleRelease")
+            artifactDir.set(file("$buildDir/outputs/bundle/googleRelease"))
         }
     }
 
@@ -67,7 +62,7 @@ internal fun Project.configureAndroidPlayStorePublisher(): Unit {
         register("publishToGooglePlayStore") {
             group = "Continuous Delivery"
             description = "Publish project to Google play store"
-            dependsOn(named("publish"))
+            dependsOn(named("publishApps"))
         }
 
         // only there for consistent naming scheme
