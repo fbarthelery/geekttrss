@@ -86,9 +86,9 @@ class ArticleSynchronizer @AssistedInject constructor(
         try {
             Timber.i("Start sync")
             syncInfoAndFeeds()
-            Timber.i("end sync after syncInfo and Feeds")
-            return
             collectNewArticles()
+            Timber.i("end sync after collect new articles")
+            return
             updateArticlesStatus()
         } catch (e: ApiCallException) {
             Timber.w(e, "unable to synchronize articles")
