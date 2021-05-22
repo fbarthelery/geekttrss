@@ -40,10 +40,7 @@ import com.geekorum.ttrss.sync.HttpCacher
 import com.geekorum.ttrss.webapi.ApiCallException
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import timber.log.Timber
@@ -112,7 +109,7 @@ class CollectNewArticlesWorker @AssistedInject constructor(
      * Good if there are not too many of them
      */
     @Throws(ApiCallException::class, RemoteException::class, OperationApplicationException::class)
-    private suspend fun collectNewArticlesFully() {
+    private suspend fun collectNewArticlesFully() = coroutineScope {
         Timber.i("Collecting new articles fully for feed $feedId")
         val latestId = getLatestArticleId()
 
@@ -122,11 +119,7 @@ class CollectNewArticlesWorker @AssistedInject constructor(
         databaseService.runInTransaction {
             while (articles.isNotEmpty()) {
                 insertArticles(articles)
-                coroutineScope {
-                    cacheArticlesImages(articles.map { it.article } )
-                }
-
-                offset += articles.size
+                cacheArticlesImages(articles.map { it.article } )
                 articles = getArticles(feedId, latestId, offset, includeAttachments = true)
             }
         }
