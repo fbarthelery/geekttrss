@@ -20,7 +20,6 @@
  */
 package com.geekorum.ttrss.in_app_update
 
-import android.app.Activity
 import android.app.Application
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
@@ -28,17 +27,13 @@ import com.google.android.play.core.install.InstallState
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallErrorCode
 import com.google.android.play.core.install.model.InstallStatus
-import com.google.android.play.core.ktx.AppUpdateResult
-import com.google.android.play.core.ktx.installErrorCode
-import com.google.android.play.core.ktx.installStatus
-import com.google.android.play.core.ktx.requestAppUpdateInfo
-import com.google.android.play.core.ktx.requestUpdateFlow
+import com.google.android.play.core.ktx.*
 import dagger.Module
 import dagger.Provides
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import timber.log.Timber
+import com.google.android.play.core.common.IntentSenderForResultStarter as PlayIntentSenderForResultStarter
 import com.google.android.play.core.install.model.UpdateAvailability as PlayUpdateAvailability
 
 private val TAG = PlayStoreInAppUpdateManager::class.java.simpleName
@@ -63,17 +58,28 @@ class PlayStoreInAppUpdateManager(
         return UpdateState(status)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    override suspend fun startUpdate(activity: Activity, requestCode: Int): Flow<UpdateState> {
+    override suspend fun startUpdate(intentSenderForResultStarter: IntentSenderForResultStarter, requestCode: Int): Flow<UpdateState> {
         val updateInfo = appUpdateManager.requestAppUpdateInfo()
+        val playIntentSenderForResultStarter = PlayIntentSenderForResultStarter { intent, finalRequestCode, fillInIntent, flagsMask, flagsValues, extraFlags, options ->
+            intentSenderForResultStarter.startIntentSenderForResult(intent, finalRequestCode, fillInIntent, flagsMask, flagsValues, extraFlags, options)
+        }
         appUpdateManager.startUpdateFlowForResult(updateInfo, AppUpdateType.FLEXIBLE,
-                activity, requestCode)
+            playIntentSenderForResultStarter, requestCode)
         return appUpdateManager.requestUpdateFlow()
-                .map {
-                    it.toUpdateState().also {state ->
-                        Timber.tag(TAG).d("In app update state $state")
-                    }
+            .map {
+                it.toUpdateState().also {state ->
+                    Timber.tag(TAG).d("In app update state $state")
                 }
+            }
+    }
+
+    override suspend fun startImmediateUpdate(intentSenderForResultStarter: IntentSenderForResultStarter, requestCode: Int) {
+        val updateInfo = appUpdateManager.requestAppUpdateInfo()
+        val playIntentSenderForResultStarter = PlayIntentSenderForResultStarter { intent, finalRequestCode, fillInIntent, flagsMask, flagsValues, extraFlags, options ->
+            intentSenderForResultStarter.startIntentSenderForResult(intent, finalRequestCode, fillInIntent, flagsMask, flagsValues, extraFlags, options)
+        }
+        appUpdateManager.startUpdateFlowForResult(updateInfo, AppUpdateType.IMMEDIATE,
+            playIntentSenderForResultStarter, requestCode)
     }
 
     override fun completeUpdate() {

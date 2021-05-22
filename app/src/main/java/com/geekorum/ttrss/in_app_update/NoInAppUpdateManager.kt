@@ -20,7 +20,6 @@
  */
 package com.geekorum.ttrss.in_app_update
 
-import android.app.Activity
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.migration.DisableInstallInCheck
@@ -38,8 +37,12 @@ private class NoInAppUpdateManager: InAppUpdateManager {
         return UpdateAvailability.NO_UPDATE
     }
 
-    override suspend fun startUpdate(activity: Activity, requestCode: Int): Flow<UpdateState> {
+    override suspend fun startUpdate(intentSenderForResultStarter: IntentSenderForResultStarter, requestCode: Int): Flow<UpdateState> {
         return flowOf(UpdateState(UpdateState.Status.FAILED))
+    }
+
+    override suspend fun startImmediateUpdate(intentSenderForResultStarter: IntentSenderForResultStarter, requestCode: Int) {
+        // do nothing
     }
 
     override fun completeUpdate() {

@@ -21,6 +21,10 @@
 package com.geekorum.ttrss.in_app_update
 
 import android.app.Activity
+import android.content.Intent
+import android.content.IntentSender
+import android.content.IntentSender.SendIntentException
+import android.os.Bundle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 
@@ -36,9 +40,12 @@ interface InAppUpdateManager {
     suspend fun getUpdateState(): UpdateState
 
     /**
-     * Start the update process.
+     * Start the update process that you can monitor in your app (Flexible type)
      */
-    suspend fun startUpdate(activity: Activity, requestCode: Int): Flow<UpdateState>
+    suspend fun startUpdate(intentSenderForResultStarter: IntentSenderForResultStarter, requestCode: Int): Flow<UpdateState>
+
+    suspend fun startImmediateUpdate(intentSenderForResultStarter: IntentSenderForResultStarter, requestCode: Int)
+
 
     /**
      * If the [UpdateState.status] is [UpdateState.Status.DOWNLOADED], this method need to be called
@@ -61,4 +68,22 @@ data class UpdateState(
         DOWNLOADED, INSTALLING, INSTALLED,
         FAILED, CANCELED
     }
+}
+
+/**
+ * Interface for an object able to start an {@code IntentSender} for result.
+ *
+ * <p>For instance it can be used to delegate calling {@code startIntentSenderForResult} on a {@code
+ * androidx.fragment.app.Fragment}.
+ */
+interface IntentSenderForResultStarter {
+    /**
+     * Starts the provided IntentSender for result.
+     *
+     *
+     * See [android.app.Activity.startIntentSenderForResult] for the documentation of its
+     * parameters.
+     */
+    @Throws(SendIntentException::class)
+    fun startIntentSenderForResult(intent: IntentSender, requestCode: Int, fillInIntent: Intent?, flagsMask: Int, flagsValues: Int, extraFlags: Int, options: Bundle?)
 }
