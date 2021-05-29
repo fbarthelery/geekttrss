@@ -127,7 +127,7 @@ hilt {
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.5.0-beta02")
+    implementation("androidx.core:core-ktx:1.5.0")
     implementation("androidx.fragment:fragment-ktx:1.3.4")
     implementation("androidx.activity:activity-ktx:1.2.3")
 
@@ -161,8 +161,7 @@ dependencies {
 
     implementation("org.jsoup:jsoup:1.10.2")
 
-    val lifecycleVersion = "2.2.0"
-    implementation("androidx.lifecycle:lifecycle-extensions:$lifecycleVersion")
+    val lifecycleVersion = "2.3.1"
     implementation("androidx.lifecycle:lifecycle-livedata-core-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
@@ -171,7 +170,7 @@ dependencies {
     dualTestImplementation("androidx.arch.core:core-testing:2.1.0")
 
     // dagger
-    val daggerVersion = "2.35.1"
+    val daggerVersion = "2.36"
     implementation(enforcedDaggerPlatform(daggerVersion))
     kapt(enforcedDaggerPlatform(daggerVersion))
     implementation("com.google.dagger:dagger:$daggerVersion")
@@ -188,11 +187,11 @@ dependencies {
     kaptAndroidTest("com.google.dagger:hilt-compiler:$daggerVersion")
 
 
-    val roomVersion = "2.3.0-alpha02"
+    val roomVersion = "2.3.0"
     kapt("androidx.room:room-compiler:$roomVersion")
     androidTestImplementation("androidx.room:room-testing:$roomVersion")
 
-    val workVersion = "2.4.0"
+    val workVersion = "2.5.0"
     androidTestImplementation("androidx.work:work-testing:$workVersion")
 
     implementation(enforcedPlatform(kotlin("bom")))
@@ -208,13 +207,13 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
     androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
 
-    implementation(enforcedPlatform("com.google.firebase:firebase-bom:26.1.1"))
+    implementation(enforcedPlatform("com.google.firebase:firebase-bom:28.0.1"))
     add("googleImplementation", "com.google.firebase:firebase-crashlytics")
     // ensure that the free flavor don't get any firebase dependencies
     configurations["freeImplementation"].exclude(group = "com.google.firebase")
     configurations["freeImplementation"].exclude(group = "com.google.android.play")
 
-    add("googleImplementation", "com.google.android.play:core:1.9.0")
+    add("googleImplementation", "com.google.android.play:core:1.10.0")
     add("googleImplementation", "com.google.android.play:core-ktx:1.8.1")
 
     // api dependencies for features modules
