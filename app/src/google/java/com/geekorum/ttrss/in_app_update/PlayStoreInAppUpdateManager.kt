@@ -101,7 +101,8 @@ private fun InstallState.toUpdateState(): UpdateState {
     return UpdateState(status, installErrorCode)
 }
 
-inline class PlayInstallStatus(private val value: Int) {
+@JvmInline
+value class PlayInstallStatus(private val value: Int) {
 
     fun toUpdateStateStatus(): UpdateState.Status = when (value) {
         InstallStatus.DOWNLOADING -> UpdateState.Status.DOWNLOADING
