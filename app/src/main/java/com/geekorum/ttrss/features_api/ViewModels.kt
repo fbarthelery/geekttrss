@@ -117,6 +117,7 @@ private class HiltViewModelFactory(
                 val provider = component.hiltViewModelMap[modelClass.name]
                     ?: throw IllegalStateException(
                         "Expected the @HiltViewModel-annotated class '${modelClass.name}' to be available in the multi-binding of @HiltViewModelMap but none was found.")
+                @Suppress("UNCHECKED_CAST")
                 return provider.get() as T
             }
         }

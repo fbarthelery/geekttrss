@@ -29,6 +29,7 @@ import com.geekorum.geekdroid.accounts.AccountSelector
 import com.geekorum.ttrss.accounts.NetworkLoginModule
 import com.geekorum.ttrss.accounts.PerAccount
 import com.geekorum.ttrss.articles_list.ArticlesRepository
+import com.geekorum.ttrss.articles_list.SetArticleFieldAction
 import com.geekorum.ttrss.network.ApiService
 import dagger.Module
 import dagger.Provides
@@ -71,6 +72,7 @@ interface SessionActivityComponent {
     val account: Account
     val apiService: ApiService
     val articleRepository: ArticlesRepository
+    val setArticleFieldActionFactory: SetArticleFieldAction.Factory
 
     @Subcomponent.Factory
     interface Factory {

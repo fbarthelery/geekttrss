@@ -33,13 +33,9 @@ import com.geekorum.ttrss.session.Action
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -48,7 +44,6 @@ import javax.inject.Inject
 class ArticlesRepository
 @Inject constructor(
     private val articleDao: ArticleDao,
-    private val setFieldActionFactory: SetArticleFieldAction.Factory
 ) {
 
     fun getAllArticles(): PagingSource<Int, ArticleWithFeed> = articleDao.getAllArticles()
@@ -111,15 +106,12 @@ class ArticlesRepository
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getArticleById(articleId: Long): Flow<Article?> = articleDao.getArticleById(articleId).distinctUntilChanged()
 
-    fun setArticleUnread(articleId: Long, newValue: Boolean): Action {
-        val setUnreadAction = setFieldActionFactory.createSetUnreadAction(articleId, newValue)
-        setUnreadAction.execute()
-        return setUnreadAction
+    suspend fun setArticleUnread(articleId: Long, newValue: Boolean) {
+        articleDao.updateArticleUnread(articleId, newValue)
     }
 
-    fun setArticleStarred(articleId: Long, newValue: Boolean) {
-        val setStarredAction = setFieldActionFactory.createSetStarredAction(articleId, newValue)
-        setStarredAction.execute()
+    suspend fun setArticleStarred(articleId: Long, newValue: Boolean) {
+        articleDao.updateArticleMarked(articleId, newValue)
     }
 
     fun searchArticles(query: String): PagingSource<Int, ArticleWithFeed> {
@@ -134,6 +126,7 @@ class ArticlesRepository
 
 open class SetArticleFieldAction(
     private val dispatchers: CoroutineDispatchersProvider,
+    private val scope: CoroutineScope,
     private val transactionsDao: TransactionsDao,
     private val apiService: ApiService,
     private val articleId: Long,
@@ -144,13 +137,13 @@ open class SetArticleFieldAction(
     private var executionJob: Job? = null
 
     override fun execute() {
-        executionJob = GlobalScope.launch(dispatchers.io) {
+        executionJob = scope.launch(dispatchers.io) {
             updateArticleField(newValue)
         }
     }
 
     override fun undo() {
-        GlobalScope.launch(dispatchers.io) {
+        scope.launch(dispatchers.io) {
             // wait for the request to be cancelled and done
             // to be sure that the new one happens after
             executionJob?.cancelAndJoin()
@@ -190,8 +183,9 @@ internal class SetUnreadAction @AssistedInject internal constructor(
     transactionsDao: TransactionsDao,
     apiService: ApiService,
     @Assisted private val articleId: Long,
-    @Assisted newValue: Boolean
-) : SetArticleFieldAction(dispatchers, transactionsDao, apiService, articleId,
+    @Assisted newValue: Boolean,
+    @Assisted scope: CoroutineScope,
+) : SetArticleFieldAction(dispatchers, scope, transactionsDao, apiService, articleId,
     ArticlesContract.Transaction.Field.UNREAD, newValue) {
 
     override suspend fun updateArticleField(value: Boolean) {
@@ -203,7 +197,7 @@ internal class SetUnreadAction @AssistedInject internal constructor(
 
     @AssistedFactory
     interface Factory {
-        fun createSetUnreadAction(articleId: Long, newValue: Boolean): SetUnreadAction
+        fun createSetUnreadAction(scope: CoroutineScope, articleId: Long, newValue: Boolean): SetUnreadAction
     }
 }
 
@@ -216,8 +210,9 @@ internal class SetStarredAction @AssistedInject internal constructor(
     transactionsDao: TransactionsDao,
     val apiService: ApiService,
     @Assisted val articleId: Long,
-    @Assisted newValue: Boolean
-) : SetArticleFieldAction(dispatchers, transactionsDao, apiService, articleId,
+    @Assisted newValue: Boolean,
+     @Assisted scope: CoroutineScope
+) : SetArticleFieldAction(dispatchers, scope, transactionsDao, apiService, articleId,
         ArticlesContract.Transaction.Field.STARRED, newValue) {
 
     override suspend fun updateArticleField(value: Boolean) {
@@ -229,7 +224,7 @@ internal class SetStarredAction @AssistedInject internal constructor(
 
     @AssistedFactory
     interface Factory {
-        fun createSetStarredAction(articleId: Long, newValue: Boolean): SetStarredAction
+        fun createSetStarredAction(scope: CoroutineScope, articleId: Long, newValue: Boolean): SetStarredAction
     }
 
 }

@@ -26,13 +26,7 @@ import android.content.ContextWrapper
 import android.net.Uri
 import androidx.core.app.ShareCompat
 import androidx.core.net.toUri
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asLiveData
-import androidx.lifecycle.distinctUntilChanged
-import androidx.lifecycle.map
-import androidx.lifecycle.switchMap
+import androidx.lifecycle.*
 import com.geekorum.ttrss.articles_list.ArticlesRepository
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.network.TtRssBrowserLauncher
@@ -53,7 +47,9 @@ class ArticleDetailsViewModel @Inject constructor(
     componentFactory: SessionActivityComponent.Factory
 ) : ViewModel() {
 
-    private val articlesRepository: ArticlesRepository = componentFactory.newComponent().articleRepository
+    val sessionActivityComponent = componentFactory.newComponent()
+    private val articlesRepository: ArticlesRepository = sessionActivityComponent.articleRepository
+    private val setFieldActionFactory = sessionActivityComponent.setArticleFieldActionFactory
 
     private val articleId = state.getLiveData<Long>(STATE_ARTICLE_ID)
 
@@ -117,7 +113,8 @@ class ArticleDetailsViewModel @Inject constructor(
 
     fun onStarChanged(newValue: Boolean) {
         article.value?.let {
-            articlesRepository.setArticleStarred(it.id, newValue)
+            val action = setFieldActionFactory.createSetStarredAction(viewModelScope, it.id, newValue)
+            action.execute()
         }
     }
 
@@ -129,7 +126,8 @@ class ArticleDetailsViewModel @Inject constructor(
 
     fun setArticleUnread(unread: Boolean) {
         article.value?.let {
-            articlesRepository.setArticleUnread(it.id, unread)
+            val action = setFieldActionFactory.createSetUnreadAction(viewModelScope, it.id, unread)
+            action.execute()
         }
     }
 

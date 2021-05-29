@@ -24,6 +24,7 @@ import androidx.annotation.MainThread
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
+import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -42,7 +43,9 @@ class SearchViewModel @Inject constructor(
     componentFactory: SessionActivityComponent.Factory
 ) : ViewModel() {
 
-    private val articlesRepository: ArticlesRepository = componentFactory.newComponent().articleRepository
+    val sessionActivityComponent = componentFactory.newComponent()
+    private val articlesRepository: ArticlesRepository = sessionActivityComponent.articleRepository
+    private val setFieldActionFactory = sessionActivityComponent.setArticleFieldActionFactory
 
     private val searchQuery = MutableLiveData<String>().apply { value = "" }
 
@@ -58,11 +61,13 @@ class SearchViewModel @Inject constructor(
     }
 
     fun setArticleStarred(articleId: Long, newValue: Boolean) {
-        articlesRepository.setArticleStarred(articleId, newValue)
+        val action = setFieldActionFactory.createSetStarredAction(viewModelScope, articleId, newValue)
+        action.execute()
     }
 
     fun setArticleUnread(articleId: Long, newValue: Boolean) {
-        articlesRepository.setArticleUnread(articleId, newValue)
+        val action = setFieldActionFactory.createSetUnreadAction(viewModelScope, articleId, newValue)
+        action.execute()
     }
 
 }

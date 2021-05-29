@@ -35,7 +35,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 private const val STATE_NEED_UNREAD = "need_unread"
@@ -51,6 +50,8 @@ abstract class BaseArticlesViewModel(
 
     protected val component = componentFactory.newComponent()
     private val articlesRepository = component.articleRepository
+    private val setFieldActionFactory = component.setArticleFieldActionFactory
+
     abstract val articles: Flow<PagingData<ArticleWithFeed>>
 
     private val _pendingArticlesSetUnread = MutableLiveData<Int>().apply { value = 0 }
@@ -78,8 +79,10 @@ abstract class BaseArticlesViewModel(
     }
 
     fun setArticleUnread(articleId: Long, newValue: Boolean) {
-        val unreadAction = articlesRepository.setArticleUnread(articleId, newValue)
-        unreadActionUndoManager.recordAction(unreadAction)
+        setFieldActionFactory.createSetUnreadAction(viewModelScope, articleId, newValue).also {
+            it.execute()
+            unreadActionUndoManager.recordAction(it)
+        }
         _pendingArticlesSetUnread.value = unreadActionUndoManager.nbActions
     }
 
@@ -88,7 +91,8 @@ abstract class BaseArticlesViewModel(
     }
 
     fun setArticleStarred(articleId: Long, newValue: Boolean) {
-        articlesRepository.setArticleStarred(articleId, newValue)
+        val action = setFieldActionFactory.createSetStarredAction(viewModelScope, articleId, newValue)
+        action.execute()
     }
 
     fun commitSetUnreadActions() {
