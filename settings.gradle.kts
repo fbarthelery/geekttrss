@@ -41,7 +41,7 @@ pluginManagement {
 
     repositories {
         gradlePluginPortal()
-        jcenter()
+        mavenCentral()
         maven {
             // Workaround for bug https://github.com/gradle/kotlin-dsl/issues/1186
             // we publish oss-licenses-plugin 0.9.5.1

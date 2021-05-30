@@ -47,7 +47,7 @@ extra["compileSdkVersion"] = "android-30"
 allprojects {
     repositories {
         google().setupGoogleContent()
-        jcenter()
+        mavenCentral()
         // for kotlinx
         maven { url = URI("https://kotlin.bintray.com/kotlinx") }
         // for geekdroid
