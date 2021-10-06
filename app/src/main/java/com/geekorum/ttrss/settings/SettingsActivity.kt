@@ -27,6 +27,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.StrictMode
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.browser.customtabs.CustomTabsService
 import androidx.core.net.toUri
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.commit
@@ -109,10 +110,19 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
         }
 
         private fun getInAppBrowserPackages(): Map<String, CharSequence> {
-            val activityIntent = Intent(Intent.ACTION_VIEW, "http://".toUri())
-            val resolveInfoList =
-                packageManager.queryIntentActivities(activityIntent, PackageManager.MATCH_DEFAULT_ONLY)
-            return resolveInfoList.map { it.activityInfo.packageName to it.loadLabel(packageManager) }.toMap()
+            val activityIntent = Intent(Intent.ACTION_VIEW, "http://".toUri()).apply {
+                addCategory(Intent.CATEGORY_BROWSABLE)
+            }
+            val browsersResolveInfoList =
+                packageManager.queryIntentActivities(activityIntent, PackageManager.MATCH_ALL)
+
+            val customTabsSupported = browsersResolveInfoList.filter {
+                val customTabServiceIntent = Intent(CustomTabsService.ACTION_CUSTOM_TABS_CONNECTION).apply {
+                    `package` = it.activityInfo.packageName
+                }
+                packageManager.resolveService(customTabServiceIntent, 0) != null
+            }
+            return customTabsSupported.associate { it.activityInfo.packageName to it.loadLabel(packageManager) }
         }
     }
 
