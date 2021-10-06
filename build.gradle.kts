@@ -40,9 +40,16 @@ plugins {
     id("dagger.hilt.android.plugin") apply false
 }
 
+// Need to be there because if not, the various plugins downgrade the AGP version used from buildSrc
+// during the compilation of the *.gradle.kts script
+buildscript {
+    dependencies {
+        classpath("com.android.tools.build:gradle:7.0.2")
+    }
+}
 
 // some extra properties
-extra["compileSdkVersion"] = "android-30"
+extra["compileSdkInt"] = 30
 
 allprojects {
     repositories {

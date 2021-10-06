@@ -31,19 +31,18 @@ plugins {
 }
 
 android {
-    val compileSdkVersion: String by rootProject.extra
-    compileSdkVersion(compileSdkVersion)
+    val compileSdkInt: Int by rootProject.extra
+    compileSdk = compileSdkInt
 
     defaultConfig {
-        minSdkVersion(24)
-        targetSdkVersion(29)
+        minSdk = 24
     }
 
     dataBinding {
         isEnabled = true
     }
 
-    flavorDimensions("distribution")
+    flavorDimensions += "distribution"
     productFlavors {
         register("free") {
             dimension = "distribution"

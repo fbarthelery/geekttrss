@@ -41,12 +41,12 @@ plugins {
 }
 
 android {
-    val compileSdkVersion: String by rootProject.extra
-    compileSdkVersion(compileSdkVersion)
+    val compileSdkInt: Int by rootProject.extra
+    compileSdk = compileSdkInt
     defaultConfig {
         applicationId = "com.geekorum.ttrss"
-        minSdkVersion(24)
-        targetSdkVersion(29)
+        minSdk = 24
+        targetSdk = 29
         val major = 1
         val minor = 5
         val patch = 2
@@ -62,7 +62,7 @@ android {
     }
 
 
-    lintOptions {
+    lint {
         isAbortOnError = false
         isCheckReleaseBuilds = false
         disable("MissingTranslation")
@@ -84,7 +84,7 @@ android {
         isEnabled = true
     }
 
-    flavorDimensions("distribution")
+    flavorDimensions += "distribution"
     productFlavors {
         register("free") {
             dimension = "distribution"
@@ -104,12 +104,14 @@ android {
         }
     }
 
-    dynamicFeatures = mutableSetOf(":manage_feeds")
+    dynamicFeatures += setOf(":manage_feeds")
 
     packagingOptions {
         // Fix: https://github.com/Kotlin/kotlinx.coroutines/issues/2023
-        exclude("META-INF/AL2.0")
-        exclude("META-INF/LGPL2.1")
+        resources {
+            excludes += listOf("META-INF/AL2.0",
+                "META-INF/LGPL2.1")
+        }
     }
 }
 

@@ -24,11 +24,6 @@ plugins {
 
 version = "1.0"
 
-kotlinDslPluginOptions {
-    experimentalWarning.set(false)
-}
-
-
 repositories {
     gradlePluginPortal()
     google()
@@ -38,8 +33,8 @@ repositories {
 }
 
 dependencies {
-    implementation("com.android.tools.build:gradle:4.2.1")
+    implementation("com.android.tools.build:gradle:7.0.2")
     implementation("gradle.plugin.com.hierynomus.gradle.plugins:license-gradle-plugin:0.16.1")
-    implementation("com.github.triplet.gradle:play-publisher:3.4.0-agp4.2")
+    implementation("com.github.triplet.gradle:play-publisher:3.6.0")
     implementation("com.geekorum.gradle.avdl:flydroid:0.0.2")
 }
