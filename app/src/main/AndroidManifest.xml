@@ -47,8 +47,8 @@
             android:networkSecurityConfig="@xml/network_security_config"
             tools:ignore="UnusedAttribute">
 
-        <activity
-                android:name="com.geekorum.ttrss.MainActivity">
+        <activity android:name="com.geekorum.ttrss.MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -57,13 +57,17 @@
 
         <activity
             android:name="com.geekorum.ttrss.articles_list.ArticleListActivity"
-            android:theme="@style/AppTheme.ArticleListActivity"/>
+            android:theme="@style/AppTheme.ArticleListActivity"
+            android:exported="false"
+            />
 
         <activity
             android:name="com.geekorum.ttrss.article_details.ArticleDetailActivity"
             android:label="@string/title_article_details"
             android:parentActivityName="com.geekorum.ttrss.articles_list.ArticleListActivity"
-            android:theme="@style/AppTheme.ArticleDetailActivity">
+            android:theme="@style/AppTheme.ArticleDetailActivity"
+            android:exported="true"
+            >
             <intent-filter tools:ignore="AppLinkUrlError">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -74,20 +78,25 @@
         <activity android:name="com.geekorum.ttrss.accounts.LoginActivity"
                   android:excludeFromRecents="true"
                   android:taskAffinity="com.geekorum.ttrss.account"
-                  android:theme="@style/AppTheme.NoActionBar" />
+                  android:theme="@style/AppTheme.NoActionBar"
+                  android:exported="false"
+            />
 
         <activity
                 android:name="com.geekorum.ttrss.settings.SettingsActivity"
                 android:label="@string/activity_settings_title"
                 android:theme="@style/AppTheme.NoActionBar"
-                android:parentActivityName="com.geekorum.ttrss.articles_list.ArticleListActivity">
-        </activity>
+                android:parentActivityName="com.geekorum.ttrss.articles_list.ArticleListActivity"
+                android:exported="false"
+            />
 
-        <activity android:name=".settings.manage_features.InstallFeatureActivity" />
+        <activity android:name=".settings.manage_features.InstallFeatureActivity"
+            android:exported="false" />
 
         <activity android:name=".add_feed.AddFeedLauncherActivity"
                   android:label="@string/activity_add_feed_title"
-                  android:theme="@style/AppTheme.LauncherActivity">
+                  android:theme="@style/AppTheme.LauncherActivity"
+                  android:exported="true" >
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
@@ -98,9 +107,11 @@
 
         <activity android:name=".add_feed.AddFeedInstallerActivity"
             android:label="@string/lbl_install_feature_title"
-           />
+            android:exported="false"
+            />
 
         <service android:name="com.geekorum.ttrss.accounts.AuthenticatorService"
+                 android:exported="true"
                  tools:ignore="ExportedService">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
@@ -110,6 +121,7 @@
         </service>
 
         <service android:name="com.geekorum.ttrss.sync.ArticleSyncService"
+                 android:exported="true"
                  tools:ignore="ExportedService">
             <!--TODO run in another process-->
             <intent-filter>
@@ -123,10 +135,18 @@
             android:name="com.geekorum.ttrss.providers.ArticlesProvider"
             android:exported="false"/>
 
-        <!-- Remove WorkManagerInitializer and initialize manually in Application -->
-        <provider android:name="androidx.work.impl.WorkManagerInitializer"
-                  android:authorities="${applicationId}.workmanager-init"
-                  tools:node="remove"/>
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <!-- Remove WorkManagerInitializer and initialize manually in Application -->
+            <meta-data
+                android:name="androidx.work.WorkManagerInitializer"
+                android:value="androidx.startup"
+                tools:node="remove" />
+        </provider>
+
 
         <!-- Preloaded downloaded fonts -->
         <meta-data

@@ -44,12 +44,12 @@ plugins {
 // during the compilation of the *.gradle.kts script
 buildscript {
     dependencies {
-        classpath("com.android.tools.build:gradle:7.0.2")
+        classpath("com.android.tools.build:gradle:7.0.3")
     }
 }
 
 // some extra properties
-extra["compileSdkInt"] = 30
+extra["compileSdkInt"] = 31
 
 allprojects {
     repositories {

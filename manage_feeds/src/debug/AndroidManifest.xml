@@ -25,7 +25,8 @@
     package="com.geekorum.ttrss.manage_feeds">
 
     <application>
-        <activity android:name="com.geekorum.ttrss.manage_feeds.ViewModelProvidedActivity"/>
+        <activity android:name="com.geekorum.ttrss.manage_feeds.ViewModelProvidedActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

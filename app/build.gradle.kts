@@ -46,7 +46,7 @@ android {
     defaultConfig {
         applicationId = "com.geekorum.ttrss"
         minSdk = 24
-        targetSdk = 29
+        targetSdk = 31
         val major = 1
         val minor = 5
         val patch = 2
@@ -193,7 +193,7 @@ dependencies {
     kapt("androidx.room:room-compiler:$roomVersion")
     androidTestImplementation("androidx.room:room-testing:$roomVersion")
 
-    val workVersion = "2.5.0"
+    val workVersion = "2.7.0"
     androidTestImplementation("androidx.work:work-testing:$workVersion")
 
     implementation(enforcedPlatform(kotlin("bom")))
