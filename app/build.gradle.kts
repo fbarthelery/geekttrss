@@ -163,7 +163,7 @@ dependencies {
 
     implementation("org.jsoup:jsoup:1.10.2")
 
-    val lifecycleVersion = "2.3.1"
+    val lifecycleVersion = "2.4.0"
     implementation("androidx.lifecycle:lifecycle-livedata-core-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")

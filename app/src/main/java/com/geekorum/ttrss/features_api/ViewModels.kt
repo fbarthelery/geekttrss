@@ -25,6 +25,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
+import androidx.navigation.NavBackStackEntry
 import androidx.savedstate.SavedStateRegistryOwner
 import dagger.BindsInstance
 import dagger.Module
@@ -70,6 +71,15 @@ object DefaultViewModelFactories {
             return getHiltViewModelFactory(fragment, fragment.arguments, delegateFactory)
         }
 
+        /**
+         * Added to get a factory from a [NavBackStackEntry]
+         */
+        fun fromNavBackStackEntry(navBackStackEntry: NavBackStackEntry, delegateFactory: ViewModelProvider.Factory): ViewModelProvider.Factory {
+            return getHiltViewModelFactory(navBackStackEntry,
+                navBackStackEntry.arguments,
+                delegateFactory)
+        }
+
         private fun getHiltViewModelFactory(
             owner: SavedStateRegistryOwner,
             defaultArgs: Bundle?,
@@ -98,6 +108,9 @@ object DefaultViewModelFactories {
 /**
  * View Model Provider Factory for the Hilt Extension.
  *
+ *
+ * A provider for this factory will be installed in the [ ] and [ ]. An instance of this factory will also be the
+ * default factory by activities and fragments annotated with [ ].
  */
 private class HiltViewModelFactory(
     owner: SavedStateRegistryOwner,
@@ -122,7 +135,7 @@ private class HiltViewModelFactory(
             }
         }
 
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         return if (hiltViewModelKeys.contains(modelClass.name)) {
             hiltViewModelFactory.create(modelClass)
         } else {
