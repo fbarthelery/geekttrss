@@ -20,9 +20,8 @@
  */
 package com.geekorum.ttrss.article_details
 
-import android.content.Intent
-import android.content.IntentFilter
-import android.content.pm.PackageManager
+import android.content.Context
+import android.content.Intent.*
 import android.content.res.Resources
 import android.graphics.Color
 import android.net.Uri
@@ -32,21 +31,17 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.WebChromeClient
-import android.webkit.WebResourceRequest
-import android.webkit.WebResourceResponse
-import android.webkit.WebSettings
-import android.webkit.WebView
+import android.webkit.*
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.net.toUri
+import androidx.core.text.parseAsHtml
 import androidx.core.view.doOnNextLayout
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
-import com.geekorum.geekdroid.network.OkHttpWebViewClient
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.articles_list.ArticleListActivity
 import com.geekorum.ttrss.data.Article
@@ -188,7 +183,27 @@ class ArticleDetailFragment @Inject constructor(
 
     private fun configureWebView() {
         withStrictMode(allowThreadDiskReads()) {
-            binding.articleContent.webViewClient = MyWebViewClient()
+            binding.articleContent.webViewClient = ArticleDetailsWebViewClient(
+                okHttpClient, webFontProvider,
+                openUrlInBrowser = articleDetailsViewModel::openUrlInBrowser,
+                onPageFinishedCallback = { _, _ ->
+                    val root = binding.root as NestedScrollView
+                    // sometimes onPageFinished is called before updating the webview.
+                    // wait for next layout pass to calculate if we have reached end
+                    // and request a layout pass if not
+                    if (!root.isInLayout) {
+                        root.requestLayout()
+                    }
+                    root.doOnNextLayout {
+                        if (root.isAtEndOfArticle) {
+                            markReadJob = viewLifecycleOwner.lifecycleScope.launchWhenResumed {
+                                delay(2000)
+                                articleDetailsViewModel.setArticleUnread(false)
+                            }
+                        }
+                    }
+                }
+            )
         }
 
         with(binding.articleContent.settings) {
@@ -201,43 +216,6 @@ class ArticleDetailFragment @Inject constructor(
         binding.articleContent.webChromeClient = chromeClient
     }
 
-    private data class WebViewColors(
-        @field:ColorInt
-        val backgroundColor: Int,
-        @field:ColorInt
-        internal val textColor: Int,
-        @field:ColorInt
-        internal val linkColor: Int
-    ) {
-
-        companion object {
-            fun fromTheme(theme: Resources.Theme): WebViewColors {
-                val typedValue = TypedValue()
-                theme.resolveAttribute(R.attr.articleBackground, typedValue, true)
-                val backgroundColor = toColorInt(typedValue, theme)
-                theme.resolveAttribute(R.attr.articleTextColor, typedValue, true)
-                val textColor = toColorInt(typedValue, theme)
-                theme.resolveAttribute(R.attr.linkColor, typedValue, true)
-                val linkColor = toColorInt(typedValue, theme)
-                return WebViewColors(backgroundColor, textColor, linkColor)
-            }
-
-            @ColorInt
-            private fun toColorInt(typedValue: TypedValue, theme: Resources.Theme ): Int {
-                return when (typedValue.type) {
-                    in TypedValue.TYPE_FIRST_COLOR_INT..TypedValue.TYPE_LAST_COLOR_INT -> typedValue.data
-                    TypedValue.TYPE_REFERENCE -> ResourcesCompat.getColor(theme.resources, typedValue.data, theme)
-                    TypedValue.TYPE_STRING -> ResourcesCompat.getColor(theme.resources, typedValue.resourceId, theme)
-                    TypedValue.TYPE_ATTRIBUTE -> {
-                        theme.resolveAttribute(typedValue.data, typedValue, true)
-                        toColorInt(typedValue, theme)
-                    }
-                    else -> throw IllegalArgumentException("Theme attribute expected to be a color")
-                }
-            }
-
-        }
-    }
 
     override fun onPause() {
         super.onPause()
@@ -311,61 +289,6 @@ class ArticleDetailFragment @Inject constructor(
         }
     }
 
-    private inner class MyWebViewClient internal constructor() : OkHttpWebViewClient(okHttpClient) {
-
-        override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-            val intent = Intent(Intent.ACTION_VIEW, request.url)
-            val context = view.context
-            val activities =
-                context.packageManager.queryIntentActivities(intent, PackageManager.GET_RESOLVED_FILTER)
-                    .filterNot {
-                        it.filter.isWebBrowserApp()
-                    }
-            if (activities.isNotEmpty()) {
-                context.startActivity(intent)
-            } else {
-                articleDetailsViewModel.openUrlInBrowser(context, request.url)
-            }
-            return true
-        }
-
-        override fun shouldInterceptRequest(view: WebView, request: WebResourceRequest): WebResourceResponse? {
-            val url = request.url.toString()
-            if (webFontProvider.isWebFontUrl(url)) {
-                Timber.d("Intercept url for webfont $url")
-                return webFontProvider.getFont(url)?.let {
-                    WebResourceResponse("application/octet-stream", null, it ).apply {
-                        responseHeaders = mapOf("Access-Control-Allow-Origin"  to "*")
-                    }
-                }
-            }
-            return super.shouldInterceptRequest(view, request)
-        }
-
-        override fun onPageFinished(view: WebView?, url: String?) {
-            super.onPageFinished(view, url)
-            val root = binding.root as NestedScrollView
-            // sometimes onPageFinished is called before updating the webview.
-            // wait for next layout pass to calculate if we have reached end
-            // and request a layout pass if not
-            if (!root.isInLayout) {
-                root.requestLayout()
-            }
-            root.doOnNextLayout {
-                if (root.isAtEndOfArticle) {
-                    markReadJob = viewLifecycleOwner.lifecycleScope.launchWhenResumed {
-                        delay(2000)
-                        articleDetailsViewModel.setArticleUnread(false)
-                    }
-                }
-            }
-        }
-    }
-
-    private fun Int.toRgbaCall(): String {
-        return "rgba(%d, %d, %d, %.2f)".format(Locale.ENGLISH,
-            Color.red(this), Color.green(this), Color.blue(this), Color.alpha(this) / 255f)
-    }
 
     private val NestedScrollView.scrollRange: Int
         get() = getChildAt(0)?.let { child ->
@@ -388,25 +311,4 @@ class ArticleDetailFragment @Inject constructor(
         return hasCategory(Intent.CATEGORY_APP_BROWSER) || handlesWebUris() && countDataAuthorities() == 0
     }
 
-    private fun IntentFilter.handlesWebUris(): Boolean {
-        // adapted from hidden method IntentFilter.handleWebUris()
-        val nbDataSchemes = countDataSchemes()
-        // Require ACTION_VIEW, CATEGORY_BROWSEABLE, and at least one scheme
-        if (!hasAction(Intent.ACTION_VIEW)
-            || !hasCategory(Intent.CATEGORY_BROWSABLE)
-            || nbDataSchemes == 0
-        ) {
-            return false
-        }
-
-        // Now allow only the schemes "http" and "https"
-        for (i in 0 until nbDataSchemes) {
-            val scheme = getDataScheme(i)
-            val isWebScheme = "http" == scheme || "https" == scheme
-            if (isWebScheme) {
-                return true
-            }
-        }
-        return false
-    }
 }

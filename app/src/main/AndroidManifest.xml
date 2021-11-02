@@ -33,6 +33,12 @@
     <!-- AGP 7.0 seems to have a bug who makes it ignores targetSdkVersion for manifest of variant (debug/release) -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" tools:node="remove" />
 
+    <queries>
+        <intent>
+            <action android:name="android.support.customtabs.action.CustomTabsService" />
+        </intent>
+    </queries>
+
     <application
             android:name="com.geekorum.ttrss.Application"
             android:appCategory="news"
