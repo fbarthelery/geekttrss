@@ -40,6 +40,8 @@ plugins {
     id("dagger.hilt.android.plugin")
 }
 
+val composeVersion = "1.1.0-beta01"
+
 android {
     val compileSdkInt: Int by rootProject.extra
     compileSdk = compileSdkInt
@@ -80,8 +82,13 @@ android {
         }
     }
 
-    dataBinding {
-        isEnabled = true
+    buildFeatures {
+        dataBinding = true
+        compose = true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = composeVersion
     }
 
     flavorDimensions += "distribution"
@@ -123,9 +130,6 @@ kapt {
     }
 }
 
-hilt {
-    enableTransformForLocalTests = true
-}
 
 dependencies {
 
@@ -140,6 +144,25 @@ dependencies {
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.1.0")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation("androidx.preference:preference-ktx:1.1.1")
+
+    // compose
+    implementation("androidx.compose.ui:ui:$composeVersion")
+    implementation("androidx.compose.ui:ui-util:$composeVersion")
+    implementation("androidx.compose.foundation:foundation:$composeVersion")
+    implementation("androidx.compose.material:material:$composeVersion")
+    implementation("androidx.compose.material:material-icons-core:$composeVersion")
+    implementation("androidx.compose.material:material-icons-extended:$composeVersion")
+    implementation("androidx.compose.ui:ui-viewbinding:$composeVersion")
+    implementation("androidx.activity:activity-compose:1.4.0")
+    implementation("androidx.compose.runtime:runtime-livedata:$composeVersion")
+    val accompanistVersion = "0.21.0-beta"
+    implementation("com.google.accompanist:accompanist-insets:$accompanistVersion")
+    implementation("com.google.accompanist:accompanist-insets-ui:$accompanistVersion")
+
+
+    // for layout inspector
+    debugImplementation("androidx.compose.ui:ui-tooling:$composeVersion")
+    implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
 
     // androidx others
     implementation("androidx.browser:browser:1.3.0")
@@ -170,6 +193,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycleVersion")
     dualTestImplementation("androidx.arch.core:core-testing:2.1.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleVersion")
 
     // dagger
     val daggerVersion = "2.36"
