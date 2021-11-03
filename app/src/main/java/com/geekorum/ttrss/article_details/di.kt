@@ -22,34 +22,15 @@
 
 package com.geekorum.ttrss.article_details
 
-import androidx.fragment.app.Fragment
-import com.geekorum.geekdroid.dagger.FragmentKey
 import dagger.Binds
 import dagger.Module
-import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ActivityComponent
 import dagger.hilt.migration.DisableInstallInCheck
-import dagger.multibindings.IntoMap
 
 
 /**
  * Dependency injection pieces for the article_details functionality
  */
 
-
-/**
- * Provides the Fragments injectors.
- */
-@Module
-@InstallIn(ActivityComponent::class)
-abstract class FragmentsInjectorModule {
-
-    @Binds
-    @IntoMap
-    @FragmentKey(ArticleDetailFragment::class)
-    internal abstract fun providesArticleDetailsFragment(fragment: ArticleDetailFragment): Fragment
-
-}
 
 @Module
 @DisableInstallInCheck

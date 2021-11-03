@@ -23,20 +23,17 @@ package com.geekorum.ttrss.article_details
 import android.annotation.SuppressLint
 import android.content.ContentUris
 import android.os.Bundle
+import android.webkit.WebViewClient
+import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.marginBottom
-import androidx.core.view.updateLayoutParams
-import androidx.databinding.DataBindingUtil
-import com.geekorum.geekdroid.views.doOnApplyWindowInsets
-import com.geekorum.ttrss.R
 import com.geekorum.ttrss.articles_list.ArticleListActivity
-import com.geekorum.ttrss.databinding.ActivityArticleDetailBinding
-import com.geekorum.ttrss.databinding.ToolbarArticleDetailsBinding
 import com.geekorum.ttrss.session.SessionActivity
+import com.geekorum.ttrss.ui.AppTheme
+import com.google.accompanist.insets.ProvideWindowInsets
 import dagger.hilt.android.AndroidEntryPoint
+import okhttp3.OkHttpClient
+import javax.inject.Inject
 
 /**
  * An activity representing a single Article detail screen. This
@@ -47,50 +44,34 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class ArticleDetailActivity : SessionActivity() {
 
-    private lateinit var binding: ActivityArticleDetailBinding
-
     private val articleDetailsViewModel: ArticleDetailsViewModel by viewModels()
+    private lateinit var webViewClient: WebViewClient
+    @Inject lateinit var okHttpClient: OkHttpClient
+    @Inject lateinit var webFontProvider: WebFontProvider
 
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_article_detail)
-        binding.lifecycleOwner = this
-        binding.viewModel = articleDetailsViewModel
-        setSupportActionBar(binding.detailToolbar)
-        setUpBottomAppBar()
+        webViewClient = ArticleDetailsWebViewClient(okHttpClient, webFontProvider,
+            openUrlInBrowser = articleDetailsViewModel::openUrlInBrowser,
+            onPageFinishedCallback = { _, _ -> }
+        )
+
         setUpEdgeToEdge()
-
-        // Show the Up button in the action bar.
-        val actionBar = supportActionBar!!
-        actionBar.setDisplayShowTitleEnabled(false)
-        actionBar.setDisplayHomeAsUpEnabled(true)
-
         val articleUri = requireNotNull(intent.data)
         articleDetailsViewModel.init(ContentUris.parseId(articleUri))
+
+        setContent {
+            ProvideWindowInsets {
+                AppTheme {
+                    ArticleDetailsScreen(articleDetailsViewModel, webViewClient)
+                }
+            }
+        }
     }
 
     @SuppressLint("RestrictedApi")
     private fun setUpEdgeToEdge() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        val fabInitialBottomMargin = binding.fab.marginBottom
-        binding.root.doOnApplyWindowInsets { view, windowInsets, initialPadding ->
-            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-            initialPadding.top += insets.top
-            initialPadding.applyToView(view)
-            // we don't want to apply bottom padding on the whole view group, so we only update fab margin
-            binding.fab.updateLayoutParams<CoordinatorLayout.LayoutParams> {
-                bottomMargin = fabInitialBottomMargin + insets.bottom
-            }
-            windowInsets
-        }
-    }
-
-    private fun setUpBottomAppBar() {
-        val toolbarBinding = ToolbarArticleDetailsBinding.inflate(layoutInflater).apply {
-            lifecycleOwner = this@ArticleDetailActivity
-            viewModel = articleDetailsViewModel
-        }
-        binding.bottomAppBar.addView(toolbarBinding.root)
     }
 
 }
