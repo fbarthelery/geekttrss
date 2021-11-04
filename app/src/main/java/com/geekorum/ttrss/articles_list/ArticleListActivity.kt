@@ -166,8 +166,9 @@ class ArticleListActivity : SessionActivity() {
             .setOpenableLayout(drawerLayout)
             .build()
         binding.toolbar.setupWithNavController(navController, appBarConfiguration)
-        appBarPresenter = AppBarPresenter(binding.appBar, binding.toolbar, binding.tagsList, binding.tagsGroup,
-            this, tagsViewModel, navController)
+        appBarPresenter = AppBarPresenter(binding.appBar, binding.toolbar,
+            binding.tagsList,
+            tagsViewModel, navController)
     }
 
     private fun setupSortOrder() {

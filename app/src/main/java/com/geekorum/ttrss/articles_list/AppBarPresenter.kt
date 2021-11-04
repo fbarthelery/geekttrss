@@ -20,18 +20,19 @@
  */
 package com.geekorum.ttrss.articles_list
 
-import android.view.LayoutInflater
 import android.view.View
-import androidx.core.view.children
-import androidx.lifecycle.LifecycleOwner
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.ComposeView
 import androidx.navigation.NavController
 import androidx.navigation.dynamicfeatures.DynamicGraphNavigator
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Feed.Companion.FEED_ID_ALL_ARTICLES
+import com.geekorum.ttrss.ui.AppTheme
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.chip.Chip
-import com.google.android.material.chip.ChipGroup
 
 
 /**
@@ -40,19 +41,16 @@ import com.google.android.material.chip.ChipGroup
 internal class AppBarPresenter(
     private val appBarLayout: AppBarLayout,
     private val toolbar: MaterialToolbar,
-    private val tagsList: View,
-    private val tagsGroup: ChipGroup,
-    private val lifecycleOwner: LifecycleOwner,
+    private val tagsListCompose: ComposeView,
     private val tagsViewModel: TagsViewModel,
     private val navController: NavController
 ){
 
-    private var tagsIds: Map<Int, String>? = null
-    private var currentTag: String? = null
+    private var currentTag: String? by mutableStateOf(null)
 
     init {
         setup()
-        observeTags()
+        setupTagsListBar()
     }
 
     private fun setup() {
@@ -80,53 +78,35 @@ internal class AppBarPresenter(
                 }
                 else -> View.GONE
             }
-            tagsList.visibility = tagsVisibility
-            if (destination.id == R.id.articlesListByTagFragment) {
-                currentTag = arguments?.getString("tag")
+            tagsListCompose.visibility = tagsVisibility
+            currentTag = if (destination.id == R.id.articlesListByTagFragment) {
+                arguments?.getString("tag")
             } else {
-                currentTag = null
-                tagsGroup.clearCheck()
+                null
             }
         }
     }
 
-    private fun observeTags() {
-        tagsViewModel.tags.observe(lifecycleOwner) { tags ->
-            tagsIds = tags.map { View.generateViewId() to it }.toMap()
-            transformTagsToChips()
-        }
-        tagsGroup.setOnCheckedChangeListener { _, checkedId ->
-            val tag = tagsIds?.get(checkedId)
-            if (tag == null) {
-                if (navController.currentDestination?.id == R.id.articlesListByTagFragment) {
-                    navController.popBackStack()
-                }
-            } else if (tag != currentTag) {
-                val showTag = ArticlesListFragmentDirections.actionShowTag(tag)
-                navController.navigate(showTag)
+    private fun setupTagsListBar() {
+        tagsListCompose.setContent {
+            AppTheme {
+                val tags by tagsViewModel.tags.observeAsState()
+                TagsListBar(tags = tags?.toSet() ?: emptySet(),
+                    selectedTag = currentTag,
+                    selectedTagChange = { tag ->
+                        currentTag = tag
+                        if (tag == null) {
+                            if (navController.currentDestination?.id == R.id.articlesListByTagFragment) {
+                                navController.popBackStack()
+                            }
+                        } else {
+                            val showTag = ArticlesListFragmentDirections.actionShowTag(tag)
+                            navController.navigate(showTag)
+                        }
+                    }
+                )
             }
         }
     }
 
-    private fun transformTagsToChips() {
-        tagsGroup.removeAllViews()
-        val layoutInflater = LayoutInflater.from(tagsGroup.context)
-        for ((id, tag) in tagsIds!!) {
-            layoutInflater.inflate(R.layout.chip_tag, tagsGroup)
-            val chip = tagsGroup.children.last() as Chip
-            chip.apply {
-                setId(id)
-                text = tag
-                setTag(tag)
-            }
-        }
-        checkCurrentTagChip()
-    }
-
-    private fun checkCurrentTagChip() {
-        val checkedId = currentTag?.let {
-            tagsGroup.findViewWithTag<View>(it)?.id
-        } ?: View.NO_ID
-        tagsGroup.check(checkedId)
-    }
 }

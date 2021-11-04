@@ -63,25 +63,12 @@
                     style="?appBarToolbarStyle"
                     />
 
-            <HorizontalScrollView
+            <androidx.compose.ui.platform.ComposeView
                 android:id="@+id/tags_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:scrollbars="none"
                 app:layout_scrollFlags="scroll|enterAlways"
-                android:background="?colorSurface"
-                android:paddingHorizontal="16dp"
-                android:clipToPadding="false"
-                >
-
-                <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/tags_group"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    app:singleSelection="true"
-                    app:singleLine="true"
-                    android:theme="@style/ThemeOverlay.AppTheme.TagChip"/>
-            </HorizontalScrollView>
+                />
 
         </com.google.android.material.appbar.AppBarLayout>
 
