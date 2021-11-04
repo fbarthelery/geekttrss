@@ -36,6 +36,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -45,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberImagePainter
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.ui.AppTheme
+import kotlin.math.roundToInt
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -106,7 +108,7 @@ private fun TitleWithImage(
     imageUrl: String,
     isUnread: Boolean,
 ) {
-    BoxWithConstraints {
+    Box {
         val finalImageUrl = imageUrl.takeUnless { it.isEmpty() }
         var hasImage by remember { mutableStateOf(finalImageUrl != null) }
         if (hasImage) {
@@ -114,7 +116,7 @@ private fun TitleWithImage(
                 val colorMatrix = ColorMatrix().apply { setToSaturation(0f) }
                 ColorFilter.colorMatrix(colorMatrix)
             } else null
-            val imageMaxHeight = (maxWidth * (9f / 16))
+
             Image(
                 painter = rememberImagePainter(data = finalImageUrl) {
                     listener(onError = { _, _ ->
@@ -126,7 +128,14 @@ private fun TitleWithImage(
                 colorFilter = colorFilter,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .heightIn(max = imageMaxHeight)
+                    .layout { measurable, constraints ->
+                        val maxHeight = (constraints.maxWidth * (9f / 16)).roundToInt()
+                            .coerceIn(constraints.minHeight, constraints.maxHeight)
+                        val placeable = measurable.measure(constraints.copy(maxHeight = maxHeight))
+                        layout(placeable.width, placeable.height) {
+                            placeable.placeRelative(0, 0)
+                        }
+                    }
                     .padding(bottom = 16.dp),
                 contentDescription = null,
             )
