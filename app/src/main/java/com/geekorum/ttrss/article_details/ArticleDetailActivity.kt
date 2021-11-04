@@ -63,7 +63,11 @@ class ArticleDetailActivity : SessionActivity() {
         setContent {
             ProvideWindowInsets {
                 AppTheme {
-                    ArticleDetailsScreen(articleDetailsViewModel, webViewClient)
+                    ArticleDetailsScreen(articleDetailsViewModel,
+                        webViewClient = webViewClient,
+                        onNavigateUpClick = {
+                            onSupportNavigateUp()
+                        })
                 }
             }
         }

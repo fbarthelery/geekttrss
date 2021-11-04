@@ -54,6 +54,7 @@ fun ArticleBottomAppBar(
     } else 0
     val lifecycleOwner = LocalLifecycleOwner.current
     val layoutInflater: LayoutInflater = LocalContext.current.getSystemService()!!
+    //TODO looks like the star don't animate to checked state on creation
     val toolbarBinding = remember {
         ToolbarArticleDetailsBinding.inflate(layoutInflater).apply {
             this.lifecycleOwner = lifecycleOwner

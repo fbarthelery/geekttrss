@@ -122,6 +122,7 @@ class ArticleDetailsScreenState(
 @Composable
 fun ArticleDetailsScreen(
     articleDetailsViewModel: ArticleDetailsViewModel,
+    onNavigateUpClick: () -> Unit,
     webViewClient: WebViewClient? = null,
 ) {
     val articleDetailsScreenState = rememberArticleDetailsScreenState()
@@ -131,7 +132,7 @@ fun ArticleDetailsScreen(
     Scaffold(
         topBar = {
             val appBarElevation = articleDetailsScreenState.appBarElevation
-            ArticleTopAppBar(appBarElevation)
+            ArticleTopAppBar(appBarElevation, onNavigateUpClick)
         },
         bottomBar = {
             val context = LocalContext.current
@@ -173,7 +174,7 @@ fun ArticleDetailsScreen(
 }
 
 @Composable
-private fun ArticleTopAppBar(appBarElevation: Dp) {
+private fun ArticleTopAppBar(appBarElevation: Dp, onNavigateUpClick: () -> Unit) {
     Surface(elevation = appBarElevation) {
         val statusBarPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars)
         TopAppBar(
@@ -182,7 +183,9 @@ private fun ArticleTopAppBar(appBarElevation: Dp) {
             elevation = 0.dp,
             backgroundColor = MaterialTheme.colors.surface,
             navigationIcon = {
-                Icon(Icons.Default.ArrowBack, contentDescription = null)
+                IconButton(onClick = onNavigateUpClick) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = null)
+                }
             },
         )
     }
