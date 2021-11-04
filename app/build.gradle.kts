@@ -155,6 +155,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-viewbinding:$composeVersion")
     implementation("androidx.activity:activity-compose:1.4.0")
     implementation("androidx.compose.runtime:runtime-livedata:$composeVersion")
+    implementation("androidx.compose.animation:animation-graphics:$composeVersion")
     val accompanistVersion = "0.21.0-beta"
     implementation("com.google.accompanist:accompanist-insets:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-insets-ui:$accompanistVersion")
@@ -181,7 +182,9 @@ dependencies {
     implementation("com.google.android.material:material:1.3.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.6.0")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.6.0")
-    implementation("io.coil-kt:coil:1.2.0")
+    val coilVersion = "1.4.0"
+    implementation("io.coil-kt:coil:$coilVersion")
+    implementation("io.coil-kt:coil-compose:$coilVersion")
     implementation("com.google.android.gms:play-services-oss-licenses:17.0.0")
 
     implementation("org.jsoup:jsoup:1.10.2")
@@ -223,7 +226,7 @@ dependencies {
     implementation(enforcedPlatform(kotlin("bom")))
     implementation(kotlin("stdlib-jdk8"))
 
-    val coroutinesVersion = "1.5.0"
+    val coroutinesVersion = "1.5.2"
     implementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:$coroutinesVersion"))
     testImplementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:$coroutinesVersion"))
     androidTestImplementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:$coroutinesVersion"))
