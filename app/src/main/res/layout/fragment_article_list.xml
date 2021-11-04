@@ -66,7 +66,6 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                     android:orientation="vertical"
-                    tools:listitem="@layout/headlines_row"
                     android:visibility="@{(fragmentViewModel.haveZeroArticles ?? false) ? View.INVISIBLE : View.VISIBLE, default=visible}"
                     />
         </androidx.constraintlayout.widget.ConstraintLayout>

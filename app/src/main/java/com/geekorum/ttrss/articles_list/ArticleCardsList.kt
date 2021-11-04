@@ -28,20 +28,26 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.unit.dp
 import androidx.core.app.ShareCompat
-import androidx.core.view.doOnPreDraw
 import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import coil.load
 import com.geekorum.geekdroid.views.recyclerview.SpacingItemDecoration
-import com.geekorum.ttrss.BR
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleWithFeed
 import com.geekorum.ttrss.data.Feed
-import com.geekorum.ttrss.databinding.HeadlinesRowBinding
-import kotlin.math.roundToInt
+import com.geekorum.ttrss.ui.AppTheme
 
 
 internal fun RecyclerView.setupCardSpacing() {
@@ -54,16 +60,15 @@ internal fun RecyclerView.setupCardSpacing() {
 internal open class ArticlesListAdapter(
     private val layoutInflater: LayoutInflater,
     private val eventHandler: CardEventHandler
-) : PagingDataAdapter<ArticleWithFeed, HeadlinesBindingViewHolder>(ARTICLE_DIFF_CALLBACK) {
+) : PagingDataAdapter<ArticleWithFeed, HeadlinesComposeViewHolder>(ARTICLE_DIFF_CALLBACK) {
 
     var displayFeedName = false
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HeadlinesBindingViewHolder {
-        val binding = HeadlinesRowBinding.inflate(layoutInflater, parent, false)
-        return HeadlinesBindingViewHolder(binding)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HeadlinesComposeViewHolder {
+        return HeadlinesComposeViewHolder(ComposeView(parent.context))
     }
 
-    override fun onBindViewHolder(holder: HeadlinesBindingViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: HeadlinesComposeViewHolder, position: Int) {
         with(holder) {
             val articleWithFeed = getItem(position)
             setArticle(articleWithFeed?.article)
@@ -75,72 +80,6 @@ internal open class ArticlesListAdapter(
             }
             setHandler(eventHandler)
             setPosition(position)
-        }
-        holder.binding.executePendingBindings()
-    }
-}
-
-internal class HeadlinesBindingViewHolder(val binding: HeadlinesRowBinding) :
-    RecyclerView.ViewHolder(binding.root) {
-
-    fun setArticle(article: Article?) {
-        binding.setVariable(BR.article, article)
-        setArticleFlavorImage(article?.flavorImageUri)
-    }
-
-    fun setFeedIcon(feedIconUrl: String?) {
-        if (feedIconUrl == null) {
-            binding.feedIcon.setImageResource(R.drawable.ic_rss_feed_orange)
-        } else {
-            binding.feedIcon.load(feedIconUrl)
-        }
-    }
-
-    fun setAuthor(author: String?) {
-        if (!author.isNullOrBlank()) {
-            binding.author.text = binding.author.resources.getString(R.string.author_formatted, author)
-        } else {
-            binding.author.text = ""
-        }
-    }
-
-    fun setFeedName(feed: Feed?) {
-        val feedName = if (feed?.displayTitle?.isBlank() == true) {
-            feed.title
-        } else {
-            feed?.displayTitle
-        }
-        if (!feedName.isNullOrBlank()) {
-            binding.author.text = feedName
-        } else {
-            binding.author.text = ""
-        }
-    }
-
-    fun setHandler(cardEventHandler: CardEventHandler) {
-        binding.setVariable(BR.handler, cardEventHandler)
-    }
-
-    fun setPosition(position: Int) {
-        binding.setVariable(BR.position, position)
-    }
-
-    private fun setArticleFlavorImage(url: String?) {
-        val view = binding.flavorImage
-        val parent = view.parent as View
-        val finalUrl = url.takeUnless { it.isNullOrEmpty() }
-        // just to be sure that we will load an image. run it without size info
-        view.load(finalUrl)
-
-        // reload with size info to resize bitmap
-        // this is important to not load big bitmap into memory
-        parent.doOnPreDraw {
-            val width = parent.width.takeIf { it != 0 } ?: return@doOnPreDraw
-            val height = (width.toFloat() * 9 / 16).roundToInt()
-            view.maxHeight = height
-            view.load(finalUrl) {
-                size(width, height)
-            }
         }
     }
 }
@@ -195,5 +134,111 @@ private val ARTICLE_DIFF_CALLBACK = object : DiffUtil.ItemCallback<ArticleWithFe
 
     override fun areContentsTheSame(oldItem: ArticleWithFeed, newItem: ArticleWithFeed): Boolean {
         return oldItem == newItem
+    }
+}
+
+internal class HeadlinesComposeViewHolder(
+    private val composeView: ComposeView
+) :
+    RecyclerView.ViewHolder(composeView) {
+
+    private var title by mutableStateOf("")
+    private var flavorImageUrl by mutableStateOf("")
+    private var excerpt by mutableStateOf("")
+    private var feedNameOrAuthor by mutableStateOf("")
+    private var feedIconUrl by mutableStateOf("")
+    private var isUnread by mutableStateOf(true)
+    private var isStarred by mutableStateOf(false)
+    private var itemPosition = 0
+    private var cardEventHandler: CardEventHandler? = null
+    private var article: Article? = null
+
+    init {
+        composeView.setContent {
+            AppTheme {
+                BoxWithConstraints(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.TopCenter
+                ) {
+                    var paddingStart = 0.dp
+                    var paddingEnd = 0.dp
+                    if (maxWidth > 496.dp) { // 384 (max card width) + 24 + 88
+                        paddingStart = 24.dp
+                        paddingEnd = 88.dp
+                    }
+                    ArticleCard(title = title,
+                        flavorImageUrl = flavorImageUrl,
+                        excerpt = excerpt,
+                        feedNameOrAuthor = feedNameOrAuthor,
+                        feedIconUrl = feedIconUrl,
+                        isUnread = isUnread,
+                        isStarred = isStarred,
+                        onCardClick = {
+                            cardEventHandler?.onCardClicked(composeView, article!!, itemPosition)
+                        },
+                        onOpenInBrowserClick = {
+                            cardEventHandler?.onOpenButtonClicked(composeView, article!!)
+                        },
+                        onStarChanged = {
+                            cardEventHandler?.onStarChanged(article!!, it)
+                        },
+                        onShareClick = {
+                            cardEventHandler?.onShareClicked(article!!)
+                        },
+                        onToggleUnreadClick = {
+                            cardEventHandler?.onMenuToggleReadSelected(article!!)
+                        },
+                        modifier = Modifier.padding(1.dp)
+                            .padding(start = paddingStart, end = paddingEnd)
+                    )
+                }
+            }
+        }
+    }
+
+    fun setArticle(article: Article?) {
+        this.article = article
+        title = article?.title ?: ""
+        excerpt = article?.contentExcerpt ?: ""
+        isUnread = article?.isUnread ?: false
+        isStarred = article?.isStarred ?: false
+        setArticleFlavorImage(article?.flavorImageUri)
+    }
+
+    fun setFeedIcon(feedIconUrl: String?) {
+        this.feedIconUrl = feedIconUrl ?: ""
+    }
+
+    fun setAuthor(author: String?) {
+        if (!author.isNullOrBlank()) {
+            feedNameOrAuthor = composeView.resources.getString(R.string.author_formatted, author)
+        } else {
+            feedNameOrAuthor = ""
+        }
+    }
+
+    fun setFeedName(feed: Feed?) {
+        val feedName = if (feed?.displayTitle?.isBlank() == true) {
+            feed.title
+        } else {
+            feed?.displayTitle
+        }
+        if (!feedName.isNullOrBlank()) {
+            feedNameOrAuthor = feedName
+        } else {
+            feedNameOrAuthor = ""
+        }
+    }
+
+    fun setHandler(cardEventHandler: CardEventHandler) {
+        this.cardEventHandler = cardEventHandler
+    }
+
+    fun setPosition(position: Int) {
+        this.itemPosition = position
+    }
+
+    private fun setArticleFlavorImage(url: String?) {
+        flavorImageUrl = url ?: ""
     }
 }
