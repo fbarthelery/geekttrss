@@ -48,6 +48,57 @@ import com.geekorum.ttrss.R
 import com.geekorum.ttrss.ui.AppTheme
 import kotlin.math.roundToInt
 
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun SwipeableArticleCard(
+    title: String,
+    flavorImageUrl: String,
+    excerpt: String,
+    feedNameOrAuthor: String,
+    feedIconUrl: String?,
+    isUnread: Boolean,
+    isStarred: Boolean,
+    onCardClick: () -> Unit,
+    onOpenInBrowserClick: () -> Unit,
+    onStarChanged: (Boolean) -> Unit,
+    onShareClick: () -> Unit,
+    onToggleUnreadClick: () -> Unit,
+    onSwiped: () -> Unit,
+    modifier: Modifier = Modifier,
+    behindCardContent: @Composable (DismissDirection?) -> Unit = { }
+) {
+    val dismissState = rememberDismissState()
+    LaunchedEffect(dismissState.currentValue) {
+        if (dismissState.currentValue != DismissValue.Default) {
+            onSwiped()
+        }
+    }
+
+    SwipeToDismiss(
+        state = dismissState,
+        modifier = modifier,
+        background = {
+            behindCardContent(dismissState.dismissDirection)
+        },
+        dismissContent = {
+            ArticleCard(
+                title = title,
+                flavorImageUrl = flavorImageUrl,
+                excerpt = excerpt,
+                feedNameOrAuthor = feedNameOrAuthor,
+                feedIconUrl = feedIconUrl,
+                isUnread = isUnread,
+                isStarred = isStarred,
+                onCardClick = onCardClick,
+                onOpenInBrowserClick = onOpenInBrowserClick,
+                onStarChanged = onStarChanged,
+                onShareClick = onShareClick,
+                onToggleUnreadClick = onToggleUnreadClick,
+            )
+        }
+    )
+}
+
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -129,7 +180,8 @@ private fun TitleWithImage(
                 modifier = Modifier
                     .fillMaxWidth()
                     .layout { measurable, constraints ->
-                        val maxHeight = (constraints.maxWidth * (9f / 16)).roundToInt()
+                        val maxHeight = (constraints.maxWidth * (9f / 16))
+                            .roundToInt()
                             .coerceIn(constraints.minHeight, constraints.maxHeight)
                         val placeable = measurable.measure(constraints.copy(maxHeight = maxHeight))
                         layout(placeable.width, placeable.height) {
