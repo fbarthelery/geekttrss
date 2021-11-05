@@ -169,6 +169,15 @@ class ArticleListActivity : SessionActivity() {
         appBarPresenter = AppBarPresenter(binding.appBar, binding.toolbar,
             binding.tagsList,
             tagsViewModel, navController)
+
+        // workaround with compose fragment
+        // it looks like appbar_scrolling_view_behavior is not applied correctly
+        // I don't know exactly what additional size is added to the height of the screen.
+        // anyway we need to communicate it to the compose view to add it as bottom padding.
+        // appBar height works fine
+        binding.appBar.doOnLayout {
+            activityViewModel.appBarHeight = it.height
+        }
     }
 
     private fun setupSortOrder() {

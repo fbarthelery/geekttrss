@@ -23,6 +23,9 @@ package com.geekorum.ttrss.articles_list
 import android.accounts.Account
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -79,6 +82,8 @@ class ActivityViewModel @Inject constructor(
     }
 
     val onlyUnreadArticles = state.getLiveData(STATE_NEED_UNREAD, true)
+
+    var appBarHeight: Int by mutableStateOf(0)
 
     init {
         browserLauncher.warmUp()

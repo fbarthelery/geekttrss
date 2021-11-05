@@ -80,6 +80,9 @@ abstract class BaseArticlesListFragment() : Fragment() {
             setContent {
                 ProvideWindowInsets {
                     AppTheme {
+                        val appBarHeightDp = with(LocalDensity.current) {
+                            activityViewModel.appBarHeight.toDp()
+                        }
                         Surface(Modifier.fillMaxSize()) {
                             ArticleCardList(
                                 viewModel = articlesViewModel,
@@ -88,6 +91,7 @@ abstract class BaseArticlesListFragment() : Fragment() {
                                 onOpenInBrowserClick = {
                                     activityViewModel.displayArticleInBrowser(requireContext(), it)
                                 },
+                                additionalContentPaddingBottom = appBarHeightDp,
                                 modifier = Modifier
                                     .fillMaxSize()
                             )
