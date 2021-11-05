@@ -20,45 +20,35 @@
  */
 package com.geekorum.ttrss.articles_list
 
-import android.content.Context
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updatePadding
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Surface
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.core.app.ShareCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
-import androidx.paging.LoadState
-import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.RecyclerView
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
-import com.geekorum.geekdroid.views.doOnApplyWindowInsets
-import com.geekorum.geekdroid.views.recyclerview.ItemSwiper
-import com.geekorum.geekdroid.views.recyclerview.ScrollFromBottomAppearanceItemAnimator
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Article
-import com.geekorum.ttrss.databinding.FragmentArticleListBinding
+import com.geekorum.ttrss.ui.AppTheme
+import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 
 /**
  * Display all the articles in a list.
  */
 abstract class BaseArticlesListFragment() : Fragment() {
-
-    private lateinit var binding: FragmentArticleListBinding
-    private lateinit var adapter: SwipingArticlesListAdapter
 
     protected abstract val articlesViewModel: BaseArticlesViewModel
     private val activityViewModel: ActivityViewModel by activityViewModels()
@@ -66,13 +56,16 @@ abstract class BaseArticlesListFragment() : Fragment() {
     private var hasLoadedDataAtLeastOnce = false
 
     private val unreadSnackbar: Snackbar by lazy {
-        Snackbar.make(binding.root, "", Snackbar.LENGTH_LONG).apply {
+        Snackbar.make(requireView(), "", Snackbar.LENGTH_LONG).apply {
             addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
                 override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
                     articlesViewModel.commitSetUnreadActions()
                 }
             })
             setAction(R.string.undo_set_articles_read_btn) {
+                // TODO undo doesn't work anymore
+                // seems like the article is added back in the composable list but its state is already swiped
+                // so onSwiped is trigger again and it removes it then loop
                 articlesViewModel.undoSetUnreadActions()
             }
         }
@@ -82,29 +75,34 @@ abstract class BaseArticlesListFragment() : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentArticleListBinding.inflate(inflater, container, false)
-        binding.lifecycleOwner = this
-        setupRecyclerView(binding.articleList, binding.swipeRefreshContainer)
-        return binding.root
-    }
-
-    private fun setupEdgeToEdge() {
-        binding.articleList.doOnApplyWindowInsets { view, windowInsets, padding ->
-            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-            view.updatePadding(bottom = padding.bottom + insets.bottom)
-            windowInsets
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                ProvideWindowInsets {
+                    AppTheme {
+                        Surface(Modifier.fillMaxSize()) {
+                            ArticleCardList(
+                                viewModel = articlesViewModel,
+                                onCardClick = activityViewModel::displayArticle,
+                                onShareClick = ::onShareClicked,
+                                onOpenInBrowserClick = {
+                                    activityViewModel.displayArticleInBrowser(requireContext(), it)
+                                },
+                                modifier = Modifier
+                                    .fillMaxSize()
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setupEdgeToEdge()
-        viewLifecycleOwner.lifecycleScope.launch {
-            articlesViewModel.articles.collectLatest {
-                adapter.submitData(it)
-            }
-        }
-
+        // TODO
+/*
         adapter.loadStateFlow.onEach {
             when (it.refresh) {
                 is LoadState.NotLoading -> {
@@ -120,10 +118,7 @@ abstract class BaseArticlesListFragment() : Fragment() {
                 is LoadState.Error -> Unit
             }
         }.launchIn(viewLifecycleOwner.lifecycleScope)
-
-        articlesViewModel.isMultiFeed.onEach {
-            adapter.displayFeedName = it
-        }.launchIn(viewLifecycleOwner.lifecycleScope)
+*/
 
         articlesViewModel.getPendingArticlesSetUnread().observe(viewLifecycleOwner) { nbArticles ->
             if (nbArticles > 0) {
@@ -143,7 +138,6 @@ abstract class BaseArticlesListFragment() : Fragment() {
             articlesViewModel.setNeedUnread(it)
         }
 
-        binding.fragmentViewModel = articlesViewModel
     }
 
     private fun updateUnreadSnackbar(nbArticles: Int) {
@@ -153,85 +147,17 @@ abstract class BaseArticlesListFragment() : Fragment() {
         unreadSnackbar.show()
     }
 
-    private fun setupRecyclerView(recyclerView: RecyclerView, swipeRefresh: SwipeRefreshLayout) {
-        val eventHandler = ArticleEventHandler(requireActivity())
-        adapter = SwipingArticlesListAdapter(layoutInflater, eventHandler)
-        recyclerView.adapter = adapter
-        recyclerView.setupCardSpacing()
-
-        swipeRefresh.setOnRefreshListener {
-            articlesViewModel.refresh()
-            // leave the progress at least 1s, then refresh its value
-            // So if the user trigger a refresh but no sync operation is launch (eg: because of no connectivity)
-            // the SwipeRefreshLayout will come back to original status
-            viewLifecycleOwner.lifecycleScope.launch {
-                delay(1000)
-                swipeRefresh.isRefreshing = articlesViewModel.isRefreshing.value!!
-            }
-        }
-        recyclerView.itemAnimator = ScrollFromBottomAppearanceItemAnimator(recyclerView, DefaultItemAnimator())
-        val changeReadSwiper = ChangeReadSwiper(requireContext())
-        changeReadSwiper.attachToRecyclerView(recyclerView)
+    private fun onShareClicked(article: Article) {
+        startActivity(createShareIntent(requireActivity(), article))
     }
 
-    private inner class SwipingArticlesListAdapter(
-        layoutInflater: LayoutInflater, eventHandler: CardEventHandler
-    ) : ArticlesListAdapter(layoutInflater, eventHandler), ChangeReadDecoration.ArticleProvider {
-
-        override fun getArticle(item: RecyclerView.ViewHolder): Article? {
-            val position = item.bindingAdapterPosition
-            return if (position != RecyclerView.NO_POSITION) {
-                getItem(position)?.article
-            } else null
-        }
-    }
-
-    private inner class ArticleEventHandler(context: Context) : CardEventHandler(context) {
-
-        override fun onCardClicked(card: View, article: Article, position: Int) {
-            activityViewModel.displayArticle(position, article)
-        }
-
-        override fun onStarChanged(article: Article, newValue: Boolean) {
-            articlesViewModel.setArticleStarred(article.id, newValue)
-        }
-
-        override fun onShareClicked(article: Article) {
-            startActivity(createShareIntent(requireActivity(), article))
-        }
-
-        override fun onMenuToggleReadSelected(article: Article) {
-            articlesViewModel.setArticleUnread(article.id, !article.isTransientUnread)
-        }
-
-        override fun onOpenButtonClicked(button: View, article: Article) {
-            activityViewModel.displayArticleInBrowser(context, article)
-        }
-    }
-
-
-    private inner class ChangeReadSwiper(
-        context: Context
-    ) : ItemSwiper(ItemTouchHelper.START or ItemTouchHelper.END) {
-
-        private val decoration: ChangeReadDecoration = ChangeReadDecoration(context, adapter)
-
-        init {
-            setOnSwipingListener(decoration)
-        }
-
-        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-            adapter.getArticle(viewHolder)?.let {
-                articlesViewModel.setArticleUnread(it.id, !it.isTransientUnread)
-            }
-        }
-
-        override fun attachToRecyclerView(recyclerView: RecyclerView) {
-            super.attachToRecyclerView(recyclerView)
-            recyclerView.addItemDecoration(decoration)
-        }
-
-        override fun getSwipeThreshold(viewHolder: RecyclerView.ViewHolder): Float = 0.3f
+    private fun createShareIntent(activity: Activity, article: Article): Intent {
+        val shareIntent = ShareCompat.IntentBuilder(activity)
+        shareIntent.setSubject(article.title)
+            .setHtmlText(article.content)
+            .setText(article.link)
+            .setType("text/plain")
+        return shareIntent.createChooserIntent()
     }
 
 }
