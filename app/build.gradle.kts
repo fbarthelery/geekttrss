@@ -40,7 +40,7 @@ plugins {
     id("dagger.hilt.android.plugin")
 }
 
-val composeVersion = "1.1.0-beta01"
+val composeVersion = "1.1.0-beta02"
 
 android {
     val compileSdkInt: Int by rootProject.extra
@@ -156,9 +156,11 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.4.0")
     implementation("androidx.compose.runtime:runtime-livedata:$composeVersion")
     implementation("androidx.compose.animation:animation-graphics:$composeVersion")
+    implementation("androidx.paging:paging-compose:1.0.0-alpha14")
     val accompanistVersion = "0.21.0-beta"
     implementation("com.google.accompanist:accompanist-insets:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-insets-ui:$accompanistVersion")
+    implementation("com.google.accompanist:accompanist-swiperefresh:$accompanistVersion")
 
 
     // for layout inspector
@@ -250,7 +252,7 @@ dependencies {
     api("androidx.work:work-runtime-ktx:$workVersion")
     api("androidx.room:room-runtime:$roomVersion")
     api("androidx.room:room-ktx:$roomVersion")
-    api("androidx.paging:paging-runtime-ktx:3.0.0")
+    api("androidx.paging:paging-runtime-ktx:3.1.0-rc01")
     api("com.squareup.retrofit2:retrofit:2.9.0")
     api("com.squareup.okhttp3:okhttp:4.9.1")
     api("com.jakewharton.timber:timber:4.7.1")
