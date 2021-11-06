@@ -100,7 +100,7 @@ internal class FragmentScenario<F: Fragment?, A: FragmentActivity>(
 
 internal inline fun <reified VM: ViewModel> createViewModelFactoryFor(viewModel: VM): ViewModelProvider.Factory = object : ViewModelProvider.Factory {
 
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass == VM::class.java) {
             return viewModel as T
         }
