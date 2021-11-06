@@ -47,6 +47,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.lerp
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Feed
@@ -62,7 +63,7 @@ fun FeedListNavigationMenu(
     onManageFeedsClicked: () -> Unit,
     onSettingsClicked: () -> Unit,
 ) {
-    Box {
+    BoxWithNavigationMenuTypography {
         val scrollState = rememberScrollState()
         Column(Modifier.verticalScroll(scrollState)
             .withVerticalScrollBar(scrollState)
@@ -93,6 +94,21 @@ fun FeedListNavigationMenu(
             )
             Spacer(Modifier.navigationBarsHeight())
         }
+    }
+}
+
+@Composable
+private inline fun BoxWithNavigationMenuTypography(
+    crossinline content: @Composable BoxScope.() -> Unit
+) {
+    val navTypography = MaterialTheme.typography.copy(
+        button = MaterialTheme.typography.button.copy(
+            letterSpacing = 0.4.sp,
+            fontWeight = FontWeight.SemiBold
+        )
+    )
+    MaterialTheme(typography = navTypography) {
+        Box(content = content)
     }
 }
 
