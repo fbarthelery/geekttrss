@@ -133,14 +133,14 @@ kapt {
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.5.0")
-    implementation("androidx.fragment:fragment-ktx:1.3.4")
-    implementation("androidx.activity:activity-ktx:1.2.3")
+    implementation("androidx.core:core-ktx:1.7.0")
+    implementation("androidx.fragment:fragment-ktx:1.3.6")
+    implementation("androidx.activity:activity-ktx:1.4.0")
 
     // androidx ui
     implementation("androidx.drawerlayout:drawerlayout:1.1.1")
-    implementation("androidx.constraintlayout:constraintlayout:2.0.4")
-    implementation("androidx.recyclerview:recyclerview:1.2.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.1")
+    implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.1.0")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
     implementation("androidx.preference:preference-ktx:1.1.1")
@@ -168,7 +168,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
 
     // androidx others
-    implementation("androidx.browser:browser:1.3.0")
+    implementation("androidx.browser:browser:1.4.0")
     // needed by robolectric
     implementation("androidx.loader:loader:1.1.0")
 
@@ -183,7 +183,7 @@ dependencies {
     implementation(project(":webapi"))
     implementation(project(":faviKonSnoop"))
 
-    implementation("com.google.android.material:material:1.3.0")
+    implementation("com.google.android.material:material:1.4.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.6.0")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.6.0")
     val coilVersion = "1.4.0"
@@ -191,7 +191,7 @@ dependencies {
     implementation("io.coil-kt:coil-compose:$coilVersion")
     implementation("com.google.android.gms:play-services-oss-licenses:17.0.0")
 
-    implementation("org.jsoup:jsoup:1.10.2")
+    implementation("org.jsoup:jsoup:1.13.1")
 
     val lifecycleVersion = "2.4.0"
     implementation("androidx.lifecycle:lifecycle-livedata-core-ktx:$lifecycleVersion")
@@ -250,14 +250,14 @@ dependencies {
     add("googleImplementation", "com.google.android.play:core-ktx:1.8.1")
 
     // api dependencies for features modules
-    api("androidx.appcompat:appcompat:1.3.0")
+    api("androidx.appcompat:appcompat:1.3.1")
     api("androidx.work:work-runtime-ktx:$workVersion")
     api("androidx.room:room-runtime:$roomVersion")
     api("androidx.room:room-ktx:$roomVersion")
     api("androidx.paging:paging-runtime-ktx:3.1.0-rc01")
     api("com.squareup.retrofit2:retrofit:2.9.0")
     api("com.squareup.okhttp3:okhttp:4.9.1")
-    api("com.jakewharton.timber:timber:4.7.1")
+    api("com.jakewharton.timber:timber:5.0.1")
 
     val navigationVersion = "2.3.5"
     api("androidx.navigation:navigation-fragment-ktx:$navigationVersion")
@@ -266,7 +266,7 @@ dependencies {
 
     // fragment testing declare some activities and resources that needs to be in the apk
     // we don't use it. here but it is used in feature modules
-    debugImplementation("androidx.fragment:fragment-testing:1.3.4")
+    debugImplementation("androidx.fragment:fragment-testing:1.3.6")
 
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.7")
 }

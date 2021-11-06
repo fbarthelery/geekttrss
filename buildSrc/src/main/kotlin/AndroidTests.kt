@@ -46,8 +46,10 @@ internal fun Project.configureTests() {
     extensions.configure<BaseExtension> {
         defaultConfig {
             testInstrumentationRunner = "com.geekorum.ttrss.HiltRunner"
-            testInstrumentationRunnerArgument("clearPackageData", "true")
-            testInstrumentationRunnerArgument("disableAnalytics", "true")
+            testInstrumentationRunnerArguments += mapOf(
+                "clearPackageData" to "true",
+                "disableAnalytics" to "true"
+            )
         }
 
         testOptions {
