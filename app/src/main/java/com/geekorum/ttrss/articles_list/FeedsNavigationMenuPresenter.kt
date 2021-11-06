@@ -20,53 +20,88 @@
  */
 package com.geekorum.ttrss.articles_list
 
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.Surface
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.NavController
-import androidx.navigation.ui.NavigationUI
+import com.geekorum.geekdroid.views.doOnApplyWindowInsets
 import com.geekorum.ttrss.ArticlesListDirections
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Feed
-import com.geekorum.ttrss.databinding.MenuFeedActionViewBinding
-import com.google.android.material.navigation.NavigationView
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-
-private const val MENU_GROUP_ID_SPECIAL = 1
+import com.geekorum.ttrss.ui.AppTheme
+import com.google.accompanist.insets.ProvideWindowInsets
 
 
 /**
  * Display the feeds in a NavigationView menu.
  */
 class FeedsNavigationMenuPresenter(
-    private val view: NavigationView,
-    private val menu: Menu,
-    private val lifeCycleOwner: LifecycleOwner,
+    private val composeView: ComposeView,
     private val navController: NavController,
     private val feedsViewModel: FeedsViewModel,
+    private val accountViewModel: TtrssAccountViewModel,
     private val activityViewModel: ActivityViewModel
 ) {
 
-    private val layoutInflater = LayoutInflater.from(view.context)
-    private var currentFeedId: Long = 4L
+    private var currentFeedId: Long by mutableStateOf(4L)
 
     init {
-        collectFeeds()
         setDestinationListener()
+        setComposeContent()
     }
 
-    fun onFeedSelected(item: MenuItem): Boolean {
-        item.feed?.let {
-            activityViewModel.setSelectedFeed(it)
-            navController.navigate(ArticlesListDirections.actionShowFeed(it.id, it.title))
-            return true
+    private fun setComposeContent() {
+        // pass window insets to compose
+        composeView.fitsSystemWindows = true
+        composeView.doOnApplyWindowInsets { view, windowInsetsCompat, relativePadding ->
+            windowInsetsCompat
         }
-        return false
+
+        composeView.setContent {
+            ProvideWindowInsets {
+                AppTheme {
+                    Surface(Modifier.fillMaxSize()) {
+                        val account by accountViewModel.selectedAccount.observeAsState()
+                        val server by accountViewModel.selectedAccountHost.observeAsState()
+                        FeedListNavigationMenu(
+                            user = account?.name ?: "",
+                            server = server?: "",
+                            feedSection = {
+                                val feeds by feedsViewModel.feeds.collectAsState(emptyList())
+                                FeedSection(
+                                    feeds,
+                                    selectedFeed = feeds.find { it.id == currentFeedId },
+                                    onFeedSelected = {
+                                        currentFeedId = it.id
+                                        navigateToFeed(it)
+                                    }
+                                )
+                            },
+                            onManageFeedsClicked = {
+                                val directions = ArticlesListDirections.actionManageFeeds()
+                                navController.navigate(directions)
+                            },
+                            onSettingsClicked = {
+                                val directions = ArticlesListDirections.actionShowSettings()
+                                navController.navigate(directions)
+                            },
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    private fun navigateToFeed(feed: Feed) {
+        activityViewModel.setSelectedFeed(feed)
+        navController.navigate(ArticlesListDirections.actionShowFeed(feed.id, feed.title))
     }
 
     private fun setDestinationListener() {
@@ -74,70 +109,8 @@ class FeedsNavigationMenuPresenter(
             when(destination.id) {
                 R.id.articlesListFragment -> {
                     currentFeedId = arguments!!.getLong("feed_id")
-                    view.setCheckedItem(currentFeedId.toInt())
                 }
             }
         }
-    }
-
-    private fun collectFeeds() {
-        feedsViewModel.feeds.onEach { feeds ->
-            transformFeedViewsInMenuEntry(menu, feeds)
-        }.launchIn(lifeCycleOwner.lifecycleScope)
-    }
-
-    private fun transformFeedViewsInMenuEntry(menu: Menu, feeds: List<Feed>) {
-        menu.clear()
-        feeds.forEach { feed ->
-            val title = if (feed.displayTitle.isEmpty()) feed.title else feed.displayTitle
-            val feedId = feed.id.toInt()
-            val menuItem = if (feedId < 0) {
-                menu.add(Menu.NONE, feedId, 0, title)
-            } else {
-                menu.add(MENU_GROUP_ID_SPECIAL, feedId, 0, title)
-            }
-            setMenuItemIcon(feed, menuItem)
-            setMenuItemUnreadCount(feed, menuItem)
-            menuItem.isCheckable = true
-            menuItem.feed = feed
-        }
-        view.setCheckedItem(currentFeedId.toInt())
-    }
-
-    private fun setMenuItemUnreadCount(feed: Feed, menuItem: MenuItem) {
-        val menuView = MenuFeedActionViewBinding.inflate(layoutInflater,
-            null, false).apply {
-            unreadCounter.text = feed.unreadCount.toString()
-            unreadCounter.visibility = if (feed.unreadCount > 0) View.VISIBLE else View.INVISIBLE
-        }
-        menuItem.actionView = menuView.root
-    }
-
-    private fun setMenuItemIcon(feed: Feed, menuItem: MenuItem) {
-        val iconRes = when {
-            feed.isArchivedFeed -> R.drawable.ic_archive
-            feed.isStarredFeed -> R.drawable.ic_star
-            feed.isPublishedFeed -> R.drawable.ic_checkbox_marked
-            feed.isFreshFeed -> R.drawable.ic_coffee
-            feed.isAllArticlesFeed -> R.drawable.ic_folder_outline
-            else -> R.drawable.ic_rss_box
-        }
-        menuItem.setIcon(iconRes)
-    }
-
-    private var MenuItem.feed: Feed?
-        get() = actionView?.tag as? Feed
-        set(value) { actionView.tag = value }
-
-}
-
-fun NavigationView.setupWithNavController(navController: NavController, presenter: FeedsNavigationMenuPresenter) {
-    setNavigationItemSelectedListener { item ->
-        var handled = NavigationUI.onNavDestinationSelected(item, navController)
-        handled = handled || presenter.onFeedSelected(item)
-        if (handled) {
-            (parent as? DrawerLayout)?.closeDrawer(this)
-        }
-        handled
     }
 }

@@ -37,13 +37,12 @@
         tools:context="com.geekorum.ttrss.articles_list.ArticleListActivity"
         >
 
-        <com.google.android.material.navigation.NavigationView
-                    android:id="@+id/navigation_view"
-                    android:layout_width="300dp"
-                    android:layout_height="match_parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:headerLayout="@layout/drawer_header"
-                    />
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/navigation_view"
+            android:layout_width="300dp"
+            android:layout_height="match_parent"
+            app:layout_constraintStart_toStartOf="parent"
+            />
 
             <androidx.coordinatorlayout.widget.CoordinatorLayout
                     android:layout_width="0dp"

@@ -71,7 +71,6 @@ class ArticleListActivity : SessionActivity() {
     private lateinit var appBarPresenter: AppBarPresenter
     private lateinit var fabPresenter: FabPresenter
     private lateinit var feedNavigationPresenter: FeedsNavigationMenuPresenter
-    private lateinit var accountHeaderPresenter: AccountHeaderPresenter
     private var drawerLayoutPresenter: DrawerLayoutPresenter? = null
 
     @Inject
@@ -147,16 +146,6 @@ class ArticleListActivity : SessionActivity() {
                 view.onApplyWindowInsets(noTopInsets.toWindowInsets())
             )
         }
-
-        // navigation view
-        val innerView = binding.navigationView[0]
-        val innerViewInitialPaddingBottom = innerView.paddingBottom
-        binding.navigationView.doOnApplyWindowInsets { _, windowInsets, _ ->
-            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-            innerView.updatePadding(
-                bottom = innerViewInitialPaddingBottom + insets.bottom)
-            windowInsets
-        }
     }
 
     private fun setupToolbar() {
@@ -206,16 +195,10 @@ class ArticleListActivity : SessionActivity() {
     }
 
     private fun setupNavigationView() {
-        val feedsMenu = binding.navigationView.menu.addSubMenu(R.string.title_feeds_menu)
-        binding.navigationView.inflateMenu(R.menu.fragment_feed_list)
-
         feedNavigationPresenter =
-            FeedsNavigationMenuPresenter(binding.navigationView, feedsMenu, this, navController,
-                feedsViewModel, activityViewModel)
-        binding.navigationView.setupWithNavController(navController, feedNavigationPresenter)
+            FeedsNavigationMenuPresenter(binding.navigationView, navController,
+                feedsViewModel, accountViewModel, activityViewModel)
 
-        val headerView = binding.navigationView.getHeaderView(0)
-        accountHeaderPresenter = AccountHeaderPresenter(headerView, this, accountViewModel)
         drawerLayout?.let {
             drawerLayoutPresenter = DrawerLayoutPresenter(it, navController, this, this)
         }
