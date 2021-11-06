@@ -23,6 +23,7 @@ package com.geekorum.ttrss.articles_list
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,6 +33,7 @@ import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -62,7 +64,9 @@ fun FeedListNavigationMenu(
 ) {
     Box {
         val scrollState = rememberScrollState()
-        Column(Modifier.verticalScroll(scrollState)) {
+        Column(Modifier.verticalScroll(scrollState)
+            .withVerticalScrollBar(scrollState)
+        ) {
             AppTheme(colors = AppTheme.DarkColors) {
                 AccountHeader(user, server)
             }
@@ -89,29 +93,34 @@ fun FeedListNavigationMenu(
             )
             Spacer(Modifier.navigationBarsHeight())
         }
-
-        // primitive scrollbar
-        val scrollBarAlpha by animateFloatAsState(targetValue = if (scrollState.isScrollInProgress)
-            0.5f else 0f, animationSpec = tween(500))
-        val scrollBarColor = MaterialTheme.colors.onSurface
-        Box(Modifier
-            .fillMaxHeight()
-            .align(Alignment.TopEnd)
-            .drawWithContent {
-                val scrollBarHeight = 56.dp.toPx()
-                val scrollBarWidth = 4.dp.toPx()
-                val scrollBarY = lerp(0f, size.height - scrollBarHeight, (scrollState.value) / scrollState.maxValue.toFloat())
-                val scrollBarX = size.width - scrollBarWidth
-                drawRoundRect(
-                    color = scrollBarColor,
-                    topLeft = Offset(x = scrollBarX, y = scrollBarY),
-                    size = Size(width = scrollBarWidth, height = scrollBarHeight),
-                    cornerRadius = CornerRadius(4.dp.toPx()),
-                    alpha = scrollBarAlpha,
-                )
-            }
-        )
     }
+}
+
+private fun Modifier.withVerticalScrollBar(
+    scrollState: ScrollState,
+) : Modifier  = composed {
+    val scrollBarAlpha by animateFloatAsState(targetValue = if (scrollState.isScrollInProgress)
+        0.5f else 0f, animationSpec = tween(500))
+    withVerticalScrollBar(scrollState, MaterialTheme.colors.onSurface, scrollBarAlpha)
+}
+
+private fun Modifier.withVerticalScrollBar(
+    scrollState: ScrollState,
+    color: Color,
+    alpha: Float = 1f
+) = drawWithContent {
+    drawContent()
+    val scrollBarHeight = 56.dp.toPx()
+    val scrollBarWidth = 4.dp.toPx()
+    val scrollBarY = lerp(0f, size.height - scrollBarHeight, (scrollState.value) / scrollState.maxValue.toFloat())
+    val scrollBarX = size.width - scrollBarWidth
+    drawRoundRect(
+        color = color,
+        topLeft = Offset(x = scrollBarX, y = scrollBarY),
+        size = Size(width = scrollBarWidth, height = scrollBarHeight),
+        cornerRadius = CornerRadius(4.dp.toPx()),
+        alpha = alpha,
+    )
 }
 
 @Composable
