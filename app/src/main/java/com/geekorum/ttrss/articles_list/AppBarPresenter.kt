@@ -91,20 +91,23 @@ internal class AppBarPresenter(
         tagsListCompose.setContent {
             AppTheme {
                 val tags by tagsViewModel.tags.observeAsState()
-                TagsListBar(tags = tags?.toSet() ?: emptySet(),
-                    selectedTag = currentTag,
-                    selectedTagChange = { tag ->
-                        currentTag = tag
-                        if (tag == null) {
-                            if (navController.currentDestination?.id == R.id.articlesListByTagFragment) {
-                                navController.popBackStack()
+                val tagsSet = tags?.toSet() ?: emptySet()
+                if (tagsSet.isNotEmpty()) {
+                    TagsListBar(tags = tagsSet,
+                        selectedTag = currentTag,
+                        selectedTagChange = { tag ->
+                            currentTag = tag
+                            if (tag == null) {
+                                if (navController.currentDestination?.id == R.id.articlesListByTagFragment) {
+                                    navController.popBackStack()
+                                }
+                            } else {
+                                val showTag = ArticlesListFragmentDirections.actionShowTag(tag)
+                                navController.navigate(showTag)
                             }
-                        } else {
-                            val showTag = ArticlesListFragmentDirections.actionShowTag(tag)
-                            navController.navigate(showTag)
                         }
-                    }
-                )
+                    )
+                }
             }
         }
     }
