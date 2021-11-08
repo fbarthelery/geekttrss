@@ -68,8 +68,15 @@ fun SwipeableArticleCard(
     behindCardContent: @Composable (DismissDirection?) -> Unit = { }
 ) {
     val dismissState = rememberDismissState()
-    LaunchedEffect(dismissState.currentValue) {
-        if (dismissState.currentValue != DismissValue.Default) {
+    var isInit by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        // state is restored because it user rememberSaveable
+        // so reset it if needed
+        dismissState.snapTo(DismissValue.Default)
+        isInit = true
+    }
+    LaunchedEffect(isInit, dismissState.currentValue) {
+        if (isInit && dismissState.currentValue != DismissValue.Default) {
             onSwiped()
         }
     }

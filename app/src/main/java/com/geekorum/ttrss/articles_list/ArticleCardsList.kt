@@ -345,7 +345,7 @@ private fun SwipeableArticleCard(
             }
         },
         onSwiped = {
-            viewModel.setArticleUnread(article.id, !article.isTransientUnread)
+            viewModel.setArticleUnread(article.id, false)
         }
     )
 }
