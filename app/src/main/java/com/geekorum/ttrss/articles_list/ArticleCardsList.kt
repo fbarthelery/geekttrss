@@ -32,6 +32,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
@@ -41,11 +43,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ShareCompat
+import androidx.paging.LoadState
 import androidx.paging.PagingDataAdapter
+import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemsIndexed
 import androidx.recyclerview.widget.DiffUtil
@@ -61,6 +66,9 @@ import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 
 
 internal fun RecyclerView.setupCardSpacing() {
@@ -258,6 +266,33 @@ internal class HeadlinesComposeViewHolder(
 }
 
 
+/**
+ * Get [PagingViewLoadState] for [pagingItems].
+ * This allows to make the disctinction between the initial [LoadState] of [LoadState.NotLoading]
+ * and the final [LoadState.NotLoading] at the end of the operation
+ */
+@Composable
+fun pagingViewStateFor(pagingItems: LazyPagingItems<ArticleWithFeed>) =
+    produceState(initialValue = PagingViewLoadState.INITIAL, key1 = pagingItems) {
+        snapshotFlow { pagingItems.loadState.refresh }
+            .drop(1) // the initial one is always LoadState.NotLoading, drop it
+            .distinctUntilChanged()
+            .collect {
+                value = when (it) {
+                    is LoadState.NotLoading -> PagingViewLoadState.LOADED
+                    is LoadState.Loading -> PagingViewLoadState.LOADING
+                    is LoadState.Error -> PagingViewLoadState.ERROR
+                }
+            }
+    }
+
+enum class PagingViewLoadState {
+    INITIAL,
+    LOADING,
+    LOADED,
+    ERROR
+}
+
 
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -278,6 +313,24 @@ fun ArticleCardList(
         modifier = modifier
     ) {
         val pagingItems = viewModel.articles.collectAsLazyPagingItems()
+        val loadState by pagingViewStateFor(pagingItems)
+        val isEmpty = pagingItems.itemCount == 0
+        var refreshIfEmpty = remember { true }
+        LaunchedEffect(loadState, isEmpty) {
+            if (loadState == PagingViewLoadState.LOADED) {
+                if (isEmpty && refreshIfEmpty) {
+                    viewModel.refresh()
+                }
+                // refresh again if we loaded some items
+                refreshIfEmpty = !isEmpty
+            }
+        }
+
+        if (isEmpty && loadState == PagingViewLoadState.LOADED) {
+            FeedEmptyText(isRefreshing)
+            return@SwipeRefresh
+        }
+
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -305,6 +358,28 @@ fun ArticleCardList(
         }
     }
 }
+
+
+@Composable
+private fun FeedEmptyText(isRefreshing: Boolean) {
+    val emptyText = if (isRefreshing) {
+        stringResource(R.string.fragment_articles_list_no_articles_and_sync_lbl)
+    } else stringResource(R.string.fragment_articles_list_no_articles_lbl)
+    Box(Modifier
+        .fillMaxSize()
+        .verticalScroll(rememberScrollState()),
+        contentAlignment = Alignment.TopCenter
+    ) {
+        Text(emptyText,
+            style = MaterialTheme.typography.h4,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .padding(top = 192.dp)
+        )
+    }
+}
+
 
 @Composable
 private fun SwipeableArticleCard(

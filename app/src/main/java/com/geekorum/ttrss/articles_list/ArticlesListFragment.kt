@@ -63,9 +63,6 @@ abstract class BaseArticlesListFragment() : Fragment() {
                 }
             })
             setAction(R.string.undo_set_articles_read_btn) {
-                // TODO undo doesn't work anymore
-                // seems like the article is added back in the composable list but its state is already swiped
-                // so onSwiped is trigger again and it removes it then loop
                 articlesViewModel.undoSetUnreadActions()
             }
         }
