@@ -20,23 +20,49 @@
  */
 package com.geekorum.ttrss.articles_list.search
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Surface
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.core.app.ShareCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemsIndexed
 import com.geekorum.ttrss.articles_list.ActivityViewModel
-import com.geekorum.ttrss.articles_list.ArticlesListAdapter
-import com.geekorum.ttrss.articles_list.CardEventHandler
-import com.geekorum.ttrss.articles_list.setupCardSpacing
+import com.geekorum.ttrss.articles_list.ArticleCard
+import com.geekorum.ttrss.articles_list.PagingViewLoadState
+import com.geekorum.ttrss.articles_list.pagingViewStateFor
 import com.geekorum.ttrss.data.Article
-import com.geekorum.ttrss.databinding.FragmentArticlesSearchBinding
+import com.geekorum.ttrss.data.ArticleWithFeed
+import com.geekorum.ttrss.ui.AppTheme
+import com.google.accompanist.insets.LocalWindowInsets
+import com.google.accompanist.insets.ProvideWindowInsets
+import com.google.accompanist.insets.rememberInsetsPaddingValues
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
+import timber.log.Timber
 
 /**
  * Display search results
@@ -44,24 +70,34 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class ArticlesSearchFragment : Fragment() {
 
-    lateinit var binding: FragmentArticlesSearchBinding
     private val activityViewModel: ActivityViewModel by activityViewModels()
     private val searchViewModel: SearchViewModel by viewModels()
-    private lateinit var adapter: ArticlesListAdapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentArticlesSearchBinding.inflate(inflater, container, false)
-        binding.lifecycleOwner = this
-        setupRecyclerView()
-        return binding.root
-    }
-
-
-    private fun setupRecyclerView() {
-        binding.articleList.setupCardSpacing()
-        val eventHandler = EventHandler()
-        adapter = ArticlesListAdapter(layoutInflater, eventHandler).also {
-            binding.articleList.adapter = it
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                ProvideWindowInsets {
+                    AppTheme {
+                        val appBarHeightDp = with(LocalDensity.current) {
+                            activityViewModel.appBarHeight.toDp()
+                        }
+                        Surface(Modifier.fillMaxSize()) {
+                            SearchResultCardList(
+                                viewModel = searchViewModel,
+                                onCardClick = activityViewModel::displayArticle,
+                                onShareClick = ::onShareClicked,
+                                onOpenInBrowserClick = {
+                                    activityViewModel.displayArticleInBrowser(requireContext(), it)
+                                },
+                                additionalContentPaddingBottom = appBarHeightDp,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -70,34 +106,118 @@ class ArticlesSearchFragment : Fragment() {
         activityViewModel.searchQuery.observe(viewLifecycleOwner) {
             searchViewModel.setSearchQuery(it)
         }
-        viewLifecycleOwner.lifecycleScope.launch {
-            searchViewModel.articles.collectLatest {
-                adapter.submitData(it)
+    }
+
+    private fun onShareClicked(article: Article) {
+        startActivity(createShareIntent(requireActivity(), article))
+    }
+
+    private fun createShareIntent(activity: Activity, article: Article): Intent {
+        val shareIntent = ShareCompat.IntentBuilder(activity)
+        shareIntent.setSubject(article.title)
+            .setHtmlText(article.content)
+            .setText(article.link)
+            .setType("text/plain")
+        return shareIntent.createChooserIntent()
+    }
+
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun SearchResultCardList(
+    viewModel: SearchViewModel,
+    onCardClick: (Int, Article) -> Unit,
+    onShareClick: (Article) -> Unit,
+    onOpenInBrowserClick: (Article) -> Unit,
+    modifier: Modifier = Modifier,
+    additionalContentPaddingBottom: Dp = 0.dp,
+) {
+    val pagingItems = viewModel.articles.collectAsLazyPagingItems()
+
+    val listState = rememberLazyListState()
+    var animateItemAppearance by remember { mutableStateOf(true) }
+    val loadState by pagingViewStateFor(pagingItems)
+    LaunchedEffect(loadState, pagingItems.itemCount) {
+        if (loadState == PagingViewLoadState.LOADING) {
+            Timber.i("loading item reset animate item appearance")
+            animateItemAppearance = true
+        }
+    }
+
+    LazyColumn(
+        state = listState,
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        contentPadding = rememberInsetsPaddingValues(
+            insets = LocalWindowInsets.current.navigationBars,
+            additionalBottom = additionalContentPaddingBottom,
+            additionalStart = 8.dp,
+            additionalTop = 8.dp,
+            additionalEnd = 8.dp
+        ),
+        modifier = modifier.fillMaxSize()
+    ) {
+        itemsIndexed(pagingItems,
+            key = { _, articleWithFeed -> articleWithFeed.article.id }
+        ) { index, articleWithFeed ->
+            // initial state is visible if we don't animate
+            val visibilityState = remember { MutableTransitionState(!animateItemAppearance) }
+            // delay start of animation
+            LaunchedEffect(index, Unit) {
+                if (!animateItemAppearance) {
+                    return@LaunchedEffect
+                }
+                if (index == listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index) {
+                    animateItemAppearance = false
+                }
+                delay(38L * index)
+                Timber.i("index $index animate appearance")
+                visibilityState.targetState = true
+            }
+
+            AnimatedVisibility(visibilityState,
+                enter = fadeIn() + slideInVertically { it / 3 }) {
+                if (articleWithFeed != null) {
+                    ArticleCard(
+                        articleWithFeed = articleWithFeed,
+                        viewModel = viewModel,
+                        onCardClick = { onCardClick(index, articleWithFeed.article) },
+                        onOpenInBrowserClick = onOpenInBrowserClick,
+                        onShareClick = onShareClick)
+                }
             }
         }
     }
+}
 
-    inner class EventHandler : CardEventHandler(requireContext()) {
+@Composable
+private fun ArticleCard(
+    articleWithFeed: ArticleWithFeed,
+    viewModel: SearchViewModel,
+    onCardClick: () -> Unit,
+    onOpenInBrowserClick: (Article) -> Unit,
+    onShareClick: (Article) -> Unit
+) {
+    val (article, feed) = articleWithFeed
+    val feedNameOrAuthor = feed.displayTitle.takeIf { it.isNotBlank() } ?: feed.title
 
-        override fun onOpenButtonClicked(button: View, article: Article) {
-            activityViewModel.displayArticleInBrowser(context, article)
+    ArticleCard(
+//                TODO add this on beta03
+//                modifier = Modifier.animateItemPlacement(),
+        title = article.title,
+        flavorImageUrl = article.flavorImageUri,
+        excerpt = article.contentExcerpt,
+        feedNameOrAuthor = feedNameOrAuthor,
+        feedIconUrl = feed.feedIconUrl,
+        isUnread = article.isUnread,
+        isStarred = article.isStarred,
+        onCardClick = onCardClick,
+        onOpenInBrowserClick = { onOpenInBrowserClick(article) },
+        onStarChanged = { viewModel.setArticleStarred(article.id, it) },
+        onShareClick = { onShareClick(article) },
+        onToggleUnreadClick = {
+            viewModel.setArticleUnread(article.id, !article.isTransientUnread)
         }
-
-        override fun onCardClicked(card: View, article: Article, position: Int) {
-            activityViewModel.displayArticle(position, article)
-        }
-
-        override fun onStarChanged(article: Article, newValue: Boolean) {
-            searchViewModel.setArticleStarred(article.id, newValue)
-        }
-
-        override fun onShareClicked(article: Article) {
-            startActivity(createShareIntent(requireActivity(), article))
-        }
-
-        override fun onMenuToggleReadSelected(article: Article) {
-            searchViewModel.setArticleUnread(article.id, !article.isTransientUnread)
-        }
-    }
-
+    )
 }
