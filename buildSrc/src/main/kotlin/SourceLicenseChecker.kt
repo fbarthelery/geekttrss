@@ -1,7 +1,7 @@
 /*
  * Geekttrss is a RSS feed reader application on the Android Platform.
  *
- * Copyright (C) 2017-2020 by Frederic-Charles Barthelery.
+ * Copyright (C) 2017-2021 by Frederic-Charles Barthelery.
  *
  * This file is part of Geekttrss.
  *
@@ -37,7 +37,8 @@ internal fun Project.configureSourceLicenseChecker(): Unit {
 
     configure<LicenseExtension> {
         header = file("$rootDir/config/license/header.txt")
-
+        mapping("java", "SLASHSTAR_STYLE")
+        mapping("kt", "SLASHSTAR_STYLE")
         excludes(listOf("**/*.webp", "**/*.png"))
     }
 

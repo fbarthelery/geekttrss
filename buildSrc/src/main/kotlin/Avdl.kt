@@ -2,7 +2,7 @@
  * Geekdroid is a utility library for development on the Android
  * Platform.
  *
- * Copyright (C) 2017-2020 by Frederic-Charles Barthelery.
+ * Copyright (C) 2017-2021 by Frederic-Charles Barthelery.
  *
  * This file is part of Geekdroid.
  *
