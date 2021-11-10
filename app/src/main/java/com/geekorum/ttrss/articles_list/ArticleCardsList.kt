@@ -28,10 +28,15 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupMenu
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
@@ -66,6 +71,7 @@ import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
@@ -232,10 +238,10 @@ internal class HeadlinesComposeViewHolder(
     }
 
     fun setAuthor(author: String?) {
-        if (!author.isNullOrBlank()) {
-            feedNameOrAuthor = composeView.resources.getString(R.string.author_formatted, author)
+        feedNameOrAuthor = if (!author.isNullOrBlank()) {
+            composeView.resources.getString(R.string.author_formatted, author)
         } else {
-            feedNameOrAuthor = ""
+            ""
         }
     }
 
@@ -245,10 +251,10 @@ internal class HeadlinesComposeViewHolder(
         } else {
             feed?.displayTitle
         }
-        if (!feedName.isNullOrBlank()) {
-            feedNameOrAuthor = feedName
+        feedNameOrAuthor = if (!feedName.isNullOrBlank()) {
+            feedName
         } else {
-            feedNameOrAuthor = ""
+            ""
         }
     }
 
@@ -331,7 +337,10 @@ fun ArticleCardList(
             return@SwipeRefresh
         }
 
+        val listState = rememberLazyListState()
+        var animateItemAppearance by remember { mutableStateOf(true) }
         LazyColumn(
+            state = listState,
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             contentPadding = rememberInsetsPaddingValues(
@@ -346,13 +355,30 @@ fun ArticleCardList(
             itemsIndexed(pagingItems,
                 key = { _, articleWithFeed -> articleWithFeed.article.id }
             ) { index, articleWithFeed ->
-                if (articleWithFeed != null) {
-                    SwipeableArticleCard(
-                        articleWithFeed = articleWithFeed,
-                        viewModel = viewModel,
-                        onCardClick = { onCardClick(index, articleWithFeed.article) },
-                        onOpenInBrowserClick = onOpenInBrowserClick,
-                        onShareClick = onShareClick)
+                // initial state is visible if we don't animate
+                val visibilityState = remember { MutableTransitionState(!animateItemAppearance) }
+                // delay start of animation
+                LaunchedEffect(index, Unit) {
+                    if (!animateItemAppearance) {
+                        return@LaunchedEffect
+                    }
+                    if (index == listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ) {
+                        animateItemAppearance = false
+                    }
+                    delay(38L * index)
+                    visibilityState.targetState = true
+                }
+
+                AnimatedVisibility(visibilityState,
+                    enter = fadeIn() + slideInVertically { it / 3 }) {
+                    if (articleWithFeed != null) {
+                        SwipeableArticleCard(
+                            articleWithFeed = articleWithFeed,
+                            viewModel = viewModel,
+                            onCardClick = { onCardClick(index, articleWithFeed.article) },
+                            onOpenInBrowserClick = onOpenInBrowserClick,
+                            onShareClick = onShareClick)
+                    }
                 }
             }
         }
