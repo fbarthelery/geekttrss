@@ -48,12 +48,10 @@ import dagger.hilt.android.AndroidEntryPoint
 /**
  * Display all the articles in a list.
  */
-abstract class BaseArticlesListFragment() : Fragment() {
+abstract class BaseArticlesListFragment : Fragment() {
 
     protected abstract val articlesViewModel: BaseArticlesViewModel
     private val activityViewModel: ActivityViewModel by activityViewModels()
-    private var shouldRefreshOnZeroItem = false //initial state is not loading and empty
-    private var hasLoadedDataAtLeastOnce = false
 
     private val unreadSnackbar: Snackbar by lazy {
         Snackbar.make(requireView(), "", Snackbar.LENGTH_LONG).apply {
@@ -102,24 +100,6 @@ abstract class BaseArticlesListFragment() : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // TODO
-/*
-        adapter.loadStateFlow.onEach {
-            when (it.refresh) {
-                is LoadState.NotLoading -> {
-                    if (adapter.itemCount == 0 && shouldRefreshOnZeroItem) {
-                        articlesViewModel.refresh()
-                    }
-                    shouldRefreshOnZeroItem = adapter.itemCount > 0
-                    if (hasLoadedDataAtLeastOnce) {
-                        articlesViewModel.setHaveZeroArticle(adapter.itemCount == 0)
-                    }
-                }
-                LoadState.Loading -> hasLoadedDataAtLeastOnce = true
-                is LoadState.Error -> Unit
-            }
-        }.launchIn(viewLifecycleOwner.lifecycleScope)
-*/
 
         articlesViewModel.getPendingArticlesSetUnread().observe(viewLifecycleOwner) { nbArticles ->
             if (nbArticles > 0) {

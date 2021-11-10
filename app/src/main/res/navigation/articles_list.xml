@@ -37,7 +37,7 @@
 
     <fragment android:id="@+id/articlesListFragment"
             android:name="com.geekorum.ttrss.articles_list.ArticlesListFragment"
-            android:label="@string/label_feed_name" tools:layout="@layout/fragment_article_list" >
+            android:label="@string/label_feed_name" >
         <argument android:name="feed_id" android:defaultValue="-4L" app:argType="long" />
         <argument android:name="feed_name" android:defaultValue="All articles" app:argType="string" />
 
@@ -53,7 +53,7 @@
 
     <fragment android:id="@+id/articlesListByTagFragment"
         android:name="com.geekorum.ttrss.articles_list.ArticlesListByTagFragment"
-        android:label="@string/label_tag" tools:layout="@layout/fragment_article_list" >
+        android:label="@string/label_tag" >
         <argument android:name="tag" app:argType="string" />
 
         <action android:id="@+id/action_show_article"
@@ -79,7 +79,7 @@
             android:label="@string/title_article_details"
             app:action="android.intent.action.VIEW"
             app:dataPattern="@string/article_details_data_pattern"
-            tools:layout="@layout/activity_article_detail" >
+            >
         <argument android:name="article_id" app:argType="long" />
     </activity>
 
