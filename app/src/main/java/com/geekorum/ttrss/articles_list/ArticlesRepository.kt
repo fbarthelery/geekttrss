@@ -56,6 +56,10 @@ class ArticlesRepository
         return articleDao.getAllUnreadArticlesOldestFirst()
     }
 
+    suspend fun getUnreadArticlesRandomized(count: Int): List<ArticleWithFeed> {
+        return articleDao.getUnreadArticlesRandomized(count)
+    }
+
     fun getAllPublishedArticles(): PagingSource<Int, ArticleWithFeed> = articleDao.getAllPublishedArticles()
     fun getAllPublishedArticlesOldestFirst(): PagingSource<Int, ArticleWithFeed> = articleDao.getAllPublishedArticlesOldestFirst()
 
@@ -76,6 +80,10 @@ class ArticlesRepository
     }
     fun getAllUnreadArticlesForFeedOldestFirst(feedId: Long): PagingSource<Int, ArticleWithFeed> {
         return articleDao.getAllUnreadArticlesForFeedOldestFirst(feedId)
+    }
+
+    suspend fun getAllUnreadArticlesForFeedUpdatedAfterTimeRandomized(feedId: Long, time: Long): List<Article> {
+        return articleDao.getAllUnreadArticlesForFeedUpdatedAfterTimeRandomized(feedId, time)
     }
 
     fun getAllArticlesForTag(tag: String): PagingSource<Int, ArticleWithFeed> = articleDao.getAllArticlesForTag(tag)
@@ -105,6 +113,10 @@ class ArticlesRepository
 
     @OptIn(ExperimentalCoroutinesApi::class)
     fun getArticleById(articleId: Long): Flow<Article?> = articleDao.getArticleById(articleId).distinctUntilChanged()
+
+    fun getArticlesById(articleIds: List<Long>): PagingSource<Int, ArticleWithFeed> {
+        return articleDao.getArticlesById(articleIds)
+    }
 
     suspend fun setArticleUnread(articleId: Long, newValue: Boolean) {
         articleDao.updateArticleUnread(articleId, newValue)
