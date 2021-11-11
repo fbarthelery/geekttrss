@@ -50,7 +50,8 @@ class FeedsNavigationMenuPresenter(
     private val activityViewModel: ActivityViewModel
 ) {
 
-    private var currentFeedId: Long by mutableStateOf(4L)
+    private var currentFeedId: Long? by mutableStateOf(null)
+    private var isMagazineFeed: Boolean by mutableStateOf(true)
 
     init {
         setDestinationListener()
@@ -78,9 +79,12 @@ class FeedsNavigationMenuPresenter(
                                 FeedSection(
                                     feeds,
                                     selectedFeed = feeds.find { it.id == currentFeedId },
+                                    isMagazineSelected = isMagazineFeed,
                                     onFeedSelected = {
-                                        currentFeedId = it.id
                                         navigateToFeed(it)
+                                    },
+                                    onMagazineSelected = {
+                                        navigateToMagazine()
                                     }
                                 )
                             },
@@ -99,6 +103,10 @@ class FeedsNavigationMenuPresenter(
         }
     }
 
+    private fun navigateToMagazine() {
+        navController.navigate(ArticlesListDirections.actionShowMagazine())
+    }
+
     private fun navigateToFeed(feed: Feed) {
         activityViewModel.setSelectedFeed(feed)
         navController.navigate(ArticlesListDirections.actionShowFeed(feed.id, feed.title))
@@ -109,6 +117,11 @@ class FeedsNavigationMenuPresenter(
             when(destination.id) {
                 R.id.articlesListFragment -> {
                     currentFeedId = arguments!!.getLong("feed_id")
+                    isMagazineFeed = false
+                }
+                R.id.magazineFragment -> {
+                    currentFeedId = null
+                    isMagazineFeed = true
                 }
             }
         }

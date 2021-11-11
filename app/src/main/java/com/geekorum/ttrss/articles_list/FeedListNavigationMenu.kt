@@ -162,10 +162,16 @@ fun AccountHeader(login: String, server: String) {
 @Composable
 fun FeedSection(
     feeds: List<Feed>,
+    isMagazineSelected: Boolean,
     selectedFeed: Feed?,
+    onMagazineSelected: () -> Unit,
     onFeedSelected: (Feed) -> Unit
 ) {
     SectionLabel(stringResource(R.string.title_feeds_menu))
+    NavigationItem(stringResource(R.string.title_magazine),
+        icon = { Icon(painterResource(R.drawable.ic_newspaper_24), contentDescription = null) },
+        selected = isMagazineSelected,
+        onClick = onMagazineSelected)
     for (feed in feeds) {
         NavigationItem(
             feed.displayTitle.takeIf { it.isNotBlank() } ?: feed.title,
@@ -315,13 +321,22 @@ fun PreviewFeedListNavigationMenu() {
                     server = "example.org",
                     feedSection = {
                         var selectedFeed by remember {
-                            mutableStateOf(feeds.first())
+                            mutableStateOf<Feed?>(null)
+                        }
+                        var isMagazineSelected by remember {
+                            mutableStateOf(true)
                         }
                         FeedSection(
                             feeds,
                             selectedFeed = selectedFeed,
                             onFeedSelected = {
                                 selectedFeed = it
+                                isMagazineSelected = false
+                            },
+                            isMagazineSelected = isMagazineSelected,
+                            onMagazineSelected = {
+                                selectedFeed = null
+                                isMagazineSelected = true
                             }
                         )
                     },
