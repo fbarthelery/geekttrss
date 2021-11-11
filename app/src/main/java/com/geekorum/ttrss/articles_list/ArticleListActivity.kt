@@ -32,7 +32,6 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
-import com.geekorum.geekdroid.views.doOnApplyWindowInsets
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.article_details.ArticleDetailActivity
 import com.geekorum.ttrss.databinding.ActivityArticleListBinding
@@ -151,8 +150,9 @@ class ArticleListActivity : SessionActivity() {
     private fun setupToolbar() {
         setupSearch()
         setupSortOrder()
-        val appBarConfiguration = AppBarConfiguration.Builder(R.id.articlesListFragment, R.id.articlesListByTagFragment)
-            .setOpenableLayout(drawerLayout)
+        val appBarConfiguration = AppBarConfiguration.Builder(
+            R.id.magazineFragment, R.id.articlesListFragment, R.id.articlesListByTagFragment
+        ).setOpenableLayout(drawerLayout)
             .build()
         binding.toolbar.setupWithNavController(navController, appBarConfiguration)
         appBarPresenter = AppBarPresenter(binding.appBar, binding.toolbar,
@@ -190,6 +190,13 @@ class ArticleListActivity : SessionActivity() {
                     true
                 }
                 else -> false
+            }
+        }
+        navController.addOnDestinationChangedListener { controller, destination, arguments ->
+            val sortMenuItem = binding.toolbar.menu.findItem(R.id.articles_sort_order)
+            sortMenuItem?.isVisible = when(destination.id) {
+                R.id.magazineFragment -> false
+                else -> true
             }
         }
     }

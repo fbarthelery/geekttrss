@@ -25,7 +25,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:id="@+id/articles_list"
-        app:startDestination="@id/articlesListFragment">
+        app:startDestination="@id/magazineFragment">
 
     <action android:id="@+id/action_show_settings"
         app:destination="@id/settingsActivity" />
