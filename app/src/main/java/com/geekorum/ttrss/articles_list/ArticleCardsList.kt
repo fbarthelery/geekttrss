@@ -177,7 +177,7 @@ fun ArticleCardList(
 
 
 @Composable
-private fun FeedEmptyText(isRefreshing: Boolean) {
+fun FeedEmptyText(isRefreshing: Boolean) {
     val emptyText = if (isRefreshing) {
         stringResource(R.string.fragment_articles_list_no_articles_and_sync_lbl)
     } else stringResource(R.string.fragment_articles_list_no_articles_lbl)

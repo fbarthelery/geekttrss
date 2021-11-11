@@ -84,6 +84,9 @@
     <string name="lbl_install_complete">Installation complete</string>
     <string name="lbl_other">Other state</string>
 
+    <!-- Magazine fragment  -->
+    <string name="title_magazine">Magazine</string>
+
     <!-- article list items -->
     <string name="mark_as_read">Mark as read</string>
     <string name="mark_as_unread">Mark as unread</string>

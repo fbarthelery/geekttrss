@@ -35,6 +35,14 @@
     <action android:id="@+id/action_search_article"
         app:destination="@id/articlesSearchFragment" />
 
+    <fragment android:id="@+id/magazineFragment"
+        android:name="com.geekorum.ttrss.articles_list.magazine.MagazineFragment"
+        android:label="@string/title_magazine"
+        >
+        <action android:id="@+id/action_show_article"
+            app:destination="@id/articleDetailActivity"/>
+    </fragment>
+
     <fragment android:id="@+id/articlesListFragment"
             android:name="com.geekorum.ttrss.articles_list.ArticlesListFragment"
             android:label="@string/label_feed_name" >
@@ -92,6 +100,10 @@
             app:destination="@id/articlesListFragment"
             app:popUpTo="@id/articlesListFragment"
             app:popUpToInclusive="true"/>
+
+    <action android:id="@+id/action_show_magazine"
+        app:popUpTo="@id/magazineFragment"
+        />
 
     <activity android:id="@+id/manageFeedsActivity"
         android:name="com.geekorum.ttrss.manage_feeds.ManageFeedsActivity"
