@@ -73,7 +73,7 @@ fun ArticleBottomAppBar(
             bottomAppBar.addView(toolbarBinding!!.root)
             val fab = FloatingActionButton(it).apply {
                 id = R.id.fab
-                setImageResource(R.drawable.ic_action_web_site)
+                setImageResource(R.drawable.ic_open_in_browser_24)
             }
             root.addView(fab, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply {
                 anchorId = bottomAppBar.id
