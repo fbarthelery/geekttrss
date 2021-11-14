@@ -21,11 +21,13 @@
 package com.geekorum.ttrss.article_details
 
 import android.annotation.SuppressLint
+import android.app.assist.AssistContent
 import android.content.ContentUris
 import android.os.Bundle
 import android.webkit.WebViewClient
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
 import com.geekorum.ttrss.articles_list.ArticleListActivity
 import com.geekorum.ttrss.session.SessionActivity
@@ -78,4 +80,8 @@ class ArticleDetailActivity : SessionActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
     }
 
+    override fun onProvideAssistContent(outContent: AssistContent) {
+        super.onProvideAssistContent(outContent)
+        outContent.webUri = articleDetailsViewModel.article.value?.link?.toUri()
+    }
 }
