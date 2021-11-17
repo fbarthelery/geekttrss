@@ -24,6 +24,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -91,7 +92,7 @@ enum class PagingViewLoadState {
 
 
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun ArticleCardList(
     viewModel: BaseArticlesViewModel,
@@ -160,7 +161,9 @@ fun ArticleCardList(
                 }
 
                 AnimatedVisibility(visibilityState,
-                    enter = fadeIn() + slideInVertically { it / 3 }) {
+                    enter = fadeIn() + slideInVertically { it / 3 },
+                    modifier = Modifier.animateItemPlacement()
+                ) {
                     if (articleWithFeed != null) {
                         SwipeableArticleCard(
                             articleWithFeed = articleWithFeed,
@@ -214,8 +217,6 @@ private fun SwipeableArticleCard(
     }
 
     SwipeableArticleCard(
-//                TODO add this on beta03
-//                modifier = Modifier.animateItemPlacement(),
         title = article.title,
         flavorImageUrl = article.flavorImageUri,
         excerpt = article.contentExcerpt,

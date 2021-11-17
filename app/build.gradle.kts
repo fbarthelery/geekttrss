@@ -40,7 +40,7 @@ plugins {
     id("dagger.hilt.android.plugin")
 }
 
-val composeVersion = "1.1.0-beta02"
+val composeVersion = "1.1.0-beta03"
 
 android {
     val compileSdkInt: Int by rootProject.extra
