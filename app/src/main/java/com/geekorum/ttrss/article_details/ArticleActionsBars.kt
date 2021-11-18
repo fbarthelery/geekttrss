@@ -23,11 +23,20 @@ package com.geekorum.ttrss.article_details
 import android.content.res.ColorStateList
 import android.view.Gravity
 import android.view.LayoutInflater
+import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
+import androidx.compose.animation.graphics.res.animatedVectorResource
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Archive
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams
@@ -35,13 +44,16 @@ import androidx.core.content.getSystemService
 import androidx.core.view.updatePadding
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.databinding.ToolbarArticleDetailsBinding
+import com.geekorum.ttrss.ui.AppTheme
 import com.google.accompanist.insets.LocalWindowInsets
+import com.google.accompanist.insets.rememberInsetsPaddingValues
+import com.google.accompanist.insets.ui.TopAppBar
 import com.google.android.material.bottomappbar.BottomAppBar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 
 @Composable
-fun ArticleBottomAppBar(
+fun ArticleBottomActionsBar(
     articleDetailsViewModel: ArticleDetailsViewModel,
     bottomAppBarIsVisible: Boolean,
     background: ColorStateList?,
@@ -99,3 +111,63 @@ fun ArticleBottomAppBar(
     )
 }
 
+@OptIn(ExperimentalAnimationGraphicsApi::class)
+@Composable
+fun ArticleTopActionsBar(
+    title: @Composable () -> Unit,
+    isStarred: Boolean,
+    background: ColorStateList?,
+    onNavigateUpClick: () -> Unit,
+    onToggleUnreadClick: () -> Unit,
+    onStarredChange: (Boolean) -> Unit,
+    onShareClick: () -> Unit,
+) {
+    TopAppBar(
+        title = title,
+        backgroundColor = background?.defaultColor?.let { Color(it) }
+            ?: MaterialTheme.colors.primarySurface,
+        contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
+        navigationIcon = {
+            IconButton(onClick = onNavigateUpClick) {
+                Icon(Icons.Default.ArrowBack, contentDescription = null)
+            }
+        },
+        actions = {
+            IconButton(onClick = onToggleUnreadClick) {
+                Icon(Icons.Default.Archive, contentDescription = null)
+            }
+            IconToggleButton(isStarred, onCheckedChange = onStarredChange) {
+                val image = animatedVectorResource(id = R.drawable.avd_ic_star_filled)
+                val starColor = if (isStarred) {
+                    Color.Unspecified
+                } else {
+                    LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                }
+                Icon(
+                    painter = image.painterFor(atEnd = isStarred),
+                    contentDescription = null,
+                    tint = starColor,
+                )
+            }
+            IconButton(onClick = onShareClick) {
+                Icon(Icons.Default.Share, contentDescription = null)
+            }
+        }
+    )
+}
+
+@Preview
+@Composable
+fun PreviewArticleTopActionsBar() {
+    AppTheme {
+        ArticleTopActionsBar(
+            title = { Text("Article title") },
+            isStarred = false,
+            background = null,
+            onNavigateUpClick = { },
+            onToggleUnreadClick = { },
+            onStarredChange = { },
+            onShareClick = { }
+        )
+    }
+}

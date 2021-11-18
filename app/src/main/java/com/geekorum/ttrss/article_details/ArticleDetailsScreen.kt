@@ -142,7 +142,7 @@ fun ArticleDetailsScreen(
                 R.color.article_detail_bottom_appbar_read
             }
 
-            ArticleBottomAppBar(
+            ArticleBottomActionsBar(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(100.dp),
