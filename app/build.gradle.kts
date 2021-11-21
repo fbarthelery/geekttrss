@@ -134,12 +134,12 @@ kapt {
 dependencies {
 
     implementation("androidx.core:core-ktx:1.7.0")
-    implementation("androidx.fragment:fragment-ktx:1.3.6")
+    implementation("androidx.fragment:fragment-ktx:1.4.0")
     implementation("androidx.activity:activity-ktx:1.4.0")
 
     // androidx ui
     implementation("androidx.drawerlayout:drawerlayout:1.1.1")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.1")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.2")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.1.0")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
@@ -161,6 +161,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-insets:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-insets-ui:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-swiperefresh:$accompanistVersion")
+    implementation("androidx.compose.ui:ui-tooling:$composeVersion")
 
 
     // for layout inspector
@@ -173,7 +174,7 @@ dependencies {
     // needed by robolectric
     implementation("androidx.loader:loader:1.1.0")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.1")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
 
     //geekdroid
@@ -255,9 +256,9 @@ dependencies {
     api("androidx.work:work-runtime-ktx:$workVersion")
     api("androidx.room:room-runtime:$roomVersion")
     api("androidx.room:room-ktx:$roomVersion")
-    api("androidx.paging:paging-runtime-ktx:3.1.0-rc01")
+    api("androidx.paging:paging-runtime-ktx:3.1.0")
     api("com.squareup.retrofit2:retrofit:2.9.0")
-    api("com.squareup.okhttp3:okhttp:4.9.1")
+    api("com.squareup.okhttp3:okhttp:4.9.2")
     api("com.jakewharton.timber:timber:5.0.1")
 
     val navigationVersion = "2.3.5"
@@ -267,7 +268,7 @@ dependencies {
 
     // fragment testing declare some activities and resources that needs to be in the apk
     // we don't use it. here but it is used in feature modules
-    debugImplementation("androidx.fragment:fragment-testing:1.3.6")
+    debugImplementation("androidx.fragment:fragment-testing:1.4.0")
 
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.7")
 }
