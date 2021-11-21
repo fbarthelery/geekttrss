@@ -169,6 +169,7 @@ dependencies {
 
     // androidx others
     implementation("androidx.browser:browser:1.4.0")
+    implementation("androidx.window:window:1.0.0-beta04")
     // needed by robolectric
     implementation("androidx.loader:loader:1.1.0")
 

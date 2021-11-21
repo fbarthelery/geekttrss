@@ -86,6 +86,12 @@ object AppTheme {
     )
 
     val Typography = androidx.compose.material.Typography(
+        h3 = TextStyle(
+            fontFamily = ExpletusSans,
+            fontWeight = FontWeight.Normal,
+            fontSize = 48.sp,
+            letterSpacing = 0.sp
+        ),
         h4 = TextStyle(
             fontFamily = ExpletusSans,
             fontWeight = FontWeight.Normal,
