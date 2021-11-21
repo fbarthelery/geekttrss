@@ -32,6 +32,7 @@ import androidx.core.view.WindowCompat
 import com.geekorum.ttrss.articles_list.ArticleListActivity
 import com.geekorum.ttrss.session.SessionActivity
 import com.geekorum.ttrss.ui.AppTheme
+import com.geekorum.ttrss.ui.rememberWindowSizeClass
 import com.google.accompanist.insets.ProvideWindowInsets
 import dagger.hilt.android.AndroidEntryPoint
 import okhttp3.OkHttpClient
@@ -65,7 +66,10 @@ class ArticleDetailActivity : SessionActivity() {
         setContent {
             ProvideWindowInsets {
                 AppTheme {
+                    val (widthSizeClass, heightSizeClass) = rememberWindowSizeClass()
                     ArticleDetailsScreen(articleDetailsViewModel,
+                        widthSizeClass = widthSizeClass,
+                        heightSizeClass = heightSizeClass,
                         webViewClient = webViewClient,
                         onNavigateUpClick = {
                             onSupportNavigateUp()

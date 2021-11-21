@@ -27,28 +27,31 @@ import android.webkit.WebViewClient
 import androidx.annotation.ColorRes
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.net.toUri
 import androidx.core.text.parseAsHtml
+import coil.compose.rememberImagePainter
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleContentIndexed
+import com.geekorum.ttrss.ui.AppTheme
+import com.geekorum.ttrss.ui.WindowSize
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.ui.Scaffold
@@ -117,6 +120,142 @@ class ArticleDetailsScreenState(
         }.value
     }
 }
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun ArticleDetailsScreen(
+    articleDetailsViewModel: ArticleDetailsViewModel,
+    widthSizeClass: WindowSize,
+    heightSizeClass: WindowSize,
+    onNavigateUpClick: () -> Unit,
+    webViewClient: WebViewClient? = null,
+) {
+    if (widthSizeClass == WindowSize.Compact || heightSizeClass == WindowSize.Compact) {
+        ArticleDetailsScreen(
+            articleDetailsViewModel = articleDetailsViewModel,
+            onNavigateUpClick = onNavigateUpClick,
+            webViewClient = webViewClient
+        )
+    } else {
+        ArticleDetailsScreenHero(
+            articleDetailsViewModel = articleDetailsViewModel,
+            onNavigateUpClick = onNavigateUpClick,
+            webViewClient = webViewClient
+        )
+    }
+}
+
+@Composable
+fun ArticleDetailsScreenHero(
+    articleDetailsViewModel: ArticleDetailsViewModel,
+    onNavigateUpClick: () -> Unit,
+    webViewClient: WebViewClient? = null) {
+    val articleDetailsScreenState = rememberArticleDetailsScreenState()
+
+    val article by articleDetailsViewModel.article.observeAsState()
+    val context = LocalContext.current
+
+    Scaffold(
+        topBar = {
+            val backgroundColorId = if (article?.isTransientUnread == true) {
+                R.color.article_detail_bottom_appbar_unread
+            } else {
+                R.color.article_detail_bottom_appbar_read
+            }
+            ArticleTopActionsBar(
+                title = { Text(article?.title ?: "") },
+                isStarred = article?.isStarred ?: false,
+                background = getColorStateList(backgroundColorId),
+                elevation = articleDetailsScreenState.appBarElevation,
+                onNavigateUpClick = onNavigateUpClick,
+                onToggleUnreadClick = { articleDetailsViewModel.toggleArticleRead() },
+                onStarredChange = { articleDetailsViewModel.onStarChanged(it) },
+                onShareClick = { articleDetailsViewModel.shareArticle(context) }
+            )
+        },
+        floatingActionButton = {
+            OpenInBrowserExtendedFab(
+                modifier = Modifier.padding(8.dp),
+                onClick = {
+                    article?.let { articleDetailsViewModel.openArticleInBrowser(context, it) }
+                }
+            )
+        }
+    ) { padding ->
+        article?.let { article ->
+            ArticleDetailsHeroContent(
+                article,
+                modifier = Modifier.padding(padding),
+                scrollState = articleDetailsScreenState.scrollState,
+                webViewClient = webViewClient
+            )
+
+            LaunchedEffect(articleDetailsScreenState.isAtEndOfArticle) {
+                if (articleDetailsScreenState.isAtEndOfArticle) {
+                    if (articleDetailsScreenState.scrollState.value == 0) {
+                        delay(2000)
+                    }
+                    articleDetailsViewModel.setArticleUnread(false)
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun ArticleDetailsHeroContent(
+    article: Article,
+    modifier: Modifier = Modifier,
+    webViewClient: WebViewClient? = null,
+    scrollState: ScrollState = rememberScrollState(),
+) {
+    ArticleDetailsHeroContent(
+        article,
+        modifier = modifier,
+        scrollState = scrollState,
+    ) {
+        val context = LocalContext.current
+        val baseUrl = article.link.toUri().let { "${it.scheme}://${it.host}" }
+        val content = remember(context, article) {
+            val cssOverride = createCssOverride(context)
+            prepareArticleContent(article.content, cssOverride)
+        }
+        ArticleContentWebView(baseUrl = baseUrl, content = content,
+            webViewClient = webViewClient,
+        )
+    }
+}
+
+@Composable
+private fun ArticleDetailsHeroContent(
+    article: Article,
+    modifier: Modifier = Modifier,
+    scrollState: ScrollState = rememberScrollState(),
+    articleContent: @Composable () -> Unit
+) {
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        ArticleHeader(
+            title = article.title,
+            date = article.getDateString(),
+            flavorImageUri = article.flavorImageUri,
+            author = article.author,
+            modifier = Modifier.padding(bottom = 32.dp)
+        )
+        Box(Modifier
+            .width(450.dp)
+            .padding(bottom = 64.dp)) {
+            articleContent()
+        }
+    }
+}
+
+
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -191,6 +330,18 @@ private fun ArticleTopAppBar(appBarElevation: Dp, onNavigateUpClick: () -> Unit)
     }
 }
 
+@Composable
+private fun OpenInBrowserExtendedFab(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val text = stringResource(R.string.open_article_in_browser)
+    ExtendedFloatingActionButton(
+        text = { Text(text) },
+        icon = { Icon(AppTheme.Icons.OpenInBrowser, contentDescription = text) },
+        modifier = modifier,
+        onClick = onClick)
+}
 
 @Composable
 private fun ArticleDetailsContent(
@@ -210,6 +361,7 @@ private fun ArticleDetailsContent(
             webViewClient = webViewClient,
             modifier = Modifier
                 .fillMaxSize()
+                .widthIn(max = 450.dp)
                 .padding(bottom = 64.dp)
         )
     }
@@ -220,7 +372,7 @@ private fun ArticleDetailsContent(
     article: Article,
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(),
-    articleContent: @Composable ColumnScope.() -> Unit) {
+    articleContent: @Composable () -> Unit) {
     Column(modifier
         .padding(horizontal = 16.dp)
         .verticalScroll(scrollState)
@@ -228,7 +380,10 @@ private fun ArticleDetailsContent(
         val title = remember(article) {
             article.title.parseAsHtml().toString()
         }
-        ArticleHeader(title = title, date = article.getDateString())
+        ArticleHeaderWithoutImage(
+            title = title,
+            date = article.getDateString()
+        )
         Divider(Modifier
             .fillMaxWidth()
             .padding(bottom = 16.dp))
@@ -239,13 +394,35 @@ private fun ArticleDetailsContent(
 @Composable
 private fun ArticleHeader(
     title: String,
+    flavorImageUri: String,
+    author: String,
+    date: String,
+    modifier: Modifier = Modifier
+) {
+    BoxWithConstraints(modifier = modifier) {
+        if (maxWidth < 600.dp) {
+            ArticleHeaderWithoutImage(title = title, date = date)
+        } else {
+            ArticleHeaderWithFlavorImage(
+                title = title,
+                flavorImageUri = flavorImageUri,
+                author = author,
+                date = date
+            )
+        }
+    }
+}
+
+@Composable
+private fun ArticleHeaderWithoutImage(
+    title: String,
     date: String,
 ) {
     Column(Modifier
         .fillMaxWidth()
         .padding(top = 36.dp)
     ) {
-        ArticleTitle(title)
+        Text(title, style = MaterialTheme.typography.h4, color = MaterialTheme.colors.primary)
         Text(date,
             style = MaterialTheme.typography.caption,
             modifier = Modifier
@@ -256,8 +433,60 @@ private fun ArticleHeader(
 }
 
 @Composable
-private fun ArticleTitle(title: String) {
-    Text(title, style = MaterialTheme.typography.h4, color = MaterialTheme.colors.primary)
+private fun ArticleHeaderWithFlavorImage(
+    title: String,
+    flavorImageUri: String,
+    author: String,
+    date: String,
+) {
+    Column(Modifier.fillMaxWidth()) {
+        val finalImageUrl = flavorImageUri.takeUnless { it.isEmpty() }
+        var hasImage by remember { mutableStateOf(finalImageUrl != null) }
+        if (hasImage) {
+            Image(
+                painter = rememberImagePainter(data = finalImageUrl) {
+                    placeholder(R.drawable.drawer_header_dark)
+                    error(R.drawable.drawer_header_dark)
+                    listener(
+                        onError = { _, t ->
+                            hasImage = false
+                        },
+                    )
+                },
+                contentDescription = null,
+                contentScale = ContentScale.FillWidth,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 300.dp)
+            )
+        }
+
+        Column(Modifier
+            .widthIn(500.dp, 800.dp)
+            .padding(top = 36.dp)
+            .align(Alignment.CenterHorizontally)
+        ) {
+            Text(title,
+                style = MaterialTheme.typography.h3,
+                color = MaterialTheme.colors.primary,
+                modifier = Modifier
+                    .padding(top = 16.dp)
+            )
+
+            val authorDateText = when {
+                author.isNotBlank() && date.isNotBlank() -> "$author, $date"
+                author.isNotBlank() -> author
+                date.isNotBlank() -> date
+                else -> ""
+            }
+            Text(authorDateText,
+                style = MaterialTheme.typography.h6,
+                modifier = Modifier
+                    .padding(top = 16.dp)
+                    .align(Alignment.End)
+            )
+        }
+    }
 }
 
 @Composable
@@ -331,11 +560,31 @@ fun PreviewArticleDetailsContent() {
             title = "My simple but hilariously and excessively long headline",
             content = "<b>Hello world</b>"
         ))
-        ArticleDetailsContent(article = article) {
-            Box(Modifier
-                .size(width = 400.dp, height = 900.dp)
-                .background(androidx.compose.ui.graphics.Color.Gray))
+        Surface {
+            ArticleDetailsContent(article = article) {
+                Box(Modifier
+                    .size(width = 400.dp, height = 900.dp)
+                    .background(androidx.compose.ui.graphics.Color.Gray))
+            }
         }
     }
+}
 
+@Preview(device = "spec:shape=Normal,width=1920,height=1080,unit=dp,dpi=480")
+@Composable
+fun PreviewArticleDetailsHeroContent() {
+    MaterialTheme {
+        val article = Article(contentData = ArticleContentIndexed(
+            title = "My simple but hilariously and excessively long headline",
+            content = "<b>Hello world</b>"
+        ))
+        Surface {
+            ArticleDetailsHeroContent(article = article) {
+                Box(Modifier
+                    .fillMaxWidth()
+                    .height(height = 1500.dp)
+                    .background(androidx.compose.ui.graphics.Color.Gray))
+            }
+        }
+    }
 }

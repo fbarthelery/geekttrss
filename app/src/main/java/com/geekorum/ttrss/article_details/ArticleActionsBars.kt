@@ -37,6 +37,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams
@@ -117,6 +119,7 @@ fun ArticleTopActionsBar(
     title: @Composable () -> Unit,
     isStarred: Boolean,
     background: ColorStateList?,
+    elevation: Dp = AppBarDefaults.TopAppBarElevation,
     onNavigateUpClick: () -> Unit,
     onToggleUnreadClick: () -> Unit,
     onStarredChange: (Boolean) -> Unit,
@@ -126,6 +129,8 @@ fun ArticleTopActionsBar(
         title = title,
         backgroundColor = background?.defaultColor?.let { Color(it) }
             ?: MaterialTheme.colors.primarySurface,
+        contentColor = contentColorFor(backgroundColor = MaterialTheme.colors.primarySurface),
+        elevation = elevation,
         contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
         navigationIcon = {
             IconButton(onClick = onNavigateUpClick) {

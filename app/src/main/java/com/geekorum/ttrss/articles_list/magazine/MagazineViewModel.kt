@@ -91,7 +91,7 @@ class MagazineViewModel @Inject constructor (
             it.isNotEmpty()
         }
 
-        val maxArticlesByFeed = articlesByFeed.maxOf { it.size }
+        val maxArticlesByFeed = articlesByFeed.maxOfOrNull { it.size } ?: 0
         for (i in 0 until maxArticlesByFeed) {
             for (articles in articlesByFeed) {
                 articles.getOrNull(i)?.let {
