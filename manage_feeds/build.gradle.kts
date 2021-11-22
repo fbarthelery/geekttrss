@@ -68,7 +68,7 @@ dependencies {
     implementation(enforcedPlatform(kotlin("bom")))
     implementation(kotlin("stdlib-jdk8"))
 
-    val daggerVersion = "2.36"
+    val daggerVersion = "2.40.1"
     implementation(enforcedDaggerPlatform(daggerVersion))
     kapt(enforcedDaggerPlatform(daggerVersion))
     implementation("com.google.dagger:dagger:$daggerVersion")
