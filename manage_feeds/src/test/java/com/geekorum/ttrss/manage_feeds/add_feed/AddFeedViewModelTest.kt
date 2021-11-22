@@ -37,9 +37,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.junit.Rule
@@ -59,7 +59,7 @@ class AddFeedViewModelTest {
     private lateinit var workManager: WorkManager
     private lateinit var accountManager: AccountManager
     private lateinit var feedsFinder: FeedsFinder
-    private lateinit var testDispatcher: TestCoroutineDispatcher
+    private val testDispatcher = StandardTestDispatcher()
 
 
     @BeforeTest
@@ -67,7 +67,6 @@ class AddFeedViewModelTest {
         workManager = mockk(relaxed = true)
         accountManager = mockk(relaxed = true)
         feedsFinder = mockk()
-        testDispatcher = TestCoroutineDispatcher()
         Dispatchers.setMain(testDispatcher)
         val dispatchers = CoroutineDispatchersProvider(testDispatcher, testDispatcher, testDispatcher)
         target = AddFeedViewModel(dispatchers, feedsFinder, workManager, accountManager)
@@ -76,11 +75,10 @@ class AddFeedViewModelTest {
     @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
-        testDispatcher.cleanupTestCoroutines()
     }
 
     @Test
-    fun testThatInitUrlReturnsCorrectFeeds() = testDispatcher.runBlockingTest {
+    fun testThatInitUrlReturnsCorrectFeeds() = runTest {
         val feeds = listOf(
             FeedResult(HTML,"https://google.com", "type", "title"),
             FeedResult(HTML, "https://apple.com", "type2", "title2"))
@@ -98,7 +96,7 @@ class AddFeedViewModelTest {
 
 
     @Test
-    fun testThatInitUrlWithExceptionReturnsEmptyFeeds() = testDispatcher.runBlockingTest {
+    fun testThatInitUrlWithExceptionReturnsEmptyFeeds() = runTest {
         coEvery { feedsFinder.findFeeds(any()) } throws IOException("No network")
 
         val result = async {
@@ -133,7 +131,7 @@ class AddFeedViewModelTest {
 
 
     @Test
-    fun testThatSubscribeEmitCompleteEvent() = testDispatcher.runBlockingTest {
+    fun testThatSubscribeEmitCompleteEvent() = runTest {
         target.selectedFeed = FeedResult(HTML,"https://google.com", "type", "title")
         target.selectedAccount = mockk()
 
@@ -147,7 +145,7 @@ class AddFeedViewModelTest {
     }
 
     @Test
-    fun testThatCancelEmitCompleteEvent() = testDispatcher.runBlockingTest {
+    fun testThatCancelEmitCompleteEvent() = runTest {
         val completeEvent = async {
             target.complete.asFlow()
                     .first()

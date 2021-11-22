@@ -31,9 +31,9 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.Rule
 import kotlin.test.AfterTest
@@ -46,14 +46,12 @@ class InAppUpdateViewModelTest {
     @get:Rule
     val archRule = InstantTaskExecutorRule()
 
-    private val testCoroutineDispatcher = TestCoroutineDispatcher()
-
     lateinit var subject: InAppUpdateViewModel
     lateinit var updateManager: InAppUpdateManager
 
     @BeforeTest
     fun setUp() {
-        Dispatchers.setMain(testCoroutineDispatcher)
+        Dispatchers.setMain(StandardTestDispatcher())
         updateManager = mockk()
         subject = InAppUpdateViewModel(updateManager)
     }
@@ -61,11 +59,10 @@ class InAppUpdateViewModelTest {
     @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
-        testCoroutineDispatcher.cleanupTestCoroutines()
     }
 
     @Test
-    fun testUpdateAvailable()= testCoroutineDispatcher.runBlockingTest {
+    fun testUpdateAvailable()= runTest {
         coEvery { updateManager.getUpdateAvailability() } returns UpdateAvailability.UPDATE_AVAILABLE
         subject.isUpdateAvailable
                 .take(1)
@@ -75,7 +72,7 @@ class InAppUpdateViewModelTest {
     }
 
     @Test
-    fun testNoUpdateAvailable() = testCoroutineDispatcher.runBlockingTest {
+    fun testNoUpdateAvailable() = runTest {
         coEvery { updateManager.getUpdateAvailability() } returns UpdateAvailability.NO_UPDATE
         subject.isUpdateAvailable
                 .take(1)
@@ -85,7 +82,7 @@ class InAppUpdateViewModelTest {
     }
 
     @Test
-    fun testAnUpdateIsAlreadyReadyToInstall() = testCoroutineDispatcher.runBlockingTest {
+    fun testAnUpdateIsAlreadyReadyToInstall() = runTest {
         coEvery { updateManager.getUpdateState() } returns UpdateState(UpdateState.Status.DOWNLOADED)
         val updates = subject.isUpdateReadyToInstall
                 .take(1)
@@ -94,7 +91,7 @@ class InAppUpdateViewModelTest {
     }
 
     @Test
-    fun testAnUpdateFlowGoingToReadyToInstall() = testCoroutineDispatcher.runBlockingTest {
+    fun testAnUpdateFlowGoingToReadyToInstall() = runTest {
         coEvery { updateManager.getUpdateState() } returns UpdateState(UpdateState.Status.UNKNOWN)
         coEvery { updateManager.startUpdate(any(), any()) } returns flowOf(
             UpdateState(UpdateState.Status.UNKNOWN),

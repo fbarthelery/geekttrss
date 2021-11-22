@@ -35,10 +35,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runBlockingTest
-import kotlinx.coroutines.test.setMain
+import kotlinx.coroutines.test.*
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.OkHttpClient
 import org.junit.Rule
@@ -56,7 +53,7 @@ class SubscribeToFeedViewModelTest {
     private lateinit var feedExtractor: FeedExtractor
     private lateinit var workManager: WorkManager
     private lateinit var feedsFinder: FeedsFinder
-    private val testDispatcher = TestCoroutineDispatcher()
+    private val testDispatcher = StandardTestDispatcher()
 
 
     @BeforeTest
@@ -75,11 +72,10 @@ class SubscribeToFeedViewModelTest {
     @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
-        testDispatcher.cleanupTestCoroutines()
     }
 
     @Test
-    fun testThatWhenUrlIsInvalidInvalidUrlEventIsRaised() = testDispatcher.runBlockingTest {
+    fun testThatWhenUrlIsInvalidInvalidUrlEventIsRaised() = runTest {
         val invalidUrlEvent = async {
             subject.invalidUrlEvent.asFlow().first()
         }

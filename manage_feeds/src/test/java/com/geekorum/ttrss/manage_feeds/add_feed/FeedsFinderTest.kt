@@ -28,9 +28,12 @@ import com.geekorum.ttrss.manage_feeds.add_feed.FeedsFinder.Source
 import com.google.common.truth.Truth.assertThat
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -48,23 +51,24 @@ class FeedsFinderTest {
     private lateinit var subject: FeedsFinder
     private lateinit var okHttpClient: OkHttpClient
     private lateinit var feedExtractor: FeedExtractor
-    private val testDispatcher = TestCoroutineDispatcher()
+    private val testDispatcher = StandardTestDispatcher()
 
     @BeforeTest
     fun setup() {
         okHttpClient = mockk()
         feedExtractor = mockk()
+        Dispatchers.setMain(testDispatcher)
         val dispatchers = CoroutineDispatchersProvider(testDispatcher, testDispatcher, testDispatcher)
         subject = FeedsFinder(dispatchers, okHttpClient, feedExtractor)
     }
 
     @AfterTest
     fun tearDown() {
-        testDispatcher.cleanupTestCoroutines()
+        Dispatchers.resetMain()
     }
 
     @Test
-    fun testThatUrlOfFeedGetResultFromFeed() = testDispatcher.runBlockingTest {
+    fun testThatUrlOfFeedGetResultFromFeed() = runTest {
         val contentType = "application/rss+xml"
         val url = "https://curiosity.com/feeds/atom/daily_curiosity.atom"
 
@@ -78,7 +82,7 @@ class FeedsFinderTest {
     }
 
     @Test
-    fun testThatErrorUrlGetNoFeeds() = testDispatcher.runBlockingTest {
+    fun testThatErrorUrlGetNoFeeds() = runTest {
         val url = "https://curiosity.com/feeds/atom/daily_curiosity.atom"
         val response = getHttpResponse(url, 404)
 
@@ -91,7 +95,7 @@ class FeedsFinderTest {
 
 
     @Test
-    fun testThatUrlOfHtmlGetResultFromHtml() = testDispatcher.runBlockingTest {
+    fun testThatUrlOfHtmlGetResultFromHtml() = runTest {
         val contentType = "text/html"
         val url = "https://curiosity.com/feeds/atom/daily_curiosity.atom"
         val response = getHttpResponse(url, 200, contentType)

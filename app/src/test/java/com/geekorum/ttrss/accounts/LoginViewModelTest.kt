@@ -32,21 +32,14 @@ import com.google.common.truth.Truth.assertThat
 import dagger.Component
 import dagger.Module
 import dagger.Provides
-import io.mockk.Runs
-import io.mockk.coEvery
-import io.mockk.every
-import io.mockk.just
-import io.mockk.mockk
+import io.mockk.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runBlockingTest
-import kotlinx.coroutines.test.setMain
+import kotlinx.coroutines.test.*
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.junit.After
 import org.junit.Before
@@ -59,7 +52,7 @@ class LoginViewModelTest {
     @get:Rule
     val archRule = InstantTaskExecutorRule()
 
-    private val testCoroutineDispatcher = TestCoroutineDispatcher()
+    private val testCoroutineDispatcher = StandardTestDispatcher()
 
     lateinit var accountManager: TinyrssAccountManager
 
@@ -96,11 +89,10 @@ class LoginViewModelTest {
     @After
     fun tearDown() {
         Dispatchers.resetMain()
-        testCoroutineDispatcher.cleanupTestCoroutines()
     }
 
     @Test
-    fun testCheckEmptyPasswordSendEventWhenNonEmpty() = testCoroutineDispatcher.runBlockingTest {
+    fun testCheckEmptyPasswordSendEventWhenNonEmpty() = runTest {
         viewModel.checkNonEmptyPassword("")
 
         val error = viewModel.fieldErrors.asFlow().first()
@@ -108,14 +100,14 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun testCheckEmptyUsernameSendEventWhenNonEmpty() = testCoroutineDispatcher.runBlockingTest {
+    fun testCheckEmptyUsernameSendEventWhenNonEmpty() = runTest {
         viewModel.checkNonEmptyUsername("")
         val error = viewModel.fieldErrors.asFlow().first()
         assertThat(error.invalidNameMsgId).isEqualTo(R.string.error_field_required)
     }
 
     @Test
-    fun checkDoLoginSendProgressEvent(): Unit = runBlockingTest {
+    fun checkDoLoginSendProgressEvent() = runTest {
         coEvery { tinyRssApi.login(any()) } returns successLoginResponse
         every { accountManager.addAccount(any(), any()) } returns false
 
@@ -127,6 +119,7 @@ class LoginViewModelTest {
                     .take(2)
                     .toList()
         }
+        runCurrent()
 
         viewModel.doLogin()
 
@@ -134,7 +127,7 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun checkDoLoginWithSuccessSendCompleteEvent() = testCoroutineDispatcher.runBlockingTest {
+    fun checkDoLoginWithSuccessSendCompleteEvent() = runTest {
         every { accountManager.addAccount(any(), any()) } returns true
         every { accountManager.updateServerInformation(any(), any()) } just Runs
         every { accountManager.initializeAccountSync(any()) } just Runs
@@ -155,7 +148,7 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun checkDoLoginWithFailSendLoginFailedEvent(): Unit = testCoroutineDispatcher.runBlockingTest {
+    fun checkDoLoginWithFailSendLoginFailedEvent(): Unit = runTest {
         coEvery { tinyRssApi.login(any()) } returns failedLoginResponse
 
         viewModel.initialize(LoginActivity.ACTION_ADD_ACCOUNT)
