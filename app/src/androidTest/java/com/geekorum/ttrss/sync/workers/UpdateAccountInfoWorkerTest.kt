@@ -49,9 +49,9 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.asExecutor
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.Rule
 import org.junit.Test
@@ -70,7 +70,7 @@ import com.geekorum.ttrss.data.Account as DataAccount
 class UpdateAccountInfoWorkerTest {
     private lateinit var workerBuilder: TestListenableWorkerBuilder<UpdateAccountInfoWorker>
     private lateinit var apiService: MyMockApiService
-    private val testCoroutineDispatcher = TestCoroutineDispatcher()
+    private val testCoroutineDispatcher = StandardTestDispatcher()
 
     @Inject
     lateinit var hiltWorkerFactory: HiltWorkerFactory
@@ -113,12 +113,11 @@ class UpdateAccountInfoWorkerTest {
     @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
-        testCoroutineDispatcher.cleanupTestCoroutines()
     }
 
 
     @Test
-    fun testThatAccountInfoAreUpdatedAfterRunningWorker() = runBlocking {
+    fun testThatAccountInfoAreUpdatedAfterRunningWorker() = runTest {
         // previous accountInfo
         assertThat(databaseService.getAccountInfo("account", "https://test.exemple.com"))
                 .isNull()

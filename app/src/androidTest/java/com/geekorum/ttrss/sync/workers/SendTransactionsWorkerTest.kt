@@ -56,9 +56,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.asExecutor
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.setMain
+import kotlinx.coroutines.test.*
 import org.junit.Rule
 import org.junit.Test
 import javax.inject.Inject
@@ -75,7 +73,7 @@ import kotlin.test.BeforeTest
 class SendTransactionsWorkerTest {
     private lateinit var workerBuilder: TestListenableWorkerBuilder<SendTransactionsWorker>
     private lateinit var apiService: MyMockApiService
-    private val testCoroutineDispatcher = TestCoroutineDispatcher()
+    private val testCoroutineDispatcher = StandardTestDispatcher()
 
     @Inject lateinit var databaseService: DatabaseService
     @Inject lateinit var transactionsDao: TransactionsDao
@@ -119,12 +117,11 @@ class SendTransactionsWorkerTest {
     @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
-        testCoroutineDispatcher.cleanupTestCoroutines()
     }
 
 
     @Test
-    fun testTransactionAreSendAndRemovedWhenRunningWorker() = runBlocking {
+    fun testTransactionAreSendAndRemovedWhenRunningWorker() = runTest {
         // prepare database
         databaseService.insertCategories(listOf(Category(id = 1, title = "Dummy category")))
         databaseService.insertFeeds(listOf(Feed(id =1 , title= "Dummy feed", catId = 1)))

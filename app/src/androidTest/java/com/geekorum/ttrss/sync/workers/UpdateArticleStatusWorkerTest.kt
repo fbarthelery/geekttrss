@@ -29,12 +29,7 @@ import androidx.work.ListenableWorker
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.geekorum.ttrss.core.ActualCoroutineDispatchersModule
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
-import com.geekorum.ttrss.data.Article
-import com.geekorum.ttrss.data.ArticleWithAttachments
-import com.geekorum.ttrss.data.ArticlesDatabase
-import com.geekorum.ttrss.data.Category
-import com.geekorum.ttrss.data.DiskDatabaseModule
-import com.geekorum.ttrss.data.Feed
+import com.geekorum.ttrss.data.*
 import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.network.TinyrssApiModule
 import com.geekorum.ttrss.sync.DatabaseService
@@ -50,9 +45,9 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.asExecutor
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.Rule
 import org.junit.Test
@@ -70,7 +65,7 @@ import kotlin.test.BeforeTest
 class UpdateArticleStatusWorkerTest {
     private lateinit var workerBuilder: TestListenableWorkerBuilder<UpdateArticleStatusWorker>
     private lateinit var apiService: MyMockApiService
-    private val testCoroutineDispatcher = TestCoroutineDispatcher()
+    private val testCoroutineDispatcher = StandardTestDispatcher()
 
     @Inject
     lateinit var hiltWorkerFactory: HiltWorkerFactory
@@ -113,12 +108,11 @@ class UpdateArticleStatusWorkerTest {
     @AfterTest
     fun tearDown() {
         Dispatchers.resetMain()
-        testCoroutineDispatcher.cleanupTestCoroutines()
     }
 
 
     @Test
-    fun testThatArticleStatusChangeAfterRunningWorker() = runBlocking {
+    fun testThatArticleStatusChangeAfterRunningWorker() = runTest {
         // prepare database
         databaseService.insertCategories(listOf(Category(id = 1, title = "Dummy category")))
         databaseService.insertFeeds(listOf(Feed(id =1 , title= "Dummy feed", catId = 1)))
