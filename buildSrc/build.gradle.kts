@@ -27,9 +27,6 @@ version = "1.0"
 repositories {
     gradlePluginPortal()
     google()
-    maven {
-        url = uri("https://kotlin.bintray.com/kotlinx")
-    }
 }
 
 dependencies {

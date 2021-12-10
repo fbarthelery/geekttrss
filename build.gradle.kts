@@ -55,8 +55,6 @@ allprojects {
     repositories {
         google().setupGoogleContent()
         mavenCentral()
-        // for kotlinx
-        maven { url = URI("https://kotlin.bintray.com/kotlinx") }
         // for geekdroid
         flatDir {
             dirs(rootProject.files("libs"))

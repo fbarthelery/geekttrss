@@ -72,10 +72,10 @@ val GEEKDROID_PROJECT_DIR: String? by settings
 GEEKDROID_PROJECT_DIR?.let {
     includeBuild(it) {
         dependencySubstitution {
-            substitute(module("com.geekorum:geekdroid")).with(project(":geekdroid"))
-            substitute(module("com.geekorum:geekdroid-firebase")).with(project(":geekdroid-firebase"))
-            substitute(module("com.geekorum.geekdroid:geekdroid")).with(project(":geekdroid"))
-            substitute(module("com.geekorum.geekdroid:geekdroid-firebase")).with(project(":geekdroid-firebase"))
+            substitute(module("com.geekorum:geekdroid")).using(project(":geekdroid"))
+            substitute(module("com.geekorum:geekdroid-firebase")).using(project(":geekdroid-firebase"))
+            substitute(module("com.geekorum.geekdroid:geekdroid")).using(project(":geekdroid"))
+            substitute(module("com.geekorum.geekdroid:geekdroid-firebase")).using(project(":geekdroid-firebase"))
         }
     }
 }
