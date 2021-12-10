@@ -157,7 +157,7 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata:$composeVersion")
     implementation("androidx.compose.animation:animation-graphics:$composeVersion")
     implementation("androidx.paging:paging-compose:1.0.0-alpha14")
-    val accompanistVersion = "0.21.0-beta"
+    val accompanistVersion = "0.21.3-beta"
     implementation("com.google.accompanist:accompanist-insets:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-insets-ui:$accompanistVersion")
     implementation("com.google.accompanist:accompanist-swiperefresh:$accompanistVersion")
@@ -178,8 +178,8 @@ dependencies {
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
 
     //geekdroid
-    implementation("com.geekorum.geekdroid:geekdroid:geekttrss-1.5.2")
-    add("googleImplementation", "com.geekorum.geekdroid:geekdroid-firebase:geekttrss-1.5.2")
+    implementation("com.geekorum.geekdroid:geekdroid:master")
+    add("googleImplementation", "com.geekorum.geekdroid:geekdroid-firebase:master")
 
     implementation(project(":htmlparsers"))
     implementation(project(":webapi"))
