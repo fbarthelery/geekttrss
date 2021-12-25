@@ -26,12 +26,14 @@ import android.content.ContextWrapper
 import android.net.Uri
 import androidx.core.app.ShareCompat
 import androidx.core.net.toUri
+import androidx.core.text.parseAsHtml
 import androidx.lifecycle.*
 import com.geekorum.ttrss.articles_list.ArticlesRepository
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.network.TtRssBrowserLauncher
 import com.geekorum.ttrss.session.SessionActivityComponent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
@@ -55,6 +57,7 @@ class ArticleDetailsViewModel @Inject constructor(
 
     val article: LiveData<Article?> = articleId.switchMap {
         articlesRepository.getArticleById(it)
+            .map(::prepareArticle)
             .onEach { article ->
                 article?.let {
                     browserLauncher.mayLaunchUrl(article.link.toUri())
@@ -63,8 +66,6 @@ class ArticleDetailsViewModel @Inject constructor(
             .asLiveData()
     }
 
-    val articleContent: LiveData<String> = article.map { it?.content ?: "" }.distinctUntilChanged()
-
     init {
         browserLauncher.warmUp()
     }
@@ -72,6 +73,12 @@ class ArticleDetailsViewModel @Inject constructor(
     fun init(articleId: Long) {
         state[STATE_ARTICLE_ID] = articleId
     }
+
+    private fun prepareArticle(article: Article?) = article?.copy(
+        contentData = article.contentData.copy(
+            title = article.contentData.title.parseAsHtml().toString()
+        )
+    )
 
     override fun onCleared() {
         browserLauncher.shutdown()

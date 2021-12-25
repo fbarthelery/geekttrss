@@ -21,6 +21,7 @@
 package com.geekorum.ttrss.articles_list
 
 import android.accounts.Account
+import androidx.core.text.parseAsHtml
 import androidx.lifecycle.*
 import androidx.paging.*
 import com.geekorum.geekdroid.accounts.SyncInProgressLiveData
@@ -104,6 +105,17 @@ abstract class BaseArticlesViewModel(
         unreadActionUndoManager.undoAll()
         _pendingArticlesSetUnread.value = unreadActionUndoManager.nbActions
     }
+
+    protected fun prepareArticlePagingData(pagingData: PagingData<ArticleWithFeed>) =
+        pagingData.map { articleWithFeed ->
+            articleWithFeed.copy(
+                article = articleWithFeed.article.copy(
+                    contentData = articleWithFeed.article.contentData.copy(
+                        title = articleWithFeed.article.contentData.title.parseAsHtml().toString()
+                    )
+                )
+            )
+        }
 
     protected interface ArticlesAccess {
         val starredArticles: PagingSource<Int, ArticleWithFeed>
@@ -244,6 +256,7 @@ class ArticlesListViewModel @Inject constructor(
     override val articles: Flow<PagingData<ArticleWithFeed>> = feedsRepository.getFeedById(feedId)
         .filterNotNull()
         .flatMapLatest { getArticlesForFeed(it) }
+        .map(::prepareArticlePagingData)
         .cachedIn(viewModelScope)
 
     private val refreshJobName = MutableStateFlow<String?>(null)
@@ -313,9 +326,11 @@ class ArticlesListByTagViewModel @Inject constructor(
 
     private val account: Account = component.account
 
-    override val articles: Flow<PagingData<ArticleWithFeed>> = tag.asFlow().flatMapLatest {
-        getArticlesForTag(it)
-    }.cachedIn(viewModelScope)
+    override val articles: Flow<PagingData<ArticleWithFeed>> = tag.asFlow()
+        .flatMapLatest {
+            getArticlesForTag(it)
+        }.map(::prepareArticlePagingData)
+        .cachedIn(viewModelScope)
 
     override val isRefreshing: LiveData<Boolean> = SyncInProgressLiveData(account, ArticlesContract.AUTHORITY)
 

@@ -45,7 +45,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.net.toUri
-import androidx.core.text.parseAsHtml
 import coil.compose.rememberImagePainter
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Article
@@ -377,11 +376,8 @@ private fun ArticleDetailsContent(
         .padding(horizontal = 16.dp)
         .verticalScroll(scrollState)
     ) {
-        val title = remember(article) {
-            article.title.parseAsHtml().toString()
-        }
         ArticleHeaderWithoutImage(
-            title = title,
+            title = article.title,
             date = article.getDateString()
         )
         Divider(Modifier
