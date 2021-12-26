@@ -33,8 +33,7 @@ import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.network.TtRssBrowserLauncher
 import com.geekorum.ttrss.session.SessionActivityComponent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 private const val STATE_ARTICLE_ID = "article_id"
@@ -66,6 +65,14 @@ class ArticleDetailsViewModel @Inject constructor(
             .asLiveData()
     }
 
+    val additionalArticles = article
+        .asFlow()
+        .map {
+            it?.tags ?: ""
+        }.distinctUntilChanged()
+        .map(::getAdditionalArticlesForTags)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+
     init {
         browserLauncher.warmUp()
     }
@@ -79,6 +86,30 @@ class ArticleDetailsViewModel @Inject constructor(
             title = article.contentData.title.parseAsHtml().toString()
         )
     )
+
+    private suspend fun getAdditionalArticlesForTags(tags: String): List<ArticleWithTag> {
+        val randomizedTags = tags.split(",")
+            .map(String::trim)
+            .filter(String::isNotEmpty)
+            .shuffled()
+
+        val articles = randomizedTags.map { articlesRepository.getUnreadArticlesForTag(it)
+            .filterNot { it.article.id == articleId.value }
+            .toMutableList() }
+        val articlesPerTag = randomizedTags.zip(articles)
+        val result = sequence {
+            while (articlesPerTag.any { (_, v) -> v.isNotEmpty() }) {
+                for ((tag, values) in articlesPerTag) {
+                    val article = values.removeFirstOrNull()?.article
+                    if (article != null)
+                        yield(ArticleWithTag(article, tag))
+                }
+            }
+        }
+            .distinctBy { it.article }
+            .take(3)
+        return result.toList()
+    }
 
     override fun onCleared() {
         browserLauncher.shutdown()
@@ -139,3 +170,8 @@ class ArticleDetailsViewModel @Inject constructor(
     }
 
 }
+
+data class ArticleWithTag(
+    val article: Article,
+    val tag: String
+)

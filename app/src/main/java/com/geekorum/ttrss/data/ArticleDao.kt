@@ -162,4 +162,11 @@ interface ArticleDao {
         " LIMIT :count ")
     suspend fun getMostUnreadTags(count: Int): List<String>
 
+    @Query("SELECT articles.* FROM articles " +
+        " JOIN articles_tags ON (articles_tags.article_id = articles._id)" +
+        " WHERE articles_tags.tag=:tag AND unread=1 ORDER BY last_time_update DESC LIMIT :count"
+    )
+    @Transaction
+    suspend fun getUnreadArticlesForTag(tag: String, count: Int): List<ArticleWithFeed>
+
 }

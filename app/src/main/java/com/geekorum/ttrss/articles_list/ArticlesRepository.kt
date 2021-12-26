@@ -96,6 +96,10 @@ class ArticlesRepository
         return articleDao.getAllUnreadArticlesForTagOldestFirst(tag)
     }
 
+    suspend fun getUnreadArticlesForTag(tag: String, count: Int = 3): List<ArticleWithFeed> {
+        return articleDao.getUnreadArticlesForTag(tag, count)
+    }
+
     fun getAllArticlesUpdatedAfterTime(time: Long): PagingSource<Int, ArticleWithFeed> {
         return articleDao.getAllArticlesUpdatedAfterTime(time)
     }
