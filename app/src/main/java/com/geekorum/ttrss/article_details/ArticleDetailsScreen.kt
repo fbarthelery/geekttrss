@@ -40,6 +40,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -127,18 +128,21 @@ fun ArticleDetailsScreen(
     widthSizeClass: WindowSize,
     heightSizeClass: WindowSize,
     onNavigateUpClick: () -> Unit,
+    onArticleClick: (Article) -> Unit,
     webViewClient: WebViewClient? = null,
 ) {
     if (widthSizeClass == WindowSize.Compact || heightSizeClass == WindowSize.Compact) {
         ArticleDetailsScreen(
             articleDetailsViewModel = articleDetailsViewModel,
             onNavigateUpClick = onNavigateUpClick,
+            onArticleClick = onArticleClick,
             webViewClient = webViewClient
         )
     } else {
         ArticleDetailsScreenHero(
             articleDetailsViewModel = articleDetailsViewModel,
             onNavigateUpClick = onNavigateUpClick,
+            onArticleClick = onArticleClick,
             webViewClient = webViewClient
         )
     }
@@ -148,6 +152,7 @@ fun ArticleDetailsScreen(
 fun ArticleDetailsScreenHero(
     articleDetailsViewModel: ArticleDetailsViewModel,
     onNavigateUpClick: () -> Unit,
+    onArticleClick: (Article) -> Unit,
     webViewClient: WebViewClient? = null) {
     val articleDetailsScreenState = rememberArticleDetailsScreenState()
 
@@ -182,8 +187,12 @@ fun ArticleDetailsScreenHero(
         }
     ) { padding ->
         article?.let { article ->
+            val readMoreArticles by articleDetailsViewModel.additionalArticles.collectAsState()
+
             ArticleDetailsHeroContent(
                 article,
+                readMoreArticles = readMoreArticles,
+                onArticleClick = onArticleClick,
                 modifier = Modifier.padding(padding),
                 scrollState = articleDetailsScreenState.scrollState,
                 webViewClient = webViewClient
@@ -205,12 +214,16 @@ fun ArticleDetailsScreenHero(
 @Composable
 private fun ArticleDetailsHeroContent(
     article: Article,
+    readMoreArticles: List<ArticleWithTag>,
+    onArticleClick: (Article) -> Unit,
     modifier: Modifier = Modifier,
     webViewClient: WebViewClient? = null,
     scrollState: ScrollState = rememberScrollState(),
 ) {
     ArticleDetailsHeroContent(
         article,
+        readMoreArticles,
+        onArticleClick,
         modifier = modifier,
         scrollState = scrollState,
     ) {
@@ -229,6 +242,8 @@ private fun ArticleDetailsHeroContent(
 @Composable
 private fun ArticleDetailsHeroContent(
     article: Article,
+    readMoreArticles: List<ArticleWithTag>,
+    onArticleClick: (Article) -> Unit,
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(),
     articleContent: @Composable () -> Unit
@@ -246,10 +261,18 @@ private fun ArticleDetailsHeroContent(
             author = article.author,
             modifier = Modifier.padding(bottom = 32.dp)
         )
-        Box(Modifier
+        Column(Modifier
             .width(450.dp)
             .padding(bottom = 64.dp)) {
             articleContent()
+
+            if (readMoreArticles.isNotEmpty()) {
+                Divider(Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp))
+                ReadMoreSection(articles = readMoreArticles,
+                    onArticleClick = onArticleClick)
+            }
         }
     }
 }
@@ -261,6 +284,7 @@ private fun ArticleDetailsHeroContent(
 fun ArticleDetailsScreen(
     articleDetailsViewModel: ArticleDetailsViewModel,
     onNavigateUpClick: () -> Unit,
+    onArticleClick: (Article) -> Unit,
     webViewClient: WebViewClient? = null,
 ) {
     val articleDetailsScreenState = rememberArticleDetailsScreenState()
@@ -294,7 +318,12 @@ fun ArticleDetailsScreen(
         }
     ) { padding ->
         article?.let {
+            val readMoreArticles by articleDetailsViewModel.additionalArticles.collectAsState()
             ArticleDetailsContent(it,
+                readMoreArticles = readMoreArticles,
+                onArticleClick = {
+                    onArticleClick(it)
+                },
                 webViewClient = webViewClient,
                 modifier = Modifier.padding(top = padding.calculateTopPadding()),
                 scrollState = articleDetailsScreenState.scrollState)
@@ -345,23 +374,26 @@ private fun OpenInBrowserExtendedFab(
 @Composable
 private fun ArticleDetailsContent(
     article: Article,
+    readMoreArticles: List<ArticleWithTag>,
+    onArticleClick: (Article) -> Unit,
     modifier: Modifier = Modifier,
     webViewClient: WebViewClient? = null,
     scrollState: ScrollState = rememberScrollState()
 ) {
-    ArticleDetailsContent(article, modifier, scrollState) {
+    ArticleDetailsContent(article, readMoreArticles, onArticleClick , modifier, scrollState) {
         val baseUrl = article.link.toUri().let { "${it.scheme}://${it.host}" }
         val context = LocalContext.current
         val content = remember(context, article) {
             val cssOverride = createCssOverride(context)
             prepareArticleContent(article.content, cssOverride)
         }
+        val verticalPadding = if (article.content.isNotBlank()) 16.dp else 0.dp
         ArticleContentWebView(baseUrl = baseUrl, content = content,
             webViewClient = webViewClient,
             modifier = Modifier
                 .fillMaxSize()
                 .widthIn(max = 450.dp)
-                .padding(bottom = 64.dp)
+                .padding(vertical = verticalPadding)
         )
     }
 }
@@ -369,6 +401,8 @@ private fun ArticleDetailsContent(
 @Composable
 private fun ArticleDetailsContent(
     article: Article,
+    readMoreArticles: List<ArticleWithTag>,
+    onArticleClick: (Article) -> Unit,
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(),
     articleContent: @Composable () -> Unit) {
@@ -381,9 +415,19 @@ private fun ArticleDetailsContent(
             date = article.getDateString()
         )
         Divider(Modifier
-            .fillMaxWidth()
-            .padding(bottom = 16.dp))
+            .fillMaxWidth())
         articleContent()
+
+        if (readMoreArticles.isNotEmpty()) {
+            Divider(Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp))
+            ReadMoreSection(articles = readMoreArticles,
+                onArticleClick = onArticleClick,
+                Modifier.padding(bottom = 80.dp))
+        } else {
+            Spacer(Modifier.height(72.dp))
+        }
     }
 }
 
@@ -557,7 +601,8 @@ fun PreviewArticleDetailsContent() {
             content = "<b>Hello world</b>"
         ))
         Surface {
-            ArticleDetailsContent(article = article) {
+            ArticleDetailsContent(article = article, readMoreArticles = emptyList(),
+                onArticleClick = {}) {
                 Box(Modifier
                     .size(width = 400.dp, height = 900.dp)
                     .background(androidx.compose.ui.graphics.Color.Gray))
@@ -575,12 +620,71 @@ fun PreviewArticleDetailsHeroContent() {
             content = "<b>Hello world</b>"
         ))
         Surface {
-            ArticleDetailsHeroContent(article = article) {
+            ArticleDetailsHeroContent(article = article,
+                readMoreArticles = emptyList(),
+                onArticleClick = {}) {
                 Box(Modifier
                     .fillMaxWidth()
                     .height(height = 1500.dp)
                     .background(androidx.compose.ui.graphics.Color.Gray))
             }
         }
+    }
+}
+
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun ReadMoreSection(
+    articles: List<ArticleWithTag>,
+    onArticleClick: (Article) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier) {
+        Text(stringResource(R.string.lbl_read_more),
+            style = MaterialTheme.typography.h6,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+        for ((article, tag) in articles) {
+            Card(onClick = { onArticleClick(article) },
+            modifier = Modifier
+                .padding(vertical = 8.dp)
+                .widthIn(max = 400.dp)
+                .fillMaxWidth()
+            ) {
+                Row(Modifier.padding(vertical = 8.dp)) {
+                    Image(
+                        painter = rememberImagePainter(data = article.flavorImageUri) ,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.size(88.dp),
+                        contentDescription = null
+                    )
+                    Column(Modifier.padding(horizontal = 16.dp)) {
+                        Text(article.title, style = MaterialTheme.typography.subtitle1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.heightIn(max = 56.dp)
+                        )
+                        Text("#$tag", style = MaterialTheme.typography.caption)
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+@Preview
+@Composable
+fun PreviewReadMoreSection() {
+    AppTheme {
+        ReadMoreSection(
+            listOf(
+                ArticleWithTag(
+                    article = Article(id = 42, contentData = ArticleContentIndexed(title = "New quantum computer")),
+                    tag = "Quantum"
+                )
+            ),
+            onArticleClick = {}
+        )
     }
 }

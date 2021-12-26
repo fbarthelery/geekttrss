@@ -23,13 +23,16 @@ package com.geekorum.ttrss.article_details
 import android.annotation.SuppressLint
 import android.app.assist.AssistContent
 import android.content.ContentUris
+import android.content.Intent
 import android.os.Bundle
 import android.webkit.WebViewClient
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
+import com.geekorum.ttrss.R
 import com.geekorum.ttrss.articles_list.ArticleListActivity
+import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.session.SessionActivity
 import com.geekorum.ttrss.ui.AppTheme
 import com.geekorum.ttrss.ui.rememberWindowSizeClass
@@ -73,10 +76,24 @@ class ArticleDetailActivity : SessionActivity() {
                         webViewClient = webViewClient,
                         onNavigateUpClick = {
                             onSupportNavigateUp()
-                        })
+                        },
+                        onArticleClick = {
+                            showArticle(it)
+                        }
+                    )
                 }
             }
         }
+    }
+
+    private fun showArticle(article: Article) {
+        finish()
+        val intent = Intent(this, ArticleDetailActivity::class.java).apply {
+            data = getString(R.string.article_details_data_pattern)
+                .replace("{article_id}", article.id.toString())
+                .toUri()
+        }
+        startActivity(intent)
     }
 
     @SuppressLint("RestrictedApi")
