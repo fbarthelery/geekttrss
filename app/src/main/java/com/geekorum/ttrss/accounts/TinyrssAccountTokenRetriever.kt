@@ -27,7 +27,7 @@ import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.webapi.TokenRetriever
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.actor
-import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 import kotlin.time.TimeMark
 import kotlin.time.TimeSource
@@ -61,7 +61,7 @@ internal class TinyrssAccountTokenRetriever(
                 }
                 msg is Message.InvalidateToken && lastMsg == msg
                 -> {
-                    val invalidate = (lastMsgTimeMark == null || lastMsgTimeMark.elapsedNow() >= Duration.seconds(6))
+                    val invalidate = (lastMsgTimeMark == null || lastMsgTimeMark.elapsedNow() >= 6.seconds)
                     if (invalidate) {
                         invalidateTokenInternal()
                         lastMsgTimeMark = TimeSource.Monotonic.markNow()

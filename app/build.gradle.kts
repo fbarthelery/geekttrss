@@ -40,7 +40,7 @@ plugins {
     id("dagger.hilt.android.plugin")
 }
 
-val composeVersion = "1.1.0-beta03"
+val composeVersion = "1.1.0-rc01"
 
 android {
     val compileSdkInt: Int by rootProject.extra
@@ -232,7 +232,7 @@ dependencies {
     implementation(enforcedPlatform(kotlin("bom")))
     implementation(kotlin("stdlib-jdk8"))
 
-    val coroutinesVersion = "1.6.0-RC"
+    val coroutinesVersion = "1.6.0"
     implementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:$coroutinesVersion"))
     testImplementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:$coroutinesVersion"))
     androidTestImplementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:$coroutinesVersion"))
@@ -252,7 +252,7 @@ dependencies {
     add("googleImplementation", "com.google.android.play:core-ktx:1.8.1")
 
     // api dependencies for features modules
-    api("androidx.appcompat:appcompat:1.3.1")
+    api("androidx.appcompat:appcompat:1.4.0")
     api("androidx.work:work-runtime-ktx:$workVersion")
     api("androidx.room:room-runtime:$roomVersion")
     api("androidx.room:room-ktx:$roomVersion")

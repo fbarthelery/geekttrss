@@ -86,7 +86,7 @@ dependencies {
     //geekdroid
     implementation("com.geekorum.geekdroid:geekdroid:geekttrss-1.5.2")
 
-    implementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.6.0-RC"))
+    implementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.6.0"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
 

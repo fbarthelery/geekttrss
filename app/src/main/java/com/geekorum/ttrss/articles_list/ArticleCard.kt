@@ -22,6 +22,8 @@ package com.geekorum.ttrss.articles_list
 
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
+import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
+import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -262,9 +264,9 @@ private fun CardToolbar(
         }
 
         IconToggleButton(checked = isStarred, onCheckedChange = onStarChanged) {
-            val image = animatedVectorResource(id = R.drawable.avd_ic_star_filled)
+            val image = AnimatedImageVector.animatedVectorResource(id = R.drawable.avd_ic_star_filled)
             Icon(
-                painter = image.painterFor(atEnd = isStarred),
+                painter = rememberAnimatedVectorPainter(image, atEnd = isStarred),
                 contentDescription = null,
                 tint = Color.Unspecified,
             )

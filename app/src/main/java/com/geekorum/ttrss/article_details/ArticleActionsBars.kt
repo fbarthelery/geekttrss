@@ -25,6 +25,8 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
+import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
+import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Archive
@@ -38,7 +40,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams
@@ -84,7 +85,7 @@ fun ArticleBottomActionsBar(
                 id = R.id.bottom_app_bar
                 fabAlignmentMode = BottomAppBar.FAB_ALIGNMENT_MODE_END
             }
-            bottomAppBar.addView(toolbarBinding!!.root)
+            bottomAppBar.addView(toolbarBinding.root)
             val fab = FloatingActionButton(it).apply {
                 id = R.id.fab
                 setImageResource(R.drawable.ic_open_in_browser_24)
@@ -142,14 +143,14 @@ fun ArticleTopActionsBar(
                 Icon(Icons.Default.Archive, contentDescription = null)
             }
             IconToggleButton(isStarred, onCheckedChange = onStarredChange) {
-                val image = animatedVectorResource(id = R.drawable.avd_ic_star_filled)
+                val image = AnimatedImageVector.animatedVectorResource(id = R.drawable.avd_ic_star_filled)
                 val starColor = if (isStarred) {
                     Color.Unspecified
                 } else {
                     LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
                 }
                 Icon(
-                    painter = image.painterFor(atEnd = isStarred),
+                    painter = rememberAnimatedVectorPainter(image, atEnd = isStarred),
                     contentDescription = null,
                     tint = starColor,
                 )

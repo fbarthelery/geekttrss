@@ -69,7 +69,6 @@ internal class CompleteSession(id: Int) : InstallSession(id) {
 
     override suspend fun getSessionState(): State = state
 
-    @ExperimentalCoroutinesApi
     override fun getSessionStates(): Flow<State> = flowOf(state)
 
     override fun cancel() {
@@ -91,7 +90,6 @@ private class FailedSession(id: Int) : InstallSession(id) {
 
     override suspend fun getSessionState(): State = state
 
-    @ExperimentalCoroutinesApi
     override fun getSessionStates(): Flow<State> = flowOf(state)
 
     override fun cancel() {
@@ -106,7 +104,6 @@ private class FailedSession(id: Int) : InstallSession(id) {
 
 class MockedSession(id: Int) : InstallSession(id) {
 
-    @ExperimentalCoroutinesApi
     override fun getSessionStates(): Flow<State> = flow {
         var state = State(State.Status.PENDING, 0, 0)
         emit(state)

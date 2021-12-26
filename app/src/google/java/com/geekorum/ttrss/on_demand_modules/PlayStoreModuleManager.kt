@@ -79,7 +79,6 @@ private class SplitInstallSession(
     id: Int
 ) : InstallSession(id) {
 
-    @ExperimentalCoroutinesApi
     override fun getSessionStates(): Flow<State> {
         return splitInstallManager.requestProgressFlow()
                 .map { it.toInstallSessionState() }
