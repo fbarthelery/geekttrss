@@ -101,8 +101,14 @@ class ArticleDetailsViewModel @Inject constructor(
             while (articlesPerTag.any { (_, v) -> v.isNotEmpty() }) {
                 for ((tag, values) in articlesPerTag) {
                     val article = values.removeFirstOrNull()?.article
-                    if (article != null)
-                        yield(ArticleWithTag(article, tag))
+                    if (article != null) {
+                        val articleWithCorrectTitle = article.copy(
+                            contentData = article.contentData.copy(
+                                title = article.contentData.title.parseAsHtml().toString()
+                            )
+                        )
+                        yield(ArticleWithTag(articleWithCorrectTitle, tag))
+                    }
                 }
             }
         }

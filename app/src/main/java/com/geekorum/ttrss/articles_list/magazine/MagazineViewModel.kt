@@ -20,13 +20,11 @@
  */
 package com.geekorum.ttrss.articles_list.magazine
 
+import androidx.core.text.parseAsHtml
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
+import androidx.paging.*
 import com.geekorum.geekdroid.accounts.SyncInProgressLiveData
 import com.geekorum.ttrss.articles_list.FeedsRepository
 import com.geekorum.ttrss.background_job.BackgroundJobManager
@@ -37,6 +35,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -81,7 +80,8 @@ class MagazineViewModel @Inject constructor (
             }
             pager.flow
         }
-    }.cachedIn(viewModelScope)
+    }.map(::prepareArticlePagingData)
+        .cachedIn(viewModelScope)
 
     private val recentUnreadArticleIds = flow {
         val freshTimeSec = System.currentTimeMillis() / 1000 - 3600 * 36
@@ -133,4 +133,16 @@ class MagazineViewModel @Inject constructor (
     fun refreshFeeds() = viewModelScope.launch {
         backgroundJobManager.refresh(account)
     }
+
+    private fun prepareArticlePagingData(pagingData: PagingData<ArticleWithFeed>) =
+        pagingData.map { articleWithFeed ->
+            articleWithFeed.copy(
+                article = articleWithFeed.article.copy(
+                    contentData = articleWithFeed.article.contentData.copy(
+                        title = articleWithFeed.article.contentData.title.parseAsHtml().toString()
+                    )
+                )
+            )
+        }
+
 }
