@@ -170,11 +170,11 @@ dependencies {
 
     // androidx others
     implementation("androidx.browser:browser:1.4.0")
-    implementation("androidx.window:window:1.0.0-beta04")
+    implementation("androidx.window:window:1.0.0-rc01")
     // needed by robolectric
     implementation("androidx.loader:loader:1.1.0")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
 
     //geekdroid
@@ -258,7 +258,7 @@ dependencies {
     api("androidx.room:room-ktx:$roomVersion")
     api("androidx.paging:paging-runtime-ktx:3.1.0")
     api("com.squareup.retrofit2:retrofit:2.9.0")
-    api("com.squareup.okhttp3:okhttp:4.9.2")
+    api("com.squareup.okhttp3:okhttp:4.9.3")
     api("com.jakewharton.timber:timber:5.0.1")
 
     val navigationVersion = "2.3.5"
