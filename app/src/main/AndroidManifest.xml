@@ -155,6 +155,9 @@
             <meta-data android:name="com.geekorum.ttrss.background_job.WorkManagerInitializer"
                 android:value="androidx.startup" />
 
+            <meta-data android:name="com.geekorum.ttrss.background_job.BackgroundJobManagerInitializer"
+                android:value="androidx.startup" />
+
         </provider>
 
 

@@ -20,16 +20,30 @@
  */
 package com.geekorum.ttrss.background_job
 
-import android.app.Application
-import com.geekorum.geekdroid.dagger.AppInitializer
-import javax.inject.Inject
+import android.content.Context
+import androidx.annotation.Keep
+import androidx.startup.Initializer
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.components.SingletonComponent
 
-internal class BackgroundJobManagerInitializer @Inject constructor(
-    private val backgroundJobManager: BackgroundJobManager
-) : AppInitializer {
+@Keep
+class BackgroundJobManagerInitializer : Initializer<BackgroundJobManager> {
 
-    override fun initialize(app: Application) {
-        backgroundJobManager.setupPeriodicJobs()
+    @EntryPoint
+    @InstallIn(SingletonComponent::class)
+    interface BackgroundJobManagerEntryPoint {
+        val backgroundJobManager: BackgroundJobManager
     }
-}
 
+    override fun create(context: Context): BackgroundJobManager {
+        val entryPoint = EntryPointAccessors.fromApplication(context, BackgroundJobManagerEntryPoint::class.java)
+        val backgroundJobManager = entryPoint.backgroundJobManager
+        backgroundJobManager.setupPeriodicJobs()
+        return backgroundJobManager
+    }
+
+    override fun dependencies(): List<Class<out Initializer<*>>> = listOf(WorkManagerInitializer::class.java)
+
+}

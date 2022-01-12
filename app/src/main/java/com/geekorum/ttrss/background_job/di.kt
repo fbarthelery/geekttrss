@@ -24,25 +24,17 @@ import androidx.hilt.work.HiltWorkerFactory
 import androidx.work.Configuration
 import androidx.work.DelegatingWorkerFactory
 import androidx.work.WorkerFactory
-import com.geekorum.geekdroid.dagger.AppInitializer
 import com.geekorum.geekdroid.dagger.AppInitializersModule
-import com.geekorum.geekdroid.dagger.WorkerInjectionModule
 import com.geekorum.ttrss.features_api.FeaturesWorkerFactory
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import dagger.multibindings.IntoSet
 
 
 @Module(includes = [AppInitializersModule::class])
 @InstallIn(SingletonComponent::class)
 abstract class BackgroundJobsModule {
-
-    @Binds
-    @IntoSet
-    internal abstract fun providesBackgroundJobsInitializer(initializer: BackgroundJobManagerInitializer): AppInitializer
 
     companion object {
 
