@@ -59,11 +59,7 @@ open class Application : AndroidApplication(), Configuration.Provider, ImageLoad
     }
 
     protected open fun sortAppInitializers(initializers: Set<AppInitializer>): List<AppInitializer> {
-        val result = mutableListOf<AppInitializer>()
-        val strictModeInitializer = initializers.find { it is StrictModeInitializer }
-        strictModeInitializer?.let { result.add(it) }
-        result.addAll(initializers)
-        return result.distinct()
+        return initializers.toList()
     }
 
     override fun getWorkManagerConfiguration(): Configuration = workManagerConfig

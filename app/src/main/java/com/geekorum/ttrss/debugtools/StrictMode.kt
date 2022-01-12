@@ -21,14 +21,14 @@
 package com.geekorum.ttrss.debugtools
 
 import android.app.Application
-import android.content.ContentResolver
+import android.content.Context
 import android.os.Build
 import android.os.StrictMode
 import android.os.StrictMode.allowThreadDiskReads
 import android.os.strictmode.Violation
 import androidx.annotation.RequiresApi
+import androidx.startup.Initializer
 import com.geekorum.geekdroid.dagger.AppInitializer
-import com.geekorum.geekdroid.dagger.AppInitializersModule
 import com.geekorum.ttrss.BuildConfig
 import dagger.Binds
 import dagger.Module
@@ -46,13 +46,17 @@ private const val TAG = "StrictMode"
 /**
  * Configure StrictMode policies
  */
-class StrictModeInitializer @Inject constructor() : AppInitializer {
+class StrictModeInitializer : Initializer<Unit> {
     private val listenerExecutor by lazy { Executors.newSingleThreadExecutor() }
 
     @delegate:RequiresApi(Build.VERSION_CODES.P)
     private val violationListener: ViolationListener by lazy { ViolationListener() }
 
-    override fun initialize(app: Application) {
+    override fun create(context: Context) {
+        initialize()
+    }
+
+    fun initialize() {
         StrictMode.setVmPolicy(StrictMode.VmPolicy.Builder()
             .detectActivityLeaks()
             .detectCleartextNetwork()
@@ -103,15 +107,8 @@ class StrictModeInitializer @Inject constructor() : AppInitializer {
         }
     }
 
-}
+    override fun dependencies(): List<Class<out Initializer<*>>> = emptyList()
 
-
-@Module(includes = [AppInitializersModule::class])
-@InstallIn(SingletonComponent::class)
-abstract class StrictModeModule {
-    @Binds
-    @IntoSet
-    abstract fun bindStrictModeInitializer(strictModeInitializer: StrictModeInitializer): AppInitializer
 }
 
 
