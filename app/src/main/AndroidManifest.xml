@@ -151,6 +151,10 @@
                 android:name="androidx.work.WorkManagerInitializer"
                 android:value="androidx.startup"
                 tools:node="remove" />
+
+            <meta-data android:name="com.geekorum.ttrss.background_job.WorkManagerInitializer"
+                android:value="androidx.startup" />
+
         </provider>
 
 
