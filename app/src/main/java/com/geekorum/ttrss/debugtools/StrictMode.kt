@@ -25,6 +25,7 @@ import android.os.Build
 import android.os.StrictMode
 import android.os.StrictMode.allowThreadDiskReads
 import android.os.strictmode.Violation
+import androidx.annotation.Keep
 import androidx.annotation.RequiresApi
 import androidx.startup.Initializer
 import com.geekorum.geekdroid.dagger.AppInitializer
@@ -44,6 +45,7 @@ private const val TAG = "StrictMode"
 /**
  * Configure StrictMode policies
  */
+@Keep
 class StrictModeInitializer : Initializer<Unit> {
     private val listenerExecutor by lazy { Executors.newSingleThreadExecutor() }
 
@@ -113,6 +115,7 @@ class StrictModeInitializer : Initializer<Unit> {
 /**
  * Initialize some kotlin functionality eagerly to avoid a DiskReadViolation out of our control
  */
+@Keep
 class KotlinInitializer : Initializer<Unit> {
 
     override fun create(context: Context) {

@@ -20,33 +20,24 @@
  */
 package com.geekorum.ttrss.settings
 
-import android.app.Application
+import android.content.Context
 import android.os.StrictMode.allowThreadDiskWrites
+import androidx.annotation.Keep
 import androidx.preference.PreferenceManager
-import com.geekorum.geekdroid.dagger.AppInitializer
+import androidx.startup.Initializer
 import com.geekorum.ttrss.R
+import com.geekorum.ttrss.debugtools.StrictModeInitializer
 import com.geekorum.ttrss.debugtools.withStrictMode
-import dagger.Binds
-import dagger.Module
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import dagger.multibindings.IntoSet
-import javax.inject.Inject
 
-class SettingsInitializer @Inject constructor() : AppInitializer {
-    override fun initialize(app: Application) {
+@Keep
+class SettingsInitializer : Initializer<Unit> {
+
+    override fun create(context: Context) {
         withStrictMode(allowThreadDiskWrites()) {
-            PreferenceManager.setDefaultValues(app, R.xml.pref_general, false)
+            PreferenceManager.setDefaultValues(context, R.xml.pref_general, false)
         }
     }
 
-}
-
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class SettingsInitializerModule {
-    @Binds
-    @IntoSet
-    abstract fun bindSettingsInitializer(settingsInitializer: SettingsInitializer): AppInitializer
+    override fun dependencies(): List<Class<out Initializer<*>>> = listOf(StrictModeInitializer::class.java)
 
 }

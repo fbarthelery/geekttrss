@@ -164,6 +164,9 @@
             <meta-data android:name="com.geekorum.ttrss.debugtools.KotlinInitializer"
                 android:value="androidx.startup" />
 
+            <meta-data android:name="com.geekorum.ttrss.settings.SettingsInitializer"
+                android:value="androidx.startup" />
+
         </provider>
 
 
