@@ -136,6 +136,7 @@ dependencies {
     implementation("androidx.core:core-ktx:1.7.0")
     implementation("androidx.fragment:fragment-ktx:1.4.0")
     implementation("androidx.activity:activity-ktx:1.4.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.3.1")
 
     // androidx ui
     implementation("androidx.drawerlayout:drawerlayout:1.1.1")
