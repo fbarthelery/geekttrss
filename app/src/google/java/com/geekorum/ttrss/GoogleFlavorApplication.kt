@@ -22,8 +22,6 @@ package com.geekorum.ttrss
 
 import android.content.Context
 import android.os.StrictMode.allowThreadDiskReads
-import com.geekorum.geekdroid.dagger.AppInitializer
-import com.geekorum.ttrss.debugtools.StrictModeInitializer
 import com.geekorum.ttrss.debugtools.withStrictMode
 import com.google.android.play.core.splitcompat.SplitCompat
 
@@ -39,11 +37,4 @@ class GoogleFlavorApplication : Application() {
         }
     }
 
-    override fun sortAppInitializers(initializers: Set<AppInitializer>): List<AppInitializer> {
-        val result = mutableListOf<AppInitializer>()
-        val strictModeInitializer = initializers.find { it is StrictModeInitializer }
-        strictModeInitializer?.let { result.add(it) }
-        result.addAll(initializers)
-        return result.distinct()
-    }
 }
