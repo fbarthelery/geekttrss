@@ -20,7 +20,6 @@
  */
 package com.geekorum.ttrss.debugtools
 
-import android.app.Application
 import android.content.Context
 import android.os.Build
 import android.os.StrictMode
@@ -38,7 +37,6 @@ import dagger.multibindings.IntoSet
 import kotlinx.coroutines.Dispatchers
 import timber.log.Timber
 import java.util.concurrent.Executors
-import javax.inject.Inject
 import kotlin.jvm.internal.Reflection
 
 private const val TAG = "StrictMode"
@@ -115,8 +113,9 @@ class StrictModeInitializer : Initializer<Unit> {
 /**
  * Initialize some kotlin functionality eagerly to avoid a DiskReadViolation out of our control
  */
-class KotlinInitializer @Inject constructor() : AppInitializer {
-    override fun initialize(app: Application) {
+class KotlinInitializer : Initializer<Unit> {
+
+    override fun create(context: Context) {
         // load Dispatchers.Main at application start
         withStrictMode(allowThreadDiskReads()) {
             Dispatchers.Main
@@ -124,15 +123,8 @@ class KotlinInitializer @Inject constructor() : AppInitializer {
             Timber.d("initialize kotlin Klass with class $k")
         }
     }
-}
 
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class KotlinInitializerModule {
-    @Binds
-    @IntoSet
-    abstract fun bindKotlinInitializer(kotlinInitializer: KotlinInitializer): AppInitializer
-
+    override fun dependencies(): List<Class<out Initializer<*>>> = listOf(StrictModeInitializer::class.java)
 }
 
 /**
