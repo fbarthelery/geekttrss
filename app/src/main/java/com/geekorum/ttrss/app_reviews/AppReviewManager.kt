@@ -38,6 +38,8 @@ interface AppReviewManager {
      * at the discretion of the App review implementation
      */
     fun launchReview(activity: Activity)
+
+    fun release()
 }
 
 
@@ -47,6 +49,10 @@ class NoAppReviewManager : AppReviewManager {
     }
 
     override fun launchReview(activity: Activity) {
+        // Do nothing
+    }
+
+    override fun release() {
         // Do nothing
     }
 }
