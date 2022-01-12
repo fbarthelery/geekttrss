@@ -20,17 +20,17 @@
  */
 package com.geekorum.ttrss.logging
 
-import android.app.Application
-import com.geekorum.geekdroid.dagger.AppInitializer
+import android.content.Context
+import androidx.annotation.Keep
+import androidx.startup.Initializer
 import com.geekorum.geekdroid.dagger.AppInitializersModule
-import dagger.Binds
 import dagger.Module
+import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
+import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
-import dagger.multibindings.IntoSet
 import dagger.multibindings.Multibinds
 import timber.log.Timber
-import javax.inject.Inject
 
 /**
  * Declare multibindings for [Timber.Tree]
@@ -42,18 +42,24 @@ abstract class TimberModule {
     @Multibinds
     abstract fun providesTimberTrees(): Set<Timber.Tree>
 
-    @Binds
-    @IntoSet
-    abstract fun providesTimberInitializer(timberInitializer: TimberInitializer): AppInitializer
-
 }
 
-class TimberInitializer @Inject constructor(
-    // dagger provides java.util.set which is mutable
-    private val timberTrees: MutableSet<Timber.Tree>
-) : AppInitializer {
-    override fun initialize(app: Application) {
+@Keep
+class TimberInitializer : Initializer<Unit> {
+
+    @EntryPoint
+    @InstallIn(SingletonComponent::class)
+    interface TimberEntryPoint {
+        // dagger provides java.util.set which is mutable
+        val timberTrees: MutableSet<Timber.Tree>
+    }
+
+    override fun create(context: Context) {
+        val entryPoint = EntryPointAccessors.fromApplication(context, TimberEntryPoint::class.java)
+        val timberTrees = entryPoint.timberTrees
         Timber.plant(*timberTrees.toTypedArray())
     }
+
+    override fun dependencies(): List<Class<out Initializer<*>>> = emptyList()
 }
 
