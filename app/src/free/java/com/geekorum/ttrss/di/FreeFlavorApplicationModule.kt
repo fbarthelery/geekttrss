@@ -21,6 +21,7 @@
 package com.geekorum.ttrss.di
 
 import com.geekorum.ttrss.AllFeaturesInstalledModule
+import com.geekorum.ttrss.app_reviews.NoAppReviewModule
 import com.geekorum.ttrss.article_details.ResourcesWebFontProviderModule
 import com.geekorum.ttrss.in_app_update.NoInAppUpdateModule
 import dagger.Module
@@ -30,6 +31,8 @@ import dagger.hilt.components.SingletonComponent
 @Module(includes = [
     ResourcesWebFontProviderModule::class,
     AllFeaturesInstalledModule::class,
-    NoInAppUpdateModule::class])
+    NoInAppUpdateModule::class,
+    NoAppReviewModule::class,
+])
 @InstallIn(SingletonComponent::class)
 interface FreeFlavorApplicationModule

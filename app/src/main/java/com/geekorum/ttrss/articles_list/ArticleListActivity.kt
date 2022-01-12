@@ -23,7 +23,10 @@ package com.geekorum.ttrss.articles_list
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.core.graphics.Insets
-import androidx.core.view.*
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.doOnLayout
 import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
@@ -33,6 +36,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.R
+import com.geekorum.ttrss.app_reviews.AppReviewViewModel
 import com.geekorum.ttrss.article_details.ArticleDetailActivity
 import com.geekorum.ttrss.databinding.ActivityArticleListBinding
 import com.geekorum.ttrss.in_app_update.InAppUpdateViewModel
@@ -64,6 +68,7 @@ class ArticleListActivity : SessionActivity() {
     private val inAppUpdateViewModel: InAppUpdateViewModel by viewModels()
     private val feedsViewModel: FeedsViewModel by viewModels()
     private val tagsViewModel: TagsViewModel by viewModels()
+    private val appReviewViewModel: AppReviewViewModel by viewModels()
 
     private lateinit var inAppUpdatePresenter: InAppUpdatePresenter
     private lateinit var searchToolbarPresenter: SearchToolbarPresenter
@@ -116,6 +121,7 @@ class ArticleListActivity : SessionActivity() {
         setupNavigationView()
         setupEdgeToEdge()
         setupFab()
+        setupAppReview()
     }
 
     private fun setupFab() {
@@ -219,4 +225,11 @@ class ArticleListActivity : SessionActivity() {
         searchToolbarPresenter = SearchToolbarPresenter(searchItem, navController, activityViewModel)
     }
 
+    private fun setupAppReview() {
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            if (destination.id == R.id.magazineFragment) {
+                appReviewViewModel.launchReview(this)
+            }
+        }
+    }
 }

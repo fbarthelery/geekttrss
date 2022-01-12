@@ -21,6 +21,7 @@
 package com.geekorum.ttrss.di
 
 import com.geekorum.ttrss.GmsSecurityProviderModule
+import com.geekorum.ttrss.app_reviews.PlayStoreAppReviewModule
 import com.geekorum.ttrss.article_details.GoogleFontsWebFontProviderModule
 import com.geekorum.ttrss.in_app_update.PlayStoreInAppUpdateModule
 import com.geekorum.ttrss.on_demand_modules.PlayStoreInstallModule
@@ -33,6 +34,7 @@ import dagger.hilt.components.SingletonComponent
     GoogleFontsWebFontProviderModule::class,
     PlayStoreInstallModule::class,
     PlayStoreInAppUpdateModule::class,
+    PlayStoreAppReviewModule::class,
     GmsSecurityProviderModule::class
 ])
 @InstallIn(SingletonComponent::class)
