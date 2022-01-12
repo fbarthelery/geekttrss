@@ -20,37 +20,30 @@
  */
 package com.geekorum.ttrss
 
-import android.app.Application
+import android.content.Context
 import android.os.StrictMode
+import androidx.annotation.Keep
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_UNSPECIFIED
 import androidx.preference.PreferenceManager
-import com.geekorum.geekdroid.dagger.AppInitializer
-import com.geekorum.geekdroid.dagger.AppInitializersModule
+import androidx.startup.Initializer
+import com.geekorum.ttrss.debugtools.StrictModeInitializer
+import com.geekorum.ttrss.debugtools.withStrictMode
 import com.geekorum.ttrss.settings.SettingsActivity
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import dagger.multibindings.IntoSet
+import com.geekorum.ttrss.settings.SettingsInitializer
 
+@Keep
+class DefaultNightModeInitializer : Initializer<Unit> {
 
-class DefaultNightModeInitializer : AppInitializer {
-    override fun initialize(app: Application) {
-        val threadPolicy = StrictMode.allowThreadDiskWrites()
-        val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(app)
-        val nighMode =
-            sharedPreferences.getString(SettingsActivity.KEY_THEME, MODE_NIGHT_UNSPECIFIED.toString())!!.toInt()
-        AppCompatDelegate.setDefaultNightMode(nighMode)
-        StrictMode.setThreadPolicy(threadPolicy)
+    override fun create(context: Context) {
+        withStrictMode(StrictMode.allowThreadDiskWrites()) {
+            val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+            val nighMode =
+                sharedPreferences.getString(SettingsActivity.KEY_THEME, MODE_NIGHT_UNSPECIFIED.toString())!!.toInt()
+            AppCompatDelegate.setDefaultNightMode(nighMode)
+        }
     }
-}
 
-@Module(includes = [AppInitializersModule::class])
-@InstallIn(SingletonComponent::class)
-object DefaultNightModeModule {
-
-    @Provides
-    @IntoSet
-    fun providesDefaultNightModeInitializer(): AppInitializer = DefaultNightModeInitializer()
+    override fun dependencies(): List<Class<out Initializer<*>>> =
+        listOf(StrictModeInitializer::class.java, SettingsInitializer::class.java)
 }

@@ -170,6 +170,9 @@
             <meta-data android:name="com.geekorum.ttrss.logging.TimberInitializer"
                 android:value="androidx.startup" />
 
+            <meta-data android:name="com.geekorum.ttrss.DefaultNightModeInitializer"
+                android:value="androidx.startup" />
+
         </provider>
 
 

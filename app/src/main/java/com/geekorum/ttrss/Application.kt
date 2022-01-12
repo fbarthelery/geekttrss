@@ -24,9 +24,6 @@ import android.app.Activity
 import androidx.work.Configuration
 import coil.ImageLoader
 import coil.ImageLoaderFactory
-import com.geekorum.geekdroid.dagger.AppInitializer
-import com.geekorum.geekdroid.dagger.initialize
-import com.geekorum.ttrss.debugtools.StrictModeInitializer
 import com.geekorum.ttrss.di.ApplicationComponentEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.HiltAndroidApp
@@ -40,9 +37,6 @@ import android.app.Application as AndroidApplication
 open class Application : AndroidApplication(), Configuration.Provider, ImageLoaderFactory {
 
     @Inject
-    lateinit var appInitializers: MutableSet<AppInitializer>
-
-    @Inject
     lateinit var workManagerConfig: Configuration
 
     @Inject
@@ -50,16 +44,6 @@ open class Application : AndroidApplication(), Configuration.Provider, ImageLoad
 
     open val applicationComponent by lazy {
         EntryPointAccessors.fromApplication(this, ApplicationComponentEntryPoint::class.java)
-    }
-
-    override fun onCreate() {
-        super.onCreate()
-        // a few initializers need to be set up before others
-        sortAppInitializers(appInitializers).initialize(this)
-    }
-
-    protected open fun sortAppInitializers(initializers: Set<AppInitializer>): List<AppInitializer> {
-        return initializers.toList()
     }
 
     override fun getWorkManagerConfiguration(): Configuration = workManagerConfig

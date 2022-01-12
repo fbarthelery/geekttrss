@@ -28,13 +28,7 @@ import android.os.strictmode.Violation
 import androidx.annotation.Keep
 import androidx.annotation.RequiresApi
 import androidx.startup.Initializer
-import com.geekorum.geekdroid.dagger.AppInitializer
 import com.geekorum.ttrss.BuildConfig
-import dagger.Binds
-import dagger.Module
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import dagger.multibindings.IntoSet
 import kotlinx.coroutines.Dispatchers
 import timber.log.Timber
 import java.util.concurrent.Executors
