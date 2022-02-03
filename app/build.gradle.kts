@@ -40,7 +40,7 @@ plugins {
     id("dagger.hilt.android.plugin")
 }
 
-val composeVersion = "1.1.0-rc01"
+val composeVersion = "1.1.0-rc03"
 
 android {
     val compileSdkInt: Int by rootProject.extra
@@ -134,35 +134,35 @@ kapt {
 dependencies {
 
     implementation("androidx.core:core-ktx:1.7.0")
-    implementation("androidx.fragment:fragment-ktx:1.4.0")
+    implementation("androidx.fragment:fragment-ktx:1.4.1")
     implementation("androidx.activity:activity-ktx:1.4.0")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.3.1")
 
     // androidx ui
     implementation("androidx.drawerlayout:drawerlayout:1.1.1")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.2")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.3")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
-    implementation("androidx.coordinatorlayout:coordinatorlayout:1.1.0")
+    implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
-    implementation("androidx.preference:preference-ktx:1.1.1")
+    implementation("androidx.preference:preference-ktx:1.2.0")
 
     // compose
-    implementation("androidx.compose.ui:ui:$composeVersion")
-    implementation("androidx.compose.ui:ui-util:$composeVersion")
-    implementation("androidx.compose.foundation:foundation:$composeVersion")
-    implementation("androidx.compose.material:material:$composeVersion")
-    implementation("androidx.compose.material:material-icons-core:$composeVersion")
-    implementation("androidx.compose.material:material-icons-extended:$composeVersion")
-    implementation("androidx.compose.ui:ui-viewbinding:$composeVersion")
-    implementation("androidx.activity:activity-compose:1.4.0")
-    implementation("androidx.compose.runtime:runtime-livedata:$composeVersion")
-    implementation("androidx.compose.animation:animation-graphics:$composeVersion")
-    implementation("androidx.paging:paging-compose:1.0.0-alpha14")
-    val accompanistVersion = "0.21.3-beta"
-    implementation("com.google.accompanist:accompanist-insets:$accompanistVersion")
-    implementation("com.google.accompanist:accompanist-insets-ui:$accompanistVersion")
-    implementation("com.google.accompanist:accompanist-swiperefresh:$accompanistVersion")
-    implementation("androidx.compose.ui:ui-tooling:$composeVersion")
+    api("androidx.compose.ui:ui:$composeVersion")
+    api("androidx.compose.ui:ui-util:$composeVersion")
+    api("androidx.compose.foundation:foundation:$composeVersion")
+    api("androidx.compose.material:material:$composeVersion")
+    api("androidx.compose.material:material-icons-core:$composeVersion")
+    api("androidx.compose.material:material-icons-extended:$composeVersion")
+    api("androidx.compose.ui:ui-viewbinding:$composeVersion")
+    api("androidx.activity:activity-compose:1.4.0")
+    api("androidx.compose.runtime:runtime-livedata:$composeVersion")
+    api("androidx.compose.animation:animation-graphics:$composeVersion")
+    api("androidx.paging:paging-compose:1.0.0-alpha14")
+    val accompanistVersion = "0.22.1-rc"
+    api("com.google.accompanist:accompanist-insets:$accompanistVersion")
+    api("com.google.accompanist:accompanist-insets-ui:$accompanistVersion")
+    api("com.google.accompanist:accompanist-swiperefresh:$accompanistVersion")
+    api("androidx.compose.ui:ui-tooling:$composeVersion")
 
 
     // for layout inspector
@@ -171,7 +171,7 @@ dependencies {
 
     // androidx others
     implementation("androidx.browser:browser:1.4.0")
-    implementation("androidx.window:window:1.0.0-rc01")
+    implementation("androidx.window:window:1.0.0")
     implementation("androidx.startup:startup-runtime:1.1.0")
     // needed by robolectric
     implementation("androidx.loader:loader:1.1.0")
@@ -187,9 +187,9 @@ dependencies {
     implementation(project(":webapi"))
     implementation(project(":faviKonSnoop"))
 
-    implementation("com.google.android.material:material:1.4.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.6.0")
-    testImplementation("com.squareup.okhttp3:mockwebserver:4.6.0")
+    implementation("com.google.android.material:material:1.5.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.9.3")
     val coilVersion = "1.4.0"
     implementation("io.coil-kt:coil:$coilVersion")
     implementation("io.coil-kt:coil-compose:$coilVersion")
@@ -207,7 +207,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleVersion")
 
     // dagger
-    val daggerVersion = "2.40.1"
+    val daggerVersion = "2.40.5"
     implementation(enforcedDaggerPlatform(daggerVersion))
     kapt(enforcedDaggerPlatform(daggerVersion))
     implementation("com.google.dagger:dagger:$daggerVersion")
@@ -224,11 +224,11 @@ dependencies {
     kaptAndroidTest("com.google.dagger:hilt-compiler:$daggerVersion")
 
 
-    val roomVersion = "2.3.0"
+    val roomVersion = "2.4.1"
     kapt("androidx.room:room-compiler:$roomVersion")
     androidTestImplementation("androidx.room:room-testing:$roomVersion")
 
-    val workVersion = "2.7.0"
+    val workVersion = "2.7.1"
     androidTestImplementation("androidx.work:work-testing:$workVersion")
 
     implementation(enforcedPlatform(kotlin("bom")))
@@ -254,9 +254,10 @@ dependencies {
     add("googleImplementation", "com.google.android.play:core-ktx:1.8.1")
 
     // api dependencies for features modules
-    api("androidx.appcompat:appcompat:1.4.0")
+    api("androidx.appcompat:appcompat:1.4.1")
     api("androidx.work:work-runtime-ktx:$workVersion")
     api("androidx.room:room-runtime:$roomVersion")
+    api("androidx.room:room-paging:$roomVersion")
     api("androidx.room:room-ktx:$roomVersion")
     api("androidx.paging:paging-runtime-ktx:3.1.0")
     api("com.squareup.retrofit2:retrofit:2.9.0")
@@ -270,7 +271,7 @@ dependencies {
 
     // fragment testing declare some activities and resources that needs to be in the apk
     // we don't use it. here but it is used in feature modules
-    debugImplementation("androidx.fragment:fragment-testing:1.4.0")
+    debugImplementation("androidx.fragment:fragment-testing:1.4.1")
 
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.7")
 }

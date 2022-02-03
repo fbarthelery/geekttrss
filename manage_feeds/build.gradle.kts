@@ -68,7 +68,7 @@ dependencies {
     implementation(enforcedPlatform(kotlin("bom")))
     implementation(kotlin("stdlib-jdk8"))
 
-    val daggerVersion = "2.40.1"
+    val daggerVersion = "2.40.5"
     implementation(enforcedDaggerPlatform(daggerVersion))
     kapt(enforcedDaggerPlatform(daggerVersion))
     implementation("com.google.dagger:dagger:$daggerVersion")
@@ -93,14 +93,14 @@ dependencies {
     implementation("androidx.activity:activity-ktx:1.4.0")
 
     // androidx UI
-    implementation("androidx.constraintlayout:constraintlayout:2.1.2")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.3")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
-    implementation("androidx.coordinatorlayout:coordinatorlayout:1.1.0")
-    implementation("com.google.android.material:material:1.4.0")
+    implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
+    implementation("com.google.android.material:material:1.5.0")
 
     implementation("androidx.core:core-ktx:1.7.0")
 
-    val lifecycleVersion = "2.3.1"
+    val lifecycleVersion = "2.4.0"
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-livedata-core-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
@@ -113,13 +113,13 @@ dependencies {
 
     androidTestImplementation("androidx.work:work-testing:2.7.1")
     dualTestImplementation("androidx.arch.core:core-testing:2.1.0")
-    androidTestImplementation("com.squareup.okhttp3:mockwebserver:4.6.0")
+    androidTestImplementation("com.squareup.okhttp3:mockwebserver:4.9.3")
 
-    debugImplementation("androidx.fragment:fragment-testing:1.4.0")
+    debugImplementation("androidx.fragment:fragment-testing:1.4.1")
 
     // the test apk need these dependencies because they provide some of its resources
     // likely due to manifest merging with :app manifest
-    androidTestImplementation("androidx.fragment:fragment-testing:1.4.0")
+    androidTestImplementation("androidx.fragment:fragment-testing:1.4.1")
     androidTestImplementation("com.squareup.leakcanary:leakcanary-android:2.7")
     androidTestImplementation("com.google.android.gms:play-services-oss-licenses:17.0.0")
     androidTestImplementation("com.google.android.play:core-ktx:1.8.1")

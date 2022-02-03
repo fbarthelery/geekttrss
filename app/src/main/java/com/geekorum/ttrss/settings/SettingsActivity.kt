@@ -67,7 +67,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
     }
 
     override fun onPreferenceStartFragment(caller: PreferenceFragmentCompat, pref: Preference): Boolean {
-        val fragmentClass = pref.fragment
+        val fragmentClass = requireNotNull(pref.fragment)
         supportFragmentManager.commit {
             val fragment = daggerDelegateFragmentFactory.instantiate(classLoader, fragmentClass)
             addToBackStack("preferences_screen")
