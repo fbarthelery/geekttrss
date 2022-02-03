@@ -44,7 +44,7 @@ class StrictModeInitializer : Initializer<Unit> {
     private val listenerExecutor by lazy { Executors.newSingleThreadExecutor() }
 
     @delegate:RequiresApi(Build.VERSION_CODES.P)
-    private val violationListener: ViolationListener by lazy { ViolationListener() }
+    private val violationListener: ViolationListener by lazy { @Suppress("NewApi") ViolationListener() }
 
     override fun create(context: Context) {
         initialize()

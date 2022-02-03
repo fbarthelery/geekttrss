@@ -27,11 +27,9 @@ import com.geekorum.ttrss.session.SessionActivityComponent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 /**
@@ -46,14 +44,18 @@ class TagsViewModel @Inject constructor(
 
     private val articlesRepository: ArticlesRepository = componentFactory.newComponent().articleRepository
 
-    private val refreshTagsChannel = ConflatedBroadcastChannel(Any())
-    val tags = refreshTagsChannel.asFlow().flatMapLatest {
+    private val refreshTagsChannel = Channel<Unit>(Channel.CONFLATED)
+    val tags = refreshTagsChannel.receiveAsFlow().flatMapLatest {
         flowOf(articlesRepository.getMostUnreadTags(10))
     }.distinctUntilChanged()
         .asLiveData()
 
+    init {
+        refresh()
+    }
+
     fun refresh() {
-        refreshTagsChannel.trySend(Any())
+        refreshTagsChannel.trySend(Unit)
     }
 
 }

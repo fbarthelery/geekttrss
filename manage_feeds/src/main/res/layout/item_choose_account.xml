@@ -27,7 +27,8 @@
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               style="?android:attr/spinnerDropDownItemStyle"
-              android:orientation="horizontal">
+              android:orientation="horizontal"
+              tools:ignore="UseCompoundDrawables">
 
     <ImageView android:id="@+id/account_row_icon"
                android:layout_width="36dp"

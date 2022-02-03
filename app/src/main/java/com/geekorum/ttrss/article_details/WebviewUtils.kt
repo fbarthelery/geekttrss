@@ -20,6 +20,7 @@
  */
 package com.geekorum.ttrss.article_details
 
+import android.annotation.TargetApi
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
@@ -86,6 +87,7 @@ class ArticleDetailsWebViewClient constructor(
         }
     }
 
+    @TargetApi(Build.VERSION_CODES.R)
     private fun openInNonBrowserAppAfter30(context: Context, url: Uri) {
         val intent = Intent(Intent.ACTION_VIEW, url).apply {
             // The URL should either launch directly in a non-browser app (if it's
