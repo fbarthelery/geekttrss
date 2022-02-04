@@ -97,12 +97,15 @@ fun Project.configureAvdlDevices(flydroidUrl: String, flydroidKey: String) {
     }
 
     afterEvaluate {
-        // ensure that launchDeviceTask are run after StopDeviceTask of previous project
+        // ensure that launchDeviceTask are run after StopDeviceTask and connected tests of previous project
+        // https://github.com/gradle/gradle/issues/10549
         rootProject.tasks {
             getByPath(":manage_feeds:launchAvdlFreeDebugAndroidTest")
-                .mustRunAfter(":app:stopAvdlFreeDebugAndroidTest", ":app:stopAvdlGoogleDebugAndroidTest")
+                .mustRunAfter(":app:stopAvdlFreeDebugAndroidTest", ":app:stopAvdlGoogleDebugAndroidTest",
+                    ":app:connectedFreeDebugAndroidTest", ":app:connectedGoogleDebugAndroidTest")
             getByPath(":manage_feeds:launchAvdlGoogleDebugAndroidTest")
-                .mustRunAfter(":app:stopAvdlFreeDebugAndroidTest", ":app:stopAvdlGoogleDebugAndroidTest")
+                .mustRunAfter(":app:stopAvdlFreeDebugAndroidTest", ":app:stopAvdlGoogleDebugAndroidTest",
+                    ":app:connectedFreeDebugAndroidTest", ":app:connectedGoogleDebugAndroidTest")
         }
     }
 }
