@@ -32,6 +32,7 @@ import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.encoding.CompositeDecoder
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.JsonObject
 
 /**
  * Request payload to get the configuration of the TtRss server.
@@ -74,6 +75,8 @@ data class GetConfigResponsePayload(
         val iconsUrl: String? = null,
         @SerialName("num_feeds")
         val numFeeds: Int? = null,
+        @SerialName("custom_sort_types")
+        val customSortTypes: List<JsonObject> = emptyList(),
         override var error: Error? = null
 
     ) : BaseContent()

@@ -46,6 +46,7 @@ class GetConfigJsonSerializationTest {
                     "daemon_is_running" : true,
                     "icons_dir" : "feed-icons",
                     "icons_url" : "feed-icons",
+                    "custom_sort_types":[],
                     "num_feeds" : 65
                 },
                 "seq" : 0,
