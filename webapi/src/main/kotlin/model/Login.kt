@@ -77,6 +77,8 @@ data class LoginResponsePayload(
         @SerialName("api_level")
         val apiLevel: Int? = null,
 
+        val config: GetConfigResponsePayload.Content? = null,
+
         override var error: Error? = null
 
     ) : BaseContent()

@@ -46,14 +46,34 @@ class JsonSerializationTest {
             {
               "seq": null,
               "status": 0,
-              "content": {"session_id": "XXX", "api_level": 3}
+              "content": {
+                "session_id": "XXX",
+                 "config":{
+                    "icons_dir":"feed-icons",
+                    "icons_url":"feed-icons",
+                    "daemon_is_running":true,
+                    "custom_sort_types":[],
+                    "num_feeds":33
+                 },
+                 "api_level": 18
+              }
             }
         """.trimIndent()
         val serializer = getSerializer<LoginResponsePayload>()
         val result = Json.decodeFromString(serializer, jsonString)
         val expected = LoginResponsePayload(
             status = 0,
-            content = LoginResponsePayload.Content("XXX", 3)
+            content = LoginResponsePayload.Content(
+                sessionId = "XXX",
+                apiLevel = 18,
+                config = GetConfigResponsePayload.Content(
+                    daemonIsRunning = true,
+                    iconsDir = "feed-icons",
+                    iconsUrl = "feed-icons",
+                    numFeeds = 33,
+                    customSortTypes = emptyList()
+                )
+            )
         )
         assertThat(result.sequence).isEqualTo(expected.sequence)
         assertThat(result.status).isEqualTo(expected.status)
