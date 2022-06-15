@@ -43,6 +43,7 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
+import timber.log.Timber
 
 /**
  * ViewModel for LoginActivity
@@ -174,6 +175,7 @@ internal class LoginViewModel @Inject constructor(
             }
             loginFailedEvent.value = LoginFailedEvent(errorMsgId)
         } catch (e: Exception) {
+            Timber.e(e, "Failed to login with unexpected exception")
             loginFailedEvent.value = LoginFailedEvent(R.string.error_unknown)
         } finally {
             loginInProgress.value = false
