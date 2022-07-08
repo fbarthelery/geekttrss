@@ -49,7 +49,7 @@ buildscript {
 }
 
 // some extra properties
-extra["compileSdkInt"] = 31
+extra["compileSdkInt"] = 33
 
 allprojects {
     repositories {

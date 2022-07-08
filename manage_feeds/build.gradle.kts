@@ -90,15 +90,15 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
 
-    implementation("androidx.activity:activity-ktx:1.4.0")
+    implementation("androidx.activity:activity-ktx:1.5.0")
 
     // androidx UI
-    implementation("androidx.constraintlayout:constraintlayout:2.1.3")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
-    implementation("com.google.android.material:material:1.5.0")
+    implementation("com.google.android.material:material:1.6.1")
 
-    implementation("androidx.core:core-ktx:1.7.0")
+    implementation("androidx.core:core-ktx:1.8.0")
 
     val lifecycleVersion = "2.4.0"
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
@@ -115,7 +115,7 @@ dependencies {
     dualTestImplementation("androidx.arch.core:core-testing:2.1.0")
     androidTestImplementation("com.squareup.okhttp3:mockwebserver:4.9.3")
 
-    debugImplementation("androidx.fragment:fragment-testing:1.4.1")
+    debugImplementation("androidx.fragment:fragment-testing:1.5.0")
 
     // the test apk need these dependencies because they provide some of its resources
     // likely due to manifest merging with :app manifest
@@ -125,6 +125,6 @@ dependencies {
     androidTestImplementation("com.google.android.play:core-ktx:1.8.1")
 
     // used in test through geekdroid
-    androidTestImplementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.4.0")
+    androidTestImplementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.5.0")
 
 }

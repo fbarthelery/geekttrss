@@ -40,7 +40,7 @@ plugins {
     id("dagger.hilt.android.plugin")
 }
 
-val composeVersion = "1.1.0-rc03"
+val composeVersion = "1.1.1"
 
 android {
     val compileSdkInt: Int by rootProject.extra
@@ -133,14 +133,14 @@ kapt {
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.7.0")
-    implementation("androidx.fragment:fragment-ktx:1.4.1")
-    implementation("androidx.activity:activity-ktx:1.4.0")
+    implementation("androidx.core:core-ktx:1.8.0")
+    implementation("androidx.fragment:fragment-ktx:1.5.0")
+    implementation("androidx.activity:activity-ktx:1.5.0")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.3.1")
 
     // androidx ui
     implementation("androidx.drawerlayout:drawerlayout:1.1.1")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.3")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
@@ -154,7 +154,7 @@ dependencies {
     api("androidx.compose.material:material-icons-core:$composeVersion")
     api("androidx.compose.material:material-icons-extended:$composeVersion")
     api("androidx.compose.ui:ui-viewbinding:$composeVersion")
-    api("androidx.activity:activity-compose:1.4.0")
+    api("androidx.activity:activity-compose:1.5.0")
     api("androidx.compose.runtime:runtime-livedata:$composeVersion")
     api("androidx.compose.animation:animation-graphics:$composeVersion")
     api("androidx.paging:paging-compose:1.0.0-alpha14")
@@ -172,11 +172,11 @@ dependencies {
     // androidx others
     implementation("androidx.browser:browser:1.4.0")
     implementation("androidx.window:window:1.0.0")
-    implementation("androidx.startup:startup-runtime:1.1.0")
+    implementation("androidx.startup:startup-runtime:1.1.1")
     // needed by robolectric
     implementation("androidx.loader:loader:1.1.0")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
 
     //geekdroid
@@ -187,7 +187,7 @@ dependencies {
     implementation(project(":webapi"))
     implementation(project(":faviKonSnoop"))
 
-    implementation("com.google.android.material:material:1.5.0")
+    implementation("com.google.android.material:material:1.6.1")
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.9.3")
     val coilVersion = "1.4.0"
@@ -254,12 +254,12 @@ dependencies {
     add("googleImplementation", "com.google.android.play:core-ktx:1.8.1")
 
     // api dependencies for features modules
-    api("androidx.appcompat:appcompat:1.4.1")
+    api("androidx.appcompat:appcompat:1.4.2")
     api("androidx.work:work-runtime-ktx:$workVersion")
     api("androidx.room:room-runtime:$roomVersion")
     api("androidx.room:room-paging:$roomVersion")
     api("androidx.room:room-ktx:$roomVersion")
-    api("androidx.paging:paging-runtime-ktx:3.1.0")
+    api("androidx.paging:paging-runtime-ktx:3.1.1")
     api("com.squareup.retrofit2:retrofit:2.9.0")
     api("com.squareup.okhttp3:okhttp:4.9.3")
     api("com.jakewharton.timber:timber:5.0.1")
@@ -271,9 +271,9 @@ dependencies {
 
     // fragment testing declare some activities and resources that needs to be in the apk
     // we don't use it. here but it is used in feature modules
-    debugImplementation("androidx.fragment:fragment-testing:1.4.1")
+    debugImplementation("androidx.fragment:fragment-testing:1.5.0")
 
-    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.7")
+    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.9.1")
 }
 
 apply {
