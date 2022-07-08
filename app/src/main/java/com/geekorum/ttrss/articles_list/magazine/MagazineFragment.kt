@@ -30,6 +30,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
@@ -38,10 +39,13 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ShareCompat
@@ -68,6 +72,7 @@ class MagazineFragment: Fragment() {
     private val activityViewModel: ActivityViewModel by activityViewModels()
     private val magazineViewModel: MagazineViewModel by viewModels()
 
+    @OptIn(ExperimentalComposeUiApi::class)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
@@ -77,7 +82,9 @@ class MagazineFragment: Fragment() {
                         val appBarHeightDp = with(LocalDensity.current) {
                             activityViewModel.appBarHeight.toDp()
                         }
-                        Surface(Modifier.fillMaxSize()) {
+
+                        val nestedScrollInterop = rememberNestedScrollInteropConnection()
+                        Surface(Modifier.fillMaxSize().nestedScroll(nestedScrollInterop)) {
                             ArticlesMagazine(
                                 viewModel = magazineViewModel,
                                 onCardClick = activityViewModel::displayArticle,
@@ -120,6 +127,7 @@ class MagazineFragment: Fragment() {
 }
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ArticlesMagazine(
     viewModel: MagazineViewModel,
@@ -189,7 +197,9 @@ private fun ArticlesMagazine(
                 }
 
                 AnimatedVisibility(visibilityState,
-                    enter = fadeIn() + slideInVertically { it / 3 }) {
+                    enter = fadeIn() + slideInVertically { it / 3 },
+                    modifier = Modifier.animateItemPlacement()
+                ) {
                     if (articleWithFeed != null) {
                         ArticleCard(
                             articleWithFeed = articleWithFeed,
@@ -217,8 +227,6 @@ private fun ArticleCard(
     val feedNameOrAuthor = feed.displayTitle.takeIf { it.isNotBlank() } ?: feed.title
 
     ArticleCard(
-//                TODO add this on beta03
-//                modifier = Modifier.animateItemPlacement(),
         title = article.title,
         flavorImageUrl = article.flavorImageUri,
         excerpt = article.contentExcerpt,

@@ -273,7 +273,6 @@ private fun ChangeReadBehindItem(dismissDirection: DismissDirection) {
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun ArticleCardList() {
     val articles = Array(25) {

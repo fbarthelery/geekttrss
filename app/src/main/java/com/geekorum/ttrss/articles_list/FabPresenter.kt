@@ -20,8 +20,10 @@
  */
 package com.geekorum.ttrss.articles_list
 
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.navigation.NavController
 import androidx.navigation.dynamicfeatures.DynamicGraphNavigator
+import com.geekorum.geekdroid.views.behaviors.ScrollAwareFABBehavior
 import com.geekorum.ttrss.R
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
@@ -33,6 +35,9 @@ internal class FabPresenter(
     private val navController: NavController
 ){
 
+    val fabBehavior: ScrollAwareFABBehavior? =
+        (fab.layoutParams as? CoordinatorLayout.LayoutParams)?.behavior as? ScrollAwareFABBehavior
+
     init {
         setup()
     }
@@ -41,14 +46,21 @@ internal class FabPresenter(
         navController.addOnDestinationChangedListener { controller, destination, _ ->
             val progressDestinationId = (controller.graph as? DynamicGraphNavigator.DynamicNavGraph)?.progressDestination ?: 0
             when (destination.id) {
-                progressDestinationId -> {
+                progressDestinationId,
+                R.id.articlesSearchFragment -> {
+                    setFabBehavior(null)
                     fab.hide()
                 }
-                R.id.articlesSearchFragment -> {
-                    //TODO hide fab. but fab has scrollaware behavior that get it shown back when scrolling
+                else -> {
+                    setFabBehavior(fabBehavior)
+                    fab.show()
                 }
-                else -> fab.show()
             }
         }
     }
+
+    private fun setFabBehavior(behavior: ScrollAwareFABBehavior?) {
+        (fab.layoutParams as? CoordinatorLayout.LayoutParams)?.behavior = behavior
+    }
+
 }

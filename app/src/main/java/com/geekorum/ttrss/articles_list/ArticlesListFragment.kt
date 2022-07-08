@@ -28,10 +28,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.core.app.ShareCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -66,6 +69,7 @@ abstract class BaseArticlesListFragment : Fragment() {
         }
     }
 
+    @OptIn(ExperimentalComposeUiApi::class)
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -78,7 +82,9 @@ abstract class BaseArticlesListFragment : Fragment() {
                         val appBarHeightDp = with(LocalDensity.current) {
                             activityViewModel.appBarHeight.toDp()
                         }
-                        Surface(Modifier.fillMaxSize()) {
+
+                        val nestedScrollInterop = rememberNestedScrollInteropConnection()
+                        Surface(Modifier.fillMaxSize().nestedScroll(nestedScrollInterop)) {
                             ArticleCardList(
                                 viewModel = articlesViewModel,
                                 onCardClick = activityViewModel::displayArticle,

@@ -40,7 +40,7 @@ plugins {
     id("dagger.hilt.android.plugin")
 }
 
-val composeVersion = "1.1.1"
+val composeVersion = "1.2.0-rc03"
 
 android {
     val compileSdkInt: Int by rootProject.extra
@@ -88,7 +88,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = composeVersion
+        kotlinCompilerExtensionVersion = "1.2.0"
     }
 
     flavorDimensions += "distribution"
