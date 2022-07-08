@@ -207,7 +207,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleVersion")
 
     // dagger
-    val daggerVersion = "2.40.5"
+    val daggerVersion = "2.42"
     implementation(enforcedDaggerPlatform(daggerVersion))
     kapt(enforcedDaggerPlatform(daggerVersion))
     implementation("com.google.dagger:dagger:$daggerVersion")
@@ -215,7 +215,6 @@ dependencies {
     kaptTest("com.google.dagger:dagger-compiler:$daggerVersion")
     implementation("com.google.dagger:hilt-android:$daggerVersion")
     implementation("androidx.hilt:hilt-work:1.0.0")
-    implementation("androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03")
     kapt("androidx.hilt:hilt-compiler:1.0.0")
     kapt("com.google.dagger:hilt-compiler:$daggerVersion")
     testImplementation("com.google.dagger:hilt-android-testing:$daggerVersion")

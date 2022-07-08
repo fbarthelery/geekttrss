@@ -22,7 +22,6 @@ package com.geekorum.ttrss.manage_feeds
 
 import android.app.Activity
 import android.app.Application
-import androidx.hilt.lifecycle.ViewModelFactoryModules
 import androidx.work.WorkManager
 import androidx.work.WorkerFactory
 import com.geekorum.ttrss.ForceNightModeViewModel_HiltModules
@@ -72,7 +71,6 @@ interface ManageFeedActivityModule
     ForceNightModeViewModel_HiltModules.KeyModule::class,
     TtrssAccountViewModel_HiltModules.BindsModule::class,
     TtrssAccountViewModel_HiltModules.KeyModule::class,
-    ViewModelFactoryModules.ActivityModule::class,
     ManageFeedModule::class,
 ])
 interface ActivityComponent {
