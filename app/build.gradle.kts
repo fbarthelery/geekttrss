@@ -65,9 +65,9 @@ android {
 
 
     lint {
-        isAbortOnError = false
-        isCheckReleaseBuilds = false
-        disable("MissingTranslation")
+        abortOnError = false
+        checkReleaseBuilds = false
+        disable += listOf("MissingTranslation")
     }
 
     buildTypes {
