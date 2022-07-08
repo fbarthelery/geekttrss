@@ -190,7 +190,7 @@ dependencies {
     implementation("com.google.android.material:material:1.6.1")
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.9.3")
-    val coilVersion = "1.4.0"
+    val coilVersion = "2.1.0"
     implementation("io.coil-kt:coil:$coilVersion")
     implementation("io.coil-kt:coil-compose:$coilVersion")
     implementation("com.google.android.gms:play-services-oss-licenses:17.0.0")

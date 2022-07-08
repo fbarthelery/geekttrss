@@ -24,7 +24,6 @@ import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -39,13 +38,18 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
+import coil.compose.rememberAsyncImagePainter
 import coil.compose.rememberImagePainter
+import coil.request.ImageRequest
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.ui.AppTheme
 import kotlin.math.roundToInt
@@ -177,12 +181,12 @@ private fun TitleWithImage(
                 ColorFilter.colorMatrix(colorMatrix)
             } else null
 
-            Image(
-                painter = rememberImagePainter(data = finalImageUrl) {
-                    listener(onError = { _, _ ->
-                        hasImage = false
-                    })
-                },
+            val imageReq = ImageRequest.Builder(LocalContext.current)
+                .data(finalImageUrl)
+                .listener(onError = { _, _ -> hasImage = false})
+                .build()
+            AsyncImage(model = imageReq,
+                contentDescription = null,
                 alignment = Alignment.TopCenter,
                 contentScale = ContentScale.FillWidth,
                 colorFilter = colorFilter,
@@ -198,7 +202,6 @@ private fun TitleWithImage(
                         }
                     }
                     .padding(bottom = 16.dp),
-                contentDescription = null,
             )
         }
 
@@ -233,11 +236,11 @@ private fun CardToolbar(
     onToggleUnreadClick: () -> Unit,
 ) {
     Row {
-        val feedIconPainter = rememberImagePainter(data = feedIconUrl) {
-            placeholder(R.drawable.ic_rss_feed_orange)
-            fallback(R.drawable.ic_rss_feed_orange)
-            error(R.drawable.ic_rss_feed_orange)
-        }
+        val feedIconPainter = rememberAsyncImagePainter(model = feedIconUrl,
+            placeholder = painterResource(R.drawable.ic_rss_feed_orange),
+            fallback = painterResource(R.drawable.ic_rss_feed_orange),
+            error = painterResource(R.drawable.ic_rss_feed_orange),
+        )
         Icon(painter = feedIconPainter,
             tint = Color.Unspecified,
             contentDescription = null,

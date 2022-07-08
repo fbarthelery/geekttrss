@@ -46,7 +46,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.net.toUri
+import coil.compose.AsyncImage
 import coil.compose.rememberImagePainter
+import coil.request.ImageRequest
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleContentIndexed
@@ -483,16 +485,13 @@ private fun ArticleHeaderWithFlavorImage(
         val finalImageUrl = flavorImageUri.takeUnless { it.isEmpty() }
         var hasImage by remember { mutableStateOf(finalImageUrl != null) }
         if (hasImage) {
-            Image(
-                painter = rememberImagePainter(data = finalImageUrl) {
-                    placeholder(R.drawable.drawer_header_dark)
-                    error(R.drawable.drawer_header_dark)
-                    listener(
-                        onError = { _, t ->
-                            hasImage = false
-                        },
-                    )
-                },
+            val imageReq = ImageRequest.Builder(LocalContext.current)
+                .data(finalImageUrl)
+                .placeholder(R.drawable.drawer_header_dark)
+                .error(R.drawable.drawer_header_dark)
+                .listener(onError = { _, _ -> hasImage = false})
+                .build()
+            AsyncImage(model = imageReq,
                 contentDescription = null,
                 contentScale = ContentScale.FillWidth,
                 modifier = Modifier
@@ -653,8 +652,8 @@ fun ReadMoreSection(
                 .fillMaxWidth()
             ) {
                 Row(Modifier.padding(vertical = 8.dp)) {
-                    Image(
-                        painter = rememberImagePainter(data = article.flavorImageUri) ,
+                    AsyncImage(
+                        model = article.flavorImageUri,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.size(88.dp),
                         contentDescription = null
