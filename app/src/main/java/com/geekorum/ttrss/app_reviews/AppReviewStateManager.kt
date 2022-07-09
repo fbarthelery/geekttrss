@@ -38,7 +38,6 @@ class AppReviewStateManager @Inject constructor(
         get() = appPreferences.getString(PREF_LAST_REVIEW_REQUEST_TIMESTAMP, null)?.toInstant()
         set(value) = appPreferences.edit { putString(PREF_LAST_REVIEW_REQUEST_TIMESTAMP, value?.toString()) }
 
-    @OptIn(ExperimentalTime::class)
     val canAskForReview: Boolean
     get() {
         return lastReviewRequestTimestamp?.let { lastReviewRequestTimestamp ->

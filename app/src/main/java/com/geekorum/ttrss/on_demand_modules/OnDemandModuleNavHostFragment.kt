@@ -21,14 +21,10 @@
 package com.geekorum.ttrss.on_demand_modules
 
 import androidx.fragment.app.Fragment
-import androidx.navigation.ActivityNavigator
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphNavigator
-import androidx.navigation.Navigator
+import androidx.navigation.*
 import androidx.navigation.dynamicfeatures.fragment.DynamicNavHostFragment
 import androidx.navigation.fragment.DialogFragmentNavigator
 import androidx.navigation.fragment.FragmentNavigator
-import androidx.navigation.plusAssign
 import com.geekorum.geekdroid.dagger.FragmentFactoriesModule
 import com.geekorum.geekdroid.dagger.FragmentKey
 import dagger.Binds
@@ -47,18 +43,19 @@ class OnDemandModuleNavHostFragment @Inject constructor(
     private val onDemandModuleManager: OnDemandModuleManager
 ): DynamicNavHostFragment() {
 
-    override fun onCreateNavController(navController: NavController) {
+    override fun onCreateNavHostController(navHostController: NavHostController) {
         if (!onDemandModuleManager.canInstallModule) {
+            onCreateNavController(navHostController)
             Timber.i("The application can't install dynamic feature modules. Fallback to standard navigators")
             // restore default navigator (undo DynamicNavHostFragment
-            val navigatorProvider = navController.navigatorProvider
+            val navigatorProvider = navHostController.navigatorProvider
             navigatorProvider += ActivityNavigator(requireActivity())
             check(id > 0)
             navigatorProvider += FragmentNavigator(requireContext(), childFragmentManager, id)
             navigatorProvider += NavGraphNavigator(navigatorProvider)
             navigatorProvider += DialogFragmentNavigator(requireContext(), childFragmentManager)
         } else {
-            super.onCreateNavController(navController)
+            super.onCreateNavHostController(navHostController)
         }
     }
 

@@ -99,7 +99,7 @@ dependencies {
 
     implementation("androidx.core:core-ktx:1.8.0")
 
-    val lifecycleVersion = "2.4.0"
+    val lifecycleVersion = "2.5.0"
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-livedata-core-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
@@ -119,7 +119,7 @@ dependencies {
     // the test apk need these dependencies because they provide some of its resources
     // likely due to manifest merging with :app manifest
     androidTestImplementation("androidx.fragment:fragment-testing:1.4.1")
-    androidTestImplementation("com.squareup.leakcanary:leakcanary-android:2.7")
+    androidTestImplementation("com.squareup.leakcanary:leakcanary-android:2.9.1")
     androidTestImplementation("com.google.android.gms:play-services-oss-licenses:17.0.0")
     androidTestImplementation("com.google.android.play:core-ktx:1.8.1")
 

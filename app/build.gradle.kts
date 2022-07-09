@@ -158,7 +158,7 @@ dependencies {
     api("androidx.compose.runtime:runtime-livedata:$composeVersion")
     api("androidx.compose.animation:animation-graphics:$composeVersion")
     api("androidx.paging:paging-compose:1.0.0-alpha14")
-    val accompanistVersion = "0.22.1-rc"
+    val accompanistVersion = "0.24.13-rc"
     api("com.google.accompanist:accompanist-insets:$accompanistVersion")
     api("com.google.accompanist:accompanist-insets-ui:$accompanistVersion")
     api("com.google.accompanist:accompanist-swiperefresh:$accompanistVersion")
@@ -197,7 +197,7 @@ dependencies {
 
     implementation("org.jsoup:jsoup:1.13.1")
 
-    val lifecycleVersion = "2.4.0"
+    val lifecycleVersion = "2.5.0"
     implementation("androidx.lifecycle:lifecycle-livedata-core-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
@@ -223,7 +223,7 @@ dependencies {
     kaptAndroidTest("com.google.dagger:hilt-compiler:$daggerVersion")
 
 
-    val roomVersion = "2.4.1"
+    val roomVersion = "2.4.2"
     kapt("androidx.room:room-compiler:$roomVersion")
     androidTestImplementation("androidx.room:room-testing:$roomVersion")
 
@@ -233,7 +233,7 @@ dependencies {
     implementation(enforcedPlatform(kotlin("bom")))
     implementation(kotlin("stdlib-jdk8"))
 
-    val coroutinesVersion = "1.6.0"
+    val coroutinesVersion = "1.6.3"
     implementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:$coroutinesVersion"))
     testImplementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:$coroutinesVersion"))
     androidTestImplementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:$coroutinesVersion"))
@@ -263,7 +263,7 @@ dependencies {
     api("com.squareup.okhttp3:okhttp:4.9.3")
     api("com.jakewharton.timber:timber:5.0.1")
 
-    val navigationVersion = "2.3.5"
+    val navigationVersion = "2.5.0"
     api("androidx.navigation:navigation-fragment-ktx:$navigationVersion")
     api("androidx.navigation:navigation-ui-ktx:$navigationVersion")
     api("androidx.navigation:navigation-dynamic-features-fragment:$navigationVersion")

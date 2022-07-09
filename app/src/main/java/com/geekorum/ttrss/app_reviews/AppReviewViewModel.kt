@@ -29,7 +29,6 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-@OptIn(ExperimentalCoroutinesApi::class)
 class AppReviewViewModel @Inject constructor(
     private val appReviewStateManager: AppReviewStateManager,
     private val reviewManager: AppReviewManager
