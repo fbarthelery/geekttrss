@@ -30,11 +30,11 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -123,7 +123,7 @@ class ArticlesSearchFragment : Fragment() {
 
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SearchResultCardList(
     viewModel: SearchViewModel,
@@ -177,7 +177,9 @@ fun SearchResultCardList(
             }
 
             AnimatedVisibility(visibilityState,
-                enter = fadeIn() + slideInVertically { it / 3 }) {
+                enter = fadeIn() + slideInVertically { it / 3 },
+                modifier = Modifier.animateItemPlacement(),
+            ) {
                 if (articleWithFeed != null) {
                     ArticleCard(
                         articleWithFeed = articleWithFeed,
@@ -203,8 +205,6 @@ private fun ArticleCard(
     val feedNameOrAuthor = feed.displayTitle.takeIf { it.isNotBlank() } ?: feed.title
 
     ArticleCard(
-//                TODO add this on beta03
-//                modifier = Modifier.animateItemPlacement(),
         title = article.title,
         flavorImageUrl = article.flavorImageUri,
         excerpt = article.contentExcerpt,
