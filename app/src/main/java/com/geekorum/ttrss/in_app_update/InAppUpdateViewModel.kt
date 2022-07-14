@@ -23,15 +23,14 @@ package com.geekorum.ttrss.in_app_update
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 
-@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class InAppUpdateViewModel @Inject constructor(
     private val updateManager: InAppUpdateManager
@@ -39,6 +38,7 @@ class InAppUpdateViewModel @Inject constructor(
 
     val isUpdateAvailable: Flow<Boolean> = flow {
         val result = updateManager.getUpdateAvailability()
+        Timber.d("Update availability $result")
         emit(result == UpdateAvailability.UPDATE_AVAILABLE)
     }
 
@@ -52,6 +52,7 @@ class InAppUpdateViewModel @Inject constructor(
     }
 
     val isUpdateReadyToInstall = updateState.map {
+        Timber.d("Update status ${it.status}")
         it.status == UpdateState.Status.DOWNLOADED
     }.distinctUntilChanged()
 

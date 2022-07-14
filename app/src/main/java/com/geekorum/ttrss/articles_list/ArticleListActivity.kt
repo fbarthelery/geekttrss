@@ -22,10 +22,7 @@ package com.geekorum.ttrss.articles_list
 
 import android.os.Bundle
 import androidx.activity.viewModels
-import androidx.core.graphics.Insets
-import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.doOnLayout
 import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
@@ -136,21 +133,6 @@ class ArticleListActivity : SessionActivity() {
             AppBarLayout.OnOffsetChangedListener { _, _ ->
                 binding.appBar.invalidate()
             })
-
-        // banner container
-        ViewCompat.setOnApplyWindowInsetsListener(binding.bannerContainer) { view, windowInsets ->
-            // consume top padding since we are not on top of screen
-            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-            val noTopInsets = WindowInsetsCompat.Builder().setInsets(WindowInsetsCompat.Type.systemBars(),
-                Insets.of(insets.left,
-                    0,
-                    insets.right,
-                    insets.bottom)
-            ).build()
-            WindowInsetsCompat.toWindowInsetsCompat(
-                view.onApplyWindowInsets(noTopInsets.toWindowInsets())
-            )
-        }
     }
 
     private fun setupToolbar() {

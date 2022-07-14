@@ -31,21 +31,37 @@ import androidx.activity.result.ActivityResultRegistry
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.graphics.drawable.IconCompat
+import androidx.annotation.DrawableRes
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Card
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.core.view.doOnNextLayout
 import androidx.core.view.updatePadding
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
-import com.geekorum.geekdroid.views.banners.BannerContainer
-import com.geekorum.geekdroid.views.banners.BannerSpec
-import com.geekorum.geekdroid.views.banners.buildBanner
+import com.geekorum.geekdroid.views.doOnApplyWindowInsets
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.in_app_update.InAppUpdateViewModel
 import com.geekorum.ttrss.in_app_update.IntentSenderForResultStarter
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import timber.log.Timber
+import com.geekorum.ttrss.ui.AppTheme
+import com.google.accompanist.drawablepainter.rememberDrawablePainter
 
 private const val CODE_START_IN_APP_UPDATE = 1
 
@@ -54,7 +70,7 @@ private const val CODE_START_IN_APP_UPDATE = 1
  * Really tied to ArticleListActivity
  */
 class InAppUpdatePresenter(
-    private val bannerContainer: BannerContainer,
+    private val composeView: ComposeView,
     private val lifecyleOwner: LifecycleOwner,
     private val inAppUpdateViewModel: InAppUpdateViewModel,
     activityResultRegistry: ActivityResultRegistry,
@@ -80,8 +96,159 @@ class InAppUpdatePresenter(
     }
 
     init {
-        setUpViewModels()
+        composeView.fitsSystemWindows = true
+        composeView.doOnApplyWindowInsets { _, windowInsetsCompat, _ ->
+            windowInsetsCompat
+        }
+        composeView.setContent {
+            Content()
+        }
     }
+
+    @Composable
+    fun Content() {
+        AppTheme {
+            val isUpdateAvailable by inAppUpdateViewModel.isUpdateAvailable.collectAsState(false )
+            val isUpdateReadyToInstall by inAppUpdateViewModel.isUpdateReadyToInstall.collectAsState(false )
+            var showBanner by remember { mutableStateOf(false) }
+            LaunchedEffect(isUpdateAvailable, isUpdateReadyToInstall) {
+                showBanner = isUpdateAvailable || isUpdateReadyToInstall
+            }
+
+            var sheetHeigth by remember { mutableStateOf(0) }
+            AnimatedVisibility(showBanner,
+                enter = slideInVertically(initialOffsetY = { it }),
+                exit = slideOutVertically(targetOffsetY = { it}),
+                modifier = Modifier.layout { measurable, constraints ->
+                    val placeable = measurable.measure(constraints)
+                    sheetHeigth = placeable.height
+                    layout(placeable.width, placeable.height) {
+                        placeable.placeRelative(0, 0)
+                    }
+                }
+            ) {
+                SheetContent(
+                    isUpdateAvailable = isUpdateAvailable,
+                    isUpdateReadyToInstalll = isUpdateReadyToInstall,
+                    dismissSheet = {
+                        showBanner = false
+                    }
+                )
+            }
+
+            // needed to add additional padding to articles list
+            LaunchedEffect(showBanner, sheetHeigth) {
+                val paddingBottom = if (showBanner) sheetHeigth else 0
+                (composeView.parent as? View)?.doOnNextLayout { parent ->
+                    val fragmentContainerView = parent.findViewById<View>(R.id.middle_pane_layout)
+                    fragmentContainerView?.updatePadding(bottom = paddingBottom)
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun SheetContent(
+        isUpdateAvailable: Boolean,
+        isUpdateReadyToInstalll: Boolean,
+        dismissSheet: () -> Unit,
+    ) {
+        Card(shape = RoundedCornerShape(0.dp),
+            backgroundColor =  if (MaterialTheme.colors.isLight)
+                colorResource(R.color.material_blue_grey_100)
+            else MaterialTheme.colors.surface,
+            elevation = 8.dp,
+        ) {
+            Box(modifier = Modifier
+                .windowInsetsPadding(WindowInsets.navigationBars)
+                .fillMaxWidth(),
+                propagateMinConstraints = true
+            ) {
+                when {
+                    isUpdateReadyToInstalll -> {
+                        UpdateReadyBanner(onRestartClick = {
+                            inAppUpdateViewModel.completeUpdate()
+                            dismissSheet()
+                        })
+                    }
+                    isUpdateAvailable -> {
+                        UpdateAvailableBanner(onInstallClick = {
+                            inAppUpdateViewModel.startUpdateFlow(intentSenderForResultStarter,
+                                CODE_START_IN_APP_UPDATE)
+                            dismissSheet()
+                        },
+                            onDismissClick = {
+                                dismissSheet()
+                            })
+                    }
+                    else -> Unit
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun UpdateAvailableBanner(onInstallClick: () -> Unit, onDismissClick: () -> Unit) {
+        Column {
+            Row(Modifier
+                .padding(top = 24.dp)
+                .padding(horizontal = 16.dp)) {
+                val painter = rememberMipmapPainter(R.mipmap.ic_launcher)
+
+                Image(painter = painter, contentDescription = null,
+                    modifier = Modifier.size(56.dp)
+                )
+                Text(stringResource(R.string.banner_update_msg),
+                    style = MaterialTheme.typography.subtitle1,
+                    modifier = Modifier.padding(start = 16.dp))
+            }
+
+            AppTheme(
+                colors = MaterialTheme.colors.copy(primary = MaterialTheme.colors.secondary)
+            ) {
+                Row(Modifier
+                    .align(Alignment.End)
+                    .padding(top = 12.dp, end = 8.dp, bottom = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    TextButton(onClick = onDismissClick) {
+                        Text(stringResource(R.string.banner_dismiss_btn))
+                    }
+
+                    TextButton(onClick = onInstallClick) {
+                        Text(stringResource(R.string.banner_update_btn))
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun UpdateReadyBanner(onRestartClick: () -> Unit) {
+        Column {
+            Row(Modifier
+                .padding(top = 24.dp)
+                .padding(horizontal = 16.dp)) {
+                Image(painter = rememberMipmapPainter(R.mipmap.ic_launcher), contentDescription = null,
+                    Modifier.size(56.dp))
+                Text(stringResource(R.string.banner_update_install_msg),
+                    style = MaterialTheme.typography.subtitle1,
+                    modifier = Modifier.padding(start = 16.dp))
+            }
+            AppTheme(
+                colors = MaterialTheme.colors.copy(primary = MaterialTheme.colors.secondary)
+            ) {
+                TextButton(onClick = onRestartClick,
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .padding(top = 12.dp, end = 8.dp, bottom = 8.dp)
+                ) {
+                    Text(stringResource(R.string.banner_install_btn))
+                }
+            }
+        }
+    }
+
 
     private fun <I, O> registerInAppUpdateLauncher(
         contract: ActivityResultContract<I, O>,
@@ -91,79 +258,9 @@ class InAppUpdatePresenter(
             "in_app_update_presenter", lifecyleOwner, contract, callback)
     }
 
-    private fun setUpViewModels() {
-        inAppUpdateViewModel.isUpdateAvailable.onEach {
-            if (it) {
-                Timber.d("Update available")
-                val context = bannerContainer.context
-                val banner = buildBanner(context) {
-                    messageId = R.string.banner_update_msg
-                    icon = IconCompat.createWithResource(context,
-                        R.mipmap.ic_launcher)
-                    setPositiveButton(R.string.banner_update_btn) {
-                        inAppUpdateViewModel.startUpdateFlow(intentSenderForResultStarter,
-                            CODE_START_IN_APP_UPDATE)
-                        hideBanner()
-                    }
-                    setNegativeButton(R.string.banner_dismiss_btn) {
-                        hideBanner()
-                    }
-                }
-
-                showBanner(banner)
-            }
-        }.launchIn(lifecyleOwner.lifecycleScope)
-
-        inAppUpdateViewModel.isUpdateReadyToInstall.onEach {
-            if (it) {
-                Timber.d("Update ready to install")
-                val context = bannerContainer.context
-                val banner = buildBanner(context) {
-                    message = "Update ready to install"
-                    icon = IconCompat.createWithResource(context,
-                        R.mipmap.ic_launcher)
-                    setPositiveButton("Restart") {
-                        hideBanner()
-                        inAppUpdateViewModel.completeUpdate()
-                    }
-                }
-
-                showBanner(banner)
-            }
-        }.launchIn(lifecyleOwner.lifecycleScope)
+    @Composable
+    private fun rememberMipmapPainter(@DrawableRes mipmapId: Int): Painter {
+        return rememberDrawablePainter(drawable = AppCompatResources.getDrawable(LocalContext.current, mipmapId))
     }
 
-    private fun showBanner(bannerSpec: BannerSpec) {
-        bannerContainer.show(bannerSpec)
-        val behavior = BottomSheetBehavior.from(bannerContainer)
-        behavior.state = BottomSheetBehavior.STATE_EXPANDED
-
-        // wait for expanded state to set non hideable
-        behavior.addBottomSheetCallback(object : BottomSheetBehavior.BottomSheetCallback() {
-            override fun onSlide(bottomSheet: View, slideOffset: Float) {
-                // nothing to do
-            }
-
-            override fun onStateChanged(bottomSheet: View, newState: Int) {
-                if (newState == BottomSheetBehavior.STATE_EXPANDED) {
-                    behavior.isHideable = false
-                    behavior.removeBottomSheetCallback(this)
-                }
-            }
-        })
-
-        (bannerContainer.parent as? View)?.doOnNextLayout { parent ->
-            val fragmentContainerView = parent.findViewById<View>(R.id.middle_pane_layout)
-            fragmentContainerView?.updatePadding(bottom = bannerContainer.height)
-        }
-    }
-
-    private fun hideBanner() {
-        val behavior = BottomSheetBehavior.from(bannerContainer)
-        behavior.isHideable = true
-        behavior.state = BottomSheetBehavior.STATE_HIDDEN
-        val parent = bannerContainer.parent as View?
-        val fragmentContainerView = parent?.findViewById<View>(R.id.middle_pane_layout)
-        fragmentContainerView?.updatePadding(bottom = 0)
-    }
 }
