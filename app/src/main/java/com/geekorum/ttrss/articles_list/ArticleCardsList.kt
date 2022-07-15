@@ -30,11 +30,15 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material.DismissDirection
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -52,8 +56,6 @@ import com.geekorum.ttrss.data.ArticleContentIndexed
 import com.geekorum.ttrss.data.ArticleWithFeed
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.ui.AppTheme
-import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshState
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
@@ -170,17 +172,18 @@ private fun ArticleCardList(
 
         val listState = rememberLazyListState()
         var animateItemAppearance by remember { mutableStateOf(true) }
+        val navBarPadding = WindowInsets.navigationBars.asPaddingValues()
+        val contentPadding = PaddingValues(
+            start =  navBarPadding.calculateStartPadding(LocalLayoutDirection.current) +8.dp,
+            top =  navBarPadding.calculateTopPadding() +8.dp,
+            end = navBarPadding.calculateEndPadding(LocalLayoutDirection.current) + 8.dp,
+            bottom = navBarPadding.calculateBottomPadding() + additionalContentPaddingBottom
+        )
         LazyColumn(
             state = listState,
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            contentPadding = rememberInsetsPaddingValues(
-                insets = LocalWindowInsets.current.navigationBars,
-                additionalBottom = additionalContentPaddingBottom,
-                additionalStart = 8.dp,
-                additionalTop = 8.dp,
-                additionalEnd = 8.dp
-            ),
+            contentPadding = contentPadding,
             modifier = Modifier.fillMaxSize()
         ) {
             itemsIndexed(articles,

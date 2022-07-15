@@ -31,8 +31,7 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Surface
@@ -41,11 +40,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
+import androidx.compose.ui.platform.*
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ShareCompat
@@ -59,9 +54,6 @@ import com.geekorum.ttrss.articles_list.*
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleWithFeed
 import com.geekorum.ttrss.ui.AppTheme
-import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.ProvideWindowInsets
-import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import dagger.hilt.android.AndroidEntryPoint
@@ -77,26 +69,27 @@ class MagazineFragment: Fragment() {
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                ProvideWindowInsets {
-                    AppTheme {
-                        val appBarHeightDp = with(LocalDensity.current) {
-                            activityViewModel.appBarHeight.toDp()
-                        }
+                AppTheme {
+                    val appBarHeightDp = with(LocalDensity.current) {
+                        activityViewModel.appBarHeight.toDp()
+                    }
 
-                        val nestedScrollInterop = rememberNestedScrollInteropConnection()
-                        Surface(Modifier.fillMaxSize().nestedScroll(nestedScrollInterop)) {
-                            ArticlesMagazine(
-                                viewModel = magazineViewModel,
-                                onCardClick = activityViewModel::displayArticle,
-                                onShareClick = ::onShareClicked,
-                                onOpenInBrowserClick = {
-                                    activityViewModel.displayArticleInBrowser(requireContext(), it)
-                                },
-                                additionalContentPaddingBottom = appBarHeightDp,
-                                modifier = Modifier
-                                    .fillMaxSize()
-                            )
-                        }
+                    val nestedScrollInterop = rememberNestedScrollInteropConnection()
+                    Surface(Modifier.fillMaxSize()
+//                             disabled for now because of https://issuetracker.google.com/issues/236451818
+//                            .nestedScroll(nestedScrollInterop)
+                    ) {
+                        ArticlesMagazine(
+                            viewModel = magazineViewModel,
+                            onCardClick = activityViewModel::displayArticle,
+                            onShareClick = ::onShareClicked,
+                            onOpenInBrowserClick = {
+                                activityViewModel.displayArticleInBrowser(requireContext(), it)
+                            },
+                            additionalContentPaddingBottom = appBarHeightDp,
+                            modifier = Modifier
+                                .fillMaxSize()
+                        )
                     }
                 }
             }
@@ -166,17 +159,18 @@ private fun ArticlesMagazine(
 
         val listState = rememberLazyListState()
         var animateItemAppearance by remember { mutableStateOf(true) }
+        val navBarPadding = WindowInsets.navigationBars.asPaddingValues()
+        val contentPadding = PaddingValues(
+            start =  navBarPadding.calculateStartPadding(LocalLayoutDirection.current) +8.dp,
+            top =  navBarPadding.calculateTopPadding() +8.dp,
+            end = navBarPadding.calculateEndPadding(LocalLayoutDirection.current) + 8.dp,
+            bottom = navBarPadding.calculateBottomPadding() + additionalContentPaddingBottom
+        )
         LazyColumn(
             state = listState,
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            contentPadding = rememberInsetsPaddingValues(
-                insets = LocalWindowInsets.current.navigationBars,
-                additionalBottom = additionalContentPaddingBottom,
-                additionalStart = 8.dp,
-                additionalTop = 8.dp,
-                additionalEnd = 8.dp
-            ),
+            contentPadding = contentPadding,
             modifier = Modifier.fillMaxSize()
         ) {
             itemsIndexed(pagingItems,

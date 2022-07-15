@@ -30,7 +30,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -43,7 +42,6 @@ import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.ui.AppTheme
-import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.android.material.snackbar.BaseTransientBottomBar
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -77,26 +75,27 @@ abstract class BaseArticlesListFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                ProvideWindowInsets {
-                    AppTheme {
-                        val appBarHeightDp = with(LocalDensity.current) {
-                            activityViewModel.appBarHeight.toDp()
-                        }
+                AppTheme {
+                    val appBarHeightDp = with(LocalDensity.current) {
+                        activityViewModel.appBarHeight.toDp()
+                    }
 
-                        val nestedScrollInterop = rememberNestedScrollInteropConnection()
-                        Surface(Modifier.fillMaxSize().nestedScroll(nestedScrollInterop)) {
-                            ArticleCardList(
-                                viewModel = articlesViewModel,
-                                onCardClick = activityViewModel::displayArticle,
-                                onShareClick = ::onShareClicked,
-                                onOpenInBrowserClick = {
-                                    activityViewModel.displayArticleInBrowser(requireContext(), it)
-                                },
-                                additionalContentPaddingBottom = appBarHeightDp,
-                                modifier = Modifier
-                                    .fillMaxSize()
-                            )
-                        }
+                    val nestedScrollInterop = rememberNestedScrollInteropConnection()
+                    Surface(Modifier.fillMaxSize()
+//                             disabled for now because of https://issuetracker.google.com/issues/236451818
+//                            .nestedScroll(nestedScrollInterop)
+                    ) {
+                        ArticleCardList(
+                            viewModel = articlesViewModel,
+                            onCardClick = activityViewModel::displayArticle,
+                            onShareClick = ::onShareClicked,
+                            onOpenInBrowserClick = {
+                                activityViewModel.displayArticleInBrowser(requireContext(), it)
+                            },
+                            additionalContentPaddingBottom = appBarHeightDp,
+                            modifier = Modifier
+                                .fillMaxSize()
+                        )
                     }
                 }
             }
