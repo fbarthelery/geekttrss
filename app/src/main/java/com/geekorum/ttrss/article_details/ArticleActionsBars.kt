@@ -27,6 +27,10 @@ import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Archive
@@ -37,6 +41,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -65,7 +70,7 @@ fun ArticleBottomActionsBar(
     applyNavigationBarInsets: Boolean = true,
 ) {
     val bapPaddingBottom = if (applyNavigationBarInsets) {
-        LocalWindowInsets.current.navigationBars.bottom
+        WindowInsets.navigationBars.getBottom(LocalDensity.current)
     } else 0
     val lifecycleOwner = LocalLifecycleOwner.current
     val layoutInflater: LayoutInflater = LocalContext.current.getSystemService()!!
@@ -132,7 +137,7 @@ fun ArticleTopActionsBar(
             ?: MaterialTheme.colors.primarySurface,
         contentColor = contentColorFor(backgroundColor = MaterialTheme.colors.primarySurface),
         elevation = elevation,
-        contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars),
+        contentPadding = WindowInsets.statusBars.asPaddingValues(),
         navigationIcon = {
             IconButton(onClick = onNavigateUpClick) {
                 Icon(Icons.Default.ArrowBack, contentDescription = null)

@@ -25,7 +25,6 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.webkit.WebViewClient
 import androidx.annotation.ColorRes
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -47,15 +46,12 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.net.toUri
 import coil.compose.AsyncImage
-import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleContentIndexed
 import com.geekorum.ttrss.ui.AppTheme
 import com.geekorum.ttrss.ui.WindowSize
-import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.google.accompanist.insets.ui.Scaffold
 import kotlinx.coroutines.delay
 import java.util.*
@@ -123,7 +119,6 @@ class ArticleDetailsScreenState(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ArticleDetailsScreen(
     articleDetailsViewModel: ArticleDetailsViewModel,
@@ -281,7 +276,6 @@ private fun ArticleDetailsHeroContent(
 
 
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ArticleDetailsScreen(
     articleDetailsViewModel: ArticleDetailsViewModel,
@@ -323,9 +317,7 @@ fun ArticleDetailsScreen(
             val readMoreArticles by articleDetailsViewModel.additionalArticles.collectAsState()
             ArticleDetailsContent(it,
                 readMoreArticles = readMoreArticles,
-                onArticleClick = {
-                    onArticleClick(it)
-                },
+                onArticleClick = onArticleClick,
                 webViewClient = webViewClient,
                 modifier = Modifier.padding(top = padding.calculateTopPadding()),
                 scrollState = articleDetailsScreenState.scrollState)
@@ -345,9 +337,8 @@ fun ArticleDetailsScreen(
 @Composable
 private fun ArticleTopAppBar(appBarElevation: Dp, onNavigateUpClick: () -> Unit) {
     Surface(elevation = appBarElevation) {
-        val statusBarPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.statusBars)
         TopAppBar(
-            modifier = Modifier.padding(statusBarPadding),
+            modifier = Modifier.statusBarsPadding(),
             title = {},
             elevation = 0.dp,
             backgroundColor = MaterialTheme.colors.surface,

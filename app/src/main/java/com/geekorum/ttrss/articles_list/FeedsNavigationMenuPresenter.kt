@@ -29,14 +29,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
-import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.NavController
 import com.geekorum.geekdroid.views.doOnApplyWindowInsets
 import com.geekorum.ttrss.ArticlesListDirections
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.ui.AppTheme
-import com.google.accompanist.insets.ProvideWindowInsets
 
 
 /**
@@ -66,38 +64,36 @@ class FeedsNavigationMenuPresenter(
         }
 
         composeView.setContent {
-            ProvideWindowInsets {
-                AppTheme {
-                    Surface(Modifier.fillMaxSize()) {
-                        val account by accountViewModel.selectedAccount.observeAsState()
-                        val server by accountViewModel.selectedAccountHost.observeAsState()
-                        FeedListNavigationMenu(
-                            user = account?.name ?: "",
-                            server = server?: "",
-                            feedSection = {
-                                val feeds by feedsViewModel.feeds.collectAsState(emptyList())
-                                FeedSection(
-                                    feeds,
-                                    selectedFeed = feeds.find { it.id == currentFeedId },
-                                    isMagazineSelected = isMagazineFeed,
-                                    onFeedSelected = {
-                                        navigateToFeed(it)
-                                    },
-                                    onMagazineSelected = {
-                                        navigateToMagazine()
-                                    }
-                                )
-                            },
-                            onManageFeedsClicked = {
-                                val directions = ArticlesListDirections.actionManageFeeds()
-                                navController.navigate(directions)
-                            },
-                            onSettingsClicked = {
-                                val directions = ArticlesListDirections.actionShowSettings()
-                                navController.navigate(directions)
-                            },
-                        )
-                    }
+            AppTheme {
+                Surface(Modifier.fillMaxSize()) {
+                    val account by accountViewModel.selectedAccount.observeAsState()
+                    val server by accountViewModel.selectedAccountHost.observeAsState()
+                    FeedListNavigationMenu(
+                        user = account?.name ?: "",
+                        server = server?: "",
+                        feedSection = {
+                            val feeds by feedsViewModel.feeds.collectAsState(emptyList())
+                            FeedSection(
+                                feeds,
+                                selectedFeed = feeds.find { it.id == currentFeedId },
+                                isMagazineSelected = isMagazineFeed,
+                                onFeedSelected = {
+                                    navigateToFeed(it)
+                                },
+                                onMagazineSelected = {
+                                    navigateToMagazine()
+                                }
+                            )
+                        },
+                        onManageFeedsClicked = {
+                            val directions = ArticlesListDirections.actionManageFeeds()
+                            navController.navigate(directions)
+                        },
+                        onSettingsClicked = {
+                            val directions = ArticlesListDirections.actionShowSettings()
+                            navController.navigate(directions)
+                        },
+                    )
                 }
             }
         }

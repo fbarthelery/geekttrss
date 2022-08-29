@@ -52,7 +52,6 @@ import androidx.compose.ui.util.lerp
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.ui.AppTheme
-import com.google.accompanist.insets.navigationBarsHeight
 
 
 @Composable
@@ -92,7 +91,7 @@ fun FeedListNavigationMenu(
                     Icon(AppTheme.Icons.Settings, contentDescription = null)
                 },
             )
-            Spacer(Modifier.navigationBarsHeight())
+            Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.systemBars))
         }
     }
 }

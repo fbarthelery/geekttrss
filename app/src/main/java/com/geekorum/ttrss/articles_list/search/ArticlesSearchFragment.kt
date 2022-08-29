@@ -31,8 +31,7 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Surface
@@ -57,9 +56,6 @@ import com.geekorum.ttrss.articles_list.pagingViewStateFor
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleWithFeed
 import com.geekorum.ttrss.ui.AppTheme
-import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.ProvideWindowInsets
-import com.google.accompanist.insets.rememberInsetsPaddingValues
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import timber.log.Timber
@@ -77,24 +73,22 @@ class ArticlesSearchFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                ProvideWindowInsets {
-                    AppTheme {
-                        val appBarHeightDp = with(LocalDensity.current) {
-                            activityViewModel.appBarHeight.toDp()
-                        }
-                        Surface(Modifier.fillMaxSize()) {
-                            SearchResultCardList(
-                                viewModel = searchViewModel,
-                                onCardClick = activityViewModel::displayArticle,
-                                onShareClick = ::onShareClicked,
-                                onOpenInBrowserClick = {
-                                    activityViewModel.displayArticleInBrowser(requireContext(), it)
-                                },
-                                additionalContentPaddingBottom = appBarHeightDp,
-                                modifier = Modifier
-                                    .fillMaxSize()
-                            )
-                        }
+                AppTheme {
+                    val appBarHeightDp = with(LocalDensity.current) {
+                        activityViewModel.appBarHeight.toDp()
+                    }
+                    Surface(Modifier.fillMaxSize()) {
+                        SearchResultCardList(
+                            viewModel = searchViewModel,
+                            onCardClick = activityViewModel::displayArticle,
+                            onShareClick = ::onShareClicked,
+                            onOpenInBrowserClick = {
+                                activityViewModel.displayArticleInBrowser(requireContext(), it)
+                            },
+                            additionalContentPaddingBottom = appBarHeightDp,
+                            modifier = Modifier
+                                .fillMaxSize()
+                        )
                     }
                 }
             }
@@ -149,13 +143,10 @@ fun SearchResultCardList(
         state = listState,
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        contentPadding = rememberInsetsPaddingValues(
-            insets = LocalWindowInsets.current.navigationBars,
-            additionalBottom = additionalContentPaddingBottom,
-            additionalStart = 8.dp,
-            additionalTop = 8.dp,
-            additionalEnd = 8.dp
-        ),
+        contentPadding = WindowInsets.navigationBars.add(WindowInsets(
+            bottom = additionalContentPaddingBottom,
+            left = 8.dp, right = 8.dp, top = 8.dp
+        )).asPaddingValues(),
         modifier = modifier.fillMaxSize()
     ) {
         itemsIndexed(pagingItems,
