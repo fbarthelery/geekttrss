@@ -32,6 +32,8 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.OpenInBrowser
+import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -51,7 +53,6 @@ import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleContentIndexed
 import com.geekorum.ttrss.ui.AppTheme
-import com.geekorum.ttrss.ui.WindowSize
 import com.google.accompanist.insets.ui.Scaffold
 import kotlinx.coroutines.delay
 import java.util.*
@@ -122,13 +123,13 @@ class ArticleDetailsScreenState(
 @Composable
 fun ArticleDetailsScreen(
     articleDetailsViewModel: ArticleDetailsViewModel,
-    widthSizeClass: WindowSize,
-    heightSizeClass: WindowSize,
+    widthSizeClass: WindowWidthSizeClass,
+    heightSizeClass: WindowHeightSizeClass,
     onNavigateUpClick: () -> Unit,
     onArticleClick: (Article) -> Unit,
     webViewClient: WebViewClient? = null,
 ) {
-    if (widthSizeClass == WindowSize.Compact || heightSizeClass == WindowSize.Compact) {
+    if (widthSizeClass == WindowWidthSizeClass.Compact || heightSizeClass == WindowHeightSizeClass.Compact) {
         ArticleDetailsScreen(
             articleDetailsViewModel = articleDetailsViewModel,
             onNavigateUpClick = onNavigateUpClick,

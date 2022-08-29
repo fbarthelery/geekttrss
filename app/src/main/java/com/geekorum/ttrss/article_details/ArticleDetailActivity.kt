@@ -28,6 +28,8 @@ import android.os.Bundle
 import android.webkit.WebViewClient
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.core.net.toUri
 import androidx.core.view.WindowCompat
 import com.geekorum.ttrss.R
@@ -35,7 +37,8 @@ import com.geekorum.ttrss.articles_list.ArticleListActivity
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.session.SessionActivity
 import com.geekorum.ttrss.ui.AppTheme
-import com.geekorum.ttrss.ui.rememberWindowSizeClass
+import com.geekorum.ttrss.ui.component1
+import com.geekorum.ttrss.ui.component2
 import dagger.hilt.android.AndroidEntryPoint
 import okhttp3.OkHttpClient
 import javax.inject.Inject
@@ -54,6 +57,7 @@ class ArticleDetailActivity : SessionActivity() {
     @Inject lateinit var okHttpClient: OkHttpClient
     @Inject lateinit var webFontProvider: WebFontProvider
 
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         webViewClient = ArticleDetailsWebViewClient(okHttpClient, webFontProvider,
@@ -67,7 +71,8 @@ class ArticleDetailActivity : SessionActivity() {
 
         setContent {
             AppTheme {
-                val (widthSizeClass, heightSizeClass) = rememberWindowSizeClass()
+                val (widthSizeClass, heightSizeClass) = calculateWindowSizeClass(this)
+
                 ArticleDetailsScreen(articleDetailsViewModel,
                     widthSizeClass = widthSizeClass,
                     heightSizeClass = heightSizeClass,
@@ -103,3 +108,4 @@ class ArticleDetailActivity : SessionActivity() {
         outContent.webUri = articleDetailsViewModel.article.value?.link?.toUri()
     }
 }
+
