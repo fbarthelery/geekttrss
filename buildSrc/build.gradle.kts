@@ -35,7 +35,7 @@ dependencies {
     implementation("com.github.triplet.gradle:play-publisher:3.7.0")
     implementation("com.geekorum.gradle.avdl:flydroid:0.0.3")
     // need to be added to work with compose  https://issuetracker.google.com/issues/195342732
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.0")
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.10")
 
     // fix https://github.com/google/dagger/issues/3068
     implementation("com.squareup:javapoet:1.13.0")
