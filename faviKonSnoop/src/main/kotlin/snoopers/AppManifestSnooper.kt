@@ -22,15 +22,18 @@ package com.geekorum.favikonsnoop.snoopers
 
 import com.geekorum.favikonsnoop.FaviconInfo
 import com.geekorum.favikonsnoop.Snooper
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.okio.decodeFromBufferedSource
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Request
 import okio.BufferedSource
+import okio.buffer
+import okio.source
 import org.jsoup.Jsoup
 
 /**
@@ -82,7 +85,7 @@ class AppManifestSnooper internal constructor(
         val response = okHttpClient.newCall(request).execute()
         return response.use {
             if (response.isSuccessful) {
-                response.body?.string()?.let {
+                response.body?.source()?.let {
                     webAppManifestParser.parseManifest(it)
                 }
             } else null
@@ -129,11 +132,16 @@ data class ImageResource(
 internal class WebAppManifestParser(
     private val  json: Json = Json.Default
 ) {
-    fun parseManifest(content: String): WebAppManifest? {
+    @OptIn(ExperimentalSerializationApi::class)
+    fun parseManifest(source: BufferedSource): WebAppManifest? {
         return try {
-            json.decodeFromString<WebAppManifest>(content)
+            json.decodeFromBufferedSource<WebAppManifest>(source)
         } catch (e: SerializationException) {
             null
         }
     }
+
+    fun parseManifest(content: String): WebAppManifest? =
+        parseManifest(content.byteInputStream().source().buffer())
+
 }

@@ -26,7 +26,6 @@ import com.geekorum.build.createComponentsPlatforms
 import com.geekorum.build.setupGoogleContent
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import java.net.URI
 
 plugins {
     // these should not be needed but for an unknown reason they get applied
