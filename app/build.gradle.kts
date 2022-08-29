@@ -134,9 +134,9 @@ kapt {
 dependencies {
 
     implementation("androidx.core:core-ktx:1.8.0")
-    implementation("androidx.fragment:fragment-ktx:1.5.0")
-    implementation("androidx.activity:activity-ktx:1.5.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.3.1")
+    implementation("androidx.fragment:fragment-ktx:1.5.2")
+    implementation("androidx.activity:activity-ktx:1.5.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
 
     // androidx ui
     implementation("androidx.drawerlayout:drawerlayout:1.1.1")
@@ -154,10 +154,10 @@ dependencies {
     api("androidx.compose.material:material-icons-core:$composeVersion")
     api("androidx.compose.material:material-icons-extended:$composeVersion")
     api("androidx.compose.ui:ui-viewbinding:$composeVersion")
-    api("androidx.activity:activity-compose:1.5.0")
+    api("androidx.activity:activity-compose:1.5.1")
     api("androidx.compose.runtime:runtime-livedata:$composeVersion")
     api("androidx.compose.animation:animation-graphics:$composeVersion")
-    api("androidx.paging:paging-compose:1.0.0-alpha14")
+    api("androidx.paging:paging-compose:1.0.0-alpha16")
     val accompanistVersion = "0.24.13-rc"
     api("com.google.accompanist:accompanist-insets:$accompanistVersion")
     api("com.google.accompanist:accompanist-insets-ui:$accompanistVersion")
@@ -254,14 +254,14 @@ dependencies {
     add("googleImplementation", "com.google.android.play:core-ktx:1.8.1")
 
     // api dependencies for features modules
-    api("androidx.appcompat:appcompat:1.4.2")
+    api("androidx.appcompat:appcompat:1.5.0")
     api("androidx.work:work-runtime-ktx:$workVersion")
     api("androidx.room:room-runtime:$roomVersion")
     api("androidx.room:room-paging:$roomVersion")
     api("androidx.room:room-ktx:$roomVersion")
     api("androidx.paging:paging-runtime-ktx:3.1.1")
     api("com.squareup.retrofit2:retrofit:2.9.0")
-    api("com.squareup.okhttp3:okhttp:4.9.3")
+    api("com.squareup.okhttp3:okhttp:4.10.0")
     api("com.jakewharton.timber:timber:5.0.1")
 
     val navigationVersion = "2.5.0"
@@ -271,7 +271,7 @@ dependencies {
 
     // fragment testing declare some activities and resources that needs to be in the apk
     // we don't use it. here but it is used in feature modules
-    debugImplementation("androidx.fragment:fragment-testing:1.5.0")
+    debugImplementation("androidx.fragment:fragment-testing:1.5.2")
 
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.9.1")
 }

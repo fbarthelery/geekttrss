@@ -89,7 +89,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
 
-    implementation("androidx.activity:activity-ktx:1.5.0")
+    implementation("androidx.activity:activity-ktx:1.5.1")
 
     // androidx UI
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
@@ -108,22 +108,22 @@ dependencies {
     implementation(project(":htmlparsers"))
     implementation(project(":webapi"))
 
-    implementation("io.coil-kt:coil:2.1.0")
+    implementation("io.coil-kt:coil:2.2.0")
 
     androidTestImplementation("androidx.work:work-testing:2.7.1")
     dualTestImplementation("androidx.arch.core:core-testing:2.1.0")
     androidTestImplementation("com.squareup.okhttp3:mockwebserver:4.9.3")
 
-    debugImplementation("androidx.fragment:fragment-testing:1.5.0")
+    debugImplementation("androidx.fragment:fragment-testing:1.5.2")
 
     // the test apk need these dependencies because they provide some of its resources
     // likely due to manifest merging with :app manifest
-    androidTestImplementation("androidx.fragment:fragment-testing:1.4.1")
+    androidTestImplementation("androidx.fragment:fragment-testing:1.5.2")
     androidTestImplementation("com.squareup.leakcanary:leakcanary-android:2.9.1")
     androidTestImplementation("com.google.android.gms:play-services-oss-licenses:17.0.0")
     androidTestImplementation("com.google.android.play:core-ktx:1.8.1")
 
     // used in test through geekdroid
-    androidTestImplementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.5.0")
+    androidTestImplementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.5.1")
 
 }
