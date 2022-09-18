@@ -43,7 +43,7 @@ plugins {
 // during the compilation of the *.gradle.kts script
 buildscript {
     dependencies {
-        classpath("com.android.tools.build:gradle:7.2.2")
+        classpath("com.android.tools.build:gradle:7.3.0")
     }
 }
 
