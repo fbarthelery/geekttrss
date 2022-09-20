@@ -117,7 +117,9 @@ android {
         // Fix: https://github.com/Kotlin/kotlinx.coroutines/issues/2023
         resources {
             excludes += listOf("META-INF/AL2.0",
-                "META-INF/LGPL2.1")
+                "META-INF/LGPL2.1",
+                "DebugProbesKt.bin"
+            )
         }
     }
 }
@@ -159,7 +161,7 @@ dependencies {
     api("androidx.compose.runtime:runtime-livedata:$composeVersion")
     api("androidx.compose.animation:animation-graphics:$composeVersion")
     api("androidx.paging:paging-compose:1.0.0-alpha16")
-    val accompanistVersion = "0.24.13-rc"
+    val accompanistVersion = "0.25.1"
     api("com.google.accompanist:accompanist-insets-ui:$accompanistVersion")
     api("com.google.accompanist:accompanist-swiperefresh:$accompanistVersion")
     api("com.google.accompanist:accompanist-drawablepainter:$accompanistVersion")
@@ -177,7 +179,7 @@ dependencies {
     // needed by robolectric
     implementation("androidx.loader:loader:1.1.0")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.3")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
 
     //geekdroid
@@ -191,7 +193,7 @@ dependencies {
     implementation("com.google.android.material:material:1.6.1")
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.9.3")
-    val coilVersion = "2.1.0"
+    val coilVersion = "2.2.0"
     implementation("io.coil-kt:coil:$coilVersion")
     implementation("io.coil-kt:coil-compose:$coilVersion")
     implementation("com.google.android.gms:play-services-oss-licenses:17.0.0")
@@ -234,7 +236,7 @@ dependencies {
     implementation(enforcedPlatform(kotlin("bom")))
     implementation(kotlin("stdlib-jdk8"))
 
-    val coroutinesVersion = "1.6.3"
+    val coroutinesVersion = "1.6.4"
     implementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:$coroutinesVersion"))
     testImplementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:$coroutinesVersion"))
     androidTestImplementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:$coroutinesVersion"))
