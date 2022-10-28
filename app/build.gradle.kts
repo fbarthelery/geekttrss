@@ -51,6 +51,7 @@ androidComponents {
 android {
     val compileSdkInt: Int by rootProject.extra
     compileSdk = compileSdkInt
+    namespace = "com.geekorum.ttrss"
     defaultConfig {
         applicationId = "com.geekorum.ttrss"
         minSdk = 24

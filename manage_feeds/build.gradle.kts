@@ -33,6 +33,7 @@ plugins {
 android {
     val compileSdkInt: Int by rootProject.extra
     compileSdk = compileSdkInt
+    namespace = "com.geekorum.ttrss.manage_feeds"
 
     defaultConfig {
         minSdk = 24

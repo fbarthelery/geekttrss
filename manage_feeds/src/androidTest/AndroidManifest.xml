@@ -21,8 +21,7 @@
     along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
 
 -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.geekorum.ttrss.manage_feeds">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- extract native libs to allow mockk to work on android>=10 until
     https://github.com/mockk/mockk/issues/297 is resolved -->
