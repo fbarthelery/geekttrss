@@ -136,9 +136,9 @@ kapt {
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.8.0")
-    implementation("androidx.fragment:fragment-ktx:1.5.2")
-    implementation("androidx.activity:activity-ktx:1.5.1")
+    implementation("androidx.core:core-ktx:1.9.0")
+    implementation("androidx.fragment:fragment-ktx:1.5.4")
+    implementation("androidx.activity:activity-ktx:1.6.1")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
 
     // androidx ui
@@ -192,17 +192,17 @@ dependencies {
     implementation(project(":webapi"))
     implementation(project(":faviKonSnoop"))
 
-    implementation("com.google.android.material:material:1.6.1")
+    implementation("com.google.android.material:material:1.7.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
     testImplementation("com.squareup.okhttp3:mockwebserver:4.9.3")
-    val coilVersion = "2.2.0"
+    val coilVersion = "2.2.2"
     implementation("io.coil-kt:coil:$coilVersion")
     implementation("io.coil-kt:coil-compose:$coilVersion")
     implementation("com.google.android.gms:play-services-oss-licenses:17.0.0")
 
     implementation("org.jsoup:jsoup:1.13.1")
 
-    val lifecycleVersion = "2.5.0"
+    val lifecycleVersion = "2.5.1"
     implementation("androidx.lifecycle:lifecycle-livedata-core-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
@@ -228,7 +228,7 @@ dependencies {
     kaptAndroidTest("com.google.dagger:hilt-compiler:$daggerVersion")
 
 
-    val roomVersion = "2.4.2"
+    val roomVersion = "2.4.3"
     kapt("androidx.room:room-compiler:$roomVersion")
     androidTestImplementation("androidx.room:room-testing:$roomVersion")
 
@@ -258,7 +258,7 @@ dependencies {
     add("googleImplementation", "com.google.android.play:core-ktx:1.8.1")
 
     // api dependencies for features modules
-    api("androidx.appcompat:appcompat:1.5.0")
+    api("androidx.appcompat:appcompat:1.5.1")
     api("androidx.work:work-runtime-ktx:$workVersion")
     api("androidx.room:room-runtime:$roomVersion")
     api("androidx.room:room-paging:$roomVersion")
@@ -268,14 +268,14 @@ dependencies {
     api("com.squareup.okhttp3:okhttp:4.10.0")
     api("com.jakewharton.timber:timber:5.0.1")
 
-    val navigationVersion = "2.5.0"
+    val navigationVersion = "2.5.3"
     api("androidx.navigation:navigation-fragment-ktx:$navigationVersion")
     api("androidx.navigation:navigation-ui-ktx:$navigationVersion")
     api("androidx.navigation:navigation-dynamic-features-fragment:$navigationVersion")
 
     // fragment testing declare some activities and resources that needs to be in the apk
     // we don't use it. here but it is used in feature modules
-    debugImplementation("androidx.fragment:fragment-testing:1.5.2")
+    debugImplementation("androidx.fragment:fragment-testing:1.5.4")
 
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.9.1")
 }
