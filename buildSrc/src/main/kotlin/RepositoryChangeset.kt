@@ -20,23 +20,35 @@
  */
 package com.geekorum.build
 
+import com.android.build.api.variant.ApplicationAndroidComponentsExtension
+import com.android.build.api.variant.BuildConfigField
+import com.android.build.api.variant.VariantOutputConfiguration.OutputType
+import org.gradle.api.DefaultTask
 import org.gradle.api.Project
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.TaskAction
+import org.gradle.configurationcache.extensions.capitalized
+import org.gradle.kotlin.dsl.register
+import org.gradle.process.ExecOperations
+import java.io.ByteArrayOutputStream
 import java.io.File
-import java.io.IOException
-import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-internal fun Project.getGitSha1(): String? = runCommand("git rev-parse HEAD", workingDir = projectDir)?.trim()
+internal fun ExecOperations.getGitSha1(projectDir: File): String? = runCommand("git rev-parse HEAD", workingDir = projectDir)?.trim()
 
-internal fun Project.getHgSha1(): String? = runCommand("hg id --debug -i -r .", workingDir = projectDir)?.trim()
+internal fun ExecOperations.getHgSha1(projectDir: File): String? = runCommand("hg id --debug -i -r .", workingDir = projectDir)?.trim()
 
-internal fun Project.getHgLocalRevisionNumber(): String? = runCommand("hg id -n -r .", workingDir = projectDir)?.trim()
+internal fun ExecOperations.getHgLocalRevisionNumber(projectDir: File): String? = runCommand("hg id -n -r .", workingDir = projectDir)?.trim()
 
-fun Project.getChangeSet(): String {
-    val git = rootProject.file(".git")
-    val hg = rootProject.file(".hg")
+private fun ExecOperations.getChangeSet(projectDir: File): String {
+    val git = File(projectDir, ".git")
+    val hg = File(projectDir, ".hg")
     return when {
-        git.exists() -> "git:${getGitSha1()}"
-        hg.exists() -> "hg:${getHgSha1()}"
+        git.exists() -> "git:${getGitSha1(projectDir)}"
+        hg.exists() -> "hg:${getHgSha1(projectDir)}"
         else -> "unknown"
     }
 }
@@ -46,27 +58,98 @@ fun Project.getChangeSet(): String {
  * M is major, mm is minor, P is patch
  * BBB is build version number from hg
  */
-fun Project.computeChangesetVersionCode(major: Int = 0, minor: Int = 0, patch: Int = 0): Int {
+private fun ExecOperations.computeChangesetVersionCode(projectDir: File, major: Int = 0, minor: Int = 0, patch: Int = 0): Int {
     val base = (major * 1000000) + (minor * 10000) + (patch * 1000)
-    return base + (getHgLocalRevisionNumber()?.trim()?.toIntOrNull() ?: 0)
+    return base + (getHgLocalRevisionNumber(projectDir)?.trim()?.toIntOrNull() ?: 0)
 }
 
-private fun Project.runCommand(
+private fun ExecOperations.runCommand(
     command: String,
-    workingDir: File = File("."),
-    timeoutAmount: Long = 60,
-    timeoutUnit: TimeUnit = TimeUnit.MINUTES
+    workingDir: File = File(".")
 ): String? {
-    return try {
-        ProcessBuilder(*command.split("\\s".toRegex()).toTypedArray())
-            .directory(workingDir)
-            .redirectOutput(ProcessBuilder.Redirect.PIPE)
-            .redirectError(ProcessBuilder.Redirect.PIPE)
-            .start().apply {
-                waitFor(timeoutAmount, timeoutUnit)
-            }.inputStream.bufferedReader().readText()
-    } catch (e: IOException) {
-        logger.info("Unable to run command", e)
-        null
+    val output = ByteArrayOutputStream()
+    val result = exec {
+        commandLine(command.split("\\s".toRegex()))
+        setWorkingDir(workingDir)
+        setStandardOutput(output)
+        setErrorOutput(output)
+    }
+    result.rethrowFailure()
+    return output.toString(Charsets.UTF_8)
+}
+
+abstract class VersionCodeTask : DefaultTask() {
+
+    @get:OutputFile
+    abstract val versionCodeOutputFile: RegularFileProperty
+
+    @get:OutputFile
+    abstract val changesetOutputFile: RegularFileProperty
+
+    @get:Input
+    abstract val repositoryDirectory: Property<String>
+
+    @get:Input
+    abstract val major: Property<Int>
+
+    @get:Input
+    abstract val minor: Property<Int>
+
+    @get:Input
+    abstract val patch: Property<Int>
+
+    @get:Inject
+    abstract val exec: ExecOperations
+
+    @TaskAction
+    fun computeVersionCode() {
+        val projectDir = File(repositoryDirectory.get())
+        val versionCode = exec.computeChangesetVersionCode(projectDir, major.getOrElse(0), minor.getOrElse(0), patch.getOrElse(0))
+        versionCodeOutputFile.get().asFile.writeText("$versionCode")
+    }
+
+    @TaskAction
+    fun computeChangeset() {
+        val projectDir = File(repositoryDirectory.get())
+        val changeset = exec.getChangeSet(projectDir)
+        changesetOutputFile.get().asFile.writeText(changeset)
+    }
+}
+
+/**
+ * @param versionNameSuffix extra string to add to version name
+ */
+fun ApplicationAndroidComponentsExtension.configureVersionChangeset(project: Project, major: Int, minor: Int, patch: Int, versionNameSuffix: String = "") {
+    // Note: Everything in there is incubating.
+
+    // onVariantProperties registers an action that configures variant properties during
+    // variant computation (which happens during afterEvaluate)
+    onVariants {
+        // Because app module can have multiple output when using mutli-APK, versionCode/Name
+        // are only available on the variant output.
+        // Here gather the output when we are in single mode (ie no multi-apk)
+        val mainOutput = it.outputs.single { it.outputType == OutputType.SINGLE }
+
+        // create version Code generating task
+        val versionCodeTask = project.tasks.register<VersionCodeTask>("computeVersionCodeFor${it.name.capitalized()}") {
+            this.major.set(major)
+            this.minor.set(minor)
+            this.patch.set(patch)
+            repositoryDirectory.set(project.rootDir.absolutePath)
+            versionCodeOutputFile.set(project.layout.buildDirectory.file("intermediates/versionCode.txt"))
+            changesetOutputFile.set(project.layout.buildDirectory.file("intermediates/changeset.txt"))
+        }
+
+        // wire version code from the task output
+        // map will create a lazy Provider that
+        // 1. runs just before the consumer(s), ensuring that the producer (VersionCodeTask) has run
+        //    and therefore the file is created.
+        // 2. contains task dependency information so that the consumer(s) run after the producer.
+        mainOutput.versionCode.set(versionCodeTask.map { it.versionCodeOutputFile.get().asFile.readText().toInt() })
+        mainOutput.versionName.set("$major.$minor.$patch$versionNameSuffix")
+
+        it.buildConfigFields.put("REPOSITORY_CHANGESET", versionCodeTask.map {
+            BuildConfigField("String", "\"${it.changesetOutputFile.get().asFile.readText()}\"", "Repository changeset")
+        })
     }
 }

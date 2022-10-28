@@ -19,10 +19,9 @@
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-import com.geekorum.build.computeChangesetVersionCode
+import com.geekorum.build.configureVersionChangeset
 import com.geekorum.build.dualTestImplementation
 import com.geekorum.build.enforcedDaggerPlatform
-import com.geekorum.build.getChangeSet
 import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
 import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsPlugin
 
@@ -42,6 +41,13 @@ plugins {
 
 val composeVersion = "1.2.1"
 
+androidComponents {
+    val major = 1
+    val minor = 5
+    val patch = 2
+    configureVersionChangeset(project, major, minor, patch)
+}
+
 android {
     val compileSdkInt: Int by rootProject.extra
     compileSdk = compileSdkInt
@@ -49,12 +55,6 @@ android {
         applicationId = "com.geekorum.ttrss"
         minSdk = 24
         targetSdk = 31
-        val major = 1
-        val minor = 5
-        val patch = 2
-        versionCode = computeChangesetVersionCode(major, minor, patch)
-        versionName = "$major.$minor.$patch"
-        buildConfigField("String", "REPOSITORY_CHANGESET", "\"${getChangeSet()}\"")
 
         sourceSets {
             named("androidTest") {
