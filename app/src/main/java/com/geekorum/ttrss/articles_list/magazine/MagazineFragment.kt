@@ -40,6 +40,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.*
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -76,8 +77,9 @@ class MagazineFragment: Fragment() {
 
                     val nestedScrollInterop = rememberNestedScrollInteropConnection()
                     Surface(Modifier.fillMaxSize()
-//                             disabled for now because of https://issuetracker.google.com/issues/236451818
-//                            .nestedScroll(nestedScrollInterop)
+                        // seems to be much better in compose 1.3.0 but keep a look on it
+                        // https://issuetracker.google.com/issues/236451818
+                        .nestedScroll(nestedScrollInterop)
                     ) {
                         ArticlesMagazine(
                             viewModel = magazineViewModel,

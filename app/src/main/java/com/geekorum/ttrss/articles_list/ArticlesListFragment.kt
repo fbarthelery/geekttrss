@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -82,8 +83,9 @@ abstract class BaseArticlesListFragment : Fragment() {
 
                     val nestedScrollInterop = rememberNestedScrollInteropConnection()
                     Surface(Modifier.fillMaxSize()
-//                             disabled for now because of https://issuetracker.google.com/issues/236451818
-//                            .nestedScroll(nestedScrollInterop)
+                        // seems to be much better in compose 1.3.0 but keep a look on it
+                        // https://issuetracker.google.com/issues/236451818
+                            .nestedScroll(nestedScrollInterop)
                     ) {
                         ArticleCardList(
                             viewModel = articlesViewModel,
