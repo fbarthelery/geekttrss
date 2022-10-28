@@ -39,7 +39,7 @@ plugins {
     id("dagger.hilt.android.plugin")
 }
 
-val composeVersion = "1.2.1"
+val composeVersion = "2022.10.00"
 
 androidComponents {
     val major = 1
@@ -150,28 +150,29 @@ dependencies {
     implementation("androidx.preference:preference-ktx:1.2.0")
 
     // compose
-    api("androidx.compose.ui:ui:$composeVersion")
-    api("androidx.compose.ui:ui-util:$composeVersion")
-    api("androidx.compose.foundation:foundation:$composeVersion")
-    api("androidx.compose.material:material:$composeVersion")
-    api("androidx.compose.material:material-icons-core:$composeVersion")
-    api("androidx.compose.material:material-icons-extended:$composeVersion")
-    api("androidx.compose.material3:material3-window-size-class:1.0.0-beta01")
-    api("androidx.compose.ui:ui-viewbinding:$composeVersion")
-    api("androidx.activity:activity-compose:1.5.1")
-    api("androidx.compose.runtime:runtime-livedata:$composeVersion")
-    api("androidx.compose.animation:animation-graphics:$composeVersion")
-    api("androidx.paging:paging-compose:1.0.0-alpha16")
-    val accompanistVersion = "0.25.1"
+    api(platform("androidx.compose:compose-bom:$composeVersion"))
+    api("androidx.compose.ui:ui")
+    api("androidx.compose.ui:ui-util")
+    api("androidx.compose.foundation:foundation")
+    api("androidx.compose.material:material")
+    api("androidx.compose.material:material-icons-core")
+    api("androidx.compose.material:material-icons-extended")
+    api("androidx.compose.material3:material3-window-size-class")
+    api("androidx.compose.ui:ui-viewbinding")
+    api("androidx.activity:activity-compose:1.6.1")
+    api("androidx.compose.runtime:runtime-livedata")
+    api("androidx.compose.animation:animation-graphics")
+    api("androidx.paging:paging-compose:1.0.0-alpha17")
+    val accompanistVersion = "0.27.0"
     api("com.google.accompanist:accompanist-insets-ui:$accompanistVersion")
     api("com.google.accompanist:accompanist-swiperefresh:$accompanistVersion")
     api("com.google.accompanist:accompanist-drawablepainter:$accompanistVersion")
-    api("androidx.compose.ui:ui-tooling:$composeVersion")
+    api("androidx.compose.ui:ui-tooling")
 
 
     // for layout inspector
-    debugImplementation("androidx.compose.ui:ui-tooling:$composeVersion")
-    implementation("androidx.compose.ui:ui-tooling-preview:$composeVersion")
+    debugImplementation("androidx.compose.ui:ui-tooling")
+    implementation("androidx.compose.ui:ui-tooling-preview")
 
     // androidx others
     implementation("androidx.browser:browser:1.4.0")
