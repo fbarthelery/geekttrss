@@ -45,6 +45,7 @@ class OnDemandModuleNavHostFragment @Inject constructor(
 
     override fun onCreateNavHostController(navHostController: NavHostController) {
         if (!onDemandModuleManager.canInstallModule) {
+            @Suppress("DEPRECATION")
             onCreateNavController(navHostController)
             Timber.i("The application can't install dynamic feature modules. Fallback to standard navigators")
             // restore default navigator (undo DynamicNavHostFragment
