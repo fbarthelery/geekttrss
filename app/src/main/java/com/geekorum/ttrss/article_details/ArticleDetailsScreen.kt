@@ -54,6 +54,8 @@ import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleContentIndexed
 import com.geekorum.ttrss.ui.AppTheme
 import com.google.accompanist.insets.ui.Scaffold
+import com.google.accompanist.web.AccompanistWebViewClient
+import com.google.accompanist.web.rememberWebViewStateWithHTMLData
 import kotlinx.coroutines.delay
 import java.util.*
 
@@ -127,7 +129,7 @@ fun ArticleDetailsScreen(
     heightSizeClass: WindowHeightSizeClass,
     onNavigateUpClick: () -> Unit,
     onArticleClick: (Article) -> Unit,
-    webViewClient: WebViewClient? = null,
+    webViewClient: AccompanistWebViewClient,
 ) {
     if (widthSizeClass == WindowWidthSizeClass.Compact || heightSizeClass == WindowHeightSizeClass.Compact) {
         ArticleDetailsScreen(
@@ -151,7 +153,7 @@ fun ArticleDetailsScreenHero(
     articleDetailsViewModel: ArticleDetailsViewModel,
     onNavigateUpClick: () -> Unit,
     onArticleClick: (Article) -> Unit,
-    webViewClient: WebViewClient? = null) {
+    webViewClient: AccompanistWebViewClient) {
     val articleDetailsScreenState = rememberArticleDetailsScreenState()
 
     val article by articleDetailsViewModel.article.observeAsState()
@@ -215,7 +217,7 @@ private fun ArticleDetailsHeroContent(
     readMoreArticles: List<ArticleWithTag>,
     onArticleClick: (Article) -> Unit,
     modifier: Modifier = Modifier,
-    webViewClient: WebViewClient? = null,
+    webViewClient: AccompanistWebViewClient,
     scrollState: ScrollState = rememberScrollState(),
 ) {
     ArticleDetailsHeroContent(
@@ -226,7 +228,7 @@ private fun ArticleDetailsHeroContent(
         scrollState = scrollState,
     ) {
         val context = LocalContext.current
-        val baseUrl = article.link.toUri().let { "${it.scheme}://${it.host}" }
+        val baseUrl = article.link.toUri().let { "${it.scheme}://${it.host}/" }
         val content = remember(context, article) {
             val cssOverride = createCssOverride(context)
             prepareArticleContent(article.content, cssOverride)
@@ -282,7 +284,7 @@ fun ArticleDetailsScreen(
     articleDetailsViewModel: ArticleDetailsViewModel,
     onNavigateUpClick: () -> Unit,
     onArticleClick: (Article) -> Unit,
-    webViewClient: WebViewClient? = null,
+    webViewClient: AccompanistWebViewClient,
 ) {
     val articleDetailsScreenState = rememberArticleDetailsScreenState()
 
@@ -371,11 +373,11 @@ private fun ArticleDetailsContent(
     readMoreArticles: List<ArticleWithTag>,
     onArticleClick: (Article) -> Unit,
     modifier: Modifier = Modifier,
-    webViewClient: WebViewClient? = null,
+    webViewClient: AccompanistWebViewClient,
     scrollState: ScrollState = rememberScrollState()
 ) {
     ArticleDetailsContent(article, readMoreArticles, onArticleClick , modifier, scrollState) {
-        val baseUrl = article.link.toUri().let { "${it.scheme}://${it.host}" }
+        val baseUrl = article.link.toUri().let { "${it.scheme}://${it.host}/" }
         val context = LocalContext.current
         val content = remember(context, article) {
             val cssOverride = createCssOverride(context)
@@ -385,8 +387,8 @@ private fun ArticleDetailsContent(
         ArticleContentWebView(baseUrl = baseUrl, content = content,
             webViewClient = webViewClient,
             modifier = Modifier
-                .fillMaxSize()
                 .widthIn(max = 450.dp)
+                .wrapContentHeight()
                 .padding(vertical = verticalPadding)
         )
     }
@@ -410,7 +412,9 @@ private fun ArticleDetailsContent(
         )
         Divider(Modifier
             .fillMaxWidth())
-        articleContent()
+        Box(Modifier.fillMaxWidth()) {
+            articleContent()
+        }
 
         if (readMoreArticles.isNotEmpty()) {
             Divider(Modifier

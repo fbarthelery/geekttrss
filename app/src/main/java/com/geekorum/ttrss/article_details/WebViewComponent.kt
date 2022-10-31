@@ -21,81 +21,32 @@
 package com.geekorum.ttrss.article_details
 
 import android.webkit.WebSettings
-import android.webkit.WebView
-import android.webkit.WebViewClient
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
+import com.google.accompanist.web.AccompanistWebViewClient
+import com.google.accompanist.web.WebView
+import com.google.accompanist.web.rememberWebViewStateWithHTMLData
 
 @Composable
 fun ArticleContentWebView(
     baseUrl: String,
     content: String,
-    modifier: Modifier = Modifier,
-    webViewClient: WebViewClient? = null
+    webViewClient: AccompanistWebViewClient,
+    modifier: Modifier = Modifier
 ) {
-    val webview = rememberWebViewWithLifecycle()
-    AndroidView(
+    val state = rememberWebViewStateWithHTMLData(data = content, baseUrl = baseUrl)
+
+    WebView(state = state,
         modifier = modifier,
-        factory = {
-            webview.apply {
-                with(settings) {
-                    setSupportZoom(false)
-                    javaScriptEnabled = true
-                    mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-                    mediaPlaybackRequiresUserGesture = false
-                }
-                if (webViewClient != null) {
-                    this.webViewClient = webViewClient
-                }
+        captureBackPresses = false,
+        client = webViewClient,
+        onCreated = {
+            with(it.settings) {
+                setSupportZoom(false)
+                mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+                mediaPlaybackRequiresUserGesture = false
             }
-        },
-        update = {
-            it.loadDataWithBaseURL(baseUrl, content, "text/html", "utf-8", null)
         }
     )
 }
-
-
-@Composable
-fun rememberWebViewWithLifecycle(): WebView {
-    val context = LocalContext.current
-    val webview = remember {
-        WebView(context)
-    }
-
-    // Makes MapView follow the lifecycle of this composable
-    val lifecycleObserver = rememberWebViewLifecycleObserver(webview)
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
-    DisposableEffect(lifecycle) {
-        lifecycle.addObserver(lifecycleObserver)
-        onDispose {
-            lifecycle.removeObserver(lifecycleObserver)
-        }
-    }
-
-    return webview
-}
-
-@Composable
-private fun rememberWebViewLifecycleObserver(webview: WebView): LifecycleEventObserver =
-    remember(webview) {
-        LifecycleEventObserver { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_CREATE,
-                Lifecycle.Event.ON_START,
-                Lifecycle.Event.ON_STOP,
-                Lifecycle.Event.ON_DESTROY -> Unit
-                Lifecycle.Event.ON_RESUME -> webview.onResume()
-                Lifecycle.Event.ON_PAUSE -> webview.onPause()
-                else -> throw IllegalStateException()
-            }
-        }
-    }
 

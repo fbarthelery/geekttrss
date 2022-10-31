@@ -37,6 +37,7 @@ import androidx.annotation.ColorInt
 import androidx.core.content.res.ResourcesCompat
 import com.geekorum.geekdroid.network.OkHttpWebViewClient
 import com.geekorum.ttrss.R
+import com.google.accompanist.web.AccompanistWebViewClient
 import okhttp3.OkHttpClient
 import timber.log.Timber
 
@@ -50,17 +51,23 @@ class ArticleDetailsWebViewClient constructor(
     private val webFontProvider: WebFontProvider,
     private val openUrlInBrowser: (Context, Uri) -> Unit,
     private val onPageFinishedCallback: (WebView?, String?) -> Unit,
-) : OkHttpWebViewClient(okHttpClient) {
+) : AccompanistWebViewClient() {
 
-    override fun shouldOverrideUrlLoading(view: WebView, request: WebResourceRequest): Boolean {
-        val context = view.context
+    private val delegate = OkHttpWebViewClient(okHttpClient)
+
+    override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+        if (view?.url == request?.url.toString()) {
+            return false
+        }
+
+        val context = view?.context ?: return false
         try {
-            openInNonBrowserApp(context, request.url)
+            openInNonBrowserApp(context, request!!.url)
         } catch (e: ActivityNotFoundException) {
             // Only browser apps are available, or a browser is the default.
             // So you can open the URL directly in your app, for example in a
             // Custom Tab.
-            openUrlInBrowser(context, request.url)
+            openUrlInBrowser(context, request!!.url)
         }
         return true
     }
@@ -108,7 +115,7 @@ class ArticleDetailsWebViewClient constructor(
                 }
             }
         }
-        return super.shouldInterceptRequest(view, request)
+        return delegate.shouldInterceptRequest(view, request)
     }
 
     override fun onPageFinished(view: WebView?, url: String?) {

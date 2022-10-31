@@ -39,6 +39,7 @@ import com.geekorum.ttrss.session.SessionActivity
 import com.geekorum.ttrss.ui.AppTheme
 import com.geekorum.ttrss.ui.component1
 import com.geekorum.ttrss.ui.component2
+import com.google.accompanist.web.AccompanistWebViewClient
 import dagger.hilt.android.AndroidEntryPoint
 import okhttp3.OkHttpClient
 import javax.inject.Inject
@@ -53,7 +54,7 @@ import javax.inject.Inject
 class ArticleDetailActivity : SessionActivity() {
 
     private val articleDetailsViewModel: ArticleDetailsViewModel by viewModels()
-    private lateinit var webViewClient: WebViewClient
+    private lateinit var webViewClient: AccompanistWebViewClient
     @Inject lateinit var okHttpClient: OkHttpClient
     @Inject lateinit var webFontProvider: WebFontProvider
 

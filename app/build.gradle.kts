@@ -167,6 +167,7 @@ dependencies {
     api("com.google.accompanist:accompanist-insets-ui:$accompanistVersion")
     api("com.google.accompanist:accompanist-swiperefresh:$accompanistVersion")
     api("com.google.accompanist:accompanist-drawablepainter:$accompanistVersion")
+    api("com.google.accompanist:accompanist-webview:$accompanistVersion")
     api("androidx.compose.ui:ui-tooling")
 
 
