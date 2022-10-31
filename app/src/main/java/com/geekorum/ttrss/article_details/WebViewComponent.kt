@@ -41,6 +41,10 @@ fun ArticleContentWebView(
         captureBackPresses = false,
         client = webViewClient,
         onCreated = {
+            // webview doesn't clip its outline and thus its content overflow
+            // over other content in the ComposeView
+            // See  https://issuetracker.google.com/issues/242463987
+            it.clipToOutline = true
             with(it.settings) {
                 setSupportZoom(false)
                 mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
