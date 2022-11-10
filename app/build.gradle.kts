@@ -39,7 +39,7 @@ plugins {
     id("dagger.hilt.android.plugin")
 }
 
-val composeVersion = "2022.10.00"
+val composeVersion = "2022.11.00"
 
 androidComponents {
     val major = 1
