@@ -1,1 +1,5 @@
-Correction d'un bug empechant l'utilisation de l'authentication Http
+Ajout d'une vue Magazine qui affiche une sélection d'articles à lire
+Affichage de suggestions à la fin d'un article
+Affichage de l'icône et du nom du flux sur la carte de l'article
+Ajout d'un dialogue qui propose de noter l'application sur Google Play Store
+Diverses corrections de bugs et améliorations

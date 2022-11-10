@@ -43,8 +43,8 @@ val composeVersion = "2022.11.00"
 
 androidComponents {
     val major = 1
-    val minor = 5
-    val patch = 2
+    val minor = 6
+    val patch = 0
     configureVersionChangeset(project, major, minor, patch)
 }
 
