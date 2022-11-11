@@ -21,9 +21,9 @@
 package com.geekorum.ttrss.data
 
 import android.database.sqlite.SQLiteDatabase
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.core.content.contentValuesOf
 import androidx.paging.AsyncPagingDataDiffer
+import androidx.paging.LoadState
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.recyclerview.widget.DiffUtil
@@ -35,26 +35,32 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.geekorum.ttrss.data.ArticlesDatabase.Tables
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import org.junit.Rule
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.runner.RunWith
+import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @RunWith(AndroidJUnit4::class)
 class ArticleFullTextSearchTest {
 
-    @get:Rule
-    val roomRule = InstantTaskExecutorRule()
+    private val testDispatcher = StandardTestDispatcher()
 
     private lateinit var database: ArticlesDatabase
 
     @BeforeTest
     fun beforeTest() {
+        Dispatchers.setMain(testDispatcher)
         database = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(),
             ArticlesDatabase::class.java)
             .allowMainThreadQueries()
@@ -63,8 +69,14 @@ class ArticleFullTextSearchTest {
         createSomeArticles(database.openHelper.writableDatabase)
     }
 
+    @AfterTest
+    fun tearDown() {
+        database.close()
+        Dispatchers.resetMain()
+    }
+
     @Test
-    fun testAnFTSSearchPagedList() {
+    fun testAnFTSSearchPagedList() = runTest {
         val expected = ArticleWithFeed(
             article = Article(
             id = 1,
@@ -104,15 +116,15 @@ class ArticleFullTextSearchTest {
             articleDao.searchArticles("linux")
         }
 
-        runBlocking {
-            val submitJob = launch {
-                val data = pager.flow.first()
+        val submitJob = launch {
+            pager.flow.collectLatest { data ->
                 differ.submitData(data)
             }
-            // wait for the load: initial notLoading, Loading, notLoading
-            differ.loadStateFlow.take(3).collect()
-            submitJob.cancel()
         }
+        // wait for the load: initial Loading, notLoading
+        differ.loadStateFlow.takeWhile { it.refresh !is LoadState.NotLoading }.collect()
+        submitJob.cancel()
+
         assertThat(differ.snapshot()).containsExactly(expected)
     }
 
