@@ -23,22 +23,22 @@ package com.geekorum.ttrss.background_job
 import android.content.Context
 import androidx.annotation.Keep
 import androidx.startup.Initializer
-import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
-import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.android.EarlyEntryPoint
+import dagger.hilt.android.EarlyEntryPoints
 import dagger.hilt.components.SingletonComponent
 
 @Keep
 class BackgroundJobManagerInitializer : Initializer<BackgroundJobManager> {
 
-    @EntryPoint
+    @EarlyEntryPoint
     @InstallIn(SingletonComponent::class)
     interface BackgroundJobManagerEntryPoint {
         val backgroundJobManager: BackgroundJobManager
     }
 
     override fun create(context: Context): BackgroundJobManager {
-        val entryPoint = EntryPointAccessors.fromApplication(context, BackgroundJobManagerEntryPoint::class.java)
+        val entryPoint =  EarlyEntryPoints.get(context, BackgroundJobManagerEntryPoint::class.java)
         val backgroundJobManager = entryPoint.backgroundJobManager
         backgroundJobManager.setupPeriodicJobs()
         return backgroundJobManager

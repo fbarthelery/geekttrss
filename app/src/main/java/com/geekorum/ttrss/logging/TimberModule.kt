@@ -25,9 +25,9 @@ import androidx.annotation.Keep
 import androidx.startup.Initializer
 import com.geekorum.geekdroid.dagger.AppInitializersModule
 import dagger.Module
-import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
-import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.android.EarlyEntryPoint
+import dagger.hilt.android.EarlyEntryPoints
 import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.Multibinds
 import timber.log.Timber
@@ -47,7 +47,7 @@ abstract class TimberModule {
 @Keep
 class TimberInitializer : Initializer<Unit> {
 
-    @EntryPoint
+    @EarlyEntryPoint
     @InstallIn(SingletonComponent::class)
     interface TimberEntryPoint {
         // dagger provides java.util.set which is mutable
@@ -55,7 +55,7 @@ class TimberInitializer : Initializer<Unit> {
     }
 
     override fun create(context: Context) {
-        val entryPoint = EntryPointAccessors.fromApplication(context, TimberEntryPoint::class.java)
+        val entryPoint =  EarlyEntryPoints.get(context, TimberEntryPoint::class.java)
         val timberTrees = entryPoint.timberTrees
         Timber.plant(*timberTrees.toTypedArray())
     }

@@ -25,21 +25,21 @@ import androidx.annotation.Keep
 import androidx.startup.Initializer
 import androidx.work.Configuration
 import androidx.work.WorkManager
-import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
-import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.android.EarlyEntryPoint
+import dagger.hilt.android.EarlyEntryPoints
 import dagger.hilt.components.SingletonComponent
 
 @Keep
 class WorkManagerInitializer : Initializer<WorkManager> {
-    @EntryPoint
+    @EarlyEntryPoint
     @InstallIn(SingletonComponent::class)
     interface WorkManagerEntryPoint {
         val workManagerConfiguration: Configuration
     }
 
     override fun create(context: Context): WorkManager {
-        val entryPoint = EntryPointAccessors.fromApplication(context, WorkManagerEntryPoint::class.java)
+        val entryPoint = EarlyEntryPoints.get(context, WorkManagerEntryPoint::class.java)
         val configuration = entryPoint.workManagerConfiguration
         WorkManager.initialize(context, configuration)
         return WorkManager.getInstance(context)
