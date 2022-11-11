@@ -55,9 +55,6 @@ allprojects {
         google().setupGoogleContent()
         mavenCentral()
         // for geekdroid
-        flatDir {
-            dirs(rootProject.files("libs"))
-        }
         maven {
             url = uri("https://jitpack.io")
         }
