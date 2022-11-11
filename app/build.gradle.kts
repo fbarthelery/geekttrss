@@ -55,7 +55,7 @@ android {
     defaultConfig {
         applicationId = "com.geekorum.ttrss"
         minSdk = 24
-        targetSdk = 31
+        targetSdk = 33
 
         sourceSets {
             named("androidTest") {
