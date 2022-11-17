@@ -163,8 +163,9 @@ dependencies {
     api("androidx.compose.runtime:runtime-livedata")
     api("androidx.compose.animation:animation-graphics")
     api("androidx.paging:paging-compose:1.0.0-alpha17")
-    val accompanistVersion = "0.27.0"
+    val accompanistVersion = "0.27.1"
     api("com.google.accompanist:accompanist-insets-ui:$accompanistVersion")
+//  TODO see issue https://issuetracker.google.com/issues/248274004 before switching to material PullRefresh
     api("com.google.accompanist:accompanist-swiperefresh:$accompanistVersion")
     api("com.google.accompanist:accompanist-drawablepainter:$accompanistVersion")
     api("com.google.accompanist:accompanist-webview:$accompanistVersion")
