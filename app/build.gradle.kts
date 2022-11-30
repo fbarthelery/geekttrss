@@ -200,7 +200,6 @@ dependencies {
     val coilVersion = "2.2.2"
     implementation("io.coil-kt:coil:$coilVersion")
     implementation("io.coil-kt:coil-compose:$coilVersion")
-    implementation("com.google.android.gms:play-services-oss-licenses:17.0.0")
 
     implementation("org.jsoup:jsoup:1.13.1")
 

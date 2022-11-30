@@ -63,9 +63,10 @@
 
         <Preference
                 android:key="about_oss"
-                android:title="@string/oss_license_title"
+                android:title="@string/pref_title_oss_license"
+                android:summary="@string/pref_summary_oss_license"
                 >
-            <intent android:targetClass="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
+            <intent android:targetClass="com.geekorum.ttrss.settings.licenses.OpenSourceLicensesActivity"
                     android:targetPackage="@string/package_name"
                     />
         </Preference>

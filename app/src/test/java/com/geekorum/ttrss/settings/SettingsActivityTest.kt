@@ -20,7 +20,7 @@
  */
 package com.geekorum.ttrss.settings
 
-import android.content.Context
+import android.app.Application
 import androidx.recyclerview.widget.RecyclerView
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
@@ -34,38 +34,40 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.ext.truth.content.IntentSubject
 import com.geekorum.ttrss.R
-import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
-import com.google.common.truth.Truth.assertThat
+import com.geekorum.ttrss.settings.licenses.OpenSourceLicensesActivity
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
+import dagger.hilt.android.testing.HiltTestApplication
 import org.junit.Rule
 import org.junit.runner.RunWith
-import kotlin.reflect.jvm.jvmName
-import kotlin.test.Ignore
+import org.robolectric.annotation.Config
 import kotlin.test.Test
 
-/*
- * For some reasons, when it's a Robolectric test the activity doesn't launch (or synchronization is bad) so we only check
- * if the correct intent is fired. See androidTest/com.geekorum.test.SettingsActivityTest for a more complete test.
- */
 @RunWith(AndroidJUnit4::class)
-@Ignore("IntentsTestRule cause an IllegalStateException during layout pass of recyclerview")
+@HiltAndroidTest
+@Config(application = HiltTestApplication::class)
 class SettingsActivityTest {
 
     @get:Rule
-    val activityRule = IntentsTestRule(SettingsActivity::class.java)
+    val hiltRule = HiltAndroidRule(this)
 
+    @get:Rule
+    val intentsTestRule = IntentsTestRule(SettingsActivity::class.java)
 
     @Test
-    fun testThatWeCanShowDependenciesOpenSourcesLicenses() {
+    fun testThatClickOnOpenSourceLicensesOpensOpenSourcesLicensesActivity() {
         // click on OSS licenses
         onView(withId(R.id.recycler_view))
-            .perform(actionOnItem<RecyclerView.ViewHolder>(hasDescendant(withText(R.string.oss_license_title)),
-                click()))
+            .perform(
+                actionOnItem<RecyclerView.ViewHolder>(
+                    hasDescendant(withText(R.string.pref_title_oss_license)),
+                    click()
+                )
+            )
 
-        val intents = Intents.getIntents()
-        assertThat(intents).hasSize(1)
-        val intent = intents.first()
-
-        val applicationContext = ApplicationProvider.getApplicationContext<Context>()
-        IntentSubject.assertThat(intent).hasComponent(applicationContext.packageName, OssLicensesMenuActivity::class.jvmName)
+        val receivedIntent = Intents.getIntents().single()
+        IntentSubject.assertThat(receivedIntent).hasComponentClass(OpenSourceLicensesActivity::class.java)
+        val applicationContext = ApplicationProvider.getApplicationContext<Application>()
+        IntentSubject.assertThat(receivedIntent).hasComponentPackage(applicationContext.packageName)
     }
 }
