@@ -183,7 +183,7 @@ dependencies {
     // needed by robolectric
     implementation("androidx.loader:loader:1.1.0")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
 
     //geekdroid
@@ -228,6 +228,7 @@ dependencies {
     kaptTest("com.google.dagger:hilt-compiler:$daggerVersion")
     androidTestImplementation("com.google.dagger:hilt-android-testing:$daggerVersion")
     kaptAndroidTest("com.google.dagger:hilt-compiler:$daggerVersion")
+    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
 
 
     val roomVersion = "2.4.3"
@@ -274,6 +275,7 @@ dependencies {
     api("androidx.navigation:navigation-fragment-ktx:$navigationVersion")
     api("androidx.navigation:navigation-ui-ktx:$navigationVersion")
     api("androidx.navigation:navigation-dynamic-features-fragment:$navigationVersion")
+    api("androidx.navigation:navigation-compose:$navigationVersion")
 
     // fragment testing declare some activities and resources that needs to be in the apk
     // we don't use it. here but it is used in feature modules

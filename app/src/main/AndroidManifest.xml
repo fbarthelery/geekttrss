@@ -115,6 +115,12 @@
             android:exported="false"
             />
 
+        <activity android:name=".settings.licenses.OpenSourceLicensesActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName="com.geekorum.ttrss.settings.SettingsActivity"
+            android:exported="false"
+            />
+
         <service android:name="com.geekorum.ttrss.accounts.AuthenticatorService"
                  android:exported="true"
                  tools:ignore="ExportedService">

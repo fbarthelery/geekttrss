@@ -72,6 +72,8 @@
     <string name="pref_summary_about_version">%1$s-%2$s</string>
     <string name="pref_category_development">Development</string>
     <string name="pref_title_manage_features">Manage features</string>
+    <string name="pref_title_oss_license">Open source licenses</string>
+    <string name="pref_summary_oss_license">License details for open source software</string>
 
     <!-- Manage features fragment -->
     <string name="btn_install_feature">Install</string>
