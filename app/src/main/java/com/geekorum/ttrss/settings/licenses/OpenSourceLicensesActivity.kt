@@ -20,6 +20,7 @@
  */
 package com.geekorum.ttrss.settings.licenses
 
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
@@ -60,7 +61,7 @@ fun DependencyNavHost(
             OpenSourceDependenciesListScreen(
                 viewModel = openSourceLicensesViewModel,
                 onDependencyClick = {
-                    navController.navigate("dependency_license/$it")
+                    navController.navigate("dependency_license/${Uri.encode(it)}")
                 },
                 onUpClick = navigateUp
             )
