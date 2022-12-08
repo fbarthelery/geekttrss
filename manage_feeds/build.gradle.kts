@@ -96,9 +96,9 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.recyclerview:recyclerview:1.2.1")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
-    implementation("com.google.android.material:material:1.6.1")
+    implementation("com.google.android.material:material:1.7.0")
 
-    implementation("androidx.core:core-ktx:1.8.0")
+    implementation("androidx.core:core-ktx:1.9.0")
 
     val lifecycleVersion = "2.5.1"
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
@@ -109,17 +109,16 @@ dependencies {
     implementation(project(":htmlparsers"))
     implementation(project(":webapi"))
 
-    implementation("io.coil-kt:coil:2.2.0")
+    implementation("io.coil-kt:coil:2.2.2")
 
     androidTestImplementation("androidx.work:work-testing:2.7.1")
     dualTestImplementation("androidx.arch.core:core-testing:2.1.0")
     androidTestImplementation("com.squareup.okhttp3:mockwebserver:4.9.3")
 
-    debugImplementation("androidx.fragment:fragment-testing:1.5.2")
+    // alpha for manifest
+    debugImplementation("androidx.fragment:fragment-testing-manifest:1.6.0-alpha04")
+    androidTestImplementation("androidx.fragment:fragment-testing-manifest:1.6.0-alpha04")
 
-    // the test apk need these dependencies because they provide some of its resources
-    // likely due to manifest merging with :app manifest
-    androidTestImplementation("androidx.fragment:fragment-testing:1.5.2")
     androidTestImplementation("com.squareup.leakcanary:leakcanary-android:2.9.1")
     androidTestImplementation("com.google.android.gms:play-services-oss-licenses:17.0.0")
     androidTestImplementation("com.google.android.play:core-ktx:1.8.1")

@@ -137,7 +137,7 @@ kapt {
 dependencies {
 
     implementation("androidx.core:core-ktx:1.9.0")
-    implementation("androidx.fragment:fragment-ktx:1.5.4")
+    implementation("androidx.fragment:fragment-ktx:1.5.5")
     implementation("androidx.activity:activity-ktx:1.6.1")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
 
@@ -164,7 +164,7 @@ dependencies {
     api("androidx.compose.runtime:runtime-livedata")
     api("androidx.compose.animation:animation-graphics")
     api("androidx.paging:paging-compose:1.0.0-alpha17")
-    val accompanistVersion = "0.27.1"
+    val accompanistVersion = "0.28.0"
     api("com.google.accompanist:accompanist-insets-ui:$accompanistVersion")
     api("com.google.accompanist:accompanist-drawablepainter:$accompanistVersion")
     api("com.google.accompanist:accompanist-webview:$accompanistVersion")
@@ -277,9 +277,8 @@ dependencies {
     api("androidx.navigation:navigation-dynamic-features-fragment:$navigationVersion")
     api("androidx.navigation:navigation-compose:$navigationVersion")
 
-    // fragment testing declare some activities and resources that needs to be in the apk
-    // we don't use it. here but it is used in feature modules
-    debugImplementation("androidx.fragment:fragment-testing:1.5.4")
+    // alpha for manifest
+    debugImplementation("androidx.fragment:fragment-testing-manifest:1.6.0-alpha04")
 
     debugImplementation("com.squareup.leakcanary:leakcanary-android:2.9.1")
 }
