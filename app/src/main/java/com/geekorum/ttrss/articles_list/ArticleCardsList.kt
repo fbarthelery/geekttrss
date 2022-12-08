@@ -31,9 +31,14 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.DismissDirection
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.PullRefreshState
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -56,9 +61,6 @@ import com.geekorum.ttrss.data.ArticleContentIndexed
 import com.geekorum.ttrss.data.ArticleWithFeed
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.ui.AppTheme
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.SwipeRefreshState
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
@@ -93,6 +95,7 @@ enum class PagingViewLoadState {
 }
 
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ArticleCardList(
     viewModel: BaseArticlesViewModel,
@@ -103,7 +106,9 @@ fun ArticleCardList(
     additionalContentPaddingBottom: Dp = 0.dp,
 ) {
     val isRefreshing by viewModel.isRefreshing.observeAsState(false)
-    val swipeRefreshState = rememberSwipeRefreshState(isRefreshing)
+    val pullRefreshState = rememberPullRefreshState(isRefreshing, onRefresh = {
+        viewModel.refresh()
+    })
     val articles = viewModel.articles.collectAsLazyPagingItems()
     val isMultiFeedList by viewModel.isMultiFeed.collectAsState()
 
@@ -123,8 +128,8 @@ fun ArticleCardList(
     ArticleCardList(
         articles = articles,
         isMultiFeedList = isMultiFeedList,
-        swipeRefreshState = swipeRefreshState,
-        onRefresh = { viewModel.refresh() },
+        isRefreshing = isRefreshing,
+        pullRefreshState = pullRefreshState,
         onCardClick = onCardClick,
         onShareClick = onShareClick,
         onOpenInBrowserClick = onOpenInBrowserClick,
@@ -143,12 +148,13 @@ fun ArticleCardList(
 
 }
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 private fun ArticleCardList(
     articles: LazyPagingItems<ArticleWithFeed>,
     isMultiFeedList: Boolean,
-    onRefresh: () -> Unit,
+    isRefreshing: Boolean,
+    pullRefreshState: PullRefreshState,
     onCardClick: (Int, Article) -> Unit,
     onShareClick: (Article) -> Unit,
     onOpenInBrowserClick: (Article) -> Unit,
@@ -156,26 +162,22 @@ private fun ArticleCardList(
     onStarChanged: (Article, Boolean) -> Unit,
     onSwiped: (Article) -> Unit,
     modifier: Modifier = Modifier,
-    swipeRefreshState: SwipeRefreshState = rememberSwipeRefreshState(false),
     additionalContentPaddingBottom: Dp = 0.dp,
 ) {
-    SwipeRefresh(swipeRefreshState,
-        onRefresh = onRefresh,
-        modifier = modifier
-    ) {
+    Box(modifier.pullRefresh(pullRefreshState)) {
         val loadState by pagingViewStateFor(articles)
         val isEmpty = articles.itemCount == 0
         if (isEmpty && loadState == PagingViewLoadState.LOADED) {
-            FeedEmptyText(swipeRefreshState.isRefreshing)
-            return@SwipeRefresh
+            FeedEmptyText(isRefreshing)
+            return@Box
         }
 
         val listState = rememberLazyListState()
         var animateItemAppearance by remember { mutableStateOf(true) }
         val navBarPadding = WindowInsets.navigationBars.asPaddingValues()
         val contentPadding = PaddingValues(
-            start =  navBarPadding.calculateStartPadding(LocalLayoutDirection.current) +8.dp,
-            top =  navBarPadding.calculateTopPadding() +8.dp,
+            start = navBarPadding.calculateStartPadding(LocalLayoutDirection.current) + 8.dp,
+            top = navBarPadding.calculateTopPadding() + 8.dp,
             end = navBarPadding.calculateEndPadding(LocalLayoutDirection.current) + 8.dp,
             bottom = navBarPadding.calculateBottomPadding() + additionalContentPaddingBottom
         )
@@ -203,7 +205,8 @@ private fun ArticleCardList(
                     visibilityState.targetState = true
                 }
 
-                AnimatedVisibility(visibilityState,
+                AnimatedVisibility(
+                    visibilityState,
                     enter = fadeIn() + slideInVertically { it / 3 },
                     modifier = Modifier.animateItemPlacement()
                 ) {
@@ -222,6 +225,8 @@ private fun ArticleCardList(
                 }
             }
         }
+
+        PullRefreshIndicator(isRefreshing, pullRefreshState, Modifier.align(Alignment.TopCenter))
     }
 }
 
@@ -317,6 +322,7 @@ private fun ChangeReadBehindItem(dismissDirection: DismissDirection) {
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun ArticleCardList() {
     val articles = List(25) {
@@ -332,7 +338,8 @@ private fun ArticleCardList() {
     ArticleCardList(
         articles = pagingItems,
         isMultiFeedList = false,
-        onRefresh = {},
+        isRefreshing = false,
+        pullRefreshState = rememberPullRefreshState(refreshing = false, onRefresh = { }),
         onCardClick = { _, _ -> },
         onShareClick = {},
         onOpenInBrowserClick = {},

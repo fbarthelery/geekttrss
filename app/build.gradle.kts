@@ -39,7 +39,7 @@ plugins {
     id("dagger.hilt.android.plugin")
 }
 
-val composeVersion = "2022.11.00"
+val composeVersion = "2022.12.00"
 
 androidComponents {
     val major = 1
@@ -154,7 +154,8 @@ dependencies {
     api("androidx.compose.ui:ui")
     api("androidx.compose.ui:ui-util")
     api("androidx.compose.foundation:foundation")
-    api("androidx.compose.material:material")
+    // alpha for fix to PullRefreshState
+    api("androidx.compose.material:material:1.4.0-alpha03")
     api("androidx.compose.material:material-icons-core")
     api("androidx.compose.material:material-icons-extended")
     api("androidx.compose.material3:material3-window-size-class")
@@ -165,8 +166,6 @@ dependencies {
     api("androidx.paging:paging-compose:1.0.0-alpha17")
     val accompanistVersion = "0.27.1"
     api("com.google.accompanist:accompanist-insets-ui:$accompanistVersion")
-//  TODO see issue https://issuetracker.google.com/issues/248274004 before switching to material PullRefresh
-    api("com.google.accompanist:accompanist-swiperefresh:$accompanistVersion")
     api("com.google.accompanist:accompanist-drawablepainter:$accompanistVersion")
     api("com.google.accompanist:accompanist-webview:$accompanistVersion")
     api("androidx.compose.ui:ui-tooling")

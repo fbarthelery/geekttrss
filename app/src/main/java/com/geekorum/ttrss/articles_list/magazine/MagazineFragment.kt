@@ -34,7 +34,11 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Surface
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -55,8 +59,6 @@ import com.geekorum.ttrss.articles_list.*
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleWithFeed
 import com.geekorum.ttrss.ui.AppTheme
-import com.google.accompanist.swiperefresh.SwipeRefresh
-import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 
@@ -122,7 +124,7 @@ class MagazineFragment: Fragment() {
 }
 
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 private fun ArticlesMagazine(
     viewModel: MagazineViewModel,
@@ -134,12 +136,10 @@ private fun ArticlesMagazine(
 ) {
 
     val isRefreshing by viewModel.isRefreshing.observeAsState(false)
-    SwipeRefresh(rememberSwipeRefreshState(isRefreshing),
-        onRefresh = {
-            viewModel.refreshMagazine()
-        },
-        modifier = modifier
-    ) {
+    val pullRefreshState = rememberPullRefreshState(isRefreshing, onRefresh = {
+        viewModel.refreshMagazine()
+    })
+    Box(modifier.pullRefresh(pullRefreshState)) {
         val pagingItems = viewModel.articles.collectAsLazyPagingItems()
         val loadState by pagingViewStateFor(pagingItems)
         val isEmpty = pagingItems.itemCount == 0
@@ -156,15 +156,15 @@ private fun ArticlesMagazine(
 
         if (isEmpty && loadState == PagingViewLoadState.LOADED) {
             FeedEmptyText(isRefreshing)
-            return@SwipeRefresh
+            return@Box
         }
 
         val listState = rememberLazyListState()
         var animateItemAppearance by remember { mutableStateOf(true) }
         val navBarPadding = WindowInsets.navigationBars.asPaddingValues()
         val contentPadding = PaddingValues(
-            start =  navBarPadding.calculateStartPadding(LocalLayoutDirection.current) +8.dp,
-            top =  navBarPadding.calculateTopPadding() +8.dp,
+            start = navBarPadding.calculateStartPadding(LocalLayoutDirection.current) + 8.dp,
+            top = navBarPadding.calculateTopPadding() + 8.dp,
             end = navBarPadding.calculateEndPadding(LocalLayoutDirection.current) + 8.dp,
             bottom = navBarPadding.calculateBottomPadding() + additionalContentPaddingBottom
         )
@@ -185,7 +185,7 @@ private fun ArticlesMagazine(
                     if (!animateItemAppearance) {
                         return@LaunchedEffect
                     }
-                    if (index == listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ) {
+                    if (index == listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index) {
                         animateItemAppearance = false
                     }
                     delay(38L * index)
@@ -207,6 +207,8 @@ private fun ArticlesMagazine(
                 }
             }
         }
+
+        PullRefreshIndicator(isRefreshing, pullRefreshState, Modifier.align(Alignment.TopCenter))
     }
 
 }
