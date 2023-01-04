@@ -20,6 +20,7 @@
  */
 package com.geekorum.ttrss.sync
 
+import android.security.NetworkSecurityPolicy
 import com.geekorum.favikonsnoop.AdaptiveDimension
 import com.geekorum.favikonsnoop.FaviKonSnoop
 import com.geekorum.favikonsnoop.FaviconInfo
@@ -36,12 +37,8 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
-import okhttp3.Call
-import okhttp3.Callback
+import okhttp3.*
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
 import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
@@ -53,13 +50,13 @@ private const val NB_LOOKUP_COROUTINES = 5
 /**
  * Update icon's url for every feed.
  */
-@OptIn(ExperimentalCoroutinesApi::class)
 class FeedIconSynchronizer @Inject constructor(
     private val dispatchers: CoroutineDispatchersProvider,
     private val databaseService: DatabaseService,
     private val faviKonSnoop: FaviKonSnoop,
     private val okHttpClient: OkHttpClient,
-    private val httpCacher: HttpCacher
+    private val httpCacher: HttpCacher,
+    private val networkSecurityPolicy: NetworkSecurityPolicy,
 ) {
 
     suspend fun synchronizeFeedIcons() {
@@ -100,7 +97,7 @@ class FeedIconSynchronizer @Inject constructor(
         val articleUrl = (article?.link ?: feed.url).toHttpUrlOrNull()
 
         val favIconInfos = articleUrl?.newBuilder()?.encodedPath("/")?.build()?.let { url ->
-            faviKonSnoop.findFavicons(url)
+            findFavicons(url)
         } ?: emptyList()
 
         val selectedIcon = selectBestIcon(favIconInfos)
@@ -109,7 +106,24 @@ class FeedIconSynchronizer @Inject constructor(
             // if no icon is selected, don't update and let the default url
             databaseService.updateFeedIconUrl(feed.id, url.toString())
         }
+    }
 
+    private fun findFavicons(url: HttpUrl) : Collection<FaviconInfo> {
+        val httpsUrl = url.newBuilder().scheme("https").build()
+        try {
+            return faviKonSnoop.findFavicons(httpsUrl)
+        } catch (e: Exception) {
+            Timber.w(e, "Unable to find favicons for $httpsUrl")
+        }
+        // fallback to http
+        if (networkSecurityPolicy.isCleartextTrafficPermitted(url.host) && !url.isHttps) {
+            try {
+                return faviKonSnoop.findFavicons(httpsUrl)
+            } catch (e: Exception) {
+                Timber.w(e, "Unable to find favicons for $url")
+            }
+        }
+        return emptyList()
     }
 
     private suspend fun selectBestIcon(favIconInfos: Collection<FaviconInfo>): FaviconInfo? {
@@ -119,9 +133,11 @@ class FeedIconSynchronizer @Inject constructor(
                 is FixedDimension -> dimension.height * dimension.width
                 null -> Int.MIN_VALUE
             }
+        }.filter {
+            networkSecurityPolicy.isCleartextTrafficPermitted(it.url.host)
         }
 
-        return sortedIcons.asSequence().firstOrNull {
+        return sortedIcons.firstOrNull {
             try {
                 val request = Request.Builder()
                     .head()
