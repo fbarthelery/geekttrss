@@ -20,7 +20,6 @@
  */
 package com.geekorum.ttrss.data
 
-import com.geekorum.ttrss.data.Metadata
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -54,8 +53,8 @@ abstract class SynchronizationDao {
     @Query("SELECT * FROM articles WHERE _id=:id")
     abstract suspend fun getArticleById(id: Long): Article?
 
-    @Query("SELECT * FROM articles WHERE feed_id=:feedId LIMIT 1")
-    abstract fun getArticleFromFeed(feedId: Long): Article?
+    @Query("SELECT * FROM articles WHERE feed_id=:feedId ORDER BY feed_id DESC LIMIT 1")
+    abstract fun getLatestArticleFromFeed(feedId: Long): Article?
 
     @Update
     abstract suspend fun updateArticle(article: Article)

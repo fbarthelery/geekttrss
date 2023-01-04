@@ -60,7 +60,7 @@ class SynchronizationFacade @Inject constructor(
 
     override suspend fun getArticle(id: Long): Article? = synchronizationDao.getArticleById(id)
 
-    override suspend fun getRandomArticleFromFeed(feedId: Long): Article? = synchronizationDao.getArticleFromFeed(feedId)
+    override suspend fun getLatestArticleFromFeed(feedId: Long): Article? = synchronizationDao.getLatestArticleFromFeed(feedId)
 
     override suspend fun insertArticles(articles: List<Article>) = synchronizationDao.insertArticles(articles)
     override suspend fun insertArticleTags(articlesTags: List<ArticlesTags>) {

@@ -48,7 +48,7 @@ interface DatabaseService {
     suspend fun deleteTransaction(transaction: Transaction)
 
     suspend fun getArticle(id: Long): Article?
-    suspend fun getRandomArticleFromFeed(feedId: Long): Article?
+    suspend fun getLatestArticleFromFeed(feedId: Long): Article?
     suspend fun insertArticles(articles: List<Article>)
     suspend fun insertArticleTags(articlesTags: List<ArticlesTags>)
     suspend fun updateArticle(article: Article)

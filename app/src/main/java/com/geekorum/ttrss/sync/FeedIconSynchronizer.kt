@@ -96,7 +96,7 @@ class FeedIconSynchronizer @Inject constructor(
     private suspend fun updateFeedIcon(feed: Feed) {
         // TODO this doesn't really work with planet or aggregator
         // we should read the feed xml to get the feed's website and then the icon
-        val article = databaseService.getRandomArticleFromFeed(feed.id)
+        val article = databaseService.getLatestArticleFromFeed(feed.id)
         val articleUrl = (article?.link ?: feed.url).toHttpUrlOrNull()
 
         val favIconInfos = articleUrl?.newBuilder()?.encodedPath("/")?.build()?.let { url ->
