@@ -44,6 +44,7 @@ import coil.load
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.geekdroid.views.doOnApplyWindowInsets
 import com.geekorum.ttrss.data.Feed
+import com.geekorum.ttrss.data.FeedWithFavIcon
 import com.geekorum.ttrss.manage_feeds.databinding.ActivityManageFeedsBinding
 import com.geekorum.ttrss.manage_feeds.databinding.DialogUnsubscribeFeedBinding
 import com.geekorum.ttrss.manage_feeds.databinding.FragmentManageFeedsBinding
@@ -127,7 +128,7 @@ class ManageFeedsFragment : Fragment() {
     }
 
 
-    private inner class FeedsAdapter : PagingDataAdapter<Feed, FeedViewHolder>(DiffFeed) {
+    private inner class FeedsAdapter : PagingDataAdapter<FeedWithFavIcon, FeedViewHolder>(DiffFeed) {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedViewHolder {
             val itemFeedBinding = ItemFeedBinding.inflate(layoutInflater, parent, false)
             return FeedViewHolder(itemFeedBinding)
@@ -143,14 +144,16 @@ class ManageFeedsFragment : Fragment() {
     }
 
     class FeedViewHolder(val binding: ItemFeedBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun setFeed(feed: Feed?) {
+        fun setFeed(feedWithFavIcon: FeedWithFavIcon?) {
+            val feed = feedWithFavIcon?.feed
+            val favIcon = feedWithFavIcon?.favIcon
             val title = feed?.displayTitle?.takeIf { it.isNotEmpty() } ?: feed?.title
             binding.setVariable(BR.name, title)
             binding.setVariable(BR.feed, feed)
             with(binding.feedIcon) {
                 // set the tint for errors and place holder drawable
                 imageTintList = resources.getColorStateList(R.color.rss_feed_orange, null)
-                load(feed?.feedIconUrl) {
+                load(favIcon?.url) {
                     error(R.drawable.ic_rss_feed_black_24dp)
                     placeholder(R.drawable.ic_rss_feed_black_24dp)
                     listener { _, _ ->
@@ -165,12 +168,12 @@ class ManageFeedsFragment : Fragment() {
         }
     }
 
-    private object DiffFeed : DiffUtil.ItemCallback<Feed>() {
-        override fun areItemsTheSame(oldItem: Feed, newItem: Feed): Boolean {
-            return oldItem.id == newItem.id
+    private object DiffFeed : DiffUtil.ItemCallback<FeedWithFavIcon>() {
+        override fun areItemsTheSame(oldItem: FeedWithFavIcon, newItem: FeedWithFavIcon): Boolean {
+            return oldItem.feed.id == newItem.feed.id
         }
 
-        override fun areContentsTheSame(oldItem: Feed, newItem: Feed): Boolean {
+        override fun areContentsTheSame(oldItem: FeedWithFavIcon, newItem: FeedWithFavIcon): Boolean {
             return oldItem == newItem
         }
     }

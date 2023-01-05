@@ -35,6 +35,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.geekorum.geekdroid.app.lifecycle.Event
 import com.geekorum.ttrss.data.Feed
+import com.geekorum.ttrss.data.FeedWithFavIcon
 import com.geekorum.ttrss.data.ManageFeedsDao
 import com.geekorum.ttrss.manage_feeds.workers.UnsubscribeWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -55,7 +56,7 @@ class ManageFeedViewModel @Inject constructor(
     private val _feedClickedEvent = MutableLiveData<Event<Feed>>()
     val feedClickedEvent: LiveData<Event<Feed>> = _feedClickedEvent
 
-    val feeds: Flow<PagingData<Feed>> by lazy {
+    val feeds: Flow<PagingData<FeedWithFavIcon>> by lazy {
         Pager(PagingConfig(40)) {
             feedsDao.allSubscribedFeeds
         }.flow
