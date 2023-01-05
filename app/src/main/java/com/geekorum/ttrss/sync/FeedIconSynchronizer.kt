@@ -27,8 +27,9 @@ import com.geekorum.favikonsnoop.FaviconInfo
 import com.geekorum.favikonsnoop.FixedDimension
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.data.Feed
+import com.geekorum.ttrss.network.ApiService
+import com.geekorum.ttrss.network.ServerInfo
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.asFlow
@@ -37,6 +38,8 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import okhttp3.*
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import timber.log.Timber
@@ -53,11 +56,15 @@ private const val NB_LOOKUP_COROUTINES = 5
 class FeedIconSynchronizer @Inject constructor(
     private val dispatchers: CoroutineDispatchersProvider,
     private val databaseService: DatabaseService,
+    private val apiService: ApiService,
     private val faviKonSnoop: FaviKonSnoop,
     private val okHttpClient: OkHttpClient,
     private val httpCacher: HttpCacher,
     private val networkSecurityPolicy: NetworkSecurityPolicy,
 ) {
+
+    private var serverInfo: ServerInfo? = null
+    private val serverInfoLock = Mutex()
 
     suspend fun synchronizeFeedIcons() {
         coroutineScope {
@@ -102,10 +109,33 @@ class FeedIconSynchronizer @Inject constructor(
 
         val selectedIcon = selectBestIcon(favIconInfos)
 
-        selectedIcon?.url?.let { url ->
-            // if no icon is selected, don't update and let the default url
-            databaseService.updateFeedIconUrl(feed.id, url.toString())
+        if (selectedIcon != null) {
+            databaseService.updateFeedIconUrl(feed.id, selectedIcon.url.toString())
+            return
         }
+        // fallback to icon from config
+        val iconUrl = getIconUrlFromServer(feed)
+        if (iconUrl != null ) {
+            databaseService.updateFeedIconUrl(feed.id, iconUrl)
+        }
+    }
+
+    private suspend fun getServerInfo(): ServerInfo {
+        return serverInfoLock.withLock {
+            // fetch again if we didn't get feedsIconsUrl
+            if (serverInfo?.feedsIconsUrl == null) {
+                serverInfo = apiService.getServerInfo()
+            }
+            serverInfo!!
+        }
+    }
+
+    private suspend fun getIconUrlFromServer(feed: Feed): String? {
+        val serverInfo = getServerInfo()
+        val baseFeedsIconsUrl = serverInfo.feedsIconsUrl?.let {
+            "${serverInfo.apiUrl}${serverInfo.feedsIconsUrl}"
+        } ?: return null
+        return "$baseFeedsIconsUrl/${feed.id}.ico"
     }
 
     private fun findFavicons(url: HttpUrl) : Collection<FaviconInfo> {
@@ -134,7 +164,7 @@ class FeedIconSynchronizer @Inject constructor(
                 null -> Int.MIN_VALUE
             }
         }.filter {
-            networkSecurityPolicy.isCleartextTrafficPermitted(it.url.host)
+            it.url.isHttps || networkSecurityPolicy.isCleartextTrafficPermitted(it.url.host)
         }
 
         return sortedIcons.firstOrNull {
