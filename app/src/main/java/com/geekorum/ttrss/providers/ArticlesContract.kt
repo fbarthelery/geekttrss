@@ -55,6 +55,7 @@ object ArticlesContract {
         const val FEED_ID = "feed_id"
         const val TITLE = "title"
         const val LINK = "link"
+        @Deprecated("has moved to another table")
         const val TAGS = "tags"
         const val CONTENT = "content"
         const val AUTHOR = "author"
@@ -73,6 +74,7 @@ object ArticlesContract {
         const val DISPLAY_TITLE = "display_title"
         const val UNREAD_COUNT = "unread_count"
         const val IS_SUBSCRIBED = "is_subscribed"
+        @Deprecated("has moved to another table")
         const val ICON_URL = "feed_icon_url"
     }
 
@@ -102,5 +104,13 @@ object ArticlesContract {
             fun asApiInteger(): Int = apiInteger
 
         }
+    }
+
+    object ArticleTags{
+        val CONTENT_URI: Uri = Uri.withAppendedPath(AUTHORITY_URI, "article_tags")
+        // columns of a ArticleTags
+        // long
+        const val ARTICLE_ID = "article_id"
+        const val TAG = "tag"
     }
 }

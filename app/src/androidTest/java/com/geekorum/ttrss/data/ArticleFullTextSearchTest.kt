@@ -99,15 +99,18 @@ class ArticleFullTextSearchTest {
             flavorImageUri = "article flavor image uri",
             contentExcerpt = "a content excerpt"
         ),
-        feed = Feed(id = 1,
-            url = "feed url",
-            title = "feed title",
-            catId = 0,
-            displayTitle = "display title",
-            lastTimeUpdate = 0,
-            unreadCount = 2,
-            isSubscribed = true,
-            feedIconUrl = "http://exemple.com/1.ico"
+        feed = FeedWithFavIcon(
+            feed = Feed(
+                id = 1,
+                url = "feed url",
+                title = "feed title",
+                catId = 0,
+                displayTitle = "display title",
+                lastTimeUpdate = 0,
+                unreadCount = 2,
+                isSubscribed = true,
+            ),
+            favIcon = null
         ))
 
         val articleDao = database.articleDao()
@@ -145,7 +148,6 @@ class ArticleFullTextSearchTest {
             ArticlesContract.Feed.LAST_TIME_UPDATE to 0,
             ArticlesContract.Feed.DISPLAY_TITLE to "display title",
             ArticlesContract.Feed.IS_SUBSCRIBED to 1,
-            ArticlesContract.Feed.ICON_URL to "http://exemple.com/1.ico"
         )
         db.insert(Tables.FEEDS, SQLiteDatabase.CONFLICT_NONE, values)
 

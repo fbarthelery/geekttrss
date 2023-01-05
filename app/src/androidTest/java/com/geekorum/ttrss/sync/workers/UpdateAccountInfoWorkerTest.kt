@@ -141,7 +141,7 @@ class UpdateAccountInfoWorkerTest {
     private class MyMockApiService : MockApiService() {
 
         override suspend fun getServerInfo(): ServerInfo {
-            return ServerInfo(42, "https://test.exemple.com/feeds-icons/", "2.0")
+            return ServerInfo("https://test.exemple.com/",42, "https://test.exemple.com/feeds-icons/", "2.0")
         }
     }
 }

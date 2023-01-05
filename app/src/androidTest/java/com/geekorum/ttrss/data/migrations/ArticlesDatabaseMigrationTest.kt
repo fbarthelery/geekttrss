@@ -46,7 +46,9 @@ class ArticlesDatabaseMigrationTest {
     @get:Rule
     var helper: MigrationTestHelper = MigrationTestHelper(
         InstrumentationRegistry.getInstrumentation(),
-        ArticlesDatabase::class.java.canonicalName)
+        ArticlesDatabase::class.java,
+        listOf(MigrationFrom13To14())
+    )
 
     @Test
     fun migrate1To2() {
@@ -76,7 +78,7 @@ class ArticlesDatabaseMigrationTest {
         values = contentValuesOf(
             ArticlesContract.Feed.TITLE to "feed title",
             ArticlesContract.Feed.URL to "feed url",
-            ArticlesContract.Feed.CAT_ID to 0,
+            ArticlesContract.Feed.CAT_ID to 1,
             ArticlesContract.Feed.UNREAD_COUNT to 2,
             ArticlesContract.Feed.LAST_TIME_UPDATE to 0,
             ArticlesContract.Feed.DISPLAY_TITLE to "display title"
@@ -348,10 +350,11 @@ class ArticlesDatabaseMigrationTest {
         )
         db.insert(Tables.CATEGORIES, SQLiteDatabase.CONFLICT_NONE, values)
 
+        @Suppress("DEPRECATION")
         values = contentValuesOf(
                 ArticlesContract.Feed.TITLE to "feed title",
                 ArticlesContract.Feed.URL to "feed url",
-                ArticlesContract.Feed.CAT_ID to 0,
+                ArticlesContract.Feed.CAT_ID to 1,
                 ArticlesContract.Feed.UNREAD_COUNT to 2,
                 ArticlesContract.Feed.LAST_TIME_UPDATE to 0,
                 ArticlesContract.Feed.DISPLAY_TITLE to "display title",
@@ -439,6 +442,79 @@ class ArticlesDatabaseMigrationTest {
             *ALL_MIGRATIONS.toTypedArray()).use {
             // MigrationTestHelper automatically verifies the schema changes,
             // but you need to validate that the contentData was migrated properly.
+            assertMigration12To13DataIntegrity(it)
+        }
+    }
+
+    private fun createSomeArticlesFromVersion13(db: SupportSQLiteDatabase) {
+        var values = contentValuesOf(
+            ArticlesContract.Category.TITLE to "category",
+            ArticlesContract.Category.UNREAD_COUNT to 2
+        )
+        db.insert(Tables.CATEGORIES, SQLiteDatabase.CONFLICT_NONE, values)
+
+        @Suppress("DEPRECATION")
+        values = contentValuesOf(
+            ArticlesContract.Feed.TITLE to "feed title",
+            ArticlesContract.Feed.URL to "feed url",
+            ArticlesContract.Feed.CAT_ID to 1,
+            ArticlesContract.Feed.UNREAD_COUNT to 2,
+            ArticlesContract.Feed.LAST_TIME_UPDATE to 0,
+            ArticlesContract.Feed.DISPLAY_TITLE to "display title",
+            ArticlesContract.Feed.IS_SUBSCRIBED to 1,
+            ArticlesContract.Feed.ICON_URL to "icon_url"
+        )
+        db.insert(Tables.FEEDS, SQLiteDatabase.CONFLICT_NONE, values)
+
+        values = contentValuesOf(
+            ArticlesContract.Article.TITLE to "article title",
+            ArticlesContract.Article.CONTENT to "a content",
+            ArticlesContract.Article.SCORE to 0,
+            ArticlesContract.Article.PUBLISHED to 1,
+            ArticlesContract.Article.LAST_TIME_UPDATE to 0,
+            ArticlesContract.Article.UNREAD to 1,
+            ArticlesContract.Article.TRANSIENT_UNREAD to 1,
+            ArticlesContract.Article.STARRED to 1,
+            ArticlesContract.Article.IS_UPDATED to 1,
+            ArticlesContract.Article.FEED_ID to 1,
+            ArticlesContract.Article.LINK to "article links",
+            ArticlesContract.Article.TAGS to "article tags",
+            ArticlesContract.Article.AUTHOR to "article author",
+            ArticlesContract.Article.FLAVOR_IMAGE_URI to "article flavor image uri",
+            ArticlesContract.Article.CONTENT_EXCERPT to "a content excerpt"
+        )
+        db.insert(Tables.ARTICLES, SQLiteDatabase.CONFLICT_NONE, values)
+
+        values = contentValuesOf(
+            ArticlesContract.ArticleTags.ARTICLE_ID to 1,
+            ArticlesContract.ArticleTags.TAG to "article tags"
+        )
+        db.insert(Tables.ARTICLES_TAGS, SQLiteDatabase.CONFLICT_NONE, values)
+
+        values = contentValuesOf(
+            ArticlesContract.Transaction.FIELD to "transaction field",
+            ArticlesContract.Transaction.VALUE to 1,
+            ArticlesContract.Transaction.ARTICLE_ID to 1
+        )
+        db.insert(Tables.TRANSACTIONS, SQLiteDatabase.CONFLICT_NONE, values)
+    }
+
+    @Test
+    fun migrate13To14() {
+        helper.createDatabase(TEST_DB, 13).use {
+            // db has schema version 8. insert some contentData using SQL queries.
+            // You cannot use DAO classes because they expect the latest schema.
+            // as our schema for this migration doesn't change much from the previous
+            // we can reuse the same function
+            createSomeArticlesFromVersion13(it)
+        }
+
+        helper.runMigrationsAndValidate(TEST_DB, 14, true,
+            *ALL_MIGRATIONS.toTypedArray()).use {
+            // MigrationTestHelper automatically verifies the schema changes,
+            // but you need to validate that the contentData was migrated properly.
+            // no data changes from 13 to 14 so only test that data is still there
+            // using assertMigration12To13DataIntegrity
             assertMigration12To13DataIntegrity(it)
         }
     }
