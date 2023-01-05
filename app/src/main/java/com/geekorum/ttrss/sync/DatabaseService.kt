@@ -29,7 +29,7 @@ interface DatabaseService {
     suspend fun <R> runInTransaction(block: suspend () -> R)
 
     suspend fun insertFeeds(feeds: List<Feed>)
-    suspend fun deleteFeedsAndArticles(feeds: List<Feed>)
+    suspend fun deleteFeedsAndRelatedData(feeds: List<Feed>)
     suspend fun getFeeds(): List<Feed>
     suspend fun getFeedFavIcons(): List<FeedFavIcon>
     suspend fun updateFeedIconUrl(feedId: Long, url: String)

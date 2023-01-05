@@ -80,10 +80,14 @@ abstract class SynchronizationDao {
     @Delete
     internal abstract suspend fun deleteFeeds(toBeDelete: List<Feed>)
 
+    @Query("DELETE FROM feed_fav_icon where _id=:feedId")
+    internal abstract suspend fun deleteFeedFavIcon(feedId: Long)
+
     @androidx.room.Transaction
-    open suspend fun deleteFeedsAndArticles(toBeDelete: List<Feed>) {
+    open suspend fun deleteFeedsAndRelatedData(toBeDelete: List<Feed>) {
         for ((id) in toBeDelete) {
             deleteArticleFromFeed(id)
+            deleteFeedFavIcon(id)
         }
         deleteFeeds(toBeDelete)
     }

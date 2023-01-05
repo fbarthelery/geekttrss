@@ -74,7 +74,7 @@ class SyncFeedsWorker @AssistedInject constructor(
         val feedsIds: List<Long> = feeds.map { it.id }
         val toBeDelete = databaseService.getFeeds().filter { it.id !in feedsIds }
 
-        databaseService.deleteFeedsAndArticles(toBeDelete)
+        databaseService.deleteFeedsAndRelatedData(toBeDelete)
     }
 
     private suspend fun deleteOldCategories(categories: List<Category>) {

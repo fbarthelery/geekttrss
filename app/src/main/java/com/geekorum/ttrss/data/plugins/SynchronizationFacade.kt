@@ -82,8 +82,8 @@ class SynchronizationFacade @Inject constructor(
         synchronizationDao.insertFeeds(feeds)
     }
 
-    override suspend fun deleteFeedsAndArticles(feeds: List<Feed>) {
-        synchronizationDao.deleteFeedsAndArticles(feeds)
+    override suspend fun deleteFeedsAndRelatedData(feeds: List<Feed>) {
+        synchronizationDao.deleteFeedsAndRelatedData(feeds)
     }
 
     override suspend fun getAccountInfo(username: String, apiUrl: String): AccountInfo? {
