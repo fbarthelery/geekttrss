@@ -20,7 +20,6 @@
  */
 package com.geekorum.ttrss.network
 
-import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleWithAttachments
 import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
@@ -66,10 +65,12 @@ interface ApiService {
 
 /**
  * Contains information on the server.
- * Each field is optional and is null if it couldn't be retrieved
+ * Each optional field is null if it couldn't be retrieved
  */
 data class ServerInfo(
+    val apiUrl: String,
     val apiLevel: Int?,
+    /** relative path to access feed icons */
     val feedsIconsUrl: String?,
     val serverVersion: String?
 )

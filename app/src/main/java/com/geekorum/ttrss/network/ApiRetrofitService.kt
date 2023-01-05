@@ -21,30 +21,18 @@
 package com.geekorum.ttrss.network
 
 import com.geekorum.ttrss.accounts.ServerInformation
-import com.geekorum.ttrss.data.Article
-import com.geekorum.ttrss.data.ArticleContentIndexed
-import com.geekorum.ttrss.data.ArticleWithAttachments
+import com.geekorum.ttrss.data.*
 import com.geekorum.ttrss.data.Attachment
-import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.webapi.ApiCallException
 import com.geekorum.ttrss.webapi.RetrofitServiceHelper
 import com.geekorum.ttrss.webapi.TinyRssApi
 import com.geekorum.ttrss.webapi.TokenRetriever
-import com.geekorum.ttrss.webapi.model.FeedCategory
-import com.geekorum.ttrss.webapi.model.GetApiLevelRequestPayload
-import com.geekorum.ttrss.webapi.model.GetArticlesRequestPayload
+import com.geekorum.ttrss.webapi.model.*
 import com.geekorum.ttrss.webapi.model.GetArticlesRequestPayload.SortOrder
 import com.geekorum.ttrss.webapi.model.GetArticlesRequestPayload.SortOrder.DATE_REVERSE
 import com.geekorum.ttrss.webapi.model.GetArticlesRequestPayload.SortOrder.FEED_DATES
-import com.geekorum.ttrss.webapi.model.GetCategoriesRequestPayload
-import com.geekorum.ttrss.webapi.model.GetConfigRequestPayload
-import com.geekorum.ttrss.webapi.model.GetFeedsRequestPayload
-import com.geekorum.ttrss.webapi.model.GetVersionRequestPayload
-import com.geekorum.ttrss.webapi.model.Headline
-import com.geekorum.ttrss.webapi.model.ResponsePayload
-import com.geekorum.ttrss.webapi.model.UpdateArticleRequestPayload
 import kotlinx.coroutines.async
 import kotlinx.coroutines.supervisorScope
 
@@ -106,18 +94,11 @@ class ApiRetrofitService(
     override suspend fun getFeeds(): List<Feed> {
         val payload = GetFeedsRequestPayload(true, false,
                     GetFeedsRequestPayload.CATEGORY_ID_ALL_EXCLUDE_VIRTUALS)
-        val getConfigResponsePayload = executeOrFail("Unable to get feeds icons url") {
-            tinyrssApi.getConfig(GetConfigRequestPayload())
-        }
-        val baseFeedsIconsUrl = "${serverInformation.apiUrl}${getConfigResponsePayload.iconsUrl}"
         val response = executeOrFail("Unable to get feeds") {
             tinyrssApi.getFeeds(payload)
         }
         val feedlist = response.result
         return feedlist.map { it.toDataType() }
-            .map {
-                it.copy(feedIconUrl = "$baseFeedsIconsUrl/${it.id}.ico")
-            }
     }
 
     @Throws(ApiCallException::class)
@@ -154,7 +135,9 @@ class ApiRetrofitService(
             }
         }
 
-        ServerInfo(apiLevel = apiLevelDeferred.runCatching { await().level }.getOrNull() ,
+        ServerInfo(
+            apiUrl = serverInformation.apiUrl,
+            apiLevel = apiLevelDeferred.runCatching { await().level }.getOrNull() ,
             feedsIconsUrl = configDeferred.runCatching { await().iconsUrl }.getOrNull(),
             serverVersion = versionDeferred.runCatching { await().version}.getOrNull()
         )
