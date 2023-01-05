@@ -33,10 +33,10 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.kotlin
 
-const val espressoVersion = "3.2.0"
-const val androidxTestRunnerVersion = "1.4.0"
-const val androidxTestCoreVersion = "1.4.0"
-const val robolectricVersion = "4.9"
+const val espressoVersion = "3.5.1"
+const val androidxTestRunnerVersion = "1.5.2"
+const val androidxTestCoreVersion = "1.5.0"
+const val robolectricVersion = "4.9.2"
 
 
 /*
@@ -65,17 +65,17 @@ internal fun Project.configureTests() {
     dependencies {
         dualTestImplementation(kotlin("test-junit"))
 
-        androidTestUtil("androidx.test:orchestrator:$androidxTestRunnerVersion")
+        androidTestUtil("androidx.test:orchestrator:1.4.2")
         androidTestImplementation("androidx.test:runner:$androidxTestRunnerVersion")
-        dualTestImplementation("androidx.test.ext:junit-ktx:1.1.1")
+        dualTestImplementation("androidx.test.ext:junit-ktx:1.1.5")
 
         dualTestImplementation("androidx.test:core-ktx:$androidxTestCoreVersion")
-        dualTestImplementation("androidx.test:rules:$androidxTestRunnerVersion")
+        dualTestImplementation("androidx.test:rules:1.5.0")
 
         // fragment testing is usually declared on debugImplementation configuration and need these dependencies
         constraints {
             debugImplementation("androidx.test:core:$androidxTestCoreVersion")
-            debugImplementation("androidx.test:monitor:$androidxTestRunnerVersion")
+            debugImplementation("androidx.test:monitor:1.6.1")
         }
 
         dualTestImplementation("androidx.test.espresso:espresso-core:$espressoVersion")
@@ -83,8 +83,8 @@ internal fun Project.configureTests() {
         dualTestImplementation("androidx.test.espresso:espresso-intents:$espressoVersion")
 
         // assertions
-        dualTestImplementation("com.google.truth:truth:1.0")
-        dualTestImplementation("androidx.test.ext:truth:1.3.0-alpha01")
+        dualTestImplementation("com.google.truth:truth:1.1.3")
+        dualTestImplementation("androidx.test.ext:truth:1.5.0")
 
         // mock
         testImplementation("io.mockk:mockk:1.11.0")
