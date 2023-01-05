@@ -20,13 +20,17 @@
  */
 package com.geekorum.ttrss.data
 
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
+import com.geekorum.ttrss.data.migrations.MigrationFrom13To14
 import com.geekorum.ttrss.providers.PurgeArticlesDao
 
 @Database(entities = [Article::class, ArticleFTS::class, ArticlesTags::class, Attachment::class,
-    Category::class, Feed::class, Transaction::class, AccountInfo::class],
-        version = 13)
+    Category::class, Feed::class, FeedFavIcon::class, Transaction::class, AccountInfo::class],
+    autoMigrations = [
+        AutoMigration(from = 13, to = 14, spec = MigrationFrom13To14::class)],
+        version = 14)
 abstract class ArticlesDatabase : RoomDatabase() {
     abstract fun articleDao(): ArticleDao
     abstract fun accountInfoDao(): AccountInfoDao

@@ -71,8 +71,8 @@ class FeedIconSynchronizer @Inject constructor(
         }
 
         // now update cache
-        databaseService.getFeeds().forEach {
-            httpCacher.cacheHttpRequest(it.feedIconUrl)
+        databaseService.getFeedFavIcons().forEach {
+            httpCacher.cacheHttpRequest(it.url)
         }
     }
 

@@ -20,6 +20,8 @@
  */
 package com.geekorum.ttrss.data.migrations
 
+import androidx.room.DeleteColumn
+import androidx.room.migration.AutoMigrationSpec
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
@@ -544,6 +546,9 @@ object MigrationFrom12To13 : Migration(12, 13) {
         }
     }
 }
+
+@DeleteColumn(tableName = "feeds", columnName = "feed_icon_url")
+class MigrationFrom13To14 : AutoMigrationSpec
 
 internal val ALL_MIGRATIONS = listOf(MigrationFrom1To2,
         MigrationFrom2To3,

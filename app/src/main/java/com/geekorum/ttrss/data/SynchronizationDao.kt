@@ -47,6 +47,9 @@ abstract class SynchronizationDao {
     @Query("SELECT * FROM feeds")
     abstract suspend fun getAllFeeds(): List<Feed>
 
+    @Query("SELECT * FROM feed_fav_icon")
+    abstract fun getAllFeedFavIcons(): List<FeedFavIcon>
+
     @Delete
     abstract suspend fun deleteTransaction(transaction: Transaction)
 
@@ -71,8 +74,8 @@ abstract class SynchronizationDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insertFeeds(feeds: List<Feed>)
 
-    @Query("UPDATE feeds SET feed_icon_url=:url WHERE _id=:id")
-    abstract suspend fun updateFeedIconUrl(id: Long, url: String)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract suspend fun setFeedFavIcon(feedFavIcon: FeedFavIcon)
 
     @Delete
     internal abstract suspend fun deleteFeeds(toBeDelete: List<Feed>)

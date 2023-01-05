@@ -20,14 +20,7 @@
  */
 package com.geekorum.ttrss.sync
 
-import com.geekorum.ttrss.data.AccountInfo
-import com.geekorum.ttrss.data.Article
-import com.geekorum.ttrss.data.ArticlesTags
-import com.geekorum.ttrss.data.Attachment
-import com.geekorum.ttrss.data.Category
-import com.geekorum.ttrss.data.Feed
-import com.geekorum.ttrss.data.Transaction
-import com.geekorum.ttrss.data.Metadata
+import com.geekorum.ttrss.data.*
 
 /**
  * Database access interface for the synchronization process.
@@ -38,6 +31,7 @@ interface DatabaseService {
     suspend fun insertFeeds(feeds: List<Feed>)
     suspend fun deleteFeedsAndArticles(feeds: List<Feed>)
     suspend fun getFeeds(): List<Feed>
+    suspend fun getFeedFavIcons(): List<FeedFavIcon>
     suspend fun updateFeedIconUrl(feedId: Long, url: String)
 
     suspend fun insertCategories(categories: List<Category>)

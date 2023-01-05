@@ -21,18 +21,8 @@
 package com.geekorum.ttrss.data.plugins
 
 import androidx.room.withTransaction
-import com.geekorum.ttrss.data.AccountInfo
-import com.geekorum.ttrss.data.AccountInfoDao
-import com.geekorum.ttrss.data.Article
-import com.geekorum.ttrss.data.ArticlesDatabase
-import com.geekorum.ttrss.data.ArticlesTags
-import com.geekorum.ttrss.data.Attachment
-import com.geekorum.ttrss.data.Category
-import com.geekorum.ttrss.data.Feed
-import com.geekorum.ttrss.data.SynchronizationDao
-import com.geekorum.ttrss.data.Transaction
+import com.geekorum.ttrss.data.*
 import com.geekorum.ttrss.sync.DatabaseService
-import com.geekorum.ttrss.data.Metadata
 import javax.inject.Inject
 
 /**
@@ -70,9 +60,10 @@ class SynchronizationFacade @Inject constructor(
     override suspend fun getCategories(): List<Category> = synchronizationDao.getAllCategories()
 
     override suspend fun getFeeds(): List<Feed> = synchronizationDao.getAllFeeds()
+    override suspend fun getFeedFavIcons(): List<FeedFavIcon> = synchronizationDao.getAllFeedFavIcons()
 
     override suspend fun updateFeedIconUrl(feedId: Long, url: String) {
-        synchronizationDao.updateFeedIconUrl(feedId, url)
+        synchronizationDao.setFeedFavIcon(FeedFavIcon(id = feedId, url = url))
     }
 
     override suspend fun deleteCategories(categories: List<Category>) {

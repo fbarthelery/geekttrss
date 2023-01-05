@@ -297,9 +297,6 @@ data class Feed(
     @ColumnInfo(name = "is_subscribed")
     val isSubscribed: Boolean = true,
 
-    @ColumnInfo(name = "feed_icon_url")
-    val feedIconUrl: String = ""
-
 ) {
 
     val isFreshFeed
@@ -351,6 +348,26 @@ data class Feed(
     }
 }
 
+@Entity(tableName = "feed_fav_icon",
+    foreignKeys = [ForeignKey(entity = Feed::class,
+        parentColumns = ["_id"],
+        childColumns = ["_id"])
+    ])
+data class FeedFavIcon(
+    @PrimaryKey
+    @ColumnInfo(name = BaseColumns._ID)
+    val id: Long = 0,
+
+    @ColumnInfo(name = "url")
+    val url: String = ""
+)
+
+data class FeedWithFavIcon(
+    @Embedded
+    val feed: Feed,
+    @Relation(parentColumn = BaseColumns._ID, entityColumn = BaseColumns._ID)
+    val favIcon: FeedFavIcon?
+)
 
 @Entity(tableName = "transactions",
         foreignKeys = [ForeignKey(
