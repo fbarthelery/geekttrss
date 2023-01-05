@@ -160,8 +160,8 @@ data class ArticleContentIndexed(
 data class ArticleWithFeed(
     @Embedded
     val article: Article,
-    @Relation(parentColumn = "feed_id", entityColumn = BaseColumns._ID)
-    val feed: Feed
+    @Relation(entity = Feed::class, parentColumn = "feed_id", entityColumn = BaseColumns._ID)
+    val feed: FeedWithFavIcon
 )
 
 

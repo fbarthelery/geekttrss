@@ -221,7 +221,8 @@ private fun ArticleCard(
     onOpenInBrowserClick: (Article) -> Unit,
     onShareClick: (Article) -> Unit
 ) {
-    val (article, feed) = articleWithFeed
+    val (article, feedWithFavIcon) = articleWithFeed
+    val (feed, favIcon) = feedWithFavIcon
     val feedNameOrAuthor = feed.displayTitle.takeIf { it.isNotBlank() } ?: feed.title
 
     ArticleCard(
@@ -229,7 +230,7 @@ private fun ArticleCard(
         flavorImageUrl = article.flavorImageUri,
         excerpt = article.contentExcerpt,
         feedNameOrAuthor = feedNameOrAuthor,
-        feedIconUrl = feed.feedIconUrl,
+        feedIconUrl = favIcon?.url,
         isUnread = article.isUnread,
         isStarred = article.isStarred,
         onCardClick = onCardClick,

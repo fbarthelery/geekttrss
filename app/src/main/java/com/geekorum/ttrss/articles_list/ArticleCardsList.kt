@@ -56,10 +56,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemsIndexed
 import com.geekorum.ttrss.R
-import com.geekorum.ttrss.data.Article
-import com.geekorum.ttrss.data.ArticleContentIndexed
-import com.geekorum.ttrss.data.ArticleWithFeed
-import com.geekorum.ttrss.data.Feed
+import com.geekorum.ttrss.data.*
 import com.geekorum.ttrss.ui.AppTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -262,7 +259,8 @@ private fun SwipeableArticleCard(
     onStarChanged: (Article, Boolean) -> Unit,
     onSwiped: (Article) -> Unit,
 ) {
-    val (article, feed) = articleWithFeed
+    val (article, feedWithFavIcon) = articleWithFeed
+    val (feed, favIcon) = feedWithFavIcon
     val feedNameOrAuthor = if (displayFeedName) {
         feed.displayTitle.takeIf { it.isNotBlank() } ?: feed.title
     } else {
@@ -274,7 +272,7 @@ private fun SwipeableArticleCard(
         flavorImageUrl = article.flavorImageUri,
         excerpt = article.contentExcerpt,
         feedNameOrAuthor = feedNameOrAuthor,
-        feedIconUrl = feed.feedIconUrl,
+        feedIconUrl = favIcon?.url,
         isUnread = article.isUnread,
         isStarred = article.isStarred,
         onCardClick = onCardClick,
@@ -330,7 +328,8 @@ private fun ArticleCardList() {
             contentData = ArticleContentIndexed("article $it", author = "author $it"),
             contentExcerpt = "Excerpt $it"
         )
-        ArticleWithFeed(a, Feed(id = it.toLong(), title = "Feed $it"))
+        val feed = Feed(id = it.toLong(), title = "Feed $it")
+        ArticleWithFeed(a, FeedWithFavIcon(feed, FeedFavIcon()))
     }
     val articlesFlow = flowOf(PagingData.from(articles))
     val pagingItems = articlesFlow.collectAsLazyPagingItems()
