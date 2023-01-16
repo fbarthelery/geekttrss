@@ -32,11 +32,8 @@ plugins {
     // with bad ordering if not there. or they can't be applied dynamically
     // version used is in gradle.properties
     kotlin("jvm") apply false
-    id("androidx.navigation.safeargs.kotlin")  apply false
-    id("com.google.firebase.crashlytics") apply false
-    id("com.google.gms.google-services") apply false
-    id("com.google.android.gms.oss-licenses-plugin") apply false
-    id("dagger.hilt.android.plugin") apply false
+    alias(libs.plugins.firebase.crashlytics) apply false
+    alias(libs.plugins.google.gms.google.services) apply false
 }
 
 // Need to be there because if not, the various plugins downgrade the AGP version used from buildSrc

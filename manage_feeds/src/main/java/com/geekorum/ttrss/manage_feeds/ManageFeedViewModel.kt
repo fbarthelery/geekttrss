@@ -58,7 +58,7 @@ class ManageFeedViewModel @Inject constructor(
 
     val feeds: Flow<PagingData<FeedWithFavIcon>> by lazy {
         Pager(PagingConfig(40)) {
-            feedsDao.allSubscribedFeeds
+            feedsDao.getAllSubscribedFeeds()
         }.flow
     }
 

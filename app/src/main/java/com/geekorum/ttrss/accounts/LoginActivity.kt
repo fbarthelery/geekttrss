@@ -28,6 +28,7 @@ import android.transition.TransitionManager
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.viewModels
+import androidx.core.content.IntentCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import com.geekorum.geekdroid.accounts.AccountAuthenticatorAppCompatActivity
@@ -65,7 +66,7 @@ class LoginActivity : AccountAuthenticatorAppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_login_account)
         binding.lifecycleOwner = this
         setSupportActionBar(binding.toolbar)
-        val account = intent.getParcelableExtra<Account>(EXTRA_ACCOUNT)?.let {
+        val account = IntentCompat.getParcelableExtra(intent, EXTRA_ACCOUNT, Account::class.java)?.let {
             accountManager.fromAndroidAccount(it)
         }
         val action = requireNotNull(intent?.action) { "Invalid intent action passed to $this"}

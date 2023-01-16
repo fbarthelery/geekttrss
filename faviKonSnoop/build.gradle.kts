@@ -20,20 +20,21 @@
  */
 plugins {
     kotlin("jvm")
-    kotlin("plugin.serialization")
+    alias(libs.plugins.kotlinx.serialization)
 }
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(enforcedPlatform(kotlin("bom")))
 
-    api("com.squareup.okhttp3:okhttp:4.10.0")
-    api("com.squareup.okio:okio:3.2.0")
-    implementation("javax.inject:javax.inject:1")
-    implementation("org.jsoup:jsoup:1.13.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json-okio:1.4.0")
+    api(platform(libs.okhttp.bom))
+    api(libs.okhttp)
+    api(libs.okio)
+    implementation(libs.javax.inject)
+    implementation(libs.jsoup)
+    implementation(libs.kotlinx.serialization.json.okio)
 
-    testImplementation("com.google.truth:truth:1.1.3")
+    testImplementation(libs.truth)
     testImplementation(kotlin("test-junit"))
-    testImplementation("io.mockk:mockk:1.13.2")
+    testImplementation(libs.mockk)
 }

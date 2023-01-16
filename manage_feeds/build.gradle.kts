@@ -19,7 +19,6 @@
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
 import com.geekorum.build.dualTestImplementation
-import com.geekorum.build.enforcedDaggerPlatform
 
 plugins {
     id("com.android.dynamic-feature")
@@ -27,7 +26,7 @@ plugins {
     kotlin("kapt")
     id("com.geekorum.build.android-tests")
     id("com.geekorum.build.android-avdl")
-    id("androidx.navigation.safeargs.kotlin")
+    alias(libs.plugins.androidx.navigation.safeargs.kotlin)
 }
 
 android {
@@ -69,61 +68,50 @@ dependencies {
     implementation(enforcedPlatform(kotlin("bom")))
     implementation(kotlin("stdlib-jdk8"))
 
-    val daggerVersion = "2.44"
-    implementation(enforcedDaggerPlatform(daggerVersion))
-    kapt(enforcedDaggerPlatform(daggerVersion))
-    implementation("com.google.dagger:dagger:$daggerVersion")
-    kapt("com.google.dagger:dagger-compiler:$daggerVersion")
-    kaptTest("com.google.dagger:dagger-compiler:$daggerVersion")
-    implementation("androidx.hilt:hilt-work:1.0.0")
-    testImplementation("com.google.dagger:hilt-android-testing:$daggerVersion")
-    androidTestImplementation("com.google.dagger:hilt-android-testing:$daggerVersion")
-    kapt("com.google.dagger:hilt-compiler:$daggerVersion")
-    kapt("androidx.hilt:hilt-compiler:1.0.0")
-    kaptTest("com.google.dagger:hilt-compiler:$daggerVersion")
-    kaptAndroidTest("com.google.dagger:hilt-compiler:$daggerVersion")
+    implementation(libs.dagger)
+    kapt(libs.dagger.compiler)
+    kaptTest(libs.dagger.compiler)
+    implementation(libs.androidx.hilt.work)
+    testImplementation(libs.dagger.hilt.android.testing)
+    androidTestImplementation(libs.dagger.hilt.android.testing)
+    kapt(libs.dagger.hilt.compiler)
+    kapt(libs.androidx.hilt.compiler)
+    kaptTest(libs.dagger.hilt.compiler)
+    kaptAndroidTest(libs.dagger.hilt.compiler)
 
     //geekdroid
-    implementation("com.geekorum.geekdroid:geekdroid:geekttrss-1.5.2")
+    implementation(libs.geekdroid)
 
-    implementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.6.4"))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
+    implementation(platform(libs.kotlinx.coroutines.bom))
+    implementation(libs.kotlinx.coroutines.core)
+    testImplementation(libs.kotlinx.coroutines.test)
 
-    implementation("androidx.activity:activity-ktx:1.6.1")
+    implementation(libs.androidx.activity)
 
     // androidx UI
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.recyclerview:recyclerview:1.2.1")
-    implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
-    implementation("com.google.android.material:material:1.7.0")
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.recyclerview)
+    implementation(libs.androidx.coordinatorlayout)
+    implementation(libs.android.material)
 
-    implementation("androidx.core:core-ktx:1.9.0")
+    implementation(libs.androidx.core)
 
-    val lifecycleVersion = "2.5.1"
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
-    implementation("androidx.lifecycle:lifecycle-livedata-core-ktx:$lifecycleVersion")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
+    implementation(libs.androidx.lifecycle.livedata)
+    implementation(libs.androidx.lifecycle.livedata.core)
+    implementation(libs.androidx.lifecycle.viewmodel)
+    implementation(libs.androidx.lifecycle.runtime)
 
     implementation(project(":htmlparsers"))
     implementation(project(":webapi"))
 
-    implementation("io.coil-kt:coil:2.2.2")
+    implementation(libs.coil)
 
-    androidTestImplementation("androidx.work:work-testing:2.7.1")
-    dualTestImplementation("androidx.arch.core:core-testing:2.1.0")
-    androidTestImplementation("com.squareup.okhttp3:mockwebserver:4.9.3")
+    androidTestImplementation(libs.androidx.work.testing)
+    dualTestImplementation(libs.androidx.arch.core.testing)
+    androidTestImplementation(platform(libs.okhttp.bom))
+    androidTestImplementation(libs.okhttp.mockwebserver)
 
-    // alpha for manifest
-    debugImplementation("androidx.fragment:fragment-testing-manifest:1.6.0-alpha04")
-    androidTestImplementation("androidx.fragment:fragment-testing-manifest:1.6.0-alpha04")
-
-    androidTestImplementation("com.squareup.leakcanary:leakcanary-android:2.9.1")
-    androidTestImplementation("com.google.android.gms:play-services-oss-licenses:17.0.0")
-    androidTestImplementation("com.google.android.play:core-ktx:1.8.1")
-
-    // used in test through geekdroid
-    androidTestImplementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.5.1")
+    debugImplementation(libs.androidx.fragment.testing.manifest)
+    androidTestImplementation(libs.androidx.fragment.testing)
 
 }

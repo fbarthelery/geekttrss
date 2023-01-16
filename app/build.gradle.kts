@@ -21,7 +21,6 @@
 
 import com.geekorum.build.configureVersionChangeset
 import com.geekorum.build.dualTestImplementation
-import com.geekorum.build.enforcedDaggerPlatform
 import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
 import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsPlugin
 
@@ -29,17 +28,15 @@ plugins {
     id("com.android.application")
     kotlin("android")
     kotlin("kapt")
-    id("com.google.android.gms.oss-licenses-plugin")
+    alias(libs.plugins.google.gms.oss.license)
     id("com.geekorum.build.android-tests")
     id("com.geekorum.build.android-signing")
     id("com.geekorum.build.android-avdl")
     id("com.geekorum.build.android-release-universal-apk")
     id("com.geekorum.build.play-store-publish")
-    id("androidx.navigation.safeargs.kotlin")
-    id("dagger.hilt.android.plugin")
+    alias(libs.plugins.androidx.navigation.safeargs.kotlin)
+    alias(libs.plugins.dagger.hilt.android)
 }
-
-val composeVersion = "2022.12.00"
 
 androidComponents {
     val major = 1
@@ -89,7 +86,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.3.2"
+        kotlinCompilerExtensionVersion = libs.versions.androidx.compose.compiler.get()
     }
 
     flavorDimensions += "distribution"
@@ -136,151 +133,139 @@ kapt {
 
 dependencies {
 
-    implementation("androidx.core:core-ktx:1.9.0")
-    implementation("androidx.fragment:fragment-ktx:1.5.5")
-    implementation("androidx.activity:activity-ktx:1.6.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+    implementation(libs.androidx.core)
+    implementation(libs.androidx.fragment)
+    implementation(libs.androidx.activity)
+    implementation(libs.kotlinx.datetime)
 
     // androidx ui
-    implementation("androidx.drawerlayout:drawerlayout:1.1.1")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation("androidx.recyclerview:recyclerview:1.2.1")
-    implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
-    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
-    implementation("androidx.preference:preference-ktx:1.2.0")
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.recyclerview)
+    implementation(libs.androidx.coordinatorlayout)
+    implementation(libs.androidx.preferences)
 
     // compose
-    api(platform("androidx.compose:compose-bom:$composeVersion"))
-    api("androidx.compose.ui:ui")
-    api("androidx.compose.ui:ui-util")
-    api("androidx.compose.foundation:foundation")
-    // alpha for fix to PullRefreshState
-    api("androidx.compose.material:material:1.4.0-alpha03")
-    api("androidx.compose.material:material-icons-core")
-    api("androidx.compose.material:material-icons-extended")
-    api("androidx.compose.material3:material3-window-size-class")
-    api("androidx.compose.ui:ui-viewbinding")
-    api("androidx.activity:activity-compose:1.6.1")
-    api("androidx.compose.runtime:runtime-livedata")
-    api("androidx.compose.animation:animation-graphics")
-    api("androidx.paging:paging-compose:1.0.0-alpha17")
-    val accompanistVersion = "0.28.0"
-    api("com.google.accompanist:accompanist-insets-ui:$accompanistVersion")
-    api("com.google.accompanist:accompanist-drawablepainter:$accompanistVersion")
-    api("com.google.accompanist:accompanist-webview:$accompanistVersion")
-    api("androidx.compose.ui:ui-tooling")
+    api(enforcedPlatform(libs.androidx.compose.bom))
+    api(libs.androidx.compose.ui)
+    api(libs.androidx.compose.ui.util)
+    api(libs.androidx.compose.foundation)
+    api(libs.androidx.compose.material)
+    api(libs.androidx.compose.material.icons.core)
+    api(libs.androidx.compose.material.icons.extended)
+    api(libs.androidx.compose.material3.window.sizes)
+    api(libs.androidx.compose.ui.viewbinding)
+    api(libs.androidx.activity.compose)
+    api(libs.androidx.compose.runtime.livedata)
+    api(libs.androidx.compose.animation.graphics)
+    api(libs.androidx.paging.compose)
+    api(libs.accompanist.insets.ui)
+    api(libs.accompanist.drawablepainter)
+    api(libs.accompanist.webview)
+    api(libs.androidx.compose.ui.tooling)
 
 
     // for layout inspector
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    implementation("androidx.compose.ui:ui-tooling-preview")
+    debugImplementation(libs.androidx.compose.ui.tooling)
+    implementation(libs.androidx.compose.ui.tooling.preview)
 
     // androidx others
-    implementation("androidx.browser:browser:1.4.0")
-    implementation("androidx.window:window:1.0.0")
-    implementation("androidx.startup:startup-runtime:1.1.1")
-    // needed by robolectric
-    implementation("androidx.loader:loader:1.1.0")
+    implementation(libs.androidx.browser)
+    implementation(libs.androidx.startup)
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
-    implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
+    implementation(enforcedPlatform(libs.kotlinx.serialization.bom))
+    implementation(libs.kotlinx.serialization.json)
+    implementation(libs.retrofit.kotlinx.serialization.converter)
 
     //geekdroid
-    implementation("com.geekorum.geekdroid:geekdroid:master-SNAPSHOT")
-    add("googleImplementation", "com.geekorum.geekdroid:geekdroid-firebase:master-SNAPSHOT")
+    implementation(libs.geekdroid)
+    add("googleImplementation", libs.geekdroid.firebase)
 
     implementation(project(":htmlparsers"))
     implementation(project(":webapi"))
     implementation(project(":faviKonSnoop"))
 
-    implementation("com.google.android.material:material:1.7.0")
-    implementation("com.squareup.okhttp3:logging-interceptor:4.9.3")
-    testImplementation("com.squareup.okhttp3:mockwebserver:4.9.3")
-    val coilVersion = "2.2.2"
-    implementation("io.coil-kt:coil:$coilVersion")
-    implementation("io.coil-kt:coil-compose:$coilVersion")
+    implementation(libs.android.material)
 
-    implementation("org.jsoup:jsoup:1.13.1")
+    implementation(enforcedPlatform(libs.okhttp.bom))
+    implementation(libs.okhttp.logging.interceptor)
+    testImplementation(libs.okhttp.mockwebserver)
+    implementation(libs.coil)
+    implementation(libs.coil.compose)
 
-    val lifecycleVersion = "2.5.1"
-    implementation("androidx.lifecycle:lifecycle-livedata-core-ktx:$lifecycleVersion")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycleVersion")
-    dualTestImplementation("androidx.arch.core:core-testing:2.1.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycleVersion")
+    implementation(libs.jsoup)
 
-    // dagger
-    val daggerVersion = "2.44"
-    implementation(enforcedDaggerPlatform(daggerVersion))
-    kapt(enforcedDaggerPlatform(daggerVersion))
-    implementation("com.google.dagger:dagger:$daggerVersion")
-    kapt("com.google.dagger:dagger-compiler:$daggerVersion")
-    kaptTest("com.google.dagger:dagger-compiler:$daggerVersion")
-    implementation("com.google.dagger:hilt-android:$daggerVersion")
-    implementation("androidx.hilt:hilt-work:1.0.0")
-    kapt("androidx.hilt:hilt-compiler:1.0.0")
-    kapt("com.google.dagger:hilt-compiler:$daggerVersion")
-    testImplementation("com.google.dagger:hilt-android-testing:$daggerVersion")
-    kaptTest("com.google.dagger:hilt-compiler:$daggerVersion")
-    androidTestImplementation("com.google.dagger:hilt-android-testing:$daggerVersion")
-    kaptAndroidTest("com.google.dagger:hilt-compiler:$daggerVersion")
-    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+    implementation(libs.androidx.lifecycle.livedata.core)
+    implementation(libs.androidx.lifecycle.livedata)
+    implementation(libs.androidx.lifecycle.viewmodel)
+    implementation(libs.androidx.lifecycle.runtime)
+    implementation(libs.androidx.lifecycle.viewmodel.savedstate)
+    dualTestImplementation(libs.androidx.arch.core.testing)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
 
 
-    val roomVersion = "2.4.3"
-    kapt("androidx.room:room-compiler:$roomVersion")
-    androidTestImplementation("androidx.room:room-testing:$roomVersion")
+    implementation(libs.dagger)
+    kapt(libs.dagger.compiler)
+    kaptTest(libs.dagger.compiler)
+    implementation(libs.dagger.hilt.android)
+    implementation(libs.androidx.hilt.work)
+    kapt(libs.androidx.hilt.compiler)
+    kapt(libs.dagger.hilt.compiler)
+    testImplementation(libs.dagger.hilt.android.testing)
+    kaptTest(libs.dagger.hilt.compiler)
+    androidTestImplementation(libs.dagger.hilt.android.testing)
+    kaptAndroidTest(libs.dagger.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
 
-    val workVersion = "2.7.1"
-    androidTestImplementation("androidx.work:work-testing:$workVersion")
+
+    kapt(libs.androidx.room.compiler)
+    androidTestImplementation(libs.androidx.room.testing)
+
+    androidTestImplementation(libs.androidx.work.testing)
 
     implementation(enforcedPlatform(kotlin("bom")))
     implementation(kotlin("stdlib-jdk8"))
 
-    val coroutinesVersion = "1.6.4"
-    implementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:$coroutinesVersion"))
-    testImplementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:$coroutinesVersion"))
-    androidTestImplementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:$coroutinesVersion"))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
-    androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test")
+    implementation(enforcedPlatform(libs.kotlinx.coroutines.bom))
+    testImplementation(enforcedPlatform(libs.kotlinx.coroutines.bom))
+    androidTestImplementation(enforcedPlatform(libs.kotlinx.coroutines.bom))
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.jdk8)
+    testImplementation(libs.kotlinx.coroutines.test)
+    androidTestImplementation(libs.kotlinx.coroutines.test)
 
-    implementation(enforcedPlatform("com.google.firebase:firebase-bom:28.0.1"))
-    add("googleImplementation", "com.google.firebase:firebase-crashlytics")
+    implementation(enforcedPlatform(libs.firebase.bom))
+    add("googleImplementation", libs.firebase.crashlytics)
     // ensure that the free flavor don't get any firebase dependencies
     configurations["freeImplementation"].exclude(group = "com.google.firebase")
     configurations["freeImplementation"].exclude(group = "com.google.android.play")
     configurations["freeImplementation"].exclude(group = "com.google.android.gms")
 
-    add("googleImplementation", "com.google.android.play:core:1.10.3")
-    add("googleImplementation", "com.google.android.play:core-ktx:1.8.1")
-    add("googleImplementation", "com.google.android.gms:play-services-base:18.1.0")
+    add("googleImplementation", libs.google.play.feature.delivery)
+    add("googleImplementation", libs.google.play.app.update)
+    add("googleImplementation", libs.google.play.review)
+    add("googleImplementation", libs.gms.play.services.base)
 
     // api dependencies for features modules
-    api("androidx.appcompat:appcompat:1.5.1")
-    api("androidx.work:work-runtime-ktx:$workVersion")
-    api("androidx.room:room-runtime:$roomVersion")
-    api("androidx.room:room-paging:$roomVersion")
-    api("androidx.room:room-ktx:$roomVersion")
-    api("androidx.paging:paging-runtime-ktx:3.1.1")
-    api("com.squareup.retrofit2:retrofit:2.9.0")
-    api("com.squareup.okhttp3:okhttp:4.10.0")
-    api("com.jakewharton.timber:timber:5.0.1")
+    api(libs.androidx.appcompat)
+    api(libs.androidx.work.runtime)
+    api(libs.androidx.room.runtime)
+    api(libs.androidx.room.paging)
+    api(libs.androidx.room)
+    api(libs.androidx.paging)
+    api(libs.retrofit)
+    api(enforcedPlatform(libs.okhttp.bom))
+    api(libs.okhttp)
+    api(libs.timber)
 
-    val navigationVersion = "2.5.3"
-    api("androidx.navigation:navigation-fragment-ktx:$navigationVersion")
-    api("androidx.navigation:navigation-ui-ktx:$navigationVersion")
-    api("androidx.navigation:navigation-dynamic-features-fragment:$navigationVersion")
-    api("androidx.navigation:navigation-compose:$navigationVersion")
+    api(libs.androidx.navigation.fragment)
+    api(libs.androidx.navigation.ui)
+    api(libs.androidx.navigation.dynamic.features.fragment)
+    api(libs.androidx.navigation.compose)
 
-    // alpha for manifest
-    debugImplementation("androidx.fragment:fragment-testing-manifest:1.6.0-alpha04")
+    debugImplementation(libs.androidx.fragment.testing.manifest)
 
-    debugImplementation("com.squareup.leakcanary:leakcanary-android:2.9.1")
+    debugImplementation(libs.leakcanary.android)
 }
 
 apply {

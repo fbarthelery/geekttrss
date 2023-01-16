@@ -21,22 +21,23 @@
 
 plugins {
     kotlin("jvm")
-    kotlin("plugin.serialization")
+    alias(libs.plugins.kotlinx.serialization)
 }
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(enforcedPlatform(kotlin("bom")))
 
-    implementation("androidx.annotation:annotation:1.5.0")
-    implementation("javax.inject:javax.inject:1")
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+    implementation(libs.androidx.annotation)
+    implementation(libs.javax.inject)
+    implementation(libs.retrofit)
+    implementation(platform(libs.kotlinx.serialization.bom))
+    implementation(libs.kotlinx.serialization.json)
 
-    implementation(enforcedPlatform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.6.4"))
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-core")
+    implementation(platform(libs.kotlinx.coroutines.bom))
+    api(libs.kotlinx.coroutines.core)
 
 
-    testImplementation("com.google.truth:truth:1.1.3")
+    testImplementation(libs.truth)
     testImplementation(kotlin("test-junit"))
 }

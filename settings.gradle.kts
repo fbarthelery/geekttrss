@@ -21,22 +21,11 @@
 
 pluginManagement {
     val kotlinVersion: String by settings
-    val androidxNavigationVersion: String by settings
-    val crashlyticsVersion: String by settings
-    val googleServicesVersion: String by settings
-    val ossLicensesVersion: String by settings
-    val hiltVersion: String by settings
 
     plugins {
         kotlin("android") version kotlinVersion
         kotlin("jvm") version kotlinVersion
         kotlin("kapt") version kotlinVersion
-        kotlin("plugin.serialization") version kotlinVersion
-        id("androidx.navigation.safeargs.kotlin") version androidxNavigationVersion
-        id("com.google.firebase.crashlytics") version crashlyticsVersion
-        id("com.google.gms.google-services") version googleServicesVersion
-        id("com.google.android.gms.oss-licenses-plugin") version ossLicensesVersion
-        id("dagger.hilt.android.plugin") version hiltVersion
     }
 
     repositories {
@@ -47,11 +36,9 @@ pluginManagement {
     resolutionStrategy {
         eachPlugin {
             when (requested.id.id) {
-                "com.google.android.gms.oss-licenses-plugin" -> useModule("com.google.android.gms:oss-licenses-plugin:${ossLicensesVersion}")
-                "com.google.gms.google-services" -> useModule("com.google.gms:google-services:${googleServicesVersion}")
-                "com.google.firebase.crashlytics" -> useModule("com.google.firebase:firebase-crashlytics-gradle:${crashlyticsVersion}")
-                "androidx.navigation.safeargs.kotlin" -> useModule("androidx.navigation:navigation-safe-args-gradle-plugin:${androidxNavigationVersion}")
-                "dagger.hilt.android.plugin" -> useModule("com.google.dagger:hilt-android-gradle-plugin:${hiltVersion}")
+                "com.google.android.gms.oss-licenses-plugin" -> useModule("com.google.android.gms:oss-licenses-plugin:${requested.version}")
+                "com.google.gms.google-services" -> useModule("com.google.gms:google-services:${requested.version}")
+                "dagger.hilt.android.plugin" -> useModule("com.google.dagger:hilt-android-gradle-plugin:${requested.version}")
             }
         }
     }

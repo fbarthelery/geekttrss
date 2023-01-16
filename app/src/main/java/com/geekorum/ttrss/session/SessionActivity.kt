@@ -24,6 +24,7 @@ import android.accounts.Account
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.core.os.BundleCompat
 import com.geekorum.ttrss.core.BaseActivity
 import com.geekorum.ttrss.MainActivity
 import com.geekorum.ttrss.articles_list.TtrssAccountViewModel
@@ -42,7 +43,7 @@ abstract class SessionActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        account = savedInstanceState?.getParcelable(SAVED_ACCOUNT)
+        account = savedInstanceState?.let { BundleCompat.getParcelable(savedInstanceState, SAVED_ACCOUNT, Account::class.java) }
         if (account == null || !accountViewModel.isExistingAccount(account)) {
             account = accountViewModel.selectedAccount.value
         }

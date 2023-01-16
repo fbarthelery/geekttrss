@@ -26,9 +26,9 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(enforcedPlatform(kotlin("bom")))
 
-    implementation("javax.inject:javax.inject:1")
-    api("org.jsoup:jsoup:1.13.1")
+    implementation(libs.javax.inject)
+    api(libs.jsoup)
 
-    testImplementation("com.google.truth:truth:1.1.3")
+    testImplementation(libs.truth)
     testImplementation(kotlin("test-junit"))
 }

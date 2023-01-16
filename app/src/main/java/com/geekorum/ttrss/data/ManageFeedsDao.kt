@@ -28,9 +28,9 @@ import androidx.room.Transaction
 @Dao
 interface ManageFeedsDao {
 
-    @get:Transaction
-    @get:Query("SELECT * FROM feeds WHERE is_subscribed == 1 ORDER BY title")
-    val allSubscribedFeeds: PagingSource<Int, FeedWithFavIcon>
+    @Transaction
+    @Query("SELECT * FROM feeds WHERE is_subscribed == 1 ORDER BY title")
+    fun getAllSubscribedFeeds(): PagingSource<Int, FeedWithFavIcon>
 
     @Query("UPDATE feeds SET is_subscribed=:isSubscribed WHERE _id=:feedId")
     suspend fun updateIsSubscribedFeed(feedId: Long, isSubscribed: Boolean)
