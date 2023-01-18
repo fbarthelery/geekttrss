@@ -31,17 +31,8 @@ plugins {
     // these should not be needed but for an unknown reason they get applied
     // with bad ordering if not there. or they can't be applied dynamically
     // version used is in gradle.properties
-    kotlin("jvm") apply false
     alias(libs.plugins.firebase.crashlytics) apply false
     alias(libs.plugins.google.gms.google.services) apply false
-}
-
-// Need to be there because if not, the various plugins downgrade the AGP version used from buildSrc
-// during the compilation of the *.gradle.kts script
-buildscript {
-    dependencies {
-        classpath("com.android.tools.build:gradle:7.3.1")
-    }
 }
 
 // some extra properties
@@ -65,9 +56,7 @@ allprojects {
 
     tasks.withType<KotlinCompile> {
         kotlinOptions {
-            jvmTarget = "1.8"
-            freeCompilerArgs = listOf(
-                "-Xjvm-default=all", "-opt-in=kotlin.RequiresOptIn")
+            freeCompilerArgs = listOf("-Xjvm-default=all")
         }
     }
 

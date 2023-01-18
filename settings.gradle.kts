@@ -20,14 +20,6 @@
  */
 
 pluginManagement {
-    val kotlinVersion: String by settings
-
-    plugins {
-        kotlin("android") version kotlinVersion
-        kotlin("jvm") version kotlinVersion
-        kotlin("kapt") version kotlinVersion
-    }
-
     repositories {
         gradlePluginPortal()
         mavenCentral()

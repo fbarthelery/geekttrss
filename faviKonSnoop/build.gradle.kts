@@ -23,6 +23,10 @@ plugins {
     alias(libs.plugins.kotlinx.serialization)
 }
 
+kotlin {
+    jvmToolchain(11)
+}
+
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation(enforcedPlatform(kotlin("bom")))
