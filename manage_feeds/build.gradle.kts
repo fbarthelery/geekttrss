@@ -38,8 +38,8 @@ android {
         minSdk = 24
     }
 
-    dataBinding {
-        isEnabled = true
+    buildFeatures {
+        dataBinding = true
     }
 
     flavorDimensions += "distribution"
@@ -60,6 +60,13 @@ android {
     }
 }
 
+kotlin {
+//        this seems to break hilt at the moment
+//        jvmToolchain(11)
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions.jvmTarget = "11"
+    }
+}
 
 dependencies {
     // it seems that app is not added in classpath when running tests from gradle

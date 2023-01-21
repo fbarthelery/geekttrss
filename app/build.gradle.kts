@@ -122,6 +122,14 @@ android {
     }
 }
 
+kotlin {
+//        this seems to break hilt at the moment
+//        jvmToolchain(11)
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        kotlinOptions.jvmTarget = "11"
+    }
+}
+
 kapt {
     arguments {
         arg("room.schemaLocation", "$projectDir/schemas")
