@@ -41,7 +41,12 @@ internal fun ExecOperations.getGitSha1(projectDir: File): String? = runCommand("
 
 internal fun ExecOperations.getHgSha1(projectDir: File): String? = runCommand("hg id --debug -i -r .", workingDir = projectDir)?.trim()
 
-internal fun ExecOperations.getHgLocalRevisionNumber(projectDir: File): String? = runCommand("hg id -n -r .", workingDir = projectDir)?.trim()
+internal fun ExecOperations.getHgLocalRevisionNumber(projectDir: File): String? {
+    val hg = File(projectDir, ".hg")
+    return if (hg.exists()) {
+        runCommand("hg id -n -r .", workingDir = projectDir)?.trim()
+    } else null
+}
 
 private fun ExecOperations.getChangeSet(projectDir: File): String {
     val git = File(projectDir, ".git")
