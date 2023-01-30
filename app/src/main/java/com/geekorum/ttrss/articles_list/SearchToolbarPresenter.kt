@@ -22,10 +22,9 @@ package com.geekorum.ttrss.articles_list
 
 import android.view.MenuItem
 import androidx.appcompat.widget.SearchView
-import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
-import androidx.navigation.dynamicfeatures.DynamicGraphNavigator
 import com.geekorum.ttrss.R
+import com.geekorum.ttrss.on_demand_modules.OnDemandModuleNavHostProgressDestinationProvider
 
 /**
  * Presenter for the search toolbar widget
@@ -33,6 +32,7 @@ import com.geekorum.ttrss.R
 internal class SearchToolbarPresenter(
     private val searchItem: MenuItem,
     private val navController: NavController,
+    private val onDemandModuleNavHostProgressDestinationProvider: OnDemandModuleNavHostProgressDestinationProvider,
     private val activityViewModel: ActivityViewModel
 ) {
 
@@ -41,11 +41,11 @@ internal class SearchToolbarPresenter(
     }
 
     private fun setup() {
-        navController.addOnDestinationChangedListener { controller, destination, _ ->
+        navController.addOnDestinationChangedListener { _, destination, _ ->
             if (destination.id != R.id.articlesSearchFragment && searchItem.isActionViewExpanded) {
                 searchItem.collapseActionView()
             }
-            val progressDestinationId = (controller.graph as? DynamicGraphNavigator.DynamicNavGraph)?.progressDestination ?: 0
+            val progressDestinationId = onDemandModuleNavHostProgressDestinationProvider.progressDestinationId
             val isOnProgress = destination.id == progressDestinationId
             searchItem.isVisible = !isOnProgress
             searchItem.isEnabled = !isOnProgress

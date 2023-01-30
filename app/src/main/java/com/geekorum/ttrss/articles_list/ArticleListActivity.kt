@@ -38,8 +38,8 @@ import com.geekorum.ttrss.article_details.ArticleDetailActivity
 import com.geekorum.ttrss.databinding.ActivityArticleListBinding
 import com.geekorum.ttrss.in_app_update.InAppUpdateViewModel
 import com.geekorum.ttrss.on_demand_modules.OnDemandModuleManager
+import com.geekorum.ttrss.on_demand_modules.findOnDemandModuleNavHostFragment
 import com.geekorum.ttrss.session.SessionActivity
-import com.google.android.material.appbar.AppBarLayout
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -73,6 +73,9 @@ class ArticleListActivity : SessionActivity() {
     private lateinit var fabPresenter: FabPresenter
     private lateinit var feedNavigationPresenter: FeedsNavigationMenuPresenter
     private var drawerLayoutPresenter: DrawerLayoutPresenter? = null
+    private val onDemandModuleNavHostFragment by lazy {
+        findOnDemandModuleNavHostFragment(R.id.middle_pane_layout)!!
+    }
 
     @Inject
     lateinit var moduleManager: OnDemandModuleManager
@@ -81,17 +84,17 @@ class ArticleListActivity : SessionActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        activityViewModel.articleSelectedEvent.observe(this, EventObserver { (position, article) ->
+        activityViewModel.articleSelectedEvent.observe(this, EventObserver { (_, article) ->
             navController.navigate(ArticlesListFragmentDirections.actionShowArticle(article.id))
         })
 
-        accountViewModel.selectedAccount.observe(this, Observer { account ->
+        accountViewModel.selectedAccount.observe(this) { account ->
             if (account != null) {
                 activityViewModel.setAccount(account)
             } else {
                 accountViewModel.startSelectAccountActivity(this)
             }
-        })
+        }
 
         accountViewModel.noAccountSelectedEvent.observe(this, EventObserver {
             finish()
@@ -122,17 +125,20 @@ class ArticleListActivity : SessionActivity() {
     }
 
     private fun setupFab() {
-        fabPresenter = FabPresenter(binding.fab, navController)
+        fabPresenter = FabPresenter(
+            fab = binding.fab,
+            onDemandModuleNavHostProgressDestinationProvider = onDemandModuleNavHostFragment,
+            navController = navController
+        )
     }
 
     private fun setupEdgeToEdge() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         // the appBar doesn't redraw statusBarForeground correctly. force it
-        binding.appBar.addOnOffsetChangedListener(
-            AppBarLayout.OnOffsetChangedListener { _, _ ->
-                binding.appBar.invalidate()
-            })
+        binding.appBar.addOnOffsetChangedListener { _, _ ->
+            binding.appBar.invalidate()
+        }
     }
 
     private fun setupToolbar() {
@@ -143,9 +149,14 @@ class ArticleListActivity : SessionActivity() {
         ).setOpenableLayout(drawerLayout)
             .build()
         binding.toolbar.setupWithNavController(navController, appBarConfiguration)
-        appBarPresenter = AppBarPresenter(binding.appBar, binding.toolbar,
-            binding.tagsList,
-            tagsViewModel, navController)
+        appBarPresenter = AppBarPresenter(
+            appBarLayout = binding.appBar,
+            toolbar = binding.toolbar,
+            tagsListCompose = binding.tagsList,
+            tagsViewModel = tagsViewModel,
+            onDemandModuleNavHostProgressDestinationProvider = onDemandModuleNavHostFragment,
+            navController = navController
+        )
 
         // workaround with compose fragment
         // it looks like appbar_scrolling_view_behavior is not applied correctly
@@ -180,7 +191,7 @@ class ArticleListActivity : SessionActivity() {
                 else -> false
             }
         }
-        navController.addOnDestinationChangedListener { controller, destination, arguments ->
+        navController.addOnDestinationChangedListener { _, destination, _ ->
             val sortMenuItem = binding.toolbar.menu.findItem(R.id.articles_sort_order)
             sortMenuItem?.isVisible = when(destination.id) {
                 R.id.magazineFragment -> false
@@ -195,7 +206,13 @@ class ArticleListActivity : SessionActivity() {
                 feedsViewModel, accountViewModel, activityViewModel)
 
         drawerLayout?.let {
-            drawerLayoutPresenter = DrawerLayoutPresenter(it, navController, this, this)
+            drawerLayoutPresenter = DrawerLayoutPresenter(
+                drawerLayout = it,
+                navController = navController,
+                onBackPressedDispatcherOwner = this,
+                onDemandModuleNavHostProgressDestinationProvider = onDemandModuleNavHostFragment,
+                lifecycleOwner = this
+            )
         }
     }
 
@@ -204,7 +221,12 @@ class ArticleListActivity : SessionActivity() {
             inflateMenu(R.menu.activity_articles_list)
             menu.findItem(R.id.articles_search)
         }
-        searchToolbarPresenter = SearchToolbarPresenter(searchItem, navController, activityViewModel)
+        searchToolbarPresenter = SearchToolbarPresenter(
+            searchItem = searchItem,
+            navController = navController,
+            onDemandModuleNavHostProgressDestinationProvider = onDemandModuleNavHostFragment,
+            activityViewModel = activityViewModel
+        )
     }
 
     private fun setupAppReview() {

@@ -253,6 +253,7 @@ dependencies {
     add("googleImplementation", libs.google.play.app.update)
     add("googleImplementation", libs.google.play.review)
     add("googleImplementation", libs.gms.play.services.base)
+    add("googleImplementation", libs.androidx.navigation.dynamic.features.fragment)
 
     // api dependencies for features modules
     api(libs.androidx.appcompat)
@@ -268,7 +269,6 @@ dependencies {
 
     api(libs.androidx.navigation.fragment)
     api(libs.androidx.navigation.ui)
-    api(libs.androidx.navigation.dynamic.features.fragment)
     api(libs.androidx.navigation.compose)
 
     debugImplementation(libs.androidx.fragment.testing.manifest)

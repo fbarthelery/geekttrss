@@ -27,9 +27,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.navigation.NavController
-import androidx.navigation.dynamicfeatures.DynamicGraphNavigator
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Feed.Companion.FEED_ID_ALL_ARTICLES
+import com.geekorum.ttrss.on_demand_modules.OnDemandModuleNavHostProgressDestinationProvider
 import com.geekorum.ttrss.ui.AppTheme
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.MaterialToolbar
@@ -43,7 +43,8 @@ internal class AppBarPresenter(
     private val toolbar: MaterialToolbar,
     private val tagsListCompose: ComposeView,
     private val tagsViewModel: TagsViewModel,
-    private val navController: NavController
+    private val onDemandModuleNavHostProgressDestinationProvider: OnDemandModuleNavHostProgressDestinationProvider,
+    private val navController: NavController,
 ){
 
     private var currentTag: String? by mutableStateOf(null)
@@ -54,8 +55,8 @@ internal class AppBarPresenter(
     }
 
     private fun setup() {
-        navController.addOnDestinationChangedListener { controller, destination, arguments ->
-            val progressDestinationId = (controller.graph as? DynamicGraphNavigator.DynamicNavGraph)?.progressDestination ?: 0
+        navController.addOnDestinationChangedListener { _, destination, arguments ->
+            val progressDestinationId = onDemandModuleNavHostProgressDestinationProvider.progressDestinationId
             when (destination.id) {
                 R.id.articlesListFragment,
                 R.id.articlesListByTagFragment,

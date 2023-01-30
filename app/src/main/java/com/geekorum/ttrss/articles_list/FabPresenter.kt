@@ -22,9 +22,9 @@ package com.geekorum.ttrss.articles_list
 
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.navigation.NavController
-import androidx.navigation.dynamicfeatures.DynamicGraphNavigator
 import com.geekorum.geekdroid.views.behaviors.ScrollAwareFABBehavior
 import com.geekorum.ttrss.R
+import com.geekorum.ttrss.on_demand_modules.OnDemandModuleNavHostProgressDestinationProvider
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 /**
@@ -32,10 +32,11 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
  */
 internal class FabPresenter(
     private val fab: FloatingActionButton,
+    private val onDemandModuleNavHostProgressDestinationProvider: OnDemandModuleNavHostProgressDestinationProvider,
     private val navController: NavController
 ){
 
-    val fabBehavior: ScrollAwareFABBehavior? =
+    private val fabBehavior: ScrollAwareFABBehavior? =
         (fab.layoutParams as? CoordinatorLayout.LayoutParams)?.behavior as? ScrollAwareFABBehavior
 
     init {
@@ -43,8 +44,8 @@ internal class FabPresenter(
     }
 
     private fun setup() {
-        navController.addOnDestinationChangedListener { controller, destination, _ ->
-            val progressDestinationId = (controller.graph as? DynamicGraphNavigator.DynamicNavGraph)?.progressDestination ?: 0
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            val progressDestinationId = onDemandModuleNavHostProgressDestinationProvider.progressDestinationId
             when (destination.id) {
                 progressDestinationId,
                 R.id.articlesSearchFragment -> {

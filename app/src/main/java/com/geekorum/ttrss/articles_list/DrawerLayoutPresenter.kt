@@ -27,8 +27,8 @@ import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
-import androidx.navigation.dynamicfeatures.DynamicGraphNavigator
 import com.geekorum.ttrss.R
+import com.geekorum.ttrss.on_demand_modules.OnDemandModuleNavHostProgressDestinationProvider
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
@@ -41,6 +41,7 @@ internal class DrawerLayoutPresenter(
     private val drawerLayout: DrawerLayout,
     private val navController: NavController,
     private val onBackPressedDispatcherOwner: OnBackPressedDispatcherOwner,
+    private val onDemandModuleNavHostProgressDestinationProvider: OnDemandModuleNavHostProgressDestinationProvider,
     private val lifecycleOwner: LifecycleOwner,
 ) {
 
@@ -49,9 +50,9 @@ internal class DrawerLayoutPresenter(
     }
 
     private fun setup() {
-        navController.addOnDestinationChangedListener { controller, destination, _ ->
+        navController.addOnDestinationChangedListener { _, destination, _ ->
             drawerLayout.closeDrawers()
-            val progressDestinationId = (controller.graph as? DynamicGraphNavigator.DynamicNavGraph)?.progressDestination ?: 0
+            val progressDestinationId = onDemandModuleNavHostProgressDestinationProvider.progressDestinationId
             val lockMode = when (destination.id) {
                 R.id.articlesSearchFragment,
                 progressDestinationId -> DrawerLayout.LOCK_MODE_LOCKED_CLOSED
@@ -71,7 +72,6 @@ internal class DrawerLayoutPresenter(
     }
 }
 
-@OptIn(ExperimentalCoroutinesApi::class)
 private fun DrawerLayout.isOpenFlow() = callbackFlow<Boolean> {
     channel.trySend(isOpen)
     val listener = object : DrawerLayout.SimpleDrawerListener() {
