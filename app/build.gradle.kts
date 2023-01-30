@@ -41,7 +41,7 @@ plugins {
 androidComponents {
     val major = 1
     val minor = 6
-    val patch = 0
+    val patch = 1
     configureVersionChangeset(project, major, minor, patch)
 }
 

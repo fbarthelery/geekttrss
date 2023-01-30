@@ -1,5 +1,2 @@
-Add a Magazine view that displays a selection of articles to read
-Display suggestions at the end of an article
-Display feed icon and feed name on article card
-Suggest to review the application on Google Play store
+Rewrite implementation of OpenSourceLicensesActivity
 Various bug fixes and improvements
