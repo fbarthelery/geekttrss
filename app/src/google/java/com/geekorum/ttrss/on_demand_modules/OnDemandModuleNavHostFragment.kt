@@ -20,18 +20,11 @@
  */
 package com.geekorum.ttrss.on_demand_modules
 
-import androidx.fragment.app.Fragment
 import androidx.navigation.*
+import androidx.navigation.dynamicfeatures.DynamicGraphNavigator
 import androidx.navigation.dynamicfeatures.fragment.DynamicNavHostFragment
 import androidx.navigation.fragment.DialogFragmentNavigator
 import androidx.navigation.fragment.FragmentNavigator
-import com.geekorum.geekdroid.dagger.FragmentFactoriesModule
-import com.geekorum.geekdroid.dagger.FragmentKey
-import dagger.Binds
-import dagger.Module
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import dagger.multibindings.IntoMap
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -41,14 +34,17 @@ import javax.inject.Inject
  */
 class OnDemandModuleNavHostFragment @Inject constructor(
     private val onDemandModuleManager: OnDemandModuleManager
-): DynamicNavHostFragment() {
+): DynamicNavHostFragment(), OnDemandModuleNavHostProgressDestinationProvider {
+
+    override val progressDestinationId: Int
+        get() = (navController.graph as? DynamicGraphNavigator.DynamicNavGraph)?.progressDestination ?: 0
 
     override fun onCreateNavHostController(navHostController: NavHostController) {
         if (!onDemandModuleManager.canInstallModule) {
             @Suppress("DEPRECATION")
             onCreateNavController(navHostController)
             Timber.i("The application can't install dynamic feature modules. Fallback to standard navigators")
-            // restore default navigator (undo DynamicNavHostFragment
+            // restore default navigator (undo DynamicNavHostFragment)
             val navigatorProvider = navHostController.navigatorProvider
             navigatorProvider += ActivityNavigator(requireActivity())
             check(id > 0)
@@ -60,13 +56,4 @@ class OnDemandModuleNavHostFragment @Inject constructor(
         }
     }
 
-}
-
-@Module(includes = [FragmentFactoriesModule::class])
-@InstallIn(SingletonComponent::class)
-abstract class OnDemandModules {
-    @Binds
-    @IntoMap
-    @FragmentKey(OnDemandModuleNavHostFragment::class)
-    abstract fun bindOnDemandModuleNavHostFragment(fragment: OnDemandModuleNavHostFragment): Fragment
 }
