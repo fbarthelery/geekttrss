@@ -31,7 +31,7 @@ import android.os.Bundle
 import android.provider.Settings
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.map
 import com.geekorum.geekdroid.accounts.AccountSelector
 import com.geekorum.geekdroid.accounts.AccountsListViewModel
 import com.geekorum.geekdroid.app.lifecycle.EmptyEvent
@@ -51,7 +51,7 @@ class TtrssAccountViewModel @Inject constructor(
     accountSelector: AccountSelector
 ): AccountsListViewModel(accountManager, accountSelector, AccountAuthenticator.TTRSS_ACCOUNT_TYPE) {
 
-    val selectedAccountHost = Transformations.map(selectedAccount) { account ->
+    val selectedAccountHost = selectedAccount.map { account ->
         val url = accountManager.getUserData(account, AccountAuthenticator.USERDATA_URL)
         Uri.parse(url).host ?: ""
     }

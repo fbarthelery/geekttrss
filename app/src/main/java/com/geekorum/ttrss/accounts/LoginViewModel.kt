@@ -25,10 +25,7 @@ import android.view.inputmethod.EditorInfo
 import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
 import androidx.databinding.InverseMethod
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.geekorum.geekdroid.app.lifecycle.Event
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
@@ -70,7 +67,7 @@ internal class LoginViewModel @Inject constructor(
         value = FieldErrorStatus()
     }
 
-    val areFieldsCorrect = Transformations.map(fieldErrors) {
+    val areFieldsCorrect = fieldErrors.map {
         val editionDone = (it.hasEditAllFields || (!canChangeUsernameOrUrl && it.hasEditPassword))
         editionDone && it.areFieldsCorrect
     }

@@ -37,8 +37,9 @@ open class BaseSessionActivity : SessionActivity() {
         activityComponent.inject(this)
     }
 
-    override fun getDefaultViewModelProviderFactory(): ViewModelProvider.Factory {
-        return activityComponent.hiltViewModelFactoryFactory.fromActivity(this,
-            super.getDefaultViewModelProviderFactory())
-    }
+    override val defaultViewModelProviderFactory: ViewModelProvider.Factory
+        get() {
+            return activityComponent.hiltViewModelFactoryFactory.fromActivity(this,
+                super.defaultViewModelProviderFactory)
+        }
 }

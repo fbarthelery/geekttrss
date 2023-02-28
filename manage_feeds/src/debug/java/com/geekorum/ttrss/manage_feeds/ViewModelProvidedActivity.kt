@@ -31,7 +31,6 @@ class ViewModelProvidedActivity : AppCompatActivity() {
 
     internal var viewModelProviderFactory: ViewModelProvider.Factory? = null
 
-    override fun getDefaultViewModelProviderFactory(): ViewModelProvider.Factory {
-        return viewModelProviderFactory ?: super.getDefaultViewModelProviderFactory()
-    }
+    override val defaultViewModelProviderFactory: ViewModelProvider.Factory
+        get() = viewModelProviderFactory ?: super.defaultViewModelProviderFactory
 }
