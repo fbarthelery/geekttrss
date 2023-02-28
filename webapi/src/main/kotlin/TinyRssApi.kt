@@ -21,27 +21,8 @@
 package com.geekorum.ttrss.webapi
 
 import androidx.annotation.Keep
-import com.geekorum.ttrss.webapi.model.Feed
-import com.geekorum.ttrss.webapi.model.FeedCategory
-import com.geekorum.ttrss.webapi.model.GetApiLevelRequestPayload
-import com.geekorum.ttrss.webapi.model.GetApiLevelResponsePayload
-import com.geekorum.ttrss.webapi.model.GetArticlesRequestPayload
-import com.geekorum.ttrss.webapi.model.GetCategoriesRequestPayload
-import com.geekorum.ttrss.webapi.model.GetConfigRequestPayload
-import com.geekorum.ttrss.webapi.model.GetConfigResponsePayload
-import com.geekorum.ttrss.webapi.model.GetFeedsRequestPayload
-import com.geekorum.ttrss.webapi.model.Headline
-import com.geekorum.ttrss.webapi.model.ListResponsePayload
-import com.geekorum.ttrss.webapi.model.LoginRequestPayload
-import com.geekorum.ttrss.webapi.model.LoginResponsePayload
-import com.geekorum.ttrss.webapi.model.SubscribeToFeedRequestPayload
-import com.geekorum.ttrss.webapi.model.SubscribeToFeedResponsePayload
-import com.geekorum.ttrss.webapi.model.UnsubscribeFeedRequestPayload
-import com.geekorum.ttrss.webapi.model.UnsubscribeFeedResponsePayload
-import com.geekorum.ttrss.webapi.model.UpdateArticleRequestPayload
-import com.geekorum.ttrss.webapi.model.UpdateArticleResponsePayload
-import com.geekorum.ttrss.webapi.model.GetVersionRequestPayload
-import com.geekorum.ttrss.webapi.model.GetVersionResponsePayload
+import com.geekorum.ttrss.webapi.model.*
+import okhttp3.ResponseBody
 import retrofit2.http.Body
 import retrofit2.http.POST
 
@@ -83,4 +64,6 @@ interface TinyRssApi {
     @POST("api/")
     suspend fun unsubscribeFromFeed(@Body unsubscribeFeedRequestPayload: UnsubscribeFeedRequestPayload): UnsubscribeFeedResponsePayload
 
+    @POST("api/")
+    suspend fun getFeedIcon(@Body getFeedIconPayload: GetFeedIconPayload): ResponseBody
 }

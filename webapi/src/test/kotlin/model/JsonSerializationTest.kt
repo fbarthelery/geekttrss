@@ -21,6 +21,7 @@
 package com.geekorum.ttrss.webapi.model
 
 import com.geekorum.ttrss.webapi.Json
+import com.geekorum.ttrss.webapi.model.Error.E_NOT_FOUND
 import com.geekorum.ttrss.webapi.model.Error.NOT_LOGGED_IN
 import com.google.common.truth.Truth.assertThat
 import kotlinx.serialization.KSerializer
@@ -348,9 +349,29 @@ class JsonSerializationTest {
         assertThat(result.content.error).isEqualTo(expected.content.error)
     }
 
+    @Test
+    fun testThatErrorResponsePayloaoLoadCorrectly() {
+        val jsonString = """
+            {
+              "seq": 0,
+              "status": 1,
+              "content": {"error":"E_NOT_FOUND"}
+            }
+        """.trimIndent()
+        val serializer = getSerializer<ErrorResponsePayload>()
+        val result = Json.decodeFromString(serializer, jsonString)
+        val expected = ErrorResponsePayload(
+            sequence = 0,
+            status = 1,
+            content = ErrorResponsePayload.Content(error = E_NOT_FOUND)
+        )
+        assertThat(result.sequence).isEqualTo(expected.sequence)
+        assertThat(result.status).isEqualTo(expected.status)
+        assertThat(result.content.error).isEqualTo(expected.content.error)
+    }
+
 }
 
-@OptIn(ExperimentalStdlibApi::class)
 internal inline fun <reified T> getSerializer(): KSerializer<T> {
     val typeToken = typeOf<T>()
     // we use type token because that's what RetrofitConverter use to get the serializer

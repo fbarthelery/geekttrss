@@ -20,8 +20,11 @@
  */
 package com.geekorum.ttrss.webapi
 
+import com.geekorum.ttrss.webapi.model.ErrorResponsePayload
 import com.geekorum.ttrss.webapi.model.ResponsePayload
-import kotlinx.coroutines.Deferred
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.decodeFromStream
+import okhttp3.ResponseBody
 import retrofit2.HttpException
 import java.io.IOException
 
@@ -35,6 +38,31 @@ class RetrofitServiceHelper(
             val body = retryIfInvalidToken(block)
             body.checkStatus { failingMessage }
             return body
+        } catch (e: IOException) {
+            throw ApiCallException(failingMessage, e)
+        } catch (e: HttpException) {
+            throw ApiCallException(failingMessage, e)
+        }
+    }
+
+    suspend fun <T : ResponseBody> getResponseBodyOrFail(failingMessage: String, block: suspend () -> T): T {
+        try {
+            val responseBody = block()
+            val contentType = responseBody.contentType()
+            if (contentType?.subtype?.contains("json") == true) {
+                responseBody.use {
+                    val serializer  = ErrorResponsePayload.serializer()
+                    val responsePayload = Json.decodeFromString(serializer, responseBody.string())
+                    responsePayload.checkStatus { failingMessage }
+                }
+            }
+            return responseBody
+        } catch (e: ApiCallException) {
+            val error = e.errorCode
+            if (error == ApiCallException.ApiError.LOGIN_FAILED || error == ApiCallException.ApiError.NOT_LOGGED_IN) {
+                tokenRetriever.invalidateToken()
+            }
+            throw e
         } catch (e: IOException) {
             throw ApiCallException(failingMessage, e)
         } catch (e: HttpException) {

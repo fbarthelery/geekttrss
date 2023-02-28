@@ -76,3 +76,17 @@ data class GetFeedsRequestPayload(
         val CATEGORY_ID_ALL_INCLUDE_VIRTUALS = -4
     }
 }
+
+/**
+ * Request Payload to get a feed icon
+ */
+@Keep
+@Serializable
+data class GetFeedIconPayload(
+    @SerialName("id")
+    private val feedId: Long,
+) : LoggedRequestPayload() {
+
+    @SerialName("op")
+    override val operation = "getFeedIcon"
+}

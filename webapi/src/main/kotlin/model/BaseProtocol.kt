@@ -97,9 +97,26 @@ enum class Error {
     INCORRECT_USAGE,
     NOT_LOGGED_IN,
     FEED_NOT_FOUND,
-    UNKNOWN_METHOD
+    UNKNOWN_METHOD,
+    E_NOT_FOUND
 }
 
+
+@Keep
+@Serializable
+data class ErrorResponsePayload(
+    @SerialName("seq")
+    override val sequence: Int? = null,
+    override val status: Int = 0,
+    override val content: Content
+) : ResponsePayload<ErrorResponsePayload.Content>() {
+
+    @Serializable
+    data class Content(
+        override var error: Error? = null
+    ) : BaseContent()
+
+}
 
 /**
  * The content of an answer from the Tiny Tiny Rss api.

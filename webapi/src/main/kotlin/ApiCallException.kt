@@ -59,7 +59,8 @@ val ResponsePayload<*>.error: ApiCallException.ApiError?
         Error.API_DISABLED -> ApiCallException.ApiError.API_DISABLED
         Error.NOT_LOGGED_IN -> ApiCallException.ApiError.NOT_LOGGED_IN
         Error.INCORRECT_USAGE -> ApiCallException.ApiError.API_INCORRECT_USAGE
-        Error.FEED_NOT_FOUND -> ApiCallException.ApiError.API_FEED_NOT_FOUND
+        Error.FEED_NOT_FOUND,
+        Error.E_NOT_FOUND -> ApiCallException.ApiError.API_FEED_NOT_FOUND
         Error.UNKNOWN_METHOD -> ApiCallException.ApiError.API_UNKNOWN_METHOD
         Error.API_UNKNOWN -> ApiCallException.ApiError.API_UNKNOWN
     }
