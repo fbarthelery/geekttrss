@@ -40,6 +40,8 @@ dependencies {
 
     implementation(platform(libs.kotlinx.coroutines.bom))
     api(libs.kotlinx.coroutines.core)
+    implementation(platform(libs.okhttp.bom))
+    api(libs.okhttp)
 
 
     testImplementation(libs.truth)

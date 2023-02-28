@@ -34,14 +34,14 @@ class BasicAuthAuthenticator(
     private val password: String = ""
 ): Authenticator {
     override fun authenticate(route: Route?, response: Response): Request? {
-        if (response.request().header("Authorization") != null) {
+        if (response.request.header("Authorization") != null) {
             return null
         }
 
         val credentials = Credentials.basic(
             username,
             password)
-        return response.request().newBuilder()
+        return response.request.newBuilder()
             .header("Authorization", credentials)
             .build()
     }
