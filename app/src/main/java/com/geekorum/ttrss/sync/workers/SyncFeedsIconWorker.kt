@@ -22,8 +22,6 @@ package com.geekorum.ttrss.sync.workers
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
-import androidx.work.CoroutineWorker
-import androidx.work.ListenableWorker
 import androidx.work.WorkerParameters
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.sync.FeedIconSynchronizer
@@ -32,7 +30,6 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import javax.inject.Inject
 
 
 /**
@@ -46,9 +43,11 @@ class SyncFeedsIconWorker @AssistedInject constructor(
     private val dispatchers: CoroutineDispatchersProvider
 ) : BaseSyncWorker(context, workerParams, syncWorkerComponentBuilder) {
 
-    private val feedIconSynchronizer: FeedIconSynchronizer = syncWorkerComponent.feedIconSynchronizer
+    private val feedIconDir = context.cacheDir.resolve("feed-icons")
 
     override suspend fun doWork(): Result = withContext(dispatchers.io) {
+        val feedIconApiDownloader = syncWorkerComponent.feedIconApiDownloaderFactory.create(feedIconDir)
+        val feedIconSynchronizer: FeedIconSynchronizer = syncWorkerComponent.feedIconSynchronizerFactory.create(feedIconApiDownloader)
         try {
             Timber.i("Synchronizing feeds icons")
             feedIconSynchronizer.synchronizeFeedIcons()

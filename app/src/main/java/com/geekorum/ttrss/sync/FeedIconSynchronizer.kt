@@ -21,6 +21,7 @@
 package com.geekorum.ttrss.sync
 
 import android.security.NetworkSecurityPolicy
+import androidx.core.net.toUri
 import com.geekorum.favikonsnoop.AdaptiveDimension
 import com.geekorum.favikonsnoop.FaviKonSnoop
 import com.geekorum.favikonsnoop.FaviconInfo
@@ -29,6 +30,9 @@ import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.network.ServerInfo
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
@@ -44,7 +48,6 @@ import okhttp3.*
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import timber.log.Timber
 import java.io.IOException
-import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
@@ -53,7 +56,7 @@ private const val NB_LOOKUP_COROUTINES = 5
 /**
  * Update icon's url for every feed.
  */
-class FeedIconSynchronizer @Inject constructor(
+class FeedIconSynchronizer @AssistedInject constructor(
     private val dispatchers: CoroutineDispatchersProvider,
     private val databaseService: DatabaseService,
     private val apiService: ApiService,
@@ -61,7 +64,13 @@ class FeedIconSynchronizer @Inject constructor(
     private val okHttpClient: OkHttpClient,
     private val httpCacher: HttpCacher,
     private val networkSecurityPolicy: NetworkSecurityPolicy,
+    @Assisted private val feedIconApiDownloader: FeedIconApiDownloader
 ) {
+
+    @AssistedFactory
+    interface Factory {
+        fun create(feedIconApiDownloader: FeedIconApiDownloader): FeedIconSynchronizer
+    }
 
     private var serverInfo: ServerInfo? = null
     private val serverInfoLock = Mutex()
@@ -89,7 +98,7 @@ class FeedIconSynchronizer @Inject constructor(
                 for (feed in feedChannel) {
                     try {
                         updateFeedIcon(feed)
-                    } catch (e: IOException) {
+                    } catch (e: Exception) {
                         Timber.w(e, "Unable to update feed icon for feed ${feed.title}")
                     }
                 }
@@ -113,11 +122,28 @@ class FeedIconSynchronizer @Inject constructor(
             databaseService.updateFeedIconUrl(feed.id, selectedIcon.url.toString())
             return
         }
+
+        // download feed icon from api
+        var iconUrl = downloadFeedIcon(feed)
+        if (iconUrl != null ) {
+            databaseService.updateFeedIconUrl(feed.id, iconUrl)
+            return
+        }
+
         // fallback to icon from config
-        val iconUrl = getIconUrlFromServer(feed)
+        iconUrl = getIconUrlFromServer(feed)
         if (iconUrl != null ) {
             databaseService.updateFeedIconUrl(feed.id, iconUrl)
         }
+    }
+
+    private suspend fun downloadFeedIcon(feed: Feed): String? {
+        val serverInfo = getServerInfo()
+        val apiLevel = serverInfo.apiLevel ?: 0
+        if (apiLevel < 19) return null
+
+        val feedFile = feedIconApiDownloader.downloadFeedIcon(feed)
+        return feedFile.toUri().toString()
     }
 
     private suspend fun getServerInfo(): ServerInfo {
@@ -132,6 +158,9 @@ class FeedIconSynchronizer @Inject constructor(
 
     private suspend fun getIconUrlFromServer(feed: Feed): String? {
         val serverInfo = getServerInfo()
+        val apiLevel = serverInfo.apiLevel ?: 0
+        if (apiLevel >= 19) return null
+
         val baseFeedsIconsUrl = serverInfo.feedsIconsUrl?.let {
             "${serverInfo.apiUrl}${serverInfo.feedsIconsUrl}"
         } ?: return null

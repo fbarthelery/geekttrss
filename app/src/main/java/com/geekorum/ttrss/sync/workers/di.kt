@@ -30,6 +30,7 @@ import com.geekorum.ttrss.accounts.PerAccount
 import com.geekorum.ttrss.accounts.ServerInformation
 import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.sync.DatabaseService
+import com.geekorum.ttrss.sync.FeedIconApiDownloader
 import com.geekorum.ttrss.sync.FeedIconSynchronizer
 import dagger.BindsInstance
 import dagger.Module
@@ -54,7 +55,8 @@ interface SyncWorkerComponent {
     val apiService: ApiService
     val serverInformation: ServerInformation
     val databaseService: DatabaseService
-    val feedIconSynchronizer: FeedIconSynchronizer
+    val feedIconSynchronizerFactory: FeedIconSynchronizer.Factory
+    val feedIconApiDownloaderFactory: FeedIconApiDownloader.Factory
 
     @Subcomponent.Builder
     interface Builder {
