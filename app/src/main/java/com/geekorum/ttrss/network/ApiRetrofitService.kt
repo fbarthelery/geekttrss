@@ -35,6 +35,8 @@ import com.geekorum.ttrss.webapi.model.GetArticlesRequestPayload.SortOrder.DATE_
 import com.geekorum.ttrss.webapi.model.GetArticlesRequestPayload.SortOrder.FEED_DATES
 import kotlinx.coroutines.async
 import kotlinx.coroutines.supervisorScope
+import okhttp3.ResponseBody
+import okio.BufferedSource
 
 /**
  * Implementation of [ApiService] which use retrofit to communicate with the Api server.
@@ -82,7 +84,7 @@ class ApiRetrofitService(
 
     @Throws(ApiCallException::class)
     override suspend fun getCategories(): List<Category> {
-        val payload = GetCategoriesRequestPayload(true, false)
+        val payload = GetCategoriesRequestPayload(includeNested = true, unreadOnly = false)
         val response = executeOrFail("Unable to get categories") {
             tinyrssApi.getCategories(payload)
         }
@@ -92,8 +94,10 @@ class ApiRetrofitService(
 
     @Throws(ApiCallException::class)
     override suspend fun getFeeds(): List<Feed> {
-        val payload = GetFeedsRequestPayload(true, false,
-                    GetFeedsRequestPayload.CATEGORY_ID_ALL_EXCLUDE_VIRTUALS)
+        val payload = GetFeedsRequestPayload(
+            includeNested = true, unreadOnly = false,
+            categorieId = GetFeedsRequestPayload.CATEGORY_ID_ALL_EXCLUDE_VIRTUALS
+        )
         val response = executeOrFail("Unable to get feeds") {
             tinyrssApi.getFeeds(payload)
         }
@@ -143,10 +147,23 @@ class ApiRetrofitService(
         )
     }
 
+    override suspend fun getFeedIcon(feedId: Long): BufferedSource {
+        val payload = GetFeedIconPayload(feedId)
+        val response = getResponseBodyOrFail("Unable to get feed icon") {
+            tinyrssApi.getFeedIcon(payload)
+        }
+        return response.source()
+    }
+
 
     @Throws(ApiCallException::class)
     suspend fun <T : ResponsePayload<*>> executeOrFail(failingMessage: String, block: suspend () -> T): T {
         return helper.executeOrFail(failingMessage, block)
+    }
+
+    @Throws(ApiCallException::class)
+    suspend fun <T : ResponseBody> getResponseBodyOrFail(failingMessage: String, block: suspend () -> T): T {
+        return helper.getResponseBodyOrFail(failingMessage, block)
     }
 
 

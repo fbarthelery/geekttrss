@@ -25,6 +25,7 @@ import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.webapi.ApiCallException
+import okio.BufferedSource
 
 /**
  * Interface needed to communicate with the Tiny Tiny Rss server.
@@ -56,6 +57,9 @@ interface ApiService {
 
     @Throws(ApiCallException::class)
     suspend fun updateArticleField(id: Long, field: ArticlesContract.Transaction.Field, value: Boolean)
+
+    @Throws(ApiCallException::class)
+    suspend fun getFeedIcon(feedId: Long): BufferedSource
 
     companion object {
         val ALL_ARTICLES_FEED_ID: Long = -4
