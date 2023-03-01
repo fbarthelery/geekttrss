@@ -31,14 +31,8 @@ import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.session.SessionActivityComponent
 import com.geekorum.ttrss.webapi.ApiCallException
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.*
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -60,16 +54,18 @@ class FeedsViewModel @Inject constructor(
     private val component = componentFactory.newComponent()
     private val apiService: ApiService = component.apiService
 
-    private val onlyUnread = state.getLiveData(STATE_ONLY_UNREAD, true).asFlow()
+    private val onlyUnread = state.getStateFlow(STATE_ONLY_UNREAD, true)
 
-    private val selectedCategory = state.getLiveData<Long>(STATE_SELECTED_CATEGORY_ID).asFlow()
+    private val selectedCategory = state.getStateFlow<Long?>(STATE_SELECTED_CATEGORY_ID, null)
 
-    val feeds: Flow<List<Feed>> = onlyUnread.flatMapLatest { onlyUnread ->
+    val feeds = onlyUnread.flatMapLatest { onlyUnread ->
         if (onlyUnread) feedsRepository.allUnreadFeeds else feedsRepository.allFeeds
-    }.refreshed()
+    }.autoRefreshed()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    private var refreshFeedsJob: Job? = null
 
-    val feedsForCategory = selectedCategory.flatMapLatest(this::getFeedsForCategory)
+    val feedsForCategory = selectedCategory.filterNotNull().flatMapLatest(this::getFeedsForCategory)
 
     private suspend fun getFeedsForCategory(catId: Long) = onlyUnread.flatMapLatest { onlyUnread ->
         if (onlyUnread)
@@ -78,12 +74,13 @@ class FeedsViewModel @Inject constructor(
             feedsRepository.getFeedsForCategory(catId)
     }
 
-    val categories: Flow<List<Category>> = onlyUnread.flatMapLatest { onlyUnread ->
+    val categories = onlyUnread.flatMapLatest { onlyUnread ->
         if (onlyUnread)
             feedsRepository.allUnreadCategories
         else
             feedsRepository.allCategories
-    }.refreshed()
+    }.autoRefreshed()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     fun setOnlyUnread(onlyUnread: Boolean) {
         state[STATE_ONLY_UNREAD] = onlyUnread
@@ -102,17 +99,33 @@ class FeedsViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Refresh feeds and categories when collecting this flow for the first time
-     */
-    private fun <T> Flow<T>.refreshed() = this.onStart {
-        viewModelScope.launch {
-            try {
-                refreshFeeds()
-            } catch (e: ApiCallException) {
-                Timber.w(e, "Unable to refresh feeds and categories")
+    private suspend fun startRefreshFeedsJob() = withContext(viewModelScope.coroutineContext) {
+        if (refreshFeedsJob == null) {
+            refreshFeedsJob = viewModelScope.launch {
+                try {
+                    while(isActive) {
+                        refreshFeeds()
+                        delay(30_000)
+                    }
+                } catch (e: ApiCallException) {
+                    Timber.w(e, "Unable to refresh feeds and categories")
+                }
             }
         }
+    }
+
+    private suspend fun cancelRefreshFeedsJob() = withContext(viewModelScope.coroutineContext) {
+        refreshFeedsJob?.cancel()
+        refreshFeedsJob = null
+    }
+
+    /**
+     * Launch job to refresh feeds and categories when collecting this flow and cancel it on flow completion
+     */
+    private fun <T> Flow<T>.autoRefreshed() = this.onStart {
+        startRefreshFeedsJob()
+    }.onCompletion {
+        cancelRefreshFeedsJob()
     }
 
 }

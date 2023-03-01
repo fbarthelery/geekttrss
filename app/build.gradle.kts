@@ -206,6 +206,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.livedata)
     implementation(libs.androidx.lifecycle.viewmodel)
     implementation(libs.androidx.lifecycle.runtime)
+    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewmodel.savedstate)
     dualTestImplementation(libs.androidx.arch.core.testing)
     implementation(libs.androidx.lifecycle.viewmodel.compose)

@@ -29,6 +29,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.geekorum.geekdroid.views.doOnApplyWindowInsets
 import com.geekorum.ttrss.ArticlesListDirections
@@ -72,7 +73,7 @@ class FeedsNavigationMenuPresenter(
                         user = account?.name ?: "",
                         server = server?: "",
                         feedSection = {
-                            val feeds by feedsViewModel.feeds.collectAsState(emptyList())
+                            val feeds by feedsViewModel.feeds.collectAsStateWithLifecycle()
                             FeedSection(
                                 feeds,
                                 selectedFeed = feeds.find { it.id == currentFeedId },
