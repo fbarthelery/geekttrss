@@ -86,10 +86,13 @@ class FeedIconSynchronizer @AssistedInject constructor(
             dispatchUpdateFeedIcons(feedChannel)
         }
 
-        // now update cache
-        databaseService.getFeedFavIcons().forEach {
-            httpCacher.cacheHttpRequest(it.url)
-        }
+        // now update cache for http urls
+        databaseService.getFeedFavIcons()
+            .mapNotNull {
+                it.url.toHttpUrlOrNull()
+            }.forEach {
+                httpCacher.cacheHttpRequest(it)
+            }
     }
 
     private fun CoroutineScope.dispatchUpdateFeedIcons(feedChannel: Channel<Feed>) {

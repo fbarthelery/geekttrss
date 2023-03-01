@@ -52,7 +52,7 @@ class SyncFeedsIconWorker @AssistedInject constructor(
             Timber.i("Synchronizing feeds icons")
             feedIconSynchronizer.synchronizeFeedIcons()
             Result.success()
-        } catch (e: ApiCallException) {
+        } catch (e: Exception) {
             Timber.w(e, "unable to update feeds icons")
             Result.failure()
         }
