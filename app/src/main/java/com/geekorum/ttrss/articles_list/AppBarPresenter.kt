@@ -21,6 +21,7 @@
 package com.geekorum.ttrss.articles_list
 
 import android.view.View
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
@@ -90,25 +91,30 @@ internal class AppBarPresenter(
 
     private fun setupTagsListBar() {
         tagsListCompose.setContent {
-            AppTheme {
-                val tags by tagsViewModel.tags.observeAsState()
-                val tagsSet = tags?.toSet() ?: emptySet()
-                if (tagsSet.isNotEmpty()) {
-                    TagsListBar(tags = tagsSet,
-                        selectedTag = currentTag,
-                        selectedTagChange = { tag ->
-                            currentTag = tag
-                            if (tag == null) {
-                                if (navController.currentDestination?.id == R.id.articlesListByTagFragment) {
-                                    navController.popBackStack()
-                                }
-                            } else {
-                                val showTag = ArticlesListFragmentDirections.actionShowTag(tag)
-                                navController.navigate(showTag)
+            Content()
+        }
+    }
+
+    @Composable
+    fun Content() {
+        AppTheme {
+            val tags by tagsViewModel.tags.observeAsState()
+            val tagsSet = tags?.toSet() ?: emptySet()
+            if (tagsSet.isNotEmpty()) {
+                TagsListBar(tags = tagsSet,
+                    selectedTag = currentTag,
+                    selectedTagChange = { tag ->
+                        currentTag = tag
+                        if (tag == null) {
+                            if (navController.currentDestination?.id == R.id.articlesListByTagFragment) {
+                                navController.popBackStack()
                             }
+                        } else {
+                            val showTag = ArticlesListFragmentDirections.actionShowTag(tag)
+                            navController.navigate(showTag)
                         }
-                    )
-                }
+                    }
+                )
             }
         }
     }
