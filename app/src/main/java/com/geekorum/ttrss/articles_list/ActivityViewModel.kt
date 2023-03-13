@@ -27,16 +27,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.core.net.toUri
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.map
+import androidx.lifecycle.*
 import com.geekorum.geekdroid.app.lifecycle.Event
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.network.TtRssBrowserLauncher
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 private const val STATE_FEED_ID = "feed_id"
@@ -80,6 +79,11 @@ class ActivityViewModel @Inject constructor(
             else -> false
         }
     }
+
+    val sortOrder = mostRecentSortOrder.asFlow()
+        .map { mostRecent ->
+            if (mostRecent) SortOrder.MOST_RECENT_FIRST else SortOrder.OLDEST_FIRST
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SortOrder.OLDEST_FIRST)
 
     val onlyUnreadArticles = state.getLiveData(STATE_NEED_UNREAD, true)
 

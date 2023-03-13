@@ -59,14 +59,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <com.google.android.material.appbar.MaterialToolbar
+                    <androidx.compose.ui.platform.ComposeView
                         android:id="@+id/toolbar"
                         android:layout_width="match_parent"
-                        android:layout_height="?actionBarSize"
+                        android:layout_height="wrap_content"
                         app:layout_scrollFlags="scroll|enterAlways|snap"
-                        android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
-                        app:popupTheme="@style/ThemeOverlay.MaterialComponents.Light"
-                        style="?appBarToolbarStyle"
                         />
 
                     <androidx.compose.ui.platform.ComposeView

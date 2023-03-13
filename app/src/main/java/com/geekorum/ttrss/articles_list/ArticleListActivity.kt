@@ -26,11 +26,9 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.doOnLayout
 import androidx.databinding.DataBindingUtil
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.Observer
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupWithNavController
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.app_reviews.AppReviewViewModel
@@ -142,17 +140,17 @@ class ArticleListActivity : SessionActivity() {
     }
 
     private fun setupToolbar() {
-        setupSearch()
-        setupSortOrder()
         val appBarConfiguration = AppBarConfiguration.Builder(
             R.id.magazineFragment, R.id.articlesListFragment, R.id.articlesListByTagFragment
         ).setOpenableLayout(drawerLayout)
             .build()
-        binding.toolbar.setupWithNavController(navController, appBarConfiguration)
         appBarPresenter = AppBarPresenter(
+            activity = this,
             appBarLayout = binding.appBar,
+            appBarConfiguration = appBarConfiguration,
             toolbar = binding.toolbar,
             tagsListCompose = binding.tagsList,
+            activityViewModel = activityViewModel,
             tagsViewModel = tagsViewModel,
             onDemandModuleNavHostProgressDestinationProvider = onDemandModuleNavHostFragment,
             navController = navController
@@ -165,38 +163,6 @@ class ArticleListActivity : SessionActivity() {
         // appBar height works fine
         binding.appBar.doOnLayout {
             activityViewModel.appBarHeight = it.height
-        }
-    }
-
-    private fun setupSortOrder() {
-        val mostRecent = binding.toolbar.menu.findItem(R.id.articles_sort_order_most_recent)!!
-        val oldestFirst = binding.toolbar.menu.findItem(R.id.articles_sort_order_oldest)!!
-        activityViewModel.mostRecentSortOrder.observe(this) {
-            if (it) {
-                mostRecent.isChecked = true
-            } else {
-                oldestFirst.isChecked = true
-            }
-        }
-        binding.toolbar.setOnMenuItemClickListener {
-            when (it.itemId) {
-                R.id.articles_sort_order_oldest -> {
-                    activityViewModel.setSortByMostRecentFirst(false)
-                    true
-                }
-                R.id.articles_sort_order_most_recent -> {
-                    activityViewModel.setSortByMostRecentFirst(true)
-                    true
-                }
-                else -> false
-            }
-        }
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            val sortMenuItem = binding.toolbar.menu.findItem(R.id.articles_sort_order)
-            sortMenuItem?.isVisible = when(destination.id) {
-                R.id.magazineFragment -> false
-                else -> true
-            }
         }
     }
 
@@ -214,19 +180,6 @@ class ArticleListActivity : SessionActivity() {
                 lifecycleOwner = this
             )
         }
-    }
-
-    private fun setupSearch() {
-        val searchItem = with(binding.toolbar) {
-            inflateMenu(R.menu.activity_articles_list)
-            menu.findItem(R.id.articles_search)
-        }
-        searchToolbarPresenter = SearchToolbarPresenter(
-            searchItem = searchItem,
-            navController = navController,
-            onDemandModuleNavHostProgressDestinationProvider = onDemandModuleNavHostFragment,
-            activityViewModel = activityViewModel
-        )
     }
 
     private fun setupAppReview() {
