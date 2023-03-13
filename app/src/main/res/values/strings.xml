@@ -41,6 +41,7 @@
 
     <string name="title_article_list">Articles</string>
     <string name="sort_order">Sort order</string>
+    <string name="content_desc_btn_sort_menu">Sort</string>
     <string name="sort_order_most_recent_first">Most recent first</string>
     <string name="sort_order_oldest_first">Oldest first</string>
     <string name="title_article_search">Search</string>
@@ -143,4 +144,8 @@
 
     <!-- features title -->
     <string name="title_manage_feeds">Manage feeds</string>
+
+    <!-- ArticlesListAppBar   -->
+    <string name="content_desc_btn_clear">clear</string>
+    <string name="placeholder_textfield_search">Search ...</string>
 </resources>
