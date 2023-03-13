@@ -39,6 +39,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.Subcomponent
 import dagger.hilt.migration.DisableInstallInCheck
+import okio.BufferedSource
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
@@ -72,6 +73,10 @@ internal open class MockApiService : ApiService {
 
     override suspend fun updateArticleField(id: Long, field: ArticlesContract.Transaction.Field, value: Boolean) {
         TODO("not implemented")
+    }
+
+    override suspend fun getFeedIcon(feedId: Long): BufferedSource {
+        TODO("Not yet implemented")
     }
 
 }

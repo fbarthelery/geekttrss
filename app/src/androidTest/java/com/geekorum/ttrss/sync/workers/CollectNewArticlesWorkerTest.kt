@@ -49,6 +49,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import okio.BufferedSource
 import org.junit.Rule
 import org.junit.Test
 import javax.inject.Inject

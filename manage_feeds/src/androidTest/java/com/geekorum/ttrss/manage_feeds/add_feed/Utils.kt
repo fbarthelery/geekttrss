@@ -27,7 +27,7 @@ import android.os.Bundle
 import androidx.annotation.StyleRes
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.fragment.testing.R
+import androidx.fragment.testing.manifest.R
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.test.core.app.ActivityScenario
