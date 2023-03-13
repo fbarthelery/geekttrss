@@ -66,7 +66,6 @@ class ArticleListActivity : SessionActivity() {
     private val appReviewViewModel: AppReviewViewModel by viewModels()
 
     private lateinit var inAppUpdatePresenter: InAppUpdatePresenter
-    private lateinit var searchToolbarPresenter: SearchToolbarPresenter
     private lateinit var appBarPresenter: AppBarPresenter
     private lateinit var fabPresenter: FabPresenter
     private lateinit var feedNavigationPresenter: FeedsNavigationMenuPresenter
