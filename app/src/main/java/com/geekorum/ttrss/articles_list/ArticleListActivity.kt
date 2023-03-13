@@ -149,7 +149,6 @@ class ArticleListActivity : SessionActivity() {
             appBarLayout = binding.appBar,
             appBarConfiguration = appBarConfiguration,
             toolbar = binding.toolbar,
-            tagsListCompose = binding.tagsList,
             activityViewModel = activityViewModel,
             tagsViewModel = tagsViewModel,
             onDemandModuleNavHostProgressDestinationProvider = onDemandModuleNavHostFragment,

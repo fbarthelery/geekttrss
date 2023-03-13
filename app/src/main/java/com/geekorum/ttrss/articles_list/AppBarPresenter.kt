@@ -22,6 +22,7 @@ package com.geekorum.ttrss.articles_list
 
 import android.app.Activity
 import android.view.View
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
@@ -51,14 +52,12 @@ internal class AppBarPresenter(
     private val appBarLayout: AppBarLayout,
     private val appBarConfiguration: AppBarConfiguration,
     private val toolbar: ComposeView,
-    private val tagsListCompose: ComposeView,
     private val tagsViewModel: TagsViewModel,
     private val activityViewModel: ActivityViewModel,
     private val onDemandModuleNavHostProgressDestinationProvider: OnDemandModuleNavHostProgressDestinationProvider,
     private val navController: NavController,
 ){
 
-    private var currentTag: String? by mutableStateOf(null)
     private var toolbarTitle: String by mutableStateOf("")
     private var hasDrawerMenu by mutableStateOf(true)
     private var hasSortMenu by mutableStateOf(false)
@@ -67,7 +66,6 @@ internal class AppBarPresenter(
     init {
         setup()
         setupToolbar()
-        setupTagsListBar()
     }
 
     private fun setup() {
@@ -96,30 +94,6 @@ internal class AppBarPresenter(
                     toolbarTitle = toolbar.resources.getString(R.string.lbl_install_feature_title)
                 }
             }
-            val tagsVisibility = when (destination.id) {
-                R.id.articlesListFragment,
-                R.id.articlesListByTagFragment -> {
-                    val feedId = arguments?.let { ArticlesListFragmentArgs.fromBundle(it) }?.feedId ?: FEED_ID_ALL_ARTICLES
-                    if (feedId == FEED_ID_ALL_ARTICLES) {
-                        View.VISIBLE
-                    } else {
-                        View.GONE
-                    }
-                }
-                else -> View.GONE
-            }
-            tagsListCompose.visibility = tagsVisibility
-            currentTag = if (destination.id == R.id.articlesListByTagFragment) {
-                arguments?.getString("tag")
-            } else {
-                null
-            }
-        }
-    }
-
-    private fun setupTagsListBar() {
-        tagsListCompose.setContent {
-            TagListContent()
         }
     }
 
@@ -171,47 +145,58 @@ internal class AppBarPresenter(
                 }
             }
 
-            ArticlesListAppBar(
-                appBarState = appbarState,
-                title = {
-                    AppBarTitleText(toolbarTitle)
-                },
-                sortOrder = sortOrder,
-                onSortOrderChange = {
-                    val mostRecentFirst = when (it) {
-                        SortOrder.MOST_RECENT_FIRST -> true
-                        SortOrder.OLDEST_FIRST -> false
-                    }
-                    activityViewModel.setSortByMostRecentFirst(mostRecentFirst)
-                },
-                displaySortMenuButton = hasSortMenu,
-                displaySearchButton = hasSearchButton,
-                navigationIcon = if (!hasFixedDrawer) navigationIcon else null
-            )
-        }
-    }
-
-
-    @Composable
-    fun TagListContent() {
-        AppTheme {
-            val tags by tagsViewModel.tags.observeAsState()
-            val tagsSet = tags?.toSet() ?: emptySet()
-            if (tagsSet.isNotEmpty()) {
-                TagsListBar(tags = tagsSet,
-                    selectedTag = currentTag,
-                    selectedTagChange = { tag ->
-                        currentTag = tag
-                        if (tag == null) {
-                            if (navController.currentDestination?.id == R.id.articlesListByTagFragment) {
-                                navController.popBackStack()
-                            }
-                        } else {
-                            val showTag = ArticlesListFragmentDirections.actionShowTag(tag)
-                            navController.navigate(showTag)
+            Column {
+                ArticlesListAppBar(
+                    appBarState = appbarState,
+                    title = {
+                        AppBarTitleText(toolbarTitle)
+                    },
+                    sortOrder = sortOrder,
+                    onSortOrderChange = {
+                        val mostRecentFirst = when (it) {
+                            SortOrder.MOST_RECENT_FIRST -> true
+                            SortOrder.OLDEST_FIRST -> false
                         }
-                    }
+                        activityViewModel.setSortByMostRecentFirst(mostRecentFirst)
+                    },
+                    displaySortMenuButton = hasSortMenu,
+                    displaySearchButton = hasSearchButton,
+                    navigationIcon = if (!hasFixedDrawer) navigationIcon else null
                 )
+
+                val showTagsBar = run{
+                    when (currentDestination?.destination?.id) {
+                        R.id.articlesListFragment,
+                        R.id.articlesListByTagFragment -> {
+                            val feedId = currentDestination?.arguments?.let { ArticlesListFragmentArgs.fromBundle(it) }?.feedId ?: FEED_ID_ALL_ARTICLES
+                            feedId == FEED_ID_ALL_ARTICLES                        }
+                        else -> false
+                    }
+                }
+
+                val tags by tagsViewModel.tags.observeAsState()
+                val tagsSet = tags?.toSet() ?: emptySet()
+                if (showTagsBar && tagsSet.isNotEmpty()) {
+                    val currentTag = if (currentDestination?.destination?.id == R.id.articlesListByTagFragment) {
+                        currentDestination?.arguments?.getString("tag")
+                    } else {
+                        null
+                    }
+
+                    TagsListBar(tags = tagsSet,
+                        selectedTag = currentTag,
+                        selectedTagChange = { tag ->
+                            if (tag == null) {
+                                if (navController.currentDestination?.id == R.id.articlesListByTagFragment) {
+                                    navController.popBackStack()
+                                }
+                            } else {
+                                val showTag = ArticlesListFragmentDirections.actionShowTag(tag)
+                                navController.navigate(showTag)
+                            }
+                        }
+                    )
+                }
             }
         }
     }
