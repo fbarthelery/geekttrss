@@ -29,6 +29,9 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.mapSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -37,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.geekorum.ttrss.R
@@ -57,34 +61,34 @@ fun ArticlesListAppBar(
         modifier = modifier,
     ) {
 
-        Row(
-            Modifier
-                .fillMaxHeight()
-                .width(68.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            if (displaySearchButton && appBarState.searchOpen) {
-                CompositionLocalProvider(
-                    LocalContentAlpha provides ContentAlpha.high,
-                    content = {
-                        IconButton(onClick = {
-                            appBarState.close()
-                        }) {
-                            Icon(Icons.Default.ArrowBack, contentDescription = "back")
-                        }
-                    }
-                )
-            } else {
-                if (navigationIcon == null) {
-                    Spacer(Modifier.width(12.dp))
-                } else {
+        val isSearchVisibleAndOpen = displaySearchButton && appBarState.searchOpen
+        val hasNavigationIcon = (isSearchVisibleAndOpen) || navigationIcon != null
+        if (!hasNavigationIcon) {
+            Spacer(Modifier.width(12.dp))
+        } else {
+            Row(
+                Modifier
+                    .fillMaxHeight()
+                    .width(68.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                     CompositionLocalProvider(
                         LocalContentAlpha provides ContentAlpha.high,
-                        content = navigationIcon
+                        content = {
+                            if (isSearchVisibleAndOpen) {
+                                IconButton(onClick = {
+                                    appBarState.closeSearch()
+                                }) {
+                                    Icon(Icons.Default.ArrowBack, contentDescription = "back")
+                                }
+                            } else {
+                                navigationIcon!!.invoke()
+                            }
+                        }
                     )
-                }
             }
         }
+
 
         Row(
             Modifier
@@ -116,11 +120,10 @@ fun ArticlesListAppBar(
                 horizontalArrangement = Arrangement.End,
                 verticalAlignment = Alignment.CenterVertically,
                 content = {
-                    val isSearchVisibleAndOpen = displaySearchButton && appBarState.searchOpen
                     if (!isSearchVisibleAndOpen) {
                         if (displaySearchButton) {
                             IconButton(onClick = {
-                                appBarState.open()
+                                appBarState.openSearch()
                             }) {
                                 Icon(Icons.Default.Search, contentDescription = "search")
                             }
@@ -136,15 +139,21 @@ fun ArticlesListAppBar(
     }
 }
 
+@Composable
+fun AppBarTitleText(title: String) {
+    Text(title, overflow = TextOverflow.Ellipsis, maxLines = 1)
+}
 
 @Stable
 class ArticlesListAppbarState(
+    initialSearchText: String = "",
+    initialSearchIsOpen: Boolean = false,
     private val onSearchTextChange: (String) -> Unit,
     private val onSearchOpenChange: (Boolean) -> Unit,
 ) {
-    var searchOpen by  mutableStateOf(false)
+    var searchOpen by  mutableStateOf(initialSearchIsOpen)
         private set
-    private var _searchText by mutableStateOf("")
+    private var _searchText by mutableStateOf(initialSearchText)
 
     var searchText: String
         get() = _searchText
@@ -156,15 +165,39 @@ class ArticlesListAppbarState(
         }
 
 
-    fun open() {
+    fun openSearch() {
         searchOpen = true
         onSearchOpenChange(searchOpen)
     }
 
-    fun close() {
+    fun closeSearch() {
+        searchText = ""
         searchOpen = false
         onSearchOpenChange(searchOpen)
-        _searchText = ""
+    }
+
+    companion object {
+        fun Saver(
+            onSearchTextChange: (String) -> Unit,
+            onSearchOpenChange: (Boolean) -> Unit,
+        ): Saver<ArticlesListAppbarState, Any> =
+            mapSaver(
+                save = {
+                    mapOf(
+                        "searchOpen" to it.searchOpen,
+                        "searchText" to it.searchText
+                    )
+                },
+                restore = {
+                    val text = it["searchText"] as String
+                    val isOpen = it["searchOpen"] as Boolean
+                    ArticlesListAppbarState(initialSearchText = text,
+                        initialSearchIsOpen = isOpen,
+                        onSearchTextChange = onSearchTextChange,
+                        onSearchOpenChange = onSearchOpenChange
+                        )
+                }
+            )
     }
 }
 
@@ -173,7 +206,12 @@ fun rememberArticlesListAppBarState(
     onSearchTextChange: (String) -> Unit = {},
     onSearchOpenChange: (Boolean) -> Unit = {}
 ): ArticlesListAppbarState {
-    return remember {
+    return rememberSaveable(
+        saver = ArticlesListAppbarState.Saver(
+            onSearchTextChange = onSearchTextChange,
+            onSearchOpenChange = onSearchOpenChange
+        )
+    ) {
         ArticlesListAppbarState(
             onSearchTextChange = onSearchTextChange,
             onSearchOpenChange = onSearchOpenChange)
