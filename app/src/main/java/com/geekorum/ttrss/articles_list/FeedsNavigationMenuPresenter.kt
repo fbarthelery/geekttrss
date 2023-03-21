@@ -20,18 +20,22 @@
  */
 package com.geekorum.ttrss.articles_list
 
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.ExtendedFloatingActionButton
+import androidx.compose.material.Icon
 import androidx.compose.material.Surface
-import androidx.compose.runtime.*
+import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.geekorum.geekdroid.views.doOnApplyWindowInsets
-import com.geekorum.ttrss.ArticlesListDirections
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Feed
+import com.geekorum.ttrss.on_demand_modules.OnDemandModuleManager
 import com.geekorum.ttrss.ui.AppTheme
 
 
@@ -39,39 +43,40 @@ import com.geekorum.ttrss.ui.AppTheme
  * Display the feeds in a NavigationView menu.
  */
 class FeedsNavigationMenuPresenter(
-    private val composeView: ComposeView,
     private val navController: NavController,
     private val feedsViewModel: FeedsViewModel,
     private val accountViewModel: TtrssAccountViewModel,
-    private val activityViewModel: ActivityViewModel
+    private val activityViewModel: ActivityViewModel,
+    private val onDemandModuleManager: OnDemandModuleManager,
 ) {
 
-    private var currentFeedId: Long? by mutableStateOf(null)
-    private var isMagazineFeed: Boolean by mutableStateOf(true)
-
-    init {
-        setDestinationListener()
-        setComposeContent()
-    }
-
-    private fun setComposeContent() {
-        // pass window insets to compose
-        composeView.fitsSystemWindows = true
-        composeView.doOnApplyWindowInsets { view, windowInsetsCompat, relativePadding ->
-            windowInsetsCompat
-        }
-
-        composeView.setContent {
-            Content(Modifier.fillMaxSize())
-        }
-    }
-
     @Composable
-    fun Content(modifier: Modifier = Modifier) {
+    fun Content(hasFab: Boolean, onNavigation: () -> Unit, modifier: Modifier = Modifier) {
         AppTheme {
             Surface(modifier) {
+                val navBackStackEntry by navController.currentBackStackEntryFlow.collectAsStateWithLifecycle(null)
+                val currentFeedId = run {
+                    if (navBackStackEntry?.destination?.route == NavRoutes.ArticlesList) {
+                        navBackStackEntry?.arguments?.getLong("feed_id")
+                    } else {
+                        null
+                    }
+                }
+                val isMagazineFeed = navBackStackEntry?.destination?.route == NavRoutes.Magazine
+
                 val account by accountViewModel.selectedAccount.observeAsState()
                 val server by accountViewModel.selectedAccountHost.observeAsState()
+
+                val fab: (@Composable () -> Unit)? = if (!hasFab) null else {
+                    @Composable {
+                        ExtendedFloatingActionButton(
+                            text = { Text(stringResource(R.string.btn_refresh)) },
+                            icon = { Icon(Icons.Default.Refresh, contentDescription = null) },
+                            onClick = {}
+                        )
+                    }
+                }
+
                 FeedListNavigationMenu(
                     user = account?.name ?: "",
                     server = server ?: "",
@@ -83,46 +88,31 @@ class FeedsNavigationMenuPresenter(
                             isMagazineSelected = isMagazineFeed,
                             onFeedSelected = {
                                 navigateToFeed(it)
+                                onNavigation()
                             },
                             onMagazineSelected = {
-                                navigateToMagazine()
+                                navController.navigateToMagazine()
+                                onNavigation()
                             }
                         )
                     },
                     onManageFeedsClicked = {
-                        val directions = ArticlesListDirections.actionManageFeeds()
-                        navController.navigate(directions)
+                        navController.navigateToManageFeeds(onDemandModuleManager)
+                        onNavigation()
                     },
                     onSettingsClicked = {
-                        val directions = ArticlesListDirections.actionShowSettings()
-                        navController.navigate(directions)
+                        navController.navigateToSettings()
+                        onNavigation()
                     },
+                    fab = fab
                 )
             }
         }
     }
 
-    private fun navigateToMagazine() {
-        navController.navigate(ArticlesListDirections.actionShowMagazine())
-    }
-
     private fun navigateToFeed(feed: Feed) {
         activityViewModel.setSelectedFeed(feed)
-        navController.navigate(ArticlesListDirections.actionShowFeed(feed.id, feed.title))
+        navController.navigateToFeed(feed.id, feed.title)
     }
 
-    private fun setDestinationListener() {
-        navController.addOnDestinationChangedListener { _, destination, arguments ->
-            when(destination.id) {
-                R.id.articlesListFragment -> {
-                    currentFeedId = arguments!!.getLong("feed_id")
-                    isMagazineFeed = false
-                }
-                R.id.magazineFragment -> {
-                    currentFeedId = null
-                    isMagazineFeed = true
-                }
-            }
-        }
-    }
 }

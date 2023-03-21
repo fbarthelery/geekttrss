@@ -59,6 +59,7 @@ fun FeedListNavigationMenu(
     user: String,
     server: String,
     feedSection: @Composable ColumnScope.() -> Unit,
+    fab: (@Composable () -> Unit)? = null,
     onManageFeedsClicked: () -> Unit,
     onSettingsClicked: () -> Unit,
 ) {
@@ -69,6 +70,15 @@ fun FeedListNavigationMenu(
         ) {
             AppTheme(colors = AppTheme.DarkColors) {
                 AccountHeader(user, server)
+            }
+
+            if (fab != null) {
+                Box(Modifier
+                    .fillMaxWidth()
+                    .padding(ActiveIndicatorContentPadding),
+                    propagateMinConstraints = true){
+                    fab()
+                }
             }
 
             feedSection()
@@ -115,7 +125,8 @@ private fun Modifier.withVerticalScrollBar(
     scrollState: ScrollState,
 ) : Modifier  = composed {
     val scrollBarAlpha by animateFloatAsState(targetValue = if (scrollState.isScrollInProgress)
-        0.5f else 0f, animationSpec = tween(500))
+        0.5f else 0f, animationSpec = tween(500), label = "scrollBarAlpha"
+    )
     withVerticalScrollBar(scrollState, MaterialTheme.colors.onSurface, scrollBarAlpha)
 }
 
@@ -345,7 +356,6 @@ fun PreviewFeedListNavigationMenu() {
             }
         }
     }
-
 }
 
 private val NavigationItemHeight = 48.dp // 56.dp
