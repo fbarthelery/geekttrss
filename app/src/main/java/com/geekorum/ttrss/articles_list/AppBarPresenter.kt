@@ -21,10 +21,13 @@
 package com.geekorum.ttrss.articles_list
 
 import android.app.Activity
+import android.content.Context
 import androidx.compose.animation.*
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
@@ -33,19 +36,18 @@ import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.FloatingWindow
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
-import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.NavDestination
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Feed.Companion.FEED_ID_ALL_ARTICLES
 import com.geekorum.ttrss.on_demand_modules.OnDemandModuleNavHostProgressDestinationProvider
 import com.geekorum.ttrss.ui.AppTheme
-import com.google.android.material.appbar.AppBarLayout
 
 
 /**
@@ -53,46 +55,15 @@ import com.google.android.material.appbar.AppBarLayout
  */
 internal class AppBarPresenter(
     private val activity: Activity,
-    private val appBarLayout: AppBarLayout,
-    private val appBarConfiguration: AppBarConfiguration,
-    private val toolbar: ComposeView,
     private val tagsViewModel: TagsViewModel,
     private val activityViewModel: ActivityViewModel,
-    private val onDemandModuleNavHostProgressDestinationProvider: OnDemandModuleNavHostProgressDestinationProvider,
+    private val onDemandModuleNavHostProgressDestinationProvider: OnDemandModuleNavHostProgressDestinationProvider?,
     private val navController: NavController,
-){
-
-    init {
-        setup()
-        setupToolbar()
-    }
-
-    private fun setup() {
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            val progressDestinationId = onDemandModuleNavHostProgressDestinationProvider.progressDestinationId
-
-            when (destination.id) {
-                R.id.articlesListFragment,
-                R.id.articlesListByTagFragment,
-                R.id.articlesSearchFragment -> appBarLayout.setExpanded(true)
-
-                progressDestinationId -> {
-                    appBarLayout.setExpanded(true)
-                }
-            }
-        }
-    }
-
-    private fun setupToolbar() {
-        toolbar.setContent {
-            ToolbarContent()
-        }
-    }
-
+) {
 
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     @Composable
-    fun ToolbarContent() {
+    fun ToolbarContent(modifier: Modifier = Modifier, onNavigationMenuClick: () -> Unit) {
         val windowSizeClass = calculateWindowSizeClass(activity)
         val hasFixedDrawer = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded
 
@@ -101,8 +72,19 @@ internal class AppBarPresenter(
                 null
             )
 
-            Column {
-                Toolbar(hasFixedDrawer, currentDestination, Modifier.zIndex(1f))
+            Column(modifier) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .windowInsetsTopHeight(WindowInsets.statusBars)
+                        .background(MaterialTheme.colors.primaryVariant)
+                )
+                Toolbar(
+                    hasFixedDrawer,
+                    currentDestination,
+                    onNavigationMenuClick,
+                    Modifier.zIndex(1f)
+                )
                 AnimatedTagsList(currentDestination)
             }
         }
@@ -111,19 +93,22 @@ internal class AppBarPresenter(
     @OptIn(ExperimentalAnimationApi::class)
     @Composable
     private fun AnimatedTagsList(currentDestination: NavBackStackEntry?) {
-        val currentTag = if (currentDestination?.destination?.id == R.id.articlesListByTagFragment) {
+        val currentTag = if (currentDestination?.destination?.route == NavRoutes.ArticlesListByTag) {
             currentDestination.arguments?.getString("tag")
         } else {
             null
         }
 
         val showTagsBar = run {
-            when (currentDestination?.destination?.id) {
-                R.id.articlesListFragment,
-                R.id.articlesListByTagFragment -> {
-                    val feedId = currentDestination.arguments?.let { ArticlesListFragmentArgs.fromBundle(it) }?.feedId ?: FEED_ID_ALL_ARTICLES
+            when (currentDestination?.destination?.route) {
+                NavRoutes.ArticlesList,
+                NavRoutes.ArticlesListByTag -> {
+                    val feedId =
+                        currentDestination.arguments?.let { ArticlesListFragmentArgs.fromBundle(it) }?.feedId
+                            ?: FEED_ID_ALL_ARTICLES
                     feedId == FEED_ID_ALL_ARTICLES
                 }
+
                 else -> false
             }
         }
@@ -140,12 +125,11 @@ internal class AppBarPresenter(
                     selectedTag = currentTag,
                     selectedTagChange = { tag ->
                         if (tag == null) {
-                            if (navController.currentDestination?.id == R.id.articlesListByTagFragment) {
+                            if (navController.currentDestination?.route == NavRoutes.ArticlesListByTag) {
                                 navController.popBackStack()
                             }
                         } else {
-                            val showTag = ArticlesListFragmentDirections.actionShowTag(tag)
-                            navController.navigate(showTag)
+                            navController.navigateToTag(tag)
                         }
                     }
                 )
@@ -157,24 +141,24 @@ internal class AppBarPresenter(
     private fun Toolbar(
         hasFixedDrawer: Boolean,
         currentDestination: NavBackStackEntry?,
+        onNavigationMenuClick: () -> Unit,
         modifier: Modifier = Modifier,
     ) {
+        //TODO deal with module installation
         val progressDestinationId =
-            onDemandModuleNavHostProgressDestinationProvider.progressDestinationId
+            onDemandModuleNavHostProgressDestinationProvider?.progressDestinationId ?: 0
 
         val hasSearchButton = currentDestination?.destination?.id != progressDestinationId
-        val hasSortMenu = when (currentDestination?.destination?.id) {
-            R.id.articlesListFragment,
-            R.id.articlesListByTagFragment -> true
-            else -> false
-        }
+        val hasSortMenu = destinationHasSortButton(currentDestination?.destination)
         val sortOrder by activityViewModel.sortOrder.collectAsStateWithLifecycle()
 
         val navigationIcon: @Composable () -> Unit = {
-            val hasDrawerMenu = currentDestination?.destination?.let { appBarConfiguration.isTopLevelDestination(it) } ?: true
+            val hasDrawerMenu = currentDestination?.destination?.let {
+                isTopLevelDestinationRoute(it)
+            } ?: true
             if (hasDrawerMenu) {
-                IconButton(onClick = { appBarConfiguration.openableLayout?.open() }) {
-                    Icon(Icons.Default.Menu, contentDescription = "open menu")
+                IconButton(onClick = onNavigationMenuClick) {
+                    Icon(Icons.Default.Menu, contentDescription = stringResource(R.string.drawer_open))
                 }
             }
         }
@@ -185,16 +169,16 @@ internal class AppBarPresenter(
             },
             onSearchOpenChange = { searchOpen ->
                 if (searchOpen) {
-                    navController.navigate(ArticlesListFragmentDirections.actionSearchArticle())
+                    navController.navigateToSearch()
                 } else {
-                    if (navController.currentDestination?.id == R.id.articlesSearchFragment) {
+                    if (navController.currentDestination?.route == NavRoutes.Search) {
                         navController.popBackStack()
                     }
                 }
             }
         )
 
-        if (currentDestination != null && currentDestination.destination.id != R.id.articlesSearchFragment) {
+        if (currentDestination != null && currentDestination.destination.route != NavRoutes.Search) {
             LaunchedEffect(currentDestination) {
                 appbarState.closeSearch()
             }
@@ -204,7 +188,11 @@ internal class AppBarPresenter(
         var toolbarTitle by remember { mutableStateOf("") }
         LaunchedEffect(currentDestination, context) {
             if (currentDestination?.destination !is FloatingWindow) {
-                toolbarTitle = currentDestination?.destination?.fillInLabel(context,
+                if (currentDestination?.destination != null && currentDestination.destination.label == null) {
+                    setDestinationLabelPerRoute(context, currentDestination.destination)
+                }
+                toolbarTitle = currentDestination?.destination?.fillInLabel(
+                    context,
                     currentDestination.arguments
                 ) ?: ""
             }
@@ -233,4 +221,17 @@ internal class AppBarPresenter(
         )
     }
 
+    private fun setDestinationLabelPerRoute(context: Context, destination: NavDestination) {
+        destination.label = NavRoutes.getLabelForRoute(context, destination.route)
+    }
+
+    private fun isTopLevelDestinationRoute(destination: NavDestination): Boolean =
+        NavRoutes.isTopLevelDestination(destination.route)
+
+    private fun destinationHasSortButton(destination: NavDestination?) = when (destination?.route) {
+        NavRoutes.ArticlesList,
+        NavRoutes.ArticlesListByTag -> true
+
+        else -> false
+    }
 }
