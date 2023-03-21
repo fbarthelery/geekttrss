@@ -28,6 +28,8 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.material.*
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
@@ -37,6 +39,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
@@ -48,6 +51,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntOffset
@@ -127,6 +131,7 @@ private fun ArticleListScaffold(
                     }
                 },
                 drawerContent = drawerContent,
+                drawerShape = MaterialTheme.shapes.large.copy(topStart = ZeroCornerSize, bottomStart = ZeroCornerSize),
                 snackbarHost = { snackbarHostState ->
                     SnackbarHostWithCustomSnackBar(snackbarHostState, undoUnreadSnackBar)
                 },
@@ -321,6 +326,13 @@ fun PreviewArticlesListScaffoldTablet() {
                     FeedListNavigationMenu(
                         user = "user",
                         server = "server",
+                        fab = {
+                            ExtendedFloatingActionButton(
+                                text = { Text(stringResource(R.string.btn_refresh)) },
+                                icon = { Icon(Icons.Default.Refresh, contentDescription = null) },
+                                onClick = {}
+                            )
+                        },
                         feedSection = { },
                         onManageFeedsClicked = {},
                         onSettingsClicked = {})
