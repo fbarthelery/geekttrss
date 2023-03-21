@@ -24,7 +24,6 @@ import android.app.Activity
 import android.content.Intent
 import android.content.IntentSender
 import android.os.Bundle
-import android.view.View
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.ActivityResultRegistry
@@ -48,15 +47,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.layout
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.view.doOnNextLayout
-import androidx.core.view.updatePadding
 import androidx.lifecycle.LifecycleOwner
-import com.geekorum.geekdroid.views.doOnApplyWindowInsets
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.in_app_update.InAppUpdateViewModel
 import com.geekorum.ttrss.in_app_update.IntentSenderForResultStarter
@@ -67,10 +62,8 @@ private const val CODE_START_IN_APP_UPDATE = 1
 
 /**
  * Presenter for InAppUpdates.
- * Really tied to ArticleListActivity
  */
 class InAppUpdatePresenter(
-    private val composeView: ComposeView,
     private val lifecyleOwner: LifecycleOwner,
     private val inAppUpdateViewModel: InAppUpdateViewModel,
     activityResultRegistry: ActivityResultRegistry,
@@ -92,16 +85,6 @@ class InAppUpdatePresenter(
                 .setFlags(flagsValues, flagsMask)
                 .build()
             inAppUpdateLauncher.launch(intentSenderRequest)
-        }
-    }
-
-    init {
-        composeView.fitsSystemWindows = true
-        composeView.doOnApplyWindowInsets { _, windowInsetsCompat, _ ->
-            windowInsetsCompat
-        }
-        composeView.setContent {
-            Content()
         }
     }
 
@@ -134,15 +117,6 @@ class InAppUpdatePresenter(
                         showBanner = false
                     }
                 )
-            }
-
-            // needed to add additional padding to articles list
-            LaunchedEffect(showBanner, sheetHeigth) {
-                val paddingBottom = if (showBanner) sheetHeigth else 0
-                (composeView.parent as? View)?.doOnNextLayout { parent ->
-                    val fragmentContainerView = parent.findViewById<View>(R.id.middle_pane_layout)
-                    fragmentContainerView?.updatePadding(bottom = paddingBottom)
-                }
             }
         }
     }
