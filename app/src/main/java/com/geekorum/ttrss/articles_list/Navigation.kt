@@ -20,20 +20,23 @@
  */
 package com.geekorum.ttrss.articles_list
 
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import androidx.core.net.toUri
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import com.geekorum.ttrss.Features
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.article_details.ArticleDetailActivity
+import com.geekorum.ttrss.on_demand_modules.OnDemandModuleManager
 import com.geekorum.ttrss.settings.SettingsActivity
 
 object NavRoutes {
     const val Magazine = "magazine"
     const val ArticlesList = "feeds/{feed_id}?feed_name={feed_name}"
     const val ArticlesListByTag = "tags/{tag}"
-    const val Search = "Search"
+    const val Search = "search"
 
     fun getLabelForRoute(context: Context, route: String?) = when(route) {
         Magazine -> context.getString(R.string.title_magazine)
@@ -101,3 +104,11 @@ fun NavController.navigateToSearch() {
     navigate(NavRoutes.Search)
 }
 
+fun NavController.navigateToManageFeeds(onDemandModuleManager: OnDemandModuleManager) {
+    if (Features.MANAGE_FEEDS in onDemandModuleManager.installedModules) {
+        val intent = Intent().apply {
+            component = ComponentName(context, "com.geekorum.ttrss.manage_feeds.ManageFeedsActivity")
+        }
+        context.startActivity(intent)
+    }
+}
