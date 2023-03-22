@@ -20,69 +20,35 @@
  */
 package com.geekorum.ttrss.articles_list
 
-import android.view.View
-import androidx.activity.OnBackPressedDispatcherOwner
-import androidx.activity.addCallback
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
+import androidx.compose.runtime.*
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.geekorum.ttrss.R
 import com.geekorum.ttrss.on_demand_modules.OnDemandModuleNavHostProgressDestinationProvider
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.collect
 
 /**
- * Controls the behavior of the [DrawerLayout]
+ * Controls the behavior of the NavigationDrawer
  */
-internal class DrawerLayoutPresenter(
-    private val drawerLayout: DrawerLayout,
-    private val navController: NavController,
-    private val onBackPressedDispatcherOwner: OnBackPressedDispatcherOwner,
-    private val onDemandModuleNavHostProgressDestinationProvider: OnDemandModuleNavHostProgressDestinationProvider,
-    private val lifecycleOwner: LifecycleOwner,
-) {
+@Stable
+internal class DrawerLayoutPresenter {
 
-    init {
-        setup()
-    }
-
-    private fun setup() {
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            drawerLayout.closeDrawers()
-            val progressDestinationId = onDemandModuleNavHostProgressDestinationProvider.progressDestinationId
-            val lockMode = when (destination.id) {
-                R.id.articlesSearchFragment,
-                progressDestinationId -> DrawerLayout.LOCK_MODE_LOCKED_CLOSED
-                else -> DrawerLayout.LOCK_MODE_UNLOCKED
-            }
-            drawerLayout.setDrawerLockMode(lockMode)
-        }
-
-        val backPressedCallback = onBackPressedDispatcherOwner.onBackPressedDispatcher.addCallback(onBackPressedDispatcherOwner) {
-            drawerLayout.closeDrawers()
-        }
-        lifecycleOwner.lifecycleScope.launchWhenStarted {
-            drawerLayout.isOpenFlow().collect { isOpen ->
-                backPressedCallback.isEnabled = isOpen
-            }
-        }
-    }
+    var drawerGesturesEnabled by mutableStateOf(true)
+        internal set
 }
 
-private fun DrawerLayout.isOpenFlow() = callbackFlow<Boolean> {
-    channel.trySend(isOpen)
-    val listener = object : DrawerLayout.SimpleDrawerListener() {
-        override fun onDrawerClosed(drawerView: View) {
-            channel.trySend(false)
-        }
+@Composable
+internal fun rememberDrawerLayoutPresenter(navController: NavController, onDemandModuleNavHostProgressDestinationProvider: OnDemandModuleNavHostProgressDestinationProvider?): DrawerLayoutPresenter {
+    val presenter = remember {
+        DrawerLayoutPresenter()
+    }
 
-        override fun onDrawerOpened(drawerView: View) {
-            channel.trySend(true)
+    val navBackStackEntry by navController.currentBackStackEntryFlow.collectAsStateWithLifecycle(null)
+    LaunchedEffect(navBackStackEntry) {
+        presenter.drawerGesturesEnabled = when {
+            navBackStackEntry?.destination?.route == NavRoutes.Search -> false
+            navBackStackEntry?.destination?.id == onDemandModuleNavHostProgressDestinationProvider?.progressDestinationId -> false
+            else -> true
         }
     }
-    addDrawerListener(listener)
-    awaitClose { removeDrawerListener(listener) }
+
+    return presenter
 }
