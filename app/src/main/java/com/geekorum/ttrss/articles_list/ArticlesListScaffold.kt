@@ -28,7 +28,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.ZeroCornerSize
 import androidx.compose.material.*
 import androidx.compose.material.FloatingActionButton
@@ -54,12 +53,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.ui.AppTheme
 import kotlinx.coroutines.launch
-import kotlin.math.roundToInt
 
 @Composable
 fun ArticlesListScaffold(
@@ -68,6 +65,7 @@ fun ArticlesListScaffold(
     scaffoldState: ScaffoldState = rememberScaffoldState(),
     topBar: @Composable () -> Unit,
     navigationMenu: @Composable (ColumnScope.() -> Unit),
+    drawerGesturesEnabled: Boolean = true,
     floatingActionButton: @Composable () -> Unit = {},
     bannerContent: @Composable (PaddingValues) -> Unit = {},
     undoUnreadSnackBar: (@Composable () -> Unit)? = null,
@@ -77,6 +75,7 @@ fun ArticlesListScaffold(
         modifier = modifier,
         scaffoldState = scaffoldState,
         hasFixedDrawer = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded,
+        drawerGesturesEnabled = drawerGesturesEnabled,
         topBar = topBar,
         navigationMenu = navigationMenu,
         floatingActionButton = floatingActionButton,
@@ -90,12 +89,13 @@ fun ArticlesListScaffold(
 private fun ArticleListScaffold(
     modifier: Modifier = Modifier,
     scaffoldState: ScaffoldState = rememberScaffoldState(),
-    hasFixedDrawer: Boolean,
     topBar: @Composable () -> Unit,
     navigationMenu: @Composable (ColumnScope.() -> Unit),
+    hasFixedDrawer: Boolean = false,
+    drawerGesturesEnabled: Boolean = true,
     floatingActionButton: @Composable () -> Unit = {},
     bannerContent: @Composable (PaddingValues) -> Unit,
-    undoUnreadSnackBar: (@Composable () -> Unit)? = null,
+    undoUnreadSnackBar: @Composable (() -> Unit)? = null,
     content: @Composable (PaddingValues) -> Unit,
 ) {
     val drawerContent: (@Composable ColumnScope.() -> Unit)? =
@@ -132,6 +132,7 @@ private fun ArticleListScaffold(
                 },
                 drawerContent = drawerContent,
                 drawerShape = MaterialTheme.shapes.large.copy(topStart = ZeroCornerSize, bottomStart = ZeroCornerSize),
+                drawerGesturesEnabled = drawerGesturesEnabled,
                 snackbarHost = { snackbarHostState ->
                     SnackbarHostWithCustomSnackBar(snackbarHostState, undoUnreadSnackBar)
                 },
