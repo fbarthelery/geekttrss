@@ -1,2 +1,3 @@
-Réécriture de l'implémentation de OpenSourceLicensesActivity
+Récupération des icones des flux en utilisant la nouvelle API
+Refraichissement des compteurs d'articles non lus automatiquement
 Diverses corrections de bugs et améliorations

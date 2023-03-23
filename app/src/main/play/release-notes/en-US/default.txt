@@ -1,2 +1,3 @@
-Rewrite implementation of OpenSourceLicensesActivity
+Collect feed icons using new API operation
+Refresh feed counters automatically
 Various bug fixes and improvements
