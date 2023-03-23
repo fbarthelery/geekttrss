@@ -18,7 +18,7 @@
 # along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
 #
 [versions]
-accompanist = "0.28.0"
+accompanist = "0.30.0"
 androidx-annotation = "1.6.0"
 androidx-core = "1.10.0-rc01" # rc for parcelable methods in sdk 33
 androidx-arch-core-testing = "2.2.0"
