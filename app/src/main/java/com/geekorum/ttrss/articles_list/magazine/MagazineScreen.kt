@@ -22,10 +22,6 @@ package com.geekorum.ttrss.articles_list.magazine
 
 import android.content.Context
 import android.content.Intent
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
@@ -44,75 +40,21 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.*
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ShareCompat
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemsIndexed
-import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.articles_list.*
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleWithFeed
 import com.geekorum.ttrss.ui.AppTheme
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 
-@AndroidEntryPoint
-class MagazineFragment: Fragment() {
-    private val activityViewModel: ActivityViewModel by activityViewModels()
-    private val magazineViewModel: MagazineViewModel by viewModels()
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return ComposeView(requireContext()).apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            setContent {
-                AppTheme {
-                    val appBarHeightDp = with(LocalDensity.current) {
-                        activityViewModel.appBarHeight.toDp()
-                    }
-
-                    val nestedScrollInterop = rememberNestedScrollInteropConnection()
-                    Surface(Modifier.fillMaxSize()
-                        // seems to be much better in compose 1.3.0 but keep a look on it
-                        // https://issuetracker.google.com/issues/236451818
-                        .nestedScroll(nestedScrollInterop)
-                    ) {
-                        ArticlesMagazine(
-                            viewModel = magazineViewModel,
-                            onCardClick = activityViewModel::displayArticle,
-                            onShareClick = ::onShareClicked,
-                            onOpenInBrowserClick = {
-                                activityViewModel.displayArticleInBrowser(requireContext(), it)
-                            },
-                            additionalContentPaddingBottom = appBarHeightDp,
-                            modifier = Modifier
-                                .fillMaxSize()
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        activityViewModel.refreshClickedEvent.observe(viewLifecycleOwner, EventObserver {
-            magazineViewModel.refreshFeeds()
-            magazineViewModel.refreshMagazine()
-        })
-    }
-
-    private fun onShareClicked(article: Article) {
-        startActivity(createShareIntent(requireActivity(), article))
-    }
-
-}
 
 private fun createShareIntent(context: Context, article: Article): Intent {
     val shareIntent = ShareCompat.IntentBuilder(context)
@@ -134,15 +76,7 @@ fun MagazineScreen(
             activityViewModel.appBarHeight.toDp()
         }
 
-        //TODO remove it should not be needed anymore
-        val nestedScrollInterop = rememberNestedScrollInteropConnection()
-        Surface(
-            Modifier
-                .fillMaxSize()
-                // seems to be much better in compose 1.3.0 but keep a look on it
-                // https://issuetracker.google.com/issues/236451818
-                .nestedScroll(nestedScrollInterop)
-        ) {
+        Surface(Modifier.fillMaxSize()) {
             val context = LocalContext.current
             val lazyListState = rememberLazyListState()
             val isScrollingUp = lazyListState.isScrollingUp()
@@ -153,8 +87,8 @@ fun MagazineScreen(
                 viewModel = magazineViewModel,
                 listState = lazyListState,
                 onCardClick = activityViewModel::displayArticle,
-                onShareClick = {article ->
-                               context.startActivity(createShareIntent(context, article))
+                onShareClick = { article ->
+                    context.startActivity(createShareIntent(context, article))
                 },
                 onOpenInBrowserClick = {
                     activityViewModel.displayArticleInBrowser(context, it)

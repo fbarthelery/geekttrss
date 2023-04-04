@@ -32,7 +32,6 @@ import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSiz
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.*
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.pluralStringResource
@@ -48,7 +47,6 @@ import com.geekorum.ttrss.app_reviews.AppReviewViewModel
 import com.geekorum.ttrss.article_details.ArticleDetailActivity
 import com.geekorum.ttrss.in_app_update.InAppUpdateViewModel
 import com.geekorum.ttrss.on_demand_modules.InstallModuleViewModel
-import com.geekorum.ttrss.on_demand_modules.findOnDemandModuleNavHostFragment
 import com.geekorum.ttrss.session.SessionActivity
 import com.geekorum.ttrss.ui.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -93,11 +91,11 @@ class ArticleListActivity : SessionActivity() {
         feedsViewModel.setOnlyUnread(true)
 
         setupEdgeToEdge()
-        setComposeContent()
+        setContent()
     }
 
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
-    private fun setComposeContent() {
+    private fun setContent() {
         setContent {
             val navController = rememberNavController()
             val appBarPresenter = remember {
@@ -151,21 +149,21 @@ class ArticleListActivity : SessionActivity() {
                     scaffoldState = scaffoldState,
                     windowSizeClass = windowSizeClass,
                     topBar = {
-                             appBarPresenter.ToolbarContent(
-                                 onNavigationMenuClick = {
-                                     coroutineScope.launch {
-                                        scaffoldState.drawerState.open()
-                                     }
-                                 })
+                        appBarPresenter.ToolbarContent(
+                            onNavigationMenuClick = {
+                                coroutineScope.launch {
+                                    scaffoldState.drawerState.open()
+                                }
+                            })
                     },
                     navigationMenu = {
                         feedNavigationPresenter.Content(
                             hasFab = hasFabInFixedDrawer,
                             onNavigation = {
-                            coroutineScope.launch {
-                                scaffoldState.drawerState.close()
-                            }
-                        })
+                                coroutineScope.launch {
+                                    scaffoldState.drawerState.close()
+                                }
+                            })
                     },
                     floatingActionButton = {
                         if (!hasFabInFixedDrawer) {
