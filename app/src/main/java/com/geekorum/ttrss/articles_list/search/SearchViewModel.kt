@@ -21,9 +21,7 @@
 package com.geekorum.ttrss.articles_list.search
 
 import androidx.annotation.MainThread
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -34,6 +32,7 @@ import com.geekorum.ttrss.session.SessionActivityComponent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import javax.inject.Inject
 
@@ -47,9 +46,9 @@ class SearchViewModel @Inject constructor(
     private val articlesRepository: ArticlesRepository = sessionActivityComponent.articleRepository
     private val setFieldActionFactory = sessionActivityComponent.setArticleFieldActionFactory
 
-    private val searchQuery = MutableLiveData<String>().apply { value = "" }
+    private val searchQuery = MutableStateFlow("")
 
-    val articles: Flow<PagingData<ArticleWithFeed>> = searchQuery.asFlow().flatMapLatest {
+    val articles: Flow<PagingData<ArticleWithFeed>> = searchQuery.flatMapLatest {
         Pager(PagingConfig(pageSize = 50)) {
             articlesRepository.searchArticles(it)
         }.flow

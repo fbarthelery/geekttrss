@@ -20,13 +20,8 @@
  */
 package com.geekorum.ttrss.articles_list.search
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
@@ -43,9 +38,6 @@ import androidx.compose.ui.platform.*
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ShareCompat
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemsIndexed
@@ -56,66 +48,8 @@ import com.geekorum.ttrss.articles_list.pagingViewStateFor
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleWithFeed
 import com.geekorum.ttrss.ui.AppTheme
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import timber.log.Timber
-
-/**
- * Display search results
- */
-@AndroidEntryPoint
-class ArticlesSearchFragment : Fragment() {
-
-    private val activityViewModel: ActivityViewModel by activityViewModels()
-    private val searchViewModel: SearchViewModel by viewModels()
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return ComposeView(requireContext()).apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            setContent {
-                AppTheme {
-                    val appBarHeightDp = with(LocalDensity.current) {
-                        activityViewModel.appBarHeight.toDp()
-                    }
-                    Surface(Modifier.fillMaxSize()) {
-                        SearchResultCardList(
-                            viewModel = searchViewModel,
-                            onCardClick = activityViewModel::displayArticle,
-                            onShareClick = ::onShareClicked,
-                            onOpenInBrowserClick = {
-                                activityViewModel.displayArticleInBrowser(requireContext(), it)
-                            },
-                            additionalContentPaddingBottom = appBarHeightDp,
-                            modifier = Modifier
-                                .fillMaxSize()
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        activityViewModel.searchQuery.observe(viewLifecycleOwner) {
-            searchViewModel.setSearchQuery(it)
-        }
-    }
-
-    private fun onShareClicked(article: Article) {
-        startActivity(createShareIntent(requireActivity(), article))
-    }
-
-    private fun createShareIntent(activity: Activity, article: Article): Intent {
-        val shareIntent = ShareCompat.IntentBuilder(activity)
-        shareIntent.setSubject(article.title)
-            .setHtmlText(article.content)
-            .setText(article.link)
-            .setType("text/plain")
-        return shareIntent.createChooserIntent()
-    }
-
-}
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
