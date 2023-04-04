@@ -20,13 +20,8 @@
  */
 package com.geekorum.ttrss.articles_list
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Surface
@@ -34,134 +29,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.*
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.core.app.ShareCompat
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
-import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.ui.AppTheme
-import com.google.android.material.snackbar.BaseTransientBottomBar
-import com.google.android.material.snackbar.Snackbar
-import dagger.hilt.android.AndroidEntryPoint
-
-/**
- * Display all the articles in a list.
- */
-abstract class BaseArticlesListFragment : Fragment() {
-
-    protected abstract val articlesViewModel: BaseArticlesViewModel
-    private val activityViewModel: ActivityViewModel by activityViewModels()
-
-    private val unreadSnackbar: Snackbar by lazy {
-        Snackbar.make(requireView(), "", Snackbar.LENGTH_LONG).apply {
-            addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
-                override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
-                    articlesViewModel.commitSetUnreadActions()
-                }
-            })
-            setAction(R.string.undo_set_articles_read_btn) {
-                articlesViewModel.undoSetUnreadActions()
-            }
-        }
-    }
-
-    @OptIn(ExperimentalComposeUiApi::class)
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return ComposeView(requireContext()).apply {
-            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
-            setContent {
-                AppTheme {
-                    val appBarHeightDp = with(LocalDensity.current) {
-                        activityViewModel.appBarHeight.toDp()
-                    }
-
-                    val nestedScrollInterop = rememberNestedScrollInteropConnection()
-                    Surface(Modifier.fillMaxSize()
-                        // seems to be much better in compose 1.3.0 but keep a look on it
-                        // https://issuetracker.google.com/issues/236451818
-                            .nestedScroll(nestedScrollInterop)
-                    ) {
-                        ArticleCardList(
-                            viewModel = articlesViewModel,
-                            onCardClick = activityViewModel::displayArticle,
-                            onShareClick = ::onShareClicked,
-                            onOpenInBrowserClick = {
-                                activityViewModel.displayArticleInBrowser(requireContext(), it)
-                            },
-                            additionalContentPaddingBottom = appBarHeightDp,
-                            modifier = Modifier
-                                .fillMaxSize()
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        articlesViewModel.getPendingArticlesSetUnread().observe(viewLifecycleOwner) { nbArticles ->
-            if (nbArticles > 0) {
-                updateUnreadSnackbar(nbArticles)
-            }
-        }
-
-        activityViewModel.refreshClickedEvent.observe(viewLifecycleOwner, EventObserver {
-            articlesViewModel.refresh()
-        })
-
-        activityViewModel.mostRecentSortOrder.observe(viewLifecycleOwner) {
-            articlesViewModel.setSortByMostRecentFirst(it)
-        }
-
-        activityViewModel.onlyUnreadArticles.observe(viewLifecycleOwner) {
-            articlesViewModel.setNeedUnread(it)
-        }
-    }
-
-    private fun updateUnreadSnackbar(nbArticles: Int) {
-        val text = resources.getQuantityString(R.plurals.undo_set_articles_read_text, nbArticles,
-            nbArticles)
-        unreadSnackbar.setText(text)
-        unreadSnackbar.show()
-    }
-
-    private fun onShareClicked(article: Article) {
-        startActivity(createShareIntent(requireActivity(), article))
-    }
-
-    private fun createShareIntent(activity: Activity, article: Article): Intent {
-        val shareIntent = ShareCompat.IntentBuilder(activity)
-        shareIntent.setSubject(article.title)
-            .setHtmlText(article.content)
-            .setText(article.link)
-            .setType("text/plain")
-        return shareIntent.createChooserIntent()
-    }
-
-}
-
-@AndroidEntryPoint
-class ArticlesListFragment : BaseArticlesListFragment() {
-    override val articlesViewModel: BaseArticlesViewModel by viewModels<ArticlesListViewModel>()
-}
-
-@AndroidEntryPoint
-class ArticlesListByTagFragment : BaseArticlesListFragment() {
-    override val articlesViewModel: BaseArticlesViewModel by viewModels<ArticlesListByTagViewModel>()
-}
 
 
 @Composable
@@ -197,12 +75,6 @@ private fun BaseArticlesListScreen(
         }
 
         LaunchedEffect(activityViewModel, articlesListViewModel, viewLifecycleOwner) {
-            articlesListViewModel.getPendingArticlesSetUnread().observe(viewLifecycleOwner) { nbArticles ->
-                if (nbArticles > 0) {
-//                    updateUnreadSnackbar(nbArticles)
-                }
-            }
-
             activityViewModel.refreshClickedEvent.observe(viewLifecycleOwner, EventObserver {
                 articlesListViewModel.refresh()
             })
