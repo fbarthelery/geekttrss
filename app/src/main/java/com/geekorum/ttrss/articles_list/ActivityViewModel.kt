@@ -33,9 +33,7 @@ import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.network.TtRssBrowserLauncher
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
 private const val STATE_FEED_ID = "feed_id"
@@ -88,6 +86,12 @@ class ActivityViewModel @Inject constructor(
     val onlyUnreadArticles = state.getLiveData(STATE_NEED_UNREAD, true)
 
     var appBarHeight: Int by mutableStateOf(0)
+
+    private val _undoReadSnackBarMessage = MutableStateFlow<UndoReadSnackbarMessage?>(null)
+    val undoReadSnackBarMessage = _undoReadSnackBarMessage.asStateFlow()
+
+    private val _isScrollingUp = MutableStateFlow(true)
+    val isScrollingUp = _isScrollingUp.asStateFlow()
 
     init {
         browserLauncher.warmUp()
@@ -158,4 +162,18 @@ class ActivityViewModel @Inject constructor(
     private fun ArticleSelectedEvent(position: Int, article: Article) =
         Event(ArticleSelectedParameters(position, article))
 
+    fun setUndoReadSnackBarMessge(snackBarMessage: UndoReadSnackbarMessage?) {
+        _undoReadSnackBarMessage.value = snackBarMessage
+    }
+
+    fun setIsScrollingUp(up: Boolean) {
+        _isScrollingUp.value = up
+    }
 }
+
+data class UndoReadSnackbarMessage(
+    val nbArticles: Int,
+    val onAction: () -> Unit,
+    val onDismiss: () -> Unit
+)
+
