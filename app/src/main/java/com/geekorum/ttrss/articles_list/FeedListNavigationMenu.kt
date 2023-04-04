@@ -60,7 +60,7 @@ fun FeedListNavigationMenu(
     server: String,
     feedSection: @Composable ColumnScope.() -> Unit,
     fab: (@Composable () -> Unit)? = null,
-    onManageFeedsClicked: () -> Unit,
+    manageFeedsSection: @Composable () -> Unit,
     onSettingsClicked: () -> Unit,
 ) {
     BoxWithNavigationMenuTypography {
@@ -84,14 +84,7 @@ fun FeedListNavigationMenu(
             feedSection()
 
             NavigationDivider()
-            NavigationItem(
-                stringResource(R.string.title_manage_feeds),
-                selected = false,
-                onClick = onManageFeedsClicked,
-                icon = {
-                    Icon(AppTheme.Icons.Tune, contentDescription = null)
-                },
-            )
+            manageFeedsSection()
             NavigationDivider()
             NavigationItem(
                 stringResource(R.string.activity_settings_title),
@@ -222,15 +215,16 @@ private fun NavigationDivider() {
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun NavigationItem(
+fun NavigationItem(
     label: String,
     selected: Boolean,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
     icon: (@Composable () -> Unit)? = null,
     badge: (@Composable () -> Unit)? = null,
 ) {
     Surface(
-        modifier = Modifier
+        modifier = modifier
             .height(NavigationItemHeight)
             .padding(horizontal = ActiveIndicatorPadding),
         shape = if (selected)
@@ -243,29 +237,49 @@ private fun NavigationItem(
         },
         onClick = onClick
     ) {
-        Row(modifier = Modifier.fillMaxSize(),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(Modifier
+        NavigationItemLayout(
+            icon = icon,
+            label = {
+                Text(
+                    label,
+                    style = MaterialTheme.typography.button,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            },
+            badge = badge
+        )
+    }
+}
+
+@Composable
+fun NavigationItemLayout(
+    label: @Composable () -> Unit,
+    icon: @Composable (() -> Unit)? = null,
+    badge: @Composable (() -> Unit)? = null
+) {
+    Row(
+        modifier = Modifier.fillMaxSize(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            Modifier
                 .padding(start = ActiveIndicatorContentPadding, end = 12.dp)
-                .size(24.dp)){
-                if (icon != null) {
-                    icon()
-                }
+                .size(24.dp)
+        ) {
+            if (icon != null) {
+                icon()
             }
+        }
 
-            Text(label,
-                modifier = Modifier.weight(1f),
-                style = MaterialTheme.typography.button,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
+        Box(Modifier.weight(1f)) {
+            label()
+        }
 
-            if (badge != null) {
-                Box(Modifier.padding(start = 12.dp, end = 24.dp)) {
-                    CompositionLocalProvider(LocalContentAlpha provides 0.4f) {
-                        badge()
-                    }
+        if (badge != null) {
+            Box(Modifier.padding(start = 12.dp, end = 24.dp)) {
+                CompositionLocalProvider(LocalContentAlpha provides 0.4f) {
+                    badge()
                 }
             }
         }
@@ -350,7 +364,16 @@ fun PreviewFeedListNavigationMenu() {
                             }
                         )
                     },
-                    onManageFeedsClicked = {},
+                    manageFeedsSection = {
+                        NavigationItem(
+                            stringResource(R.string.title_manage_feeds),
+                            selected = false,
+                            onClick = {},
+                            icon = {
+                                Icon(AppTheme.Icons.Tune, contentDescription = null)
+                            },
+                        )
+                    },
                     onSettingsClicked = {},
                 )
             }

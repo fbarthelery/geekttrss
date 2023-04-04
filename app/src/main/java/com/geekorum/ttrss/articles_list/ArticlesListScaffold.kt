@@ -39,6 +39,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.*
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
@@ -118,6 +119,7 @@ private fun ArticleListScaffold(
 
             val bannerHeightState = remember { mutableStateOf<Float?>(null) }
 
+            //TODO reimplement our own Scaffold and ScaffoldLayout
             Scaffold(
                 modifier = modifier,
                 scaffoldState = scaffoldState,
@@ -262,7 +264,16 @@ fun PreviewArticlesListScaffoldPhone() {
                         user = "user",
                         server = "server",
                         feedSection = {},
-                        onManageFeedsClicked = {},
+                        manageFeedsSection = {
+                            NavigationItem(
+                                stringResource(R.string.title_manage_feeds),
+                                selected = false,
+                                onClick = {},
+                                icon = {
+                                    Icon(AppTheme.Icons.Tune, contentDescription = null)
+                                },
+                            )
+                        },
                         onSettingsClicked = { })
                 },
                 floatingActionButton = {
@@ -335,7 +346,16 @@ fun PreviewArticlesListScaffoldTablet() {
                             )
                         },
                         feedSection = { },
-                        onManageFeedsClicked = {},
+                        manageFeedsSection = {
+                            NavigationItem(
+                                stringResource(R.string.title_manage_feeds),
+                                selected = false,
+                                onClick = {},
+                                icon = {
+                                    Icon(AppTheme.Icons.Tune, contentDescription = null)
+                                },
+                            )
+                        },
                         onSettingsClicked = {})
                 },
                 floatingActionButton = {
