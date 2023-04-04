@@ -113,4 +113,9 @@ class InstallModuleViewModel @Inject constructor(
         session?.startUserConfirmationDialog(activity, code)
     }
 
+    fun resetInstallState() {
+        _sessionState.value = InstallSession.State(PENDING, 0, 0)
+        session = null
+    }
+
 }

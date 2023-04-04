@@ -26,10 +26,8 @@ import android.content.Intent
 import androidx.core.net.toUri
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import com.geekorum.ttrss.Features
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.article_details.ArticleDetailActivity
-import com.geekorum.ttrss.on_demand_modules.OnDemandModuleManager
 import com.geekorum.ttrss.settings.SettingsActivity
 
 object NavRoutes {
@@ -104,11 +102,9 @@ fun NavController.navigateToSearch() {
     navigate(NavRoutes.Search)
 }
 
-fun NavController.navigateToManageFeeds(onDemandModuleManager: OnDemandModuleManager) {
-    if (Features.MANAGE_FEEDS in onDemandModuleManager.installedModules) {
-        val intent = Intent().apply {
-            component = ComponentName(context, "com.geekorum.ttrss.manage_feeds.ManageFeedsActivity")
-        }
-        context.startActivity(intent)
+fun NavController.navigateToManageFeeds() {
+    val intent = Intent().apply {
+        component = ComponentName(context, "com.geekorum.ttrss.manage_feeds.ManageFeedsActivity")
     }
+    context.startActivity(intent)
 }

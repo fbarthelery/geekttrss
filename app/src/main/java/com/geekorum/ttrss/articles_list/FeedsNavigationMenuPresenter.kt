@@ -20,24 +20,34 @@
  */
 package com.geekorum.ttrss.articles_list
 
-import androidx.compose.material.ExtendedFloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import android.app.Activity
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Tune
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.geekorum.ttrss.Features
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Feed
-import com.geekorum.ttrss.on_demand_modules.OnDemandModuleManager
+import com.geekorum.ttrss.on_demand_modules.InstallModuleViewModel
+import com.geekorum.ttrss.on_demand_modules.InstallSession
 import com.geekorum.ttrss.ui.AppTheme
 
+
+private const val CODE_REQUEST_USER_CONFIRMATION = 1
 
 /**
  * Display the feeds in a NavigationView menu.
@@ -47,7 +57,8 @@ class FeedsNavigationMenuPresenter(
     private val feedsViewModel: FeedsViewModel,
     private val accountViewModel: TtrssAccountViewModel,
     private val activityViewModel: ActivityViewModel,
-    private val onDemandModuleManager: OnDemandModuleManager,
+    private val installModuleViewModel: InstallModuleViewModel,
+    private val activity: Activity,
 ) {
 
     @Composable
@@ -96,9 +107,17 @@ class FeedsNavigationMenuPresenter(
                             }
                         )
                     },
-                    onManageFeedsClicked = {
-                        navController.navigateToManageFeeds(onDemandModuleManager)
-                        onNavigation()
+                    manageFeedsSection = {
+                        ManageFeedSection(
+                            viewModel = installModuleViewModel,
+                            activity = activity,
+                            navigateToManageFeed = {
+                                check(installModuleViewModel.isModuleInstalled(Features.MANAGE_FEEDS)) {
+                                    { "${Features.MANAGE_FEEDS} is not installed" }
+                                }
+                                navController.navigateToManageFeeds()
+                                onNavigation()
+                            })
                     },
                     onSettingsClicked = {
                         navController.navigateToSettings()
@@ -115,4 +134,131 @@ class FeedsNavigationMenuPresenter(
         navController.navigateToFeed(feed.id, feed.title)
     }
 
+}
+
+
+@Composable
+private fun ManageFeedSection(
+    viewModel: InstallModuleViewModel = hiltViewModel(),
+    activity: Activity,
+    navigateToManageFeed: () -> Unit
+) {
+    val installState by viewModel.sessionState.collectAsStateWithLifecycle()
+    val installProgress by viewModel.progress.collectAsStateWithLifecycle()
+    val installationIsInProgress = installState.status != InstallSession.State.Status.PENDING
+
+    LaunchedEffect(installState) {
+        when (installState.status) {
+            InstallSession.State.Status.REQUIRES_USER_CONFIRMATION ->
+                viewModel.startUserConfirmationDialog(activity, CODE_REQUEST_USER_CONFIRMATION)
+            else -> Unit
+        }
+    }
+
+    ManageFeedSection(
+        installInProgress = installationIsInProgress,
+        installationMessage = stringResource(installProgress.message),
+        indeterminateProgress = installProgress.progressIndeterminate,
+        progress = installProgress.progress,
+        progressMax = installProgress.max,
+        onItemClick = {
+            if (viewModel.isModuleInstalled(Features.MANAGE_FEEDS)) {
+                navigateToManageFeed()
+                viewModel.resetInstallState()
+            } else if (installState.status == InstallSession.State.Status.FAILED || installState.status == InstallSession.State.Status.CANCELED) {
+                viewModel.resetInstallState()
+            } else {
+                viewModel.startInstallModules(Features.MANAGE_FEEDS)
+            }
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun ManageFeedSection(
+    installInProgress: Boolean,
+    installationMessage: String,
+    indeterminateProgress: Boolean,
+    progress: Int,
+    progressMax: Int,
+    onItemClick: () -> Unit,
+) {
+    Surface(onClick = onItemClick, modifier = Modifier.padding(horizontal = 12.dp)) {
+        Column(Modifier.animateContentSize()) {
+            ManageFeedItem()
+
+            if (installInProgress) {
+                Column(Modifier.padding(start = 56.dp)) {
+                    Text(installationMessage, style = MaterialTheme.typography.caption)
+                    if (indeterminateProgress) {
+                        LinearProgressIndicator(
+                            color = MaterialTheme.colors.secondary,
+                            modifier = Modifier.padding(
+                                top = 8.dp,
+                                bottom = 16.dp
+                            )
+                        )
+                    } else {
+                        LinearProgressIndicator(
+                            progress = progress / progressMax.toFloat(),
+                            color = MaterialTheme.colors.secondary,
+                            modifier = Modifier.padding(top = 8.dp, bottom = 16.dp)
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ManageFeedItem(
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier
+            .height(48.dp)
+    ) {
+        NavigationItemLayout(
+            icon = {
+            Icon(AppTheme.Icons.Tune, contentDescription = null)
+        },
+            label = {
+                Text(
+                    stringResource(R.string.title_manage_feeds),
+                    style = MaterialTheme.typography.button,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            },
+        )
+    }
+}
+
+
+@Preview
+@Composable
+fun PreviewManageFeedSection() {
+    AppTheme {
+        ManageFeedSection(installInProgress = false,
+            installationMessage = "",
+            indeterminateProgress = false,
+            progress = 0,
+            progressMax = 1,
+            onItemClick = {})
+    }
+}
+
+@Preview
+@Composable
+fun PreviewManageFeedSectionInstallInProgress() {
+    AppTheme {
+        ManageFeedSection(installInProgress = true,
+            installationMessage = "Installing",
+            indeterminateProgress = false,
+            progress = 33,
+            progressMax = 100,
+            onItemClick = {})
+    }
 }
