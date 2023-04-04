@@ -24,11 +24,9 @@ import android.app.Activity
 import android.content.Intent
 import android.content.IntentSender
 import android.os.Bundle
-import androidx.activity.result.ActivityResultCallback
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.ActivityResultRegistry
 import androidx.activity.result.IntentSenderRequest
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.DrawableRes
 import androidx.appcompat.content.res.AppCompatResources
@@ -51,7 +49,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.LifecycleOwner
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.in_app_update.InAppUpdateViewModel
 import com.geekorum.ttrss.in_app_update.IntentSenderForResultStarter
@@ -64,21 +61,12 @@ private const val CODE_START_IN_APP_UPDATE = 1
  * Presenter for InAppUpdates.
  */
 class InAppUpdatePresenter(
-    private val lifecyleOwner: LifecycleOwner,
     private val inAppUpdateViewModel: InAppUpdateViewModel,
-    activityResultRegistry: ActivityResultRegistry,
 ) {
 
-    private val inAppUpdateLauncher = registerInAppUpdateLauncher(
-        ActivityResultContracts.StartIntentSenderForResult(),
-        activityResultRegistry
-    ) {
-        if (it.resultCode != Activity.RESULT_OK) {
-            inAppUpdateViewModel.cancelUpdateFlow()
-        }
-    }
-
-    private val intentSenderForResultStarter = object : IntentSenderForResultStarter {
+    class InAppUpdateIntentSenderForResultStarter(
+        private val inAppUpdateLauncher: ActivityResultLauncher<IntentSenderRequest>
+    ) : IntentSenderForResultStarter {
         override fun startIntentSenderForResult(intent: IntentSender, requestCode: Int, fillInIntent: Intent?, flagsMask: Int, flagsValues: Int, extraFlags: Int, options: Bundle?) {
             val intentSenderRequest = IntentSenderRequest.Builder(intent)
                 .setFillInIntent(fillInIntent)
@@ -112,7 +100,7 @@ class InAppUpdatePresenter(
             ) {
                 SheetContent(
                     isUpdateAvailable = isUpdateAvailable,
-                    isUpdateReadyToInstalll = isUpdateReadyToInstall,
+                    isUpdateReadyToInstall = isUpdateReadyToInstall,
                     dismissSheet = {
                         showBanner = false
                     }
@@ -124,9 +112,15 @@ class InAppUpdatePresenter(
     @Composable
     private fun SheetContent(
         isUpdateAvailable: Boolean,
-        isUpdateReadyToInstalll: Boolean,
+        isUpdateReadyToInstall: Boolean,
         dismissSheet: () -> Unit,
     ) {
+        val appUpdateLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult() ) {
+            if (it.resultCode != Activity.RESULT_OK) {
+                inAppUpdateViewModel.cancelUpdateFlow()
+            }
+        }
+
         Card(shape = RoundedCornerShape(0.dp),
             backgroundColor =  if (MaterialTheme.colors.isLight)
                 colorResource(R.color.material_blue_grey_100)
@@ -139,7 +133,7 @@ class InAppUpdatePresenter(
                 propagateMinConstraints = true
             ) {
                 when {
-                    isUpdateReadyToInstalll -> {
+                    isUpdateReadyToInstall -> {
                         UpdateReadyBanner(onRestartClick = {
                             inAppUpdateViewModel.completeUpdate()
                             dismissSheet()
@@ -147,7 +141,8 @@ class InAppUpdatePresenter(
                     }
                     isUpdateAvailable -> {
                         UpdateAvailableBanner(onInstallClick = {
-                            inAppUpdateViewModel.startUpdateFlow(intentSenderForResultStarter,
+                            val intentStarter = InAppUpdateIntentSenderForResultStarter(appUpdateLauncher)
+                            inAppUpdateViewModel.startUpdateFlow(intentStarter,
                                 CODE_START_IN_APP_UPDATE)
                             dismissSheet()
                         },
@@ -221,15 +216,6 @@ class InAppUpdatePresenter(
                 }
             }
         }
-    }
-
-
-    private fun <I, O> registerInAppUpdateLauncher(
-        contract: ActivityResultContract<I, O>,
-        registry: ActivityResultRegistry,
-        callback: ActivityResultCallback<O>): ActivityResultLauncher<I> {
-        return registry.register(
-            "in_app_update_presenter", lifecyleOwner, contract, callback)
     }
 
     @Composable

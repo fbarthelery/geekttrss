@@ -74,9 +74,6 @@ class ArticleListActivity : SessionActivity() {
     private val appReviewViewModel: AppReviewViewModel by viewModels()
     private val installModuleViewModel: InstallModuleViewModel by viewModels()
 
-    private lateinit var inAppUpdatePresenter: InAppUpdatePresenter
-    private lateinit var feedNavigationPresenter: FeedsNavigationMenuPresenter
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -95,10 +92,6 @@ class ArticleListActivity : SessionActivity() {
         //TODO use a preference ?
         feedsViewModel.setOnlyUnread(true)
 
-        inAppUpdatePresenter = InAppUpdatePresenter(
-            this,
-            inAppUpdateViewModel,
-            activityResultRegistry)
         setupEdgeToEdge()
         setComposeContent()
     }
@@ -110,7 +103,10 @@ class ArticleListActivity : SessionActivity() {
             val appBarPresenter = remember {
                 createAppBarPresenter(navController)
             }
-            feedNavigationPresenter = remember {
+            val inAppUpdatePresenter = remember {
+                createInAppUpdatePresenter()
+            }
+            val feedNavigationPresenter = remember {
                 createFeedsNavigationMenuPresenter(navController)
             }
             val owner = LocalLifecycleOwner.current
@@ -207,6 +203,10 @@ class ArticleListActivity : SessionActivity() {
             onDemandModuleNavHostProgressDestinationProvider = null,
             navController = navController
         )
+    }
+
+    private fun createInAppUpdatePresenter(): InAppUpdatePresenter {
+        return InAppUpdatePresenter(inAppUpdateViewModel)
     }
 
     private fun createFeedsNavigationMenuPresenter(navController: NavController): FeedsNavigationMenuPresenter {
