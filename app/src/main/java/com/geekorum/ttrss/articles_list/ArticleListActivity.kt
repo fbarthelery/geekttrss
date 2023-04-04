@@ -136,13 +136,11 @@ class ArticleListActivity : SessionActivity() {
                 val windowSizeClass = calculateWindowSizeClass(this)
                 val hasFabInFixedDrawer = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded
                 val fabPresenter = remember {
-                    FabPresenter(onDemandModuleNavHostProgressDestinationProvider = null,
-                        navController)
+                    FabPresenter(navController)
                 }
 
                 val drawerLayoutPresenter = rememberDrawerLayoutPresenter(
                     navController,
-                    onDemandModuleNavHostProgressDestinationProvider = null
                 )
 
                 ArticlesListScaffold(
@@ -198,7 +196,6 @@ class ArticleListActivity : SessionActivity() {
             activity = this,
             activityViewModel = activityViewModel,
             tagsViewModel = tagsViewModel,
-            onDemandModuleNavHostProgressDestinationProvider = null,
             navController = navController
         )
     }

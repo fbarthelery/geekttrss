@@ -46,7 +46,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Feed.Companion.FEED_ID_ALL_ARTICLES
-import com.geekorum.ttrss.on_demand_modules.OnDemandModuleNavHostProgressDestinationProvider
 import com.geekorum.ttrss.ui.AppTheme
 
 
@@ -57,7 +56,6 @@ internal class AppBarPresenter(
     private val activity: Activity,
     private val tagsViewModel: TagsViewModel,
     private val activityViewModel: ActivityViewModel,
-    private val onDemandModuleNavHostProgressDestinationProvider: OnDemandModuleNavHostProgressDestinationProvider?,
     private val navController: NavController,
 ) {
 
@@ -143,11 +141,6 @@ internal class AppBarPresenter(
         onNavigationMenuClick: () -> Unit,
         modifier: Modifier = Modifier,
     ) {
-        //TODO deal with module installation
-        val progressDestinationId =
-            onDemandModuleNavHostProgressDestinationProvider?.progressDestinationId ?: 0
-
-        val hasSearchButton = currentDestination?.destination?.id != progressDestinationId
         val hasSortMenu = destinationHasSortButton(currentDestination?.destination)
         val sortOrder by activityViewModel.sortOrder.collectAsStateWithLifecycle()
 
@@ -195,9 +188,6 @@ internal class AppBarPresenter(
                     currentDestination.arguments
                 ) ?: ""
             }
-            if (currentDestination?.destination?.id == progressDestinationId) {
-                toolbarTitle = context.resources.getString(R.string.lbl_install_feature_title)
-            }
         }
 
         ArticlesListAppBar(
@@ -214,7 +204,7 @@ internal class AppBarPresenter(
                 activityViewModel.setSortByMostRecentFirst(mostRecentFirst)
             },
             displaySortMenuButton = hasSortMenu,
-            displaySearchButton = hasSearchButton,
+            displaySearchButton = true,
             navigationIcon = if (!hasFixedDrawer) navigationIcon else null,
             modifier = modifier
         )

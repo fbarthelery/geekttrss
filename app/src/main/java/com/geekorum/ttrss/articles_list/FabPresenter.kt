@@ -35,13 +35,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import com.geekorum.ttrss.R
-import com.geekorum.ttrss.on_demand_modules.OnDemandModuleNavHostProgressDestinationProvider
 
 /**
  * Controls the behavior of the FloatingActionButton
  */
 internal class FabPresenter(
-    private val onDemandModuleNavHostProgressDestinationProvider: OnDemandModuleNavHostProgressDestinationProvider?,
     private val navController: NavController
 ){
 
@@ -50,10 +48,8 @@ internal class FabPresenter(
     fun Content(isScrollingUpOrRest: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
         //TODO deal with module install
         val navBackStackEntry by navController.currentBackStackEntryFlow.collectAsStateWithLifecycle(null)
-        val progressDestinationId = onDemandModuleNavHostProgressDestinationProvider?.progressDestinationId ?: 0
         val fabVisibleInDestination = when {
             navBackStackEntry?.destination?.route == NavRoutes.Search -> false
-            navBackStackEntry?.destination?.id == progressDestinationId -> false
             navBackStackEntry == null -> false
             else -> true
         }

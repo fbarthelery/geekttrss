@@ -23,7 +23,6 @@ package com.geekorum.ttrss.articles_list
 import androidx.compose.runtime.*
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.geekorum.ttrss.on_demand_modules.OnDemandModuleNavHostProgressDestinationProvider
 
 /**
  * Controls the behavior of the NavigationDrawer
@@ -36,7 +35,7 @@ internal class DrawerLayoutPresenter {
 }
 
 @Composable
-internal fun rememberDrawerLayoutPresenter(navController: NavController, onDemandModuleNavHostProgressDestinationProvider: OnDemandModuleNavHostProgressDestinationProvider?): DrawerLayoutPresenter {
+internal fun rememberDrawerLayoutPresenter(navController: NavController): DrawerLayoutPresenter {
     val presenter = remember {
         DrawerLayoutPresenter()
     }
@@ -45,7 +44,6 @@ internal fun rememberDrawerLayoutPresenter(navController: NavController, onDeman
     LaunchedEffect(navBackStackEntry) {
         presenter.drawerGesturesEnabled = when {
             navBackStackEntry?.destination?.route == NavRoutes.Search -> false
-            navBackStackEntry?.destination?.id == onDemandModuleNavHostProgressDestinationProvider?.progressDestinationId -> false
             else -> true
         }
     }
