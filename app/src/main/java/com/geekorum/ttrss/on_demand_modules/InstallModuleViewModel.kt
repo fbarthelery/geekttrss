@@ -38,7 +38,7 @@ import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.PENDING
 import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.REQUIRES_USER_CONFIRMATION
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -57,12 +57,11 @@ class InstallModuleViewModel @Inject constructor(
         val progressIndeterminate: Boolean
     )
 
-    private val _sessionState = MutableLiveData<InstallSession.State>().apply {
-        value = InstallSession.State(PENDING, 0, 0)
-    }
+    private val _sessionState = MutableStateFlow(InstallSession.State(PENDING, 0, 0))
+    val sessionState = _sessionState.asStateFlow()
 
-    val sessionState: LiveData<InstallSession.State> = _sessionState
     val progress = sessionState.map(this::mapStateToProgression)
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), mapStateToProgression(sessionState.value))
 
     private var session: InstallSession? = null
 
@@ -70,7 +69,6 @@ class InstallModuleViewModel @Inject constructor(
         return module in moduleManager.installedModules
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     fun startInstallModules(vararg modules: String) = viewModelScope.launch {
         if (session != null) {
             return@launch

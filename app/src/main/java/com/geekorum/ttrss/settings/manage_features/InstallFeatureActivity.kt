@@ -22,18 +22,37 @@ package com.geekorum.ttrss.settings.manage_features
 
 import android.app.Activity
 import android.os.Bundle
+import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.databinding.DataBindingUtil
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.geekorum.ttrss.core.BaseActivity
-import com.geekorum.ttrss.R
-import com.geekorum.ttrss.databinding.ActivityInstallFeatureBinding
 import com.geekorum.ttrss.on_demand_modules.InstallModuleViewModel
-import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.CANCELED
-import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.FAILED
-import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.INSTALLED
-import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.REQUIRES_USER_CONFIRMATION
+import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.*
+import com.geekorum.ttrss.ui.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -48,65 +67,147 @@ class InstallFeatureActivity : BaseActivity() {
         const val CODE_REQUEST_USER_CONFIRMATION = 1
     }
 
-    lateinit var binding: ActivityInstallFeatureBinding
-
     val viewModel: InstallModuleViewModel by viewModels()
-
-    private var animationIsRunning = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_install_feature)
-        binding.lifecycleOwner = this
-        binding.viewModel = viewModel
-
-        viewModel.sessionState.observe(this) {
-            when (it.status) {
-                INSTALLED -> {
+        setContent {
+            AppTheme {
+                InstallFeatureScreen(activity = this, viewModel, onAppInstalled = {
                     setResult(Activity.RESULT_OK)
                     lifecycleScope.launch {
                         delay(1000)
                         finish()
                     }
-                }
-                FAILED,
-                CANCELED -> stopAnimation()
-                REQUIRES_USER_CONFIRMATION -> {
-                    viewModel.startUserConfirmationDialog(this@InstallFeatureActivity,
-                        CODE_REQUEST_USER_CONFIRMATION)
-                }
-                else -> startAnimation()
+                })
             }
         }
+
         val features = intent.getStringArrayExtra(EXTRA_FEATURES_LIST) ?: emptyArray()
         viewModel.startInstallModules(*features)
     }
+}
 
-    private fun startAnimation() {
-        if (animationIsRunning) {
-            return
-        }
-        binding.moduleLogo.animate()
-            .rotationBy(360f)
-            .withEndAction {
-                animationIsRunning = false
-                startAnimation()
+
+@Composable
+fun InstallFeatureScreen(
+    activity: Activity,
+    viewModel: InstallModuleViewModel = hiltViewModel(),
+    onAppInstalled: () -> Unit,
+) {
+    val installProgression by viewModel.progress.collectAsStateWithLifecycle()
+    val installSessionState by viewModel.sessionState.collectAsStateWithLifecycle()
+    val animate = when (installSessionState.status) {
+        FAILED, CANCELED -> false
+        else -> true
+    }
+
+    LaunchedEffect(installSessionState) {
+        when (installSessionState.status) {
+            INSTALLED -> onAppInstalled()
+            REQUIRES_USER_CONFIRMATION -> {
+                viewModel.startUserConfirmationDialog(activity,
+                    InstallFeatureActivity.CODE_REQUEST_USER_CONFIRMATION
+                )
             }
-            .setInterpolator(null)
-            .setDuration(2000L)
-            .start()
-        animationIsRunning = true
+            else -> Unit
+        }
     }
 
-    private fun stopAnimation() {
-        binding.moduleLogo.animate().cancel()
-        animationIsRunning = false
-    }
+    InstallFeatureScreen(
+        installationMessage = stringResource(installProgression.message),
+        indeterminateProgress = installProgression.progressIndeterminate,
+        progress = installProgression.progress,
+        progressMax = installProgression.max,
+        animate = animate,
+        modifier = Modifier.fillMaxSize()
+    )
+}
 
-    override fun onPause() {
-        super.onPause()
-        stopAnimation()
+@Composable
+fun InstallFeatureScreen(
+    installationMessage: String,
+    indeterminateProgress: Boolean,
+    progress: Int,
+    progressMax: Int,
+    animate: Boolean,
+    modifier: Modifier = Modifier
+) {
+    Surface(modifier) {
+        // we could use rememberInfiniteTransition but we wanted the animation to stop gracefully
+        val logoAnimation = remember { Animatable(0f) }
+
+        var currentAnimationVelocity by  remember { mutableStateOf(0f) }
+        LaunchedEffect(animate) {
+            if (!animate) {
+                logoAnimation.animateTo(
+                    360f,
+                    tween(durationMillis = 800),
+                    initialVelocity = currentAnimationVelocity
+                )
+            } else {
+                try {
+                    while (true) {
+                        logoAnimation.snapTo(0f)
+                        logoAnimation.animateTo(
+                            360f, tween(durationMillis = 2000)
+                        )
+                    }
+                } catch (e: CancellationException) {
+                    currentAnimationVelocity = logoAnimation.velocity
+                }
+            }
+        }
+
+        Column(
+            Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            horizontalAlignment = Alignment.CenterHorizontally) {
+
+            Image(imageVector = Icons.Default.Settings, contentDescription = null,
+                contentScale = ContentScale.FillWidth,
+                colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
+                modifier = Modifier
+                    .size(200.dp)
+                    .rotate(logoAnimation.value)
+            )
+
+            Text(installationMessage,
+                style = MaterialTheme.typography.h6,
+                modifier = Modifier.padding(top = 32.dp))
+
+            if (indeterminateProgress) {
+                LinearProgressIndicator(
+                    color = MaterialTheme.colors.secondary,
+                    modifier = Modifier.padding(vertical = 16.dp))
+            } else {
+                LinearProgressIndicator(progress = progress/progressMax.toFloat(),
+                    color = MaterialTheme.colors.secondary,
+                    modifier = Modifier.padding(vertical = 16.dp))
+            }
+        }
     }
 }
 
+
+@Preview
+@Composable
+fun PreviewInstallFeatureScreen() {
+    AppTheme {
+        var animate by remember { mutableStateOf(true) }
+        InstallFeatureScreen(
+            installationMessage = "Installation en cours",
+            indeterminateProgress = false,
+            progress = 33,
+            progressMax = 100,
+            animate = animate,
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable {
+                    animate = !animate
+                }
+        )
+    }
+}
 
