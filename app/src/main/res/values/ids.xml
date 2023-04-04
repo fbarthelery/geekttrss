@@ -24,4 +24,6 @@
 <resources>
     <!-- Id of the bottom app bar in ArticleDetailsScreen -->
     <item name="bottom_app_bar" type="id" />
+    <!-- Id of the fab in ArticleDetailsScreen -->
+    <item name="fab" type="id" />
 </resources>
