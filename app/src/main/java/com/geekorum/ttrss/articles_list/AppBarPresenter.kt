@@ -101,13 +101,12 @@ internal class AppBarPresenter(
 
         val showTagsBar = run {
             when (currentDestination?.destination?.route) {
-                NavRoutes.ArticlesList,
-                NavRoutes.ArticlesListByTag -> {
-                    val feedId =
-                        currentDestination.arguments?.let { ArticlesListFragmentArgs.fromBundle(it) }?.feedId
-                            ?: FEED_ID_ALL_ARTICLES
+                NavRoutes.ArticlesList -> {
+                    val feedId = currentDestination.arguments?.let { ArticlesListScreenArgs(it) }?.feedId
+                        ?: FEED_ID_ALL_ARTICLES
                     feedId == FEED_ID_ALL_ARTICLES
                 }
+                NavRoutes.ArticlesListByTag -> true
 
                 else -> false
             }

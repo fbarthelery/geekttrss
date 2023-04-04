@@ -23,6 +23,7 @@ package com.geekorum.ttrss.articles_list
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import androidx.compose.runtime.Composable
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -63,6 +64,14 @@ object NavRoutes {
     }
 }
 
+class ArticlesListScreenArgs(
+    val feedId: Long,
+    val feedName: String?
+) {
+    constructor(arguments: Bundle) : this(
+        feedId = arguments.getLong("feed_id"),
+        feedName = arguments.getString("feed_name"))
+}
 
 @Composable
 fun ArticlesListNavHost(
