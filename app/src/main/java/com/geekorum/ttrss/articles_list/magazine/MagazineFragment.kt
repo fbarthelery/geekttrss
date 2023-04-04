@@ -20,7 +20,7 @@
  */
 package com.geekorum.ttrss.articles_list.magazine
 
-import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -33,6 +33,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Surface
@@ -42,7 +43,6 @@ import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.*
@@ -52,6 +52,7 @@ import androidx.core.app.ShareCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemsIndexed
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
@@ -67,7 +68,6 @@ class MagazineFragment: Fragment() {
     private val activityViewModel: ActivityViewModel by activityViewModels()
     private val magazineViewModel: MagazineViewModel by viewModels()
 
-    @OptIn(ExperimentalComposeUiApi::class)
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
@@ -112,15 +112,59 @@ class MagazineFragment: Fragment() {
         startActivity(createShareIntent(requireActivity(), article))
     }
 
-    private fun createShareIntent(activity: Activity, article: Article): Intent {
-        val shareIntent = ShareCompat.IntentBuilder(activity)
-        shareIntent.setSubject(article.title)
-            .setHtmlText(article.content)
-            .setText(article.link)
-            .setType("text/plain")
-        return shareIntent.createChooserIntent()
-    }
+}
 
+private fun createShareIntent(context: Context, article: Article): Intent {
+    val shareIntent = ShareCompat.IntentBuilder(context)
+    shareIntent.setSubject(article.title)
+        .setHtmlText(article.content)
+        .setText(article.link)
+        .setType("text/plain")
+    return shareIntent.createChooserIntent()
+}
+
+
+@Composable
+fun MagazineScreen(
+    activityViewModel: ActivityViewModel,
+    magazineViewModel: MagazineViewModel = hiltViewModel()
+) {
+    AppTheme {
+        val appBarHeightDp = with(LocalDensity.current) {
+            activityViewModel.appBarHeight.toDp()
+        }
+
+        //TODO remove it should not be needed anymore
+        val nestedScrollInterop = rememberNestedScrollInteropConnection()
+        Surface(
+            Modifier
+                .fillMaxSize()
+                // seems to be much better in compose 1.3.0 but keep a look on it
+                // https://issuetracker.google.com/issues/236451818
+                .nestedScroll(nestedScrollInterop)
+        ) {
+            val context = LocalContext.current
+            val lazyListState = rememberLazyListState()
+            val isScrollingUp = lazyListState.isScrollingUp()
+            LaunchedEffect(activityViewModel, isScrollingUp) {
+                activityViewModel.setIsScrollingUp(isScrollingUp)
+            }
+            ArticlesMagazine(
+                viewModel = magazineViewModel,
+                listState = lazyListState,
+                onCardClick = activityViewModel::displayArticle,
+                onShareClick = {article ->
+                               context.startActivity(createShareIntent(context, article))
+                },
+                onOpenInBrowserClick = {
+                    activityViewModel.displayArticleInBrowser(context, it)
+                },
+                additionalContentPaddingBottom = appBarHeightDp,
+                modifier = Modifier
+                    .fillMaxSize()
+            )
+        }
+    }
 }
 
 
@@ -132,6 +176,7 @@ private fun ArticlesMagazine(
     onShareClick: (Article) -> Unit,
     onOpenInBrowserClick: (Article) -> Unit,
     modifier: Modifier = Modifier,
+    listState: LazyListState = rememberLazyListState(),
     additionalContentPaddingBottom: Dp = 0.dp,
 ) {
 
@@ -159,7 +204,6 @@ private fun ArticlesMagazine(
             return@Box
         }
 
-        val listState = rememberLazyListState()
         var animateItemAppearance by remember { mutableStateOf(true) }
         val navBarPadding = WindowInsets.navigationBars.asPaddingValues()
         val contentPadding = PaddingValues(

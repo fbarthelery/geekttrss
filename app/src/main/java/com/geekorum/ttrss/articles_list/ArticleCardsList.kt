@@ -27,6 +27,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -96,6 +97,7 @@ enum class PagingViewLoadState {
 @Composable
 fun ArticleCardList(
     viewModel: BaseArticlesViewModel,
+    listState: LazyListState = rememberLazyListState(),
     onCardClick: (Int, Article) -> Unit,
     onShareClick: (Article) -> Unit,
     onOpenInBrowserClick: (Article) -> Unit,
@@ -124,6 +126,7 @@ fun ArticleCardList(
 
     ArticleCardList(
         articles = articles,
+        listState = listState,
         isMultiFeedList = isMultiFeedList,
         isRefreshing = isRefreshing,
         pullRefreshState = pullRefreshState,
@@ -159,6 +162,7 @@ private fun ArticleCardList(
     onStarChanged: (Article, Boolean) -> Unit,
     onSwiped: (Article) -> Unit,
     modifier: Modifier = Modifier,
+    listState: LazyListState = rememberLazyListState(),
     additionalContentPaddingBottom: Dp = 0.dp,
 ) {
     Box(modifier.pullRefresh(pullRefreshState)) {
@@ -169,7 +173,6 @@ private fun ArticleCardList(
             return@Box
         }
 
-        val listState = rememberLazyListState()
         var animateItemAppearance by remember { mutableStateOf(true) }
         val navBarPadding = WindowInsets.navigationBars.asPaddingValues()
         val contentPadding = PaddingValues(
@@ -348,6 +351,28 @@ private fun ArticleCardList() {
     )
 }
 
+
+
+/**
+ * Returns whether the lazy list is currently scrolling up.
+ */
+@Composable
+fun LazyListState.isScrollingUp(): Boolean {
+    var previousIndex by remember(this) { mutableStateOf(firstVisibleItemIndex) }
+    var previousScrollOffset by remember(this) { mutableStateOf(firstVisibleItemScrollOffset) }
+    return remember(this) {
+        derivedStateOf {
+            if (previousIndex != firstVisibleItemIndex) {
+                previousIndex > firstVisibleItemIndex
+            } else {
+                previousScrollOffset >= firstVisibleItemScrollOffset
+            }.also {
+                previousIndex = firstVisibleItemIndex
+                previousScrollOffset = firstVisibleItemScrollOffset
+            }
+        }
+    }.value
+}
 
 @Preview
 @Composable
