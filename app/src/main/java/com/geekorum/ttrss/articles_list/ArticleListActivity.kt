@@ -21,25 +21,39 @@
 package com.geekorum.ttrss.articles_list
 
 import android.os.Bundle
+import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.animation.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.*
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
-import androidx.core.view.doOnLayout
-import androidx.databinding.DataBindingUtil
-import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.compose.rememberNavController
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.app_reviews.AppReviewViewModel
 import com.geekorum.ttrss.article_details.ArticleDetailActivity
-import com.geekorum.ttrss.databinding.ActivityArticleListBinding
 import com.geekorum.ttrss.in_app_update.InAppUpdateViewModel
-import com.geekorum.ttrss.on_demand_modules.OnDemandModuleManager
+import com.geekorum.ttrss.on_demand_modules.InstallModuleViewModel
 import com.geekorum.ttrss.on_demand_modules.findOnDemandModuleNavHostFragment
 import com.geekorum.ttrss.session.SessionActivity
+import com.geekorum.ttrss.ui.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * An activity representing a list of Articles. This activity
@@ -52,38 +66,19 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ArticleListActivity : SessionActivity() {
 
-    private lateinit var binding: ActivityArticleListBinding
-    private val drawerLayout: DrawerLayout?
-        get() = binding.headlinesDrawer
-
-
-    private lateinit var navController: NavController
     private val activityViewModel: ActivityViewModel by viewModels()
     private val accountViewModel: TtrssAccountViewModel by viewModels()
     private val inAppUpdateViewModel: InAppUpdateViewModel by viewModels()
     private val feedsViewModel: FeedsViewModel by viewModels()
     private val tagsViewModel: TagsViewModel by viewModels()
     private val appReviewViewModel: AppReviewViewModel by viewModels()
+    private val installModuleViewModel: InstallModuleViewModel by viewModels()
 
     private lateinit var inAppUpdatePresenter: InAppUpdatePresenter
-    private lateinit var appBarPresenter: AppBarPresenter
-    private lateinit var fabPresenter: FabPresenter
     private lateinit var feedNavigationPresenter: FeedsNavigationMenuPresenter
-    private var drawerLayoutPresenter: DrawerLayoutPresenter? = null
-    private val onDemandModuleNavHostFragment by lazy {
-        findOnDemandModuleNavHostFragment(R.id.middle_pane_layout)!!
-    }
-
-    @Inject
-    lateinit var moduleManager: OnDemandModuleManager
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        activityViewModel.articleSelectedEvent.observe(this, EventObserver { (_, article) ->
-            navController.navigate(ArticlesListFragmentDirections.actionShowArticle(article.id))
-        })
 
         accountViewModel.selectedAccount.observe(this) { account ->
             if (account != null) {
@@ -100,91 +95,149 @@ class ArticleListActivity : SessionActivity() {
         //TODO use a preference ?
         feedsViewModel.setOnlyUnread(true)
 
-        binding = DataBindingUtil.setContentView<ActivityArticleListBinding>(this,
-            R.layout.activity_article_list).apply {
-            lifecycleOwner = this@ArticleListActivity
-            activityViewModel = this@ArticleListActivity.activityViewModel
-        }
-
         inAppUpdatePresenter = InAppUpdatePresenter(
-            binding.bannerContainer,
             this,
             inAppUpdateViewModel,
             activityResultRegistry)
-
-        navController = findNavController(R.id.middle_pane_layout)
-
-        setupToolbar()
-        setupNavigationView()
         setupEdgeToEdge()
-        setupFab()
-        setupAppReview()
+        setComposeContent()
     }
 
-    private fun setupFab() {
-        fabPresenter = FabPresenter(
-            fab = binding.fab,
-            onDemandModuleNavHostProgressDestinationProvider = onDemandModuleNavHostFragment,
-            navController = navController
-        )
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
+    private fun setComposeContent() {
+        setContent {
+            val navController = rememberNavController()
+            val appBarPresenter = remember {
+                createAppBarPresenter(navController)
+            }
+            feedNavigationPresenter = remember {
+                createFeedsNavigationMenuPresenter(navController)
+            }
+            val owner = LocalLifecycleOwner.current
+            LaunchedEffect(activityViewModel, navController, owner) {
+                activityViewModel.articleSelectedEvent.observe(owner, EventObserver { (_, article) ->
+                    navController.navigateToArticle(article.id)
+                })
+            }
+
+            val navBackStackEntry by navController.currentBackStackEntryFlow.collectAsStateWithLifecycle(null)
+            if (navBackStackEntry?.destination?.route == NavRoutes.Magazine) {
+                LaunchedEffect(Unit) {
+                    appReviewViewModel.launchReview(this@ArticleListActivity)
+                }
+            }
+
+            AppTheme {
+                val coroutineScope = rememberCoroutineScope()
+                val scaffoldState = rememberScaffoldState()
+
+                val undoUnreadSnackbarMessage by activityViewModel.undoReadSnackBarMessage.collectAsStateWithLifecycle()
+                val nbArticles = undoUnreadSnackbarMessage?.nbArticles ?: 0
+                val undoUnreadSnackbarComposable: (@Composable () -> Unit)? = if (nbArticles > 0) {
+                    @Composable {
+                        UndoUnreadSnackBar(undoUnreadSnackbarMessage = undoUnreadSnackbarMessage!!)
+                    }
+                } else null
+
+                val windowSizeClass = calculateWindowSizeClass(this)
+                val hasFabInFixedDrawer = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded
+                val fabPresenter = remember {
+                    FabPresenter(onDemandModuleNavHostProgressDestinationProvider = null,
+                        navController)
+                }
+
+                val drawerLayoutPresenter = rememberDrawerLayoutPresenter(
+                    navController,
+                    onDemandModuleNavHostProgressDestinationProvider = null
+                )
+
+                ArticlesListScaffold(
+                    scaffoldState = scaffoldState,
+                    windowSizeClass = windowSizeClass,
+                    topBar = {
+                             appBarPresenter.ToolbarContent(
+                                 onNavigationMenuClick = {
+                                     coroutineScope.launch {
+                                        scaffoldState.drawerState.open()
+                                     }
+                                 })
+                    },
+                    navigationMenu = {
+                        feedNavigationPresenter.Content(
+                            hasFab = hasFabInFixedDrawer,
+                            onNavigation = {
+                            coroutineScope.launch {
+                                scaffoldState.drawerState.close()
+                            }
+                        })
+                    },
+                    floatingActionButton = {
+                        if (!hasFabInFixedDrawer) {
+                            val isScrollingUp by activityViewModel.isScrollingUp.collectAsStateWithLifecycle()
+                            fabPresenter.Content(
+                                isScrollingUpOrRest = isScrollingUp,
+                                onClick = { activityViewModel.refresh() },
+                                modifier = Modifier.navigationBarsPadding()
+                            )
+                        }
+                    },
+                    bannerContent = {
+                        Box(Modifier.padding(it)){
+                            inAppUpdatePresenter.Content()
+                        }
+                    },
+                    undoUnreadSnackBar = undoUnreadSnackbarComposable,
+                    drawerGesturesEnabled = drawerLayoutPresenter.drawerGesturesEnabled
+                ) {
+                    ArticlesListNavHost(activityViewModel, navController)
+                }
+            }
+        }
     }
 
     private fun setupEdgeToEdge() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
-
-        // the appBar doesn't redraw statusBarForeground correctly. force it
-        binding.appBar.addOnOffsetChangedListener { _, _ ->
-            binding.appBar.invalidate()
-        }
     }
 
-    private fun setupToolbar() {
-        val appBarConfiguration = AppBarConfiguration.Builder(
-            R.id.magazineFragment, R.id.articlesListFragment, R.id.articlesListByTagFragment
-        ).setOpenableLayout(drawerLayout)
-            .build()
-        appBarPresenter = AppBarPresenter(
+    private fun createAppBarPresenter(navController: NavController): AppBarPresenter {
+        return AppBarPresenter(
             activity = this,
-            appBarLayout = binding.appBar,
-            appBarConfiguration = appBarConfiguration,
-            toolbar = binding.toolbar,
             activityViewModel = activityViewModel,
             tagsViewModel = tagsViewModel,
-            onDemandModuleNavHostProgressDestinationProvider = onDemandModuleNavHostFragment,
+            onDemandModuleNavHostProgressDestinationProvider = null,
             navController = navController
         )
-
-        // workaround with compose fragment
-        // it looks like appbar_scrolling_view_behavior is not applied correctly
-        // I don't know exactly what additional size is added to the height of the screen.
-        // anyway we need to communicate it to the compose view to add it as bottom padding.
-        // appBar height works fine
-        binding.appBar.doOnLayout {
-            activityViewModel.appBarHeight = it.height
-        }
     }
 
-    private fun setupNavigationView() {
-        feedNavigationPresenter =
-            FeedsNavigationMenuPresenter(binding.navigationView, navController,
-                feedsViewModel, accountViewModel, activityViewModel)
+    private fun createFeedsNavigationMenuPresenter(navController: NavController): FeedsNavigationMenuPresenter {
+        return FeedsNavigationMenuPresenter(
+            navController,
+            feedsViewModel, accountViewModel, activityViewModel, installModuleViewModel, this)
+    }
 
-        drawerLayout?.let {
-            drawerLayoutPresenter = DrawerLayoutPresenter(
-                drawerLayout = it,
-                navController = navController,
-                onBackPressedDispatcherOwner = this,
-                onDemandModuleNavHostProgressDestinationProvider = onDemandModuleNavHostFragment,
-                lifecycleOwner = this
+}
+
+@Composable
+private fun UndoUnreadSnackBar(undoUnreadSnackbarMessage: UndoReadSnackbarMessage) {
+    Snackbar(modifier = Modifier.padding(12.dp),
+        action = @Composable {
+            TextButton(
+                colors = ButtonDefaults.textButtonColors(contentColor = SnackbarDefaults.primaryActionColor),
+                onClick = { undoUnreadSnackbarMessage.onAction() },
+                content = { Text(stringResource(R.string.undo_set_articles_read_btn)) }
             )
-        }
+        }) {
+        val nbArticles = undoUnreadSnackbarMessage.nbArticles
+        Text(
+            pluralStringResource(
+                R.plurals.undo_set_articles_read_text,
+                nbArticles,
+                nbArticles
+            )
+        )
     }
-
-    private fun setupAppReview() {
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            if (destination.id == R.id.magazineFragment) {
-                appReviewViewModel.launchReview(this)
-            }
-        }
+    LaunchedEffect(undoUnreadSnackbarMessage.nbArticles) {
+        delay(2_750)
+        undoUnreadSnackbarMessage.onDismiss()
     }
 }
