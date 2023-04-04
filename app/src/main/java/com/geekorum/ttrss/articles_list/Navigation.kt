@@ -23,11 +23,21 @@ package com.geekorum.ttrss.articles_list
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import androidx.compose.runtime.Composable
 import androidx.core.net.toUri
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.article_details.ArticleDetailActivity
+import com.geekorum.ttrss.articles_list.magazine.MagazineScreen
+import com.geekorum.ttrss.articles_list.search.ArticlesSearchScreen
 import com.geekorum.ttrss.settings.SettingsActivity
 
 object NavRoutes {
@@ -54,6 +64,36 @@ object NavRoutes {
 }
 
 
+@Composable
+fun ArticlesListNavHost(
+    activityViewModel: ActivityViewModel = hiltViewModel(),
+    navController: NavHostController = rememberNavController()
+) {
+    NavHost(navController = navController, startDestination = "magazine") {
+        composable(NavRoutes.Magazine) {
+            MagazineScreen(activityViewModel = activityViewModel)
+        }
+        composable(NavRoutes.ArticlesList, arguments = listOf(
+            navArgument("feed_id") {
+                type = NavType.LongType
+                defaultValue = -4L
+            },
+            navArgument("feed_name") {
+                defaultValue = "All Articles"
+            }
+        )) {
+            ArticlesListScreen(activityViewModel = activityViewModel)
+        }
+
+        composable(NavRoutes.ArticlesListByTag) {
+            ArticlesListByTagScreen(activityViewModel = activityViewModel)
+        }
+
+        composable(NavRoutes.Search) {
+            ArticlesSearchScreen(activityViewModel = activityViewModel)
+        }
+    }
+}
 
  fun NavController.navigateToFeed(feedId: Long = -4L, feedTitle: String? = null) {
      // we change navigation stack but don't restore state
