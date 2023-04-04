@@ -21,6 +21,7 @@
 package com.geekorum.ttrss.articles_list.search
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -38,15 +39,14 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.platform.*
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ShareCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemsIndexed
 import com.geekorum.ttrss.articles_list.ActivityViewModel
@@ -212,4 +212,55 @@ private fun ArticleCard(
             viewModel.setArticleUnread(article.id, !article.isTransientUnread)
         }
     )
+}
+
+
+@Composable
+fun ArticlesSearchScreen(
+    activityViewModel: ActivityViewModel,
+    searchViewModel: SearchViewModel = hiltViewModel()
+) {
+    AppTheme {
+        val appBarHeightDp = with(LocalDensity.current) {
+            activityViewModel.appBarHeight.toDp()
+        }
+        val viewLifecycleOwner = LocalLifecycleOwner.current
+        LaunchedEffect(activityViewModel, viewLifecycleOwner, searchViewModel) {
+            activityViewModel.searchQuery.observe(viewLifecycleOwner) {
+                searchViewModel.setSearchQuery(it)
+            }
+        }
+
+        Surface(Modifier.fillMaxSize()) {
+            val context = LocalContext.current
+            SearchResultCardList(
+                viewModel = searchViewModel,
+                onCardClick = activityViewModel::displayArticle,
+                onShareClick = {
+                    onShareClicked(context, it)
+                },
+                onOpenInBrowserClick = {
+                    activityViewModel.displayArticleInBrowser(context, it)
+                },
+                additionalContentPaddingBottom = appBarHeightDp,
+                modifier = Modifier
+                    .fillMaxSize()
+            )
+        }
+    }
+
+}
+
+
+private fun onShareClicked(context: Context, article: Article) {
+    context.startActivity(createShareIntent(context, article))
+}
+
+private fun createShareIntent(context: Context, article: Article): Intent {
+    val shareIntent = ShareCompat.IntentBuilder(context)
+    shareIntent.setSubject(article.title)
+        .setHtmlText(article.content)
+        .setText(article.link)
+        .setType("text/plain")
+    return shareIntent.createChooserIntent()
 }
