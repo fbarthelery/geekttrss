@@ -170,63 +170,94 @@ private fun ArticleCardList(
         val isEmpty = articles.itemCount == 0
         if (isEmpty && loadState == PagingViewLoadState.LOADED) {
             FeedEmptyText(isRefreshing)
-            return@Box
+        } else {
+            ArticlesList(
+                articles,
+                listState,
+                additionalContentPaddingBottom,
+                isMultiFeedList,
+                onCardClick,
+                onOpenInBrowserClick,
+                onShareClick,
+                onStarChanged,
+                onToggleUnreadClick,
+                onSwiped
+            )
         }
 
-        var animateItemAppearance by remember { mutableStateOf(true) }
-        val navBarPadding = WindowInsets.navigationBars.asPaddingValues()
-        val contentPadding = PaddingValues(
-            start = navBarPadding.calculateStartPadding(LocalLayoutDirection.current) + 8.dp,
-            top = navBarPadding.calculateTopPadding() + 8.dp,
-            end = navBarPadding.calculateEndPadding(LocalLayoutDirection.current) + 8.dp,
-            bottom = navBarPadding.calculateBottomPadding() + additionalContentPaddingBottom
+        PullRefreshIndicator(
+            isRefreshing,
+            pullRefreshState,
+            Modifier.align(Alignment.TopCenter)
         )
-        LazyColumn(
-            state = listState,
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            contentPadding = contentPadding,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            itemsIndexed(articles,
-                key = { _, articleWithFeed -> articleWithFeed.article.id }
-            ) { index, articleWithFeed ->
-                // initial state is visible if we don't animate
-                val visibilityState = remember { MutableTransitionState(!animateItemAppearance) }
-                // delay start of animation
-                LaunchedEffect(index) {
-                    if (!animateItemAppearance) {
-                        return@LaunchedEffect
-                    }
-                    if (index == listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index) {
-                        animateItemAppearance = false
-                    }
-                    delay(38L * index)
-                    visibilityState.targetState = true
-                }
+    }
+}
 
-                AnimatedVisibility(
-                    visibilityState,
-                    enter = fadeIn() + slideInVertically { it / 3 },
-                    modifier = Modifier.animateItemPlacement()
-                ) {
-                    if (articleWithFeed != null) {
-                        SwipeableArticleCard(
-                            articleWithFeed = articleWithFeed,
-                            displayFeedName = isMultiFeedList,
-                            onCardClick = { onCardClick(index, articleWithFeed.article) },
-                            onOpenInBrowserClick = onOpenInBrowserClick,
-                            onShareClick = onShareClick,
-                            onStarChanged = onStarChanged,
-                            onToggleUnreadClick = onToggleUnreadClick,
-                            onSwiped = onSwiped
-                        )
-                    }
+@Composable
+@OptIn(ExperimentalFoundationApi::class)
+private fun ArticlesList(
+    articles: LazyPagingItems<ArticleWithFeed>,
+    listState: LazyListState,
+    additionalContentPaddingBottom: Dp,
+    isMultiFeedList: Boolean,
+    onCardClick: (Int, Article) -> Unit,
+    onOpenInBrowserClick: (Article) -> Unit,
+    onShareClick: (Article) -> Unit,
+    onStarChanged: (Article, Boolean) -> Unit,
+    onToggleUnreadClick: (Article) -> Unit,
+    onSwiped: (Article) -> Unit
+) {
+    var animateItemAppearance by remember { mutableStateOf(true) }
+    val navBarPadding = WindowInsets.navigationBars.asPaddingValues()
+    val contentPadding = PaddingValues(
+        start = navBarPadding.calculateStartPadding(LocalLayoutDirection.current) + 8.dp,
+        top = navBarPadding.calculateTopPadding() + 8.dp,
+        end = navBarPadding.calculateEndPadding(LocalLayoutDirection.current) + 8.dp,
+        bottom = navBarPadding.calculateBottomPadding() + additionalContentPaddingBottom
+    )
+    LazyColumn(
+        state = listState,
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        contentPadding = contentPadding,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        itemsIndexed(articles,
+            key = { _, articleWithFeed -> articleWithFeed.article.id }
+        ) { index, articleWithFeed ->
+            // initial state is visible if we don't animate
+            val visibilityState = remember { MutableTransitionState(!animateItemAppearance) }
+            // delay start of animation
+            LaunchedEffect(index) {
+                if (!animateItemAppearance) {
+                    return@LaunchedEffect
+                }
+                if (index == listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index) {
+                    animateItemAppearance = false
+                }
+                delay(38L * index)
+                visibilityState.targetState = true
+            }
+
+            AnimatedVisibility(
+                visibilityState,
+                enter = fadeIn() + slideInVertically { it / 3 },
+                modifier = Modifier.animateItemPlacement()
+            ) {
+                if (articleWithFeed != null) {
+                    SwipeableArticleCard(
+                        articleWithFeed = articleWithFeed,
+                        displayFeedName = isMultiFeedList,
+                        onCardClick = { onCardClick(index, articleWithFeed.article) },
+                        onOpenInBrowserClick = onOpenInBrowserClick,
+                        onShareClick = onShareClick,
+                        onStarChanged = onStarChanged,
+                        onToggleUnreadClick = onToggleUnreadClick,
+                        onSwiped = onSwiped
+                    )
                 }
             }
         }
-
-        PullRefreshIndicator(isRefreshing, pullRefreshState, Modifier.align(Alignment.TopCenter))
     }
 }
 
