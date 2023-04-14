@@ -21,7 +21,7 @@
 package com.geekorum.ttrss.settings.licenses
 
 import android.content.Context
-import com.geekorum.geekdroid.osslicenses.LicenseInfoRepository
+import com.geekorum.aboutoss.core.LicenseInfoRepository
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import dagger.Module
 import dagger.Provides

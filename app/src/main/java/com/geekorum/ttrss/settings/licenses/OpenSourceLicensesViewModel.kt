@@ -25,7 +25,7 @@ import android.net.Uri
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.geekorum.geekdroid.osslicenses.LicenseInfoRepository
+import com.geekorum.aboutoss.core.LicenseInfoRepository
 import com.geekorum.ttrss.network.TtRssBrowserLauncher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted

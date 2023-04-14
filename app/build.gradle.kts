@@ -187,6 +187,7 @@ dependencies {
     //geekdroid
     implementation(libs.geekdroid)
     add("googleImplementation", libs.geekdroid.firebase)
+    implementation(libs.aboutoss.core)
 
     implementation(project(":htmlparsers"))
     implementation(project(":webapi"))
