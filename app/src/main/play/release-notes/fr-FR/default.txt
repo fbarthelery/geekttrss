@@ -1,3 +1,2 @@
-Récupération des icones des flux en utilisant la nouvelle API
-Refraichissement des compteurs d'articles non lus automatiquement
+Correction d'un crash survenant lors de l'affichage d'un flux vide
 Diverses corrections de bugs et améliorations

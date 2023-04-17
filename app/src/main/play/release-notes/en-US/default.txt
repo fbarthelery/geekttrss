@@ -1,3 +1,2 @@
-Collect feed icons using new API operation
-Refresh feed counters automatically
+Fix crash when trying to display an empty feed
 Various bug fixes and improvements
