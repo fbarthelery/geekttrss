@@ -21,6 +21,7 @@
 package com.geekorum.ttrss.articles_list.magazine
 
 import androidx.core.text.parseAsHtml
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -69,7 +70,7 @@ class MagazineViewModel @Inject constructor (
         getNewMagazineChannel.trySend(Unit)
     }
 
-    val isRefreshing = SyncInProgressLiveData(account, ArticlesContract.AUTHORITY)
+    val isRefreshing: LiveData<Boolean> = SyncInProgressLiveData(account, ArticlesContract.AUTHORITY)
 
     val articles: Flow<PagingData<ArticleWithFeed>> = refreshMagazine.flatMapLatest {
         Timber.i("Get new magazine articles")
@@ -144,5 +145,4 @@ class MagazineViewModel @Inject constructor (
                 )
             )
         }
-
 }

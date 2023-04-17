@@ -43,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ShareCompat
@@ -50,6 +51,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemsIndexed
+import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.articles_list.*
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleWithFeed
@@ -72,6 +74,13 @@ fun MagazineScreen(
     activityViewModel: ActivityViewModel,
     magazineViewModel: MagazineViewModel = hiltViewModel()
 ) {
+    val viewLifecycleOwner = LocalLifecycleOwner.current
+    LaunchedEffect(activityViewModel, magazineViewModel, viewLifecycleOwner) {
+        activityViewModel.refreshClickedEvent.observe(viewLifecycleOwner, EventObserver {
+            magazineViewModel.refreshFeeds()
+        })
+    }
+
     AppTheme {
         val appBarHeightDp = with(LocalDensity.current) {
             activityViewModel.appBarHeight.toDp()
@@ -103,7 +112,7 @@ fun MagazineScreen(
 }
 
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun ArticlesMagazine(
     viewModel: MagazineViewModel,
