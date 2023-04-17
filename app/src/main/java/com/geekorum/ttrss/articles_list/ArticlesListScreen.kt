@@ -37,6 +37,7 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.core.app.ShareCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.ui.AppTheme
@@ -66,7 +67,7 @@ private fun BaseArticlesListScreen(
     AppTheme {
         val viewLifecycleOwner = LocalLifecycleOwner.current
 
-        val pendingArticlesSetUnread by articlesListViewModel.getPendingArticlesSetUnread().observeAsState(0)
+        val pendingArticlesSetUnread by articlesListViewModel.pendingArticlesSetUnread.collectAsStateWithLifecycle()
         LaunchedEffect(pendingArticlesSetUnread, activityViewModel) {
             val snackBarMessage = UndoReadSnackbarMessage(pendingArticlesSetUnread,
                 onAction = articlesListViewModel::undoSetUnreadActions,

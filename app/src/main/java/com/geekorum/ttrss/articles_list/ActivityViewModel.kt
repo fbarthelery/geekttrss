@@ -64,8 +64,8 @@ class ActivityViewModel @Inject constructor(
     private val _articleSelectedEvent = MutableLiveData<Event<ArticleSelectedParameters>>()
     val articleSelectedEvent: LiveData<Event<ArticleSelectedParameters>> = _articleSelectedEvent
 
-    private val _searchQuery = MutableLiveData<String>()
-    val searchQuery: LiveData<String> = _searchQuery
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery = _searchQuery.asStateFlow()
 
     private val _refreshClickedEvent = MutableLiveData<Event<Any>>()
     val refreshClickedEvent: LiveData<Event<Any>> = _refreshClickedEvent

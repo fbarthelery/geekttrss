@@ -158,9 +158,8 @@ fun ArticlesSearchScreen(
         val appBarHeightDp = with(LocalDensity.current) {
             activityViewModel.appBarHeight.toDp()
         }
-        val viewLifecycleOwner = LocalLifecycleOwner.current
-        LaunchedEffect(activityViewModel, viewLifecycleOwner, searchViewModel) {
-            activityViewModel.searchQuery.observe(viewLifecycleOwner) {
+        LaunchedEffect(activityViewModel, searchViewModel) {
+            activityViewModel.searchQuery.collect {
                 searchViewModel.setSearchQuery(it)
             }
         }

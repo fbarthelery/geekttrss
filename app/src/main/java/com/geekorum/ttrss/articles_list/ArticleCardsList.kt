@@ -51,6 +51,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
@@ -104,7 +105,7 @@ fun ArticleCardList(
     modifier: Modifier = Modifier,
     additionalContentPaddingBottom: Dp = 0.dp,
 ) {
-    val isRefreshing by viewModel.isRefreshing.observeAsState(false)
+    val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
     val pullRefreshState = rememberPullRefreshState(isRefreshing, onRefresh = {
         viewModel.refresh()
     })

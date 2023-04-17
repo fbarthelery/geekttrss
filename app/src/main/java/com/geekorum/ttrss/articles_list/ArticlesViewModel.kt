@@ -55,19 +55,13 @@ abstract class BaseArticlesViewModel(
 
     abstract val articles: Flow<PagingData<ArticleWithFeed>>
 
-    private val _pendingArticlesSetUnread = MutableLiveData<Int>().apply { value = 0 }
+    private val _pendingArticlesSetUnread = MutableStateFlow(0)
+    val pendingArticlesSetUnread = _pendingArticlesSetUnread.asStateFlow()
 
-    abstract val isRefreshing: LiveData<Boolean>
+    abstract val isRefreshing: StateFlow<Boolean>
     abstract val isMultiFeed: StateFlow<Boolean>
 
     private val unreadActionUndoManager = UndoManager<Action>()
-
-    private val _haveZeroArticle = MutableLiveData<Boolean>()
-    val haveZeroArticles: LiveData<Boolean?> = _haveZeroArticle
-
-    fun setHaveZeroArticle(value: Boolean) {
-        _haveZeroArticle.value = value
-    }
 
     abstract fun refresh()
 
@@ -85,10 +79,6 @@ abstract class BaseArticlesViewModel(
             unreadActionUndoManager.recordAction(it)
         }
         _pendingArticlesSetUnread.value = unreadActionUndoManager.nbActions
-    }
-
-    fun getPendingArticlesSetUnread(): LiveData<Int> {
-        return _pendingArticlesSetUnread
     }
 
     fun setArticleStarred(articleId: Long, newValue: Boolean) {
@@ -238,7 +228,7 @@ abstract class BaseArticlesViewModel(
 }
 
 /**
- * ViewModel for [ArticlesListFragment]
+ * ViewModel for [ArticlesListScreen]
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
@@ -263,17 +253,17 @@ class ArticlesListViewModel @Inject constructor(
 
     private val account = component.account
 
-    override val isRefreshing: LiveData<Boolean> = refreshJobName.asLiveData().switchMap {
+    override val isRefreshing = refreshJobName.flatMapLatest {
         if (it == null)
-            SyncInProgressLiveData(account, ArticlesContract.AUTHORITY)
+            SyncInProgressLiveData(account, ArticlesContract.AUTHORITY).asFlow()
         else
-            backgroundJobManager.isRefreshingStatus(state.get<Long>(STATE_FEED_ID)!!)
-    }
+            backgroundJobManager.isRefreshingStatus(state.get<Long>(STATE_FEED_ID)!!).asFlow()
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun getArticlesForFeed(feed: Feed): Flow<PagingData<ArticleWithFeed>> {
-        val isMostRecentOrderFlow = state.getLiveData<Boolean>(STATE_ORDER_MOST_RECENT_FIRST).asFlow()
-        val needUnreadFlow = state.getLiveData<Boolean>(STATE_NEED_UNREAD).asFlow()
+        val isMostRecentOrderFlow = state.getStateFlow(STATE_ORDER_MOST_RECENT_FIRST, false)
+        val needUnreadFlow = state.getStateFlow(STATE_NEED_UNREAD, false)
         return isMostRecentOrderFlow.combine(needUnreadFlow) { mostRecentFirst, needUnread ->
             getArticleAccess(mostRecentFirst, needUnread)
         }.flatMapLatest { access ->
@@ -316,23 +306,19 @@ class ArticlesListByTagViewModel @Inject constructor(
     componentFactory: SessionActivityComponent.Factory
 ) : BaseArticlesViewModel(state, componentFactory) {
 
-    val tag = state.getLiveData<String>(STATE_TAG).apply {
-        // workaround for out of sync values see
-        // https://issuetracker.google.com/issues/129989646
-        value = value
-    }
-
+    val tag = state.getStateFlow<String>(STATE_TAG, "")
     override val isMultiFeed: StateFlow<Boolean> = MutableStateFlow(true)
 
     private val account: Account = component.account
 
-    override val articles: Flow<PagingData<ArticleWithFeed>> = tag.asFlow()
+    override val articles: Flow<PagingData<ArticleWithFeed>> = tag
         .flatMapLatest {
             getArticlesForTag(it)
         }.map(::prepareArticlePagingData)
         .cachedIn(viewModelScope)
 
-    override val isRefreshing: LiveData<Boolean> = SyncInProgressLiveData(account, ArticlesContract.AUTHORITY)
+    override val isRefreshing = SyncInProgressLiveData(account, ArticlesContract.AUTHORITY).asFlow()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     override fun refresh() {
         backgroundJobManager.refresh(account)
@@ -340,8 +326,8 @@ class ArticlesListByTagViewModel @Inject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun getArticlesForTag(tag: String): Flow<PagingData<ArticleWithFeed>> {
-        val isMostRecentOrderFlow = state.getLiveData<Boolean>(STATE_ORDER_MOST_RECENT_FIRST).asFlow()
-        val needUnreadFlow = state.getLiveData<Boolean>(STATE_NEED_UNREAD).asFlow()
+        val isMostRecentOrderFlow = state.getStateFlow(STATE_ORDER_MOST_RECENT_FIRST, false)
+        val needUnreadFlow = state.getStateFlow(STATE_NEED_UNREAD, false)
         return isMostRecentOrderFlow.combine(needUnreadFlow) { mostRecentFirst, needUnread ->
             getArticleAccess(mostRecentFirst, needUnread)
         }.flatMapLatest { access ->
