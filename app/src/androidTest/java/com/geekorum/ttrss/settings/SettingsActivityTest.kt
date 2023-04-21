@@ -27,10 +27,9 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.contrib.RecyclerViewActions.actionOnItem
 import androidx.test.espresso.intent.Intents
-import androidx.test.espresso.intent.rule.IntentsTestRule
-import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
-import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.espresso.intent.rule.IntentsRule
+import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.ext.truth.content.IntentSubject.assertThat
 import com.geekorum.ttrss.R
@@ -40,6 +39,7 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Rule
 import org.junit.runner.RunWith
 import kotlin.test.Test
+import androidx.preference.R as prefR
 
 @RunWith(AndroidJUnit4::class)
 @HiltAndroidTest
@@ -49,12 +49,15 @@ class SettingsActivityTest {
     val hiltRule = HiltAndroidRule(this)
 
     @get:Rule
-    val intentsTestRule = IntentsTestRule(SettingsActivity::class.java)
+    val intentsRule = IntentsRule()
+
+    @get:Rule
+    val activityScenarioRule = ActivityScenarioRule(SettingsActivity::class.java)
 
     @Test
     fun testThatClickOnOpenSourceLicensesOpensOpenSourcesLicensesActivity() {
         // click on OSS licenses
-        onView(withId(R.id.recycler_view))
+        onView(withId(prefR.id.recycler_view))
             .perform(
                 actionOnItem<RecyclerView.ViewHolder>(
                     hasDescendant(withText(R.string.pref_title_oss_license)),
@@ -66,6 +69,5 @@ class SettingsActivityTest {
         assertThat(receivedIntent).hasComponentClass(OpenSourceLicensesActivity::class.java)
         val applicationContext = ApplicationProvider.getApplicationContext<Application>()
         assertThat(receivedIntent).hasComponentPackage(applicationContext.packageName)
-
     }
 }
