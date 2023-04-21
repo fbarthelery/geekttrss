@@ -38,6 +38,14 @@ plugins {
     alias(libs.plugins.dagger.hilt.android)
 }
 
+// workaround bug https://issuetracker.google.com/issues/275534543
+// try to remove it on next navigation-safe-args plugin release
+buildscript {
+    dependencies {
+        classpath("com.android.tools.build:gradle:8.0.0")
+    }
+}
+
 androidComponents {
     val major = 1
     val minor = 6
@@ -83,6 +91,7 @@ android {
     buildFeatures {
         dataBinding = true
         compose = true
+        buildConfig = true
     }
 
     composeOptions {
@@ -111,7 +120,7 @@ android {
 
     dynamicFeatures += setOf(":manage_feeds")
 
-    packagingOptions {
+    packaging {
         // Fix: https://github.com/Kotlin/kotlinx.coroutines/issues/2023
         resources {
             excludes += listOf("META-INF/AL2.0",

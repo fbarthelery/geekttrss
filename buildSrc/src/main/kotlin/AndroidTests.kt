@@ -56,9 +56,9 @@ internal fun Project.configureTests() {
             execution = "ANDROIDX_TEST_ORCHESTRATOR"
             animationsDisabled = true
 
-            unitTests(closureOf<TestOptions.UnitTestOptions> {
+            unitTests {
                 isIncludeAndroidResources = true
-            })
+            }
         }
     }
 
