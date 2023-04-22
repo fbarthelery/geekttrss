@@ -20,26 +20,28 @@
  */
 package com.geekorum.build
 
-import com.android.build.gradle.AppExtension
+import com.android.build.api.variant.*
 import com.android.build.gradle.AppPlugin
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.the
 import org.gradle.kotlin.dsl.withType
 
 
 internal fun Project.makeAssembleReleaseTaskGeneratesUniversalApk() {
+    val variantsName = mutableListOf<String>()
+    plugins.withType<AppPlugin> {
+        val android = project.extensions.getByType(AndroidComponentsExtension::class.java)
+        android.onVariants(android.selector().withBuildType("release")) {
+            variantsName += it.name
+        }
+    }
+
+    // this needs to run after evaluation so the different tasks have been created
     afterEvaluate {
-        plugins.withType<AppPlugin> {
-            val android = the<AppExtension>()
-            tasks.apply {
-                named("assembleRelease") {
-                    android.applicationVariants.filter {
-                        !it.buildType.isDebuggable
-                    }.map {
-                        named("package${it.name.capitalize()}UniversalApk")
-                    }.forEach {
-                        dependsOn(it)
-                    }
+        tasks.apply {
+            named("assembleRelease") {
+                for (variant in variantsName) {
+                    val packageTask = named("package${variant.capitalize()}UniversalApk")
+                    dependsOn(packageTask)
                 }
             }
         }

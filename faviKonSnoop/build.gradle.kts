@@ -19,7 +19,7 @@
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
 plugins {
-    kotlin("jvm")
+    alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlinx.serialization)
 }
 

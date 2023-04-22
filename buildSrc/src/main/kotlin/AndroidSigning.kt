@@ -20,7 +20,7 @@
  */
 package com.geekorum.build
 
-import com.android.build.gradle.BaseExtension
+import com.android.build.api.dsl.ApplicationExtension
 import org.gradle.api.Project
 
 internal fun Project.configureReleaseSigningConfig() {
@@ -29,7 +29,7 @@ internal fun Project.configureReleaseSigningConfig() {
     val releaseKeyAlias= findProperty("RELEASE_KEY_ALIAS") as? String ?: ""
     val releaseKeyPassword= findProperty("RELEASE_KEY_PASSWORD") as? String ?: ""
 
-    extensions.configure<BaseExtension>("android") {
+    extensions.configure<ApplicationExtension>("android") {
         signingConfigs {
             register("release") {
                 storeFile =  file(releaseStoreFile)

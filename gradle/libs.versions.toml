@@ -18,6 +18,7 @@
 # along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
 #
 [versions]
+android-gradle-plugin = "8.0.0"
 accompanist = "0.30.0"
 androidx-annotation = "1.6.0"
 androidx-core = "1.10.0"
@@ -63,14 +64,20 @@ leakcanary = "2.9.1"
 coil = "2.2.2"
 geekdroid = "geekttrss-1.6.3"
 aboutoss = "0.0.1"
+kotlin = "1.8.20"
 
 [plugins]
+android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
+android-dynamic-feature = { id = "com.android.dynamic-feature", version.ref = "android-gradle-plugin" }
 google-gms-google-services = { id = "com.google.gms.google-services", version = "4.3.14" }
 google-gms-oss-license = { id = "com.google.android.gms.oss-licenses-plugin", version = "0.10.5" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version = "2.9.2" }
 androidx-navigation-safeargs-kotlin = { id = "androidx.navigation.safeargs.kotlin", version.ref = "androidx-navigation" }
 dagger-hilt-android = { id = "dagger.hilt.android.plugin", version.ref = "dagger" }
-kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version = "1.7.20" }
+kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 
 [libraries]
 accompanist-insets-ui = { module = "com.google.accompanist:accompanist-insets-ui", version.ref = "accompanist" }

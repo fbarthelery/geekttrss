@@ -30,12 +30,10 @@ repositories {
 }
 
 dependencies {
-    implementation("com.android.tools.build:gradle:8.0.0")
+    implementation("com.android.tools.build:gradle-api:8.0.0")
     implementation("gradle.plugin.com.hierynomus.gradle.plugins:license-gradle-plugin:0.16.1")
-    implementation("com.github.triplet.gradle:play-publisher:3.7.0")
-    implementation("com.geekorum.gradle.avdl:flydroid:0.0.3")
-    // need to be added to work with compose  https://issuetracker.google.com/issues/195342732
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.20")
+    implementation("com.github.triplet.gradle:play-publisher:3.8.1")
+    implementation("com.geekorum.gradle.avdl:flydroid:0.0.4")
 
     // fix https://github.com/google/dagger/issues/3068
     implementation("com.squareup:javapoet:1.13.0")

@@ -20,11 +20,10 @@
  */
 package com.geekorum.build
 
-import com.android.build.gradle.AppPlugin
-import com.android.build.gradle.DynamicFeaturePlugin
-import com.android.build.gradle.LibraryPlugin
-import com.android.build.gradle.TestedExtension
-import com.android.build.gradle.api.TestVariant
+import com.android.build.api.variant.AndroidComponentsExtension
+import com.android.build.api.variant.HasAndroidTest
+import com.android.build.api.variant.Variant
+import com.android.build.gradle.*
 import com.geekorum.gradle.avdl.AvdlExtension
 import com.geekorum.gradle.avdl.providers.flydroid.FlydroidPlugin
 import com.geekorum.gradle.avdl.providers.flydroid.flydroid
@@ -39,6 +38,7 @@ import org.gradle.api.services.BuildService
 import org.gradle.api.services.BuildServiceParameters
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
+import org.gradle.configurationcache.extensions.capitalized
 import org.gradle.kotlin.dsl.*
 
 
@@ -52,11 +52,12 @@ fun Project.configureAvdlDevices(flydroidUrl: String, flydroidKey: String) {
 
     rootProject.serializeInstrumentedTestTask(oneInstrumentedTestService)
 
-    val android = the<TestedExtension>()
+    val android = project.extensions.getByType(AndroidComponentsExtension::class.java)
     configure<AvdlExtension> {
         devices {
-            android.testVariants.all {
-                register("android-n-${project.path}-$baseName") {
+            android.onVariants {
+                if (it is HasAndroidTest && it.androidTest != null)
+                register("android-n-${project.path}-${it.name}") {
                     setup = flydroid {
                         url = flydroidUrl
                         this.flydroidKey = flydroidKey
@@ -72,27 +73,35 @@ fun Project.configureAvdlDevices(flydroidUrl: String, flydroidKey: String) {
     tasks {
         var lastStopTask: TaskProvider<out Task>? = null
         var lastTestTask: TaskProvider<out Task>? = null
-        android.testVariants.all {
-            val (startTask, stopTask ) =
-                registerAvdlDevicesTaskForVariant(this, listOf("android-n-${project.path}-$baseName"))
-            listOf(startTask, stopTask).forEach {
-                it.configure {
-                    usesService(oneInstrumentedTestService)
-                }
-            }
+        android.onVariants { variant ->
+            if (variant is HasAndroidTest && variant.androidTest != null) {
+                afterEvaluate {
+                    val (startTask, stopTask) =
+                        registerAvdlDevicesTaskForVariant(
+                            variant,
+                            listOf("android-n-${project.path}-${variant.name}")
+                        )
+                    listOf(startTask, stopTask).forEach {
+                        it.configure {
+                            usesService(oneInstrumentedTestService)
+                        }
+                    }
 
-            lastStopTask?.let {
-                startTask.configure {
-                    mustRunAfter(it)
+                    lastStopTask?.let {
+                        startTask.configure {
+                            mustRunAfter(it)
+                        }
+                    }
+                    lastTestTask?.let {
+                        startTask.configure {
+                            mustRunAfter(it)
+                        }
+                    }
+
+                    lastStopTask = stopTask
+                    lastTestTask = variant.connectedInstrumentTestProvider(this@tasks)
                 }
             }
-            lastTestTask?.let {
-                startTask.configure {
-                    mustRunAfter(it)
-                }
-            }
-            lastStopTask = stopTask
-            lastTestTask = connectedInstrumentTestProvider
         }
     }
 
@@ -100,43 +109,50 @@ fun Project.configureAvdlDevices(flydroidUrl: String, flydroidKey: String) {
         // ensure that launchDeviceTask are run after StopDeviceTask and connected tests of previous project
         // https://github.com/gradle/gradle/issues/10549
         rootProject.tasks {
-            getByPath(":manage_feeds:launchAvdlFreeDebugAndroidTest")
-                .mustRunAfter(":app:stopAvdlFreeDebugAndroidTest", ":app:stopAvdlGoogleDebugAndroidTest",
-                    ":app:connectedFreeDebugAndroidTest", ":app:connectedGoogleDebugAndroidTest")
-            getByPath(":manage_feeds:launchAvdlGoogleDebugAndroidTest")
-                .mustRunAfter(":app:stopAvdlFreeDebugAndroidTest", ":app:stopAvdlGoogleDebugAndroidTest",
-                    ":app:connectedFreeDebugAndroidTest", ":app:connectedGoogleDebugAndroidTest")
+            project(":manage_feeds").tasks.whenTaskAdded {
+                when(path) {
+                    ":manage_feeds:launchAvdlFreeDebug" -> {
+                        mustRunAfter(":app:stopAvdlFreeDebug", ":app:stopAvdlGoogleDebug",
+                            ":app:connectedFreeDebugAndroidTest", ":app:connectedGoogleDebugAndroidTest")
+                    }
+                    ":manage_feeds:launchAvdlGoogleDebug" ->
+                        mustRunAfter(":app:stopAvdlFreeDebug", ":app:stopAvdlGoogleDebug",
+                            ":app:connectedFreeDebugAndroidTest", ":app:connectedGoogleDebugAndroidTest")
+                }
+            }
         }
     }
 }
 
 private fun TaskContainer.registerAvdlDevicesTaskForVariant(
-    variant: TestVariant, devices: List<String>
+    variant: Variant, devices: List<String>
 ): Pair<TaskProvider<LaunchDeviceTask>, TaskProvider<StopDeviceTask>> {
     val tasks =
         registerAvdlDevicesTask(variant.name, devices)
-    tasks.orderForTask(variant.connectedInstrumentTestProvider)
+    tasks.orderForTask(variant.connectedInstrumentTestProvider(this))
     return tasks
 }
 
 
 private fun Project.serializeInstrumentedTestTask(oneInstrumentedTestService: Provider<OneInstrumentedTestService>) {
     fun Project.configureTestTasks() {
-        extensions.configure<TestedExtension> {
-            testVariants.all {
-                connectedInstrumentTestProvider.configure {
-                    usesService(oneInstrumentedTestService)
-                }
+        val android = project.extensions.getByType(AndroidComponentsExtension::class.java)
+        android.onVariants {
+            it.connectedInstrumentTestProvider(tasks).configure {
+                usesService(oneInstrumentedTestService)
             }
         }
     }
 
     allprojects {
-        val project = this
-        plugins.withType<AppPlugin> { project.configureTestTasks() }
-        plugins.withType<DynamicFeaturePlugin> { project.configureTestTasks() }
-        plugins.withType<LibraryPlugin> { project.configureTestTasks() }
+        if (project.plugins.hasPlugin(BasePlugin::class.java)) {
+            val project = this
+            plugins.withType<AppPlugin> { project.configureTestTasks() }
+        }
     }
 }
-
 abstract class OneInstrumentedTestService : BuildService<BuildServiceParameters.None>
+
+private fun Variant.connectedInstrumentTestProvider(tasks: TaskContainer): TaskProvider<Task> {
+    return tasks.named("connected${name.capitalized()}AndroidTest")
+}

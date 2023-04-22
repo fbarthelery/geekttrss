@@ -20,18 +20,15 @@
  */
 package com.geekorum.build
 
-import com.android.build.gradle.BaseExtension
-import com.android.build.gradle.internal.dsl.TestOptions
+import com.android.build.api.dsl.ApplicationExtension
+import com.android.build.api.dsl.CommonExtension
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.DependencyConstraint
 import org.gradle.api.artifacts.ExternalModuleDependency
 import org.gradle.api.artifacts.dsl.DependencyConstraintHandler
 import org.gradle.api.artifacts.dsl.DependencyHandler
-import org.gradle.kotlin.dsl.closureOf
-import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.kotlin
+import org.gradle.kotlin.dsl.*
 
 const val espressoVersion = "3.5.1"
 const val androidxTestRunnerVersion = "1.5.2"
@@ -43,7 +40,7 @@ const val robolectricVersion = "4.9.2"
  * Configuration for espresso and robolectric usage in an Android project
  */
 internal fun Project.configureTests() {
-    extensions.configure<BaseExtension> {
+    extensions.configure<CommonExtension<*,*,*,*>>("android") {
         defaultConfig {
             testInstrumentationRunner = "com.geekorum.ttrss.HiltRunner"
             testInstrumentationRunnerArguments += mapOf(

@@ -18,16 +18,17 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-import com.android.build.gradle.BaseExtension
-import com.geekorum.build.SourceLicenseCheckerPlugin
-import com.geekorum.build.configureAnnotationProcessorDeps
-import com.geekorum.build.configureJavaVersion
-import com.geekorum.build.createComponentsPlatforms
-import com.geekorum.build.setupGoogleContent
+import com.android.build.api.dsl.CommonExtension
+import com.geekorum.build.*
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.android.dynamic.feature) apply false
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.kotlin.jvm) apply false
+    alias(libs.plugins.kotlin.kapt) apply false
     // these should not be needed but for an unknown reason they get applied
     // with bad ordering if not there. or they can't be applied dynamically
     // version used is in gradle.properties
@@ -64,7 +65,7 @@ allprojects {
         extensions.findByType<KaptExtension>()?.arguments {
             arg("dagger.formatGeneratedSource", "enabled")
         }
-        extensions.findByType<BaseExtension>()?.apply {
+        extensions.findByType(CommonExtension::class.java)?.apply {
             configureJavaVersion()
         }
     }
