@@ -18,33 +18,28 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
+package com.geekorum.ttrss.webapi
 
-plugins {
-    alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.kotlinx.serialization)
-}
+import okhttp3.Credentials
+import okhttp3.Interceptor
+import okhttp3.Response
 
-kotlin {
-    jvmToolchain(11)
-}
+/**
+ * An interceptor that add basic HTTP Authentication request headers
+ *
+ */
+class BasicAuthInterceptor(
+    private val username: String = "",
+    private val password: String = ""
+) : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val credentials = Credentials.basic(
+            username,
+            password)
 
-dependencies {
-    implementation(kotlin("stdlib-jdk8"))
-    implementation(enforcedPlatform(kotlin("bom")))
-
-    implementation(libs.androidx.annotation)
-    implementation(libs.javax.inject)
-    implementation(libs.retrofit)
-    implementation(platform(libs.kotlinx.serialization.bom))
-    implementation(libs.kotlinx.serialization.json)
-
-    implementation(platform(libs.kotlinx.coroutines.bom))
-    api(libs.kotlinx.coroutines.core)
-    implementation(platform(libs.okhttp.bom))
-    api(libs.okhttp)
-
-
-    testImplementation(libs.truth)
-    testImplementation(kotlin("test-junit"))
-    testImplementation(libs.okhttp.mockwebserver)
+        val authenticatedRequest = chain.request().newBuilder()
+            .header("Authorization", credentials)
+            .build()
+        return chain.proceed(authenticatedRequest)
+    }
 }
