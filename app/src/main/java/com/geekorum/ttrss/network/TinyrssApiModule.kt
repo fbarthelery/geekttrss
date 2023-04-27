@@ -22,10 +22,7 @@ package com.geekorum.ttrss.network
 
 import com.geekorum.ttrss.BuildConfig
 import com.geekorum.ttrss.accounts.ServerInformation
-import com.geekorum.ttrss.webapi.BasicAuthAuthenticator
-import com.geekorum.ttrss.webapi.LoggedRequestInterceptorFactory
-import com.geekorum.ttrss.webapi.TinyRssApi
-import com.geekorum.ttrss.webapi.TokenRetriever
+import com.geekorum.ttrss.webapi.*
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.BindsOptionalOf
 import dagger.Module
@@ -70,8 +67,8 @@ abstract class TinyrssApiModule {
             val basicHttpAuthPassword = serverInformation.basicHttpAuthPassword
             val basicHttpAuthUsername = serverInformation.basicHttpAuthUsername
             if (basicHttpAuthPassword != null && basicHttpAuthUsername != null) {
-                val serverAuthenticator = BasicAuthAuthenticator(basicHttpAuthUsername, basicHttpAuthPassword)
-                okHttpClient = okHttpClient.newBuilder().authenticator(serverAuthenticator).build()
+                val basicAuthInterceptor = BasicAuthInterceptor(basicHttpAuthUsername, basicHttpAuthPassword)
+                okHttpClient = okHttpClient.newBuilder().addInterceptor(basicAuthInterceptor).build()
             }
             val jsonConverterFactory = Json {
                 encodeDefaults = true

@@ -81,7 +81,6 @@ class TinyrssApiModuleTest {
 
     @Test
     fun testThatProtectedResourcesWithHttpAuthenticationInfoSendAuthorizationHeader() {
-        server.enqueue(MockResponse().setResponseCode(401))
         val mockResponse = MockResponse().apply {
             setBody("""
                     {
@@ -100,37 +99,9 @@ class TinyrssApiModuleTest {
             tinyRssApi.login(requestPayload)
         }
 
-        val unauthenticatedRequest = server.takeRequest()
-        assertThat(unauthenticatedRequest.getHeader("Authorization")).isNull()
-
         val authenticatedRequest = server.takeRequest()
         assertThat(authenticatedRequest.getHeader("Authorization")).isNotEmpty()
         assertThat(loginResponsePayload.sessionId).isEqualTo("XXX")
-
-    }
-
-    @Test
-    fun testThatNonProtectedResourcesWithHttpAuthenticationInfoDontSendAuthorizationHeader(): Unit {
-        val mockResponse = MockResponse().apply {
-            setBody("""
-                    {
-                      "seq": null,
-                      "status": 0,
-                      "content": {"session_id": "XXX", "api_level": 3}
-                    }
-                    """.trimIndent())
-        }
-        server.enqueue(mockResponse)
-
-        val tinyRssApi = TinyrssApiModule.providesTinyRssApi(okHttpClient, authServerInformation, Optional.empty())
-
-        runBlocking {
-            val requestPayload = LoginRequestPayload("user", "password")
-            tinyRssApi.login(requestPayload)
-        }
-
-        val request = server.takeRequest()
-        assertThat(request.getHeader("Authorization")).isNull()
 
     }
 
