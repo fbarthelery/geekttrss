@@ -24,8 +24,8 @@ import org.jetbrains.kotlin.gradle.plugin.KaptExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    alias(libs.plugins.android.application) apply false
-    alias(libs.plugins.android.dynamic.feature) apply false
+//    alias(libs.plugins.android.application) apply false
+//    alias(libs.plugins.android.dynamic.feature) apply false
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.kotlin.kapt) apply false

@@ -21,7 +21,8 @@
 import com.geekorum.build.dualTestImplementation
 
 plugins {
-    alias(libs.plugins.android.dynamic.feature)
+//    alias(libs.plugins.android.dynamic.feature)
+    id("com.android.dynamic-feature")
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.kapt)
     id("com.geekorum.build.android-tests")

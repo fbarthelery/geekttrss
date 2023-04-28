@@ -25,7 +25,8 @@ import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
 import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsPlugin
 
 plugins {
-    alias(libs.plugins.android.application)
+//    alias(libs.plugins.android.application)
+    id("com.android.application")
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.google.gms.oss.license)

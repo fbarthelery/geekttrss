@@ -67,6 +67,7 @@ aboutoss = "0.0.1"
 kotlin = "1.8.20"
 
 [plugins]
+# these cannot be used for now because it will use multiple classpath and will make play-publisher-plugin fail
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
 android-dynamic-feature = { id = "com.android.dynamic-feature", version.ref = "android-gradle-plugin" }
 google-gms-google-services = { id = "com.google.gms.google-services", version = "4.3.14" }
