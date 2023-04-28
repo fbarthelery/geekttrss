@@ -50,8 +50,15 @@
 # Top-level functions that can only be used by Kotlin.
 -dontwarn retrofit2.-KotlinExtensions
 
-# okhttp support conscrypt platform not available on android
+# okhttp support conscrypt platform and some BouncyCastle
+# not available on android
 -dontwarn org.conscrypt.**
+-dontwarn org.bouncycastle.jsse.BCSSLParameters
+-dontwarn org.bouncycastle.jsse.BCSSLSocket
+-dontwarn org.bouncycastle.jsse.provider.BouncyCastleJsseProvider
+-dontwarn org.openjsse.javax.net.ssl.SSLParameters
+-dontwarn org.openjsse.javax.net.ssl.SSLSocket
+-dontwarn org.openjsse.net.ssl.OpenJSSE
 
 # geekdroid: we don't use firebase stuff
 -dontwarn com.geekorum.geekdroid.firebase.**
