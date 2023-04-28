@@ -27,8 +27,10 @@ import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsPlugin
 plugins {
 //    alias(libs.plugins.android.application)
     id("com.android.application")
-    alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.kapt)
+//    alias(libs.plugins.kotlin.android)
+//    alias(libs.plugins.kotlin.kapt)
+    kotlin("android")
+    kotlin("kapt")
     alias(libs.plugins.google.gms.oss.license)
     id("com.geekorum.build.android-tests")
     id("com.geekorum.build.android-signing")

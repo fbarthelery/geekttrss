@@ -19,7 +19,8 @@
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
 plugins {
-    alias(libs.plugins.kotlin.jvm)
+//    alias(libs.plugins.kotlin.jvm)
+    kotlin("jvm")
 }
 
 kotlin {

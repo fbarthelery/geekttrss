@@ -20,8 +20,10 @@
  */
 
 plugins {
-    alias(libs.plugins.kotlin.jvm)
-    alias(libs.plugins.kotlinx.serialization)
+//    alias(libs.plugins.kotlin.jvm)
+//    alias(libs.plugins.kotlinx.serialization)
+    kotlin("jvm")
+    kotlin("plugin.serialization")
 }
 
 kotlin {

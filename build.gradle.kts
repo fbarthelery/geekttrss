@@ -26,9 +26,10 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
 //    alias(libs.plugins.android.application) apply false
 //    alias(libs.plugins.android.dynamic.feature) apply false
-    alias(libs.plugins.kotlin.android) apply false
-    alias(libs.plugins.kotlin.jvm) apply false
-    alias(libs.plugins.kotlin.kapt) apply false
+//    alias(libs.plugins.kotlin.android) apply false
+//    alias(libs.plugins.kotlin.jvm) apply false
+//    alias(libs.plugins.kotlin.kapt) apply false
+    kotlin("plugin.serialization") version libs.versions.kotlin.get() apply false
     // these should not be needed but for an unknown reason they get applied
     // with bad ordering if not there. or they can't be applied dynamically
     // version used is in gradle.properties
