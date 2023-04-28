@@ -47,12 +47,16 @@ abstract class TinyrssApiModule {
 
     companion object {
 
+        private val json = Json {
+            encodeDefaults = true
+            ignoreUnknownKeys = !BuildConfig.DEBUG
+        }
+
         @Provides
         fun provideApiService(tokenRetriever: TokenRetriever, tinyRssApi: TinyRssApi, serverInformation: ServerInformation): ApiService {
             return ApiRetrofitService(tokenRetriever, tinyRssApi, serverInformation)
         }
 
-        @OptIn(ExperimentalSerializationApi::class)
         @Provides
         fun providesTinyRssApi(okHttpClient: OkHttpClient, serverInformation: ServerInformation, loggedRequestInterceptorFactory: Optional<LoggedRequestInterceptorFactory>): TinyRssApi {
             var tinyrssApiUrl = serverInformation.apiUrl
@@ -70,10 +74,7 @@ abstract class TinyrssApiModule {
                 val basicAuthInterceptor = BasicAuthInterceptor(basicHttpAuthUsername, basicHttpAuthPassword)
                 okHttpClient = okHttpClient.newBuilder().addInterceptor(basicAuthInterceptor).build()
             }
-            val jsonConverterFactory = Json {
-                encodeDefaults = true
-                ignoreUnknownKeys = !BuildConfig.DEBUG
-            }.asConverterFactory("application/json".toMediaType())
+            val jsonConverterFactory = json.asConverterFactory("application/json".toMediaType())
             retrofitBuilder.addConverterFactory(jsonConverterFactory)
                 .client(okHttpClient)
             val retrofit = retrofitBuilder.build()
