@@ -288,6 +288,9 @@ dependencies {
     debugImplementation(libs.androidx.fragment.testing.manifest)
 
     debugImplementation(libs.leakcanary.android)
+
+    testImplementation(libs.androidx.compose.ui.test.junit4)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
 }
 
 apply {

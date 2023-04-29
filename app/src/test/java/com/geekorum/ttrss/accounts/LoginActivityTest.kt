@@ -20,13 +20,16 @@
  */
 package com.geekorum.ttrss.accounts
 
-import android.app.Application
 import android.content.Intent
+import androidx.activity.ComponentActivity
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.AndroidComposeTestRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.core.app.launchActivity
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.geekorum.ttrss.R
 import dagger.Module
@@ -38,7 +41,6 @@ import dagger.hilt.android.testing.HiltTestApplication
 import dagger.hilt.android.testing.UninstallModules
 import dagger.hilt.components.SingletonComponent
 import io.mockk.mockk
-import org.hamcrest.Matchers.not
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -51,32 +53,37 @@ import org.robolectric.annotation.Config
 class LoginActivityTest {
     @get:Rule val hiltRule = HiltAndroidRule(this)
 
+    @get:Rule val composeTestRule = AndroidComposeTestRule(
+        activityRule = ActivityScenarioRule(Intent(LoginActivity.ACTION_ADD_ACCOUNT).apply {
+            setClass(ApplicationProvider.getApplicationContext(), LoginActivity::class.java)
+        }),
+        activityProvider = ::getActivityFromTestRule
+    )
+
+    private fun <A : ComponentActivity> getActivityFromTestRule(rule: ActivityScenarioRule<A>): A {
+        var activity: A? = null
+        rule.scenario.onActivity { activity = it }
+        if (activity == null) {
+            throw IllegalStateException("Activity was not set in the ActivityScenarioRule!")
+        }
+        return activity!!
+    }
+
     @Test
     @Config(qualifiers = "w800dp")
     fun testThatWeCanStartTheActivityOnW800Dp() {
-        val applicationContext: Application = ApplicationProvider.getApplicationContext()
-        val intent = Intent(LoginActivity.ACTION_ADD_ACCOUNT).apply {
-            setClass(applicationContext, LoginActivity::class.java)
-        }
-        launchActivity<LoginActivity>(intent).use {
-            onView(withText(applicationContext.getString(R.string.action_sign_in)))
-//                .check(matches(not(isEnabled())))
-                .check(matches(isDisplayed()))
-        }
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.action_sign_in))
+            .performScrollTo()
+            .assertIsDisplayed()
+
+        composeTestRule.onNodeWithTag("contentCard").assertIsDisplayed()
     }
 
     @Test
     fun testThatWeCanStartTheActivity() {
-        val applicationContext: Application = ApplicationProvider.getApplicationContext()
-        val intent = Intent(LoginActivity.ACTION_ADD_ACCOUNT).apply {
-            setClass(applicationContext, LoginActivity::class.java)
-        }
-        launchActivity<LoginActivity>(intent).use {
-//            onView(withText(applicationContext.getString(R.string.action_sign_in)))
-            onView(withText("Login"))
-//                .check(matches(not(isEnabled())))
-                .check(matches(isDisplayed()))
-        }
+        composeTestRule.onNodeWithText(composeTestRule.activity.getString(R.string.action_sign_in))
+            .performScrollTo()
+            .assertIsDisplayed()
     }
 
     @Module
