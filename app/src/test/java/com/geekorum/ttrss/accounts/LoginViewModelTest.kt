@@ -35,12 +35,8 @@ import dagger.Provides
 import io.mockk.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.take
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.*
-import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.junit.After
 import org.junit.Before
 import org.junit.Rule
@@ -92,38 +88,36 @@ class LoginViewModelTest {
     }
 
     @Test
-    fun testCheckEmptyPasswordSendEventWhenNonEmpty() = runTest {
-        viewModel.checkNonEmptyPassword("")
+    fun testEmptyPasswordSetsErrorMessageAfterOneLoginAttempt() = runTest {
+        viewModel.loginFormUiState.password = ""
+        assertThat(viewModel.loginFormUiState.passwordFieldErrorMsg).isNull()
 
-        val error = viewModel.fieldErrors.asFlow().first()
-        assertThat(error.invalidPasswordMsgId).isEqualTo(R.string.error_field_required)
+        viewModel.loginFormUiState.hasAttemptLogin = true
+        viewModel.loginFormUiState.password = ""
+
+        assertThat(viewModel.loginFormUiState.passwordFieldErrorMsg).isEqualTo(R.string.error_field_required)
     }
 
     @Test
     fun testCheckEmptyUsernameSendEventWhenNonEmpty() = runTest {
-        viewModel.checkNonEmptyUsername("")
-        val error = viewModel.fieldErrors.asFlow().first()
-        assertThat(error.invalidNameMsgId).isEqualTo(R.string.error_field_required)
+        viewModel.loginFormUiState.username = ""
+        assertThat(viewModel.loginFormUiState.usernameFieldErrorMsg).isNull()
+
+        viewModel.loginFormUiState.hasAttemptLogin = true
+        viewModel.loginFormUiState.username = ""
+
+        assertThat(viewModel.loginFormUiState.usernameFieldErrorMsg).isEqualTo(R.string.error_field_required)
     }
 
     @Test
-    fun checkDoLoginSendProgressEvent() = runTest {
-        coEvery { tinyRssApi.login(any()) } returns successLoginResponse
-        every { accountManager.addAccount(any(), any()) } returns false
+    fun checkLoginOperationsUpdateLoginInProgressState() = runTest {
+        assertThat(viewModel.loginInProgress).isFalse()
 
-        viewModel.initialize(LoginActivity.ACTION_ADD_ACCOUNT)
-        viewModel.httpUrl = "http://localhost".toHttpUrl()
+        viewModel.startLoginOperation()
+        assertThat(viewModel.loginInProgress).isTrue()
 
-        val progressEvents = async {
-            viewModel.loginInProgress.asFlow()
-                    .take(2)
-                    .toList()
-        }
-        runCurrent()
-
-        viewModel.doLogin()
-
-        assertThat(progressEvents.await()).containsExactly(true, false)
+        viewModel.endLoginOperation()
+        assertThat(viewModel.loginInProgress).isFalse()
     }
 
     @Test
@@ -134,32 +128,35 @@ class LoginViewModelTest {
         coEvery { tinyRssApi.login(any()) } returns successLoginResponse
 
         viewModel.initialize(LoginActivity.ACTION_ADD_ACCOUNT)
-        viewModel.username = "fred"
-        viewModel.password = "password"
-        viewModel.httpUrl = "http://localhost".toHttpUrl()
+        viewModel.loginFormUiState.apply {
+            username = "fred"
+            password = "password"
+            serverUrl = "http://localhost"
+        }
 
         viewModel.doLogin()
 
         val completeEvent = viewModel.actionCompleteEvent.asFlow().first()
         val content = completeEvent.peekContent() as LoginViewModel.ActionCompleteEvent.Success
 
-        val expectedAccount = Account(viewModel.username, viewModel.httpUrl.toString())
+        val expectedAccount = Account(viewModel.loginFormUiState.username, viewModel.loginFormUiState.serverUrl)
         assertThat(content.account).isEqualTo(expectedAccount)
     }
 
     @Test
-    fun checkDoLoginWithFailSendLoginFailedEvent(): Unit = runTest {
+    fun checkDoLoginWithFailureSetsSnackbarMessage(): Unit = runTest {
         coEvery { tinyRssApi.login(any()) } returns failedLoginResponse
 
         viewModel.initialize(LoginActivity.ACTION_ADD_ACCOUNT)
-        viewModel.username = "fred"
-        viewModel.password = "password"
-        viewModel.httpUrl = "http://localhost".toHttpUrl()
+        viewModel.loginFormUiState.apply {
+            username = "fred"
+            password = "password"
+            serverUrl = "http://localhost"
+        }
 
         viewModel.doLogin()
 
-        val failedEvent = viewModel.loginFailedEvent.asFlow().first()
-        assertThat(failedEvent.peekContent()).isNotNull()
+        assertThat(viewModel.snackbarErrorMessageId).isNotNull()
     }
 }
 

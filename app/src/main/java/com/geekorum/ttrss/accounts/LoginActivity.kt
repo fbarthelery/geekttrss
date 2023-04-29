@@ -24,12 +24,11 @@ import android.accounts.Account
 import android.accounts.AccountManager
 import android.app.Activity
 import android.os.Bundle
-import android.transition.TransitionManager
-import android.view.View
-import android.view.ViewGroup
+import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -44,6 +43,7 @@ import androidx.compose.material.icons.filled.Web
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,15 +56,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.core.content.IntentCompat
-import androidx.databinding.DataBindingUtil
-import androidx.lifecycle.Observer
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.geekorum.geekdroid.accounts.AccountAuthenticatorAppCompatActivity
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.R
-import com.geekorum.ttrss.databinding.ActivityLoginAccountBinding
 import com.geekorum.ttrss.ui.AppTheme
-import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.textfield.TextInputLayout
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -84,48 +80,30 @@ class LoginActivity : AccountAuthenticatorAppCompatActivity() {
     @Inject
     lateinit var accountManager: AndroidTinyrssAccountManager
 
-    private lateinit var binding: ActivityLoginAccountBinding
-
     private val loginViewModel: LoginViewModel by viewModels()
 
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_login_account)
-        binding.lifecycleOwner = this
-        setSupportActionBar(binding.toolbar)
         val account = IntentCompat.getParcelableExtra(intent, EXTRA_ACCOUNT, Account::class.java)?.let {
             accountManager.fromAndroidAccount(it)
         }
         val action = requireNotNull(intent?.action) { "Invalid intent action passed to $this"}
         loginViewModel.initialize(action, account)
-        binding.viewModel = loginViewModel
-
-        loginViewModel.loginInProgress.observe(this, Observer { inProgress ->
-            showProgress(inProgress!!)
-        })
-        loginViewModel.loginFailedEvent.observe(this, EventObserver { event ->
-            if (event.errorMsgId in listOf(R.string.error_http_forbidden, R.string.error_http_unauthorized)) {
-                binding.form.useHttpAuth.isChecked = true
-            }
-            Snackbar.make(binding.root, event.errorMsgId, Snackbar.LENGTH_SHORT).show()
-        })
 
         loginViewModel.actionCompleteEvent.observe(this, EventObserver { event->
             when (event) {
                 is LoginViewModel.ActionCompleteEvent.Failed -> handleActionFailed()
                 is LoginViewModel.ActionCompleteEvent.Success -> handleActionSuccess(event)
-
             }
         })
 
-        loginViewModel.fieldErrors.observe(this, Observer { errorStatus ->
-            val error = checkNotNull(errorStatus)
-            setFieldError(binding.form.urlField, error.invalidUrlMsgId)
-            if (error.hasAttemptLogin) {
-                setFieldError(binding.form.usernameField, error.invalidNameMsgId)
-                setFieldError(binding.form.passwordField, error.invalidPasswordMsgId)
+        setContent {
+            AppTheme {
+                LoginScreen(windowSizeClass = calculateWindowSizeClass(this@LoginActivity),
+                    viewModel = loginViewModel)
             }
-        })
+        }
     }
 
     private fun handleActionSuccess(event: LoginViewModel.ActionCompleteEvent.Success) {
@@ -155,47 +133,83 @@ class LoginActivity : AccountAuthenticatorAppCompatActivity() {
         finish()
     }
 
-    private fun setFieldError(view: TextInputLayout, errorId: Int?) {
-        val errorMsg = if (errorId != null) getString(errorId) else null
-        view.error = errorMsg
-    }
-
-
-    private fun showProgress(show: Boolean) {
-        TransitionManager.beginDelayedTransition(binding.root as ViewGroup)
-        binding.form.loginForm.visibility = if (show) View.GONE else View.VISIBLE
-        binding.form.loginProgress.visibility = if (show) View.VISIBLE else View.GONE
-    }
 }
 
 
 @Composable
-fun LoginScreen(windowSizeClass: WindowSizeClass) {
-        val useTabletLayout = windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Medium
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    elevation = if (useTabletLayout) 0.dp else AppBarDefaults.TopAppBarElevation,
-//                    elevation = 0.dp,
-                    title = {
-                        Text("Login")
-                    })
-            },
-        ) {
-            val uiState = remember { MutableLoginFormUiState() }
-            if (useTabletLayout) {
-                TabletLayoutContent(Modifier.padding(it)) {
-                    LoginForm(uiState, onLoginClick = {}, Modifier.padding(16.dp))
+internal fun LoginScreen(windowSizeClass: WindowSizeClass, viewModel: LoginViewModel = hiltViewModel()) {
+    val scaffoldState = rememberScaffoldState()
+    LoginScreen(
+        windowSizeClass = windowSizeClass,
+        loginInProgress = viewModel.loginInProgress,
+        loginFormUiState = viewModel.loginFormUiState,
+        scaffoldState = scaffoldState,
+        onLoginClick = {
+        viewModel.confirmLogin()
+    })
+
+    viewModel.snackbarErrorMessageId?.let { messageId ->
+        val message = stringResource(messageId)
+        LaunchedEffect(message) {
+            scaffoldState.snackbarHostState.showSnackbar(message)
+            viewModel.clearSnackbarMessage()
+        }
+    }
+}
+
+@Composable
+fun LoginScreen(
+    windowSizeClass: WindowSizeClass,
+    loginInProgress: Boolean,
+    loginFormUiState: LoginFormUiState,
+    scaffoldState: ScaffoldState = rememberScaffoldState(),
+    onLoginClick: () -> Unit
+) {
+    val useTabletLayout = windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Medium
+    Scaffold(
+        scaffoldState = scaffoldState,
+        topBar = {
+            TopAppBar(
+                elevation = if (useTabletLayout) 0.dp else AppBarDefaults.TopAppBarElevation,
+                title = {
+                    Text("Login")
+                })
+        },
+    ) {
+        if (useTabletLayout) {
+            TabletLayoutContent(Modifier.padding(it)) {
+                Crossfade(loginInProgress, label = "CircularProgressCrossfade") { showLoginProgress ->
+                    if (showLoginProgress) {
+                        CircularProgressIndicator(
+                            Modifier
+                                .fillMaxWidth()
+                                .wrapContentWidth()
+                                .size(64.dp)
+                                .padding(top = 56.dp)
+                        )
+                    } else {
+                        LoginForm(loginFormUiState, onLoginClick = onLoginClick, Modifier.padding(16.dp))
+                    }
                 }
-            } else {
-                LoginForm(
-                    uiState,
-                    onLoginClick = {},
-                    Modifier
-                        .padding(it)
-                        .padding(16.dp))
+            }
+        } else {
+            Crossfade(loginInProgress, label = "CircularProgressCrossfade",
+                modifier = Modifier.padding(it)
+            ) { showLoginProgress ->
+                if (showLoginProgress) {
+                    CircularProgressIndicator(
+                        Modifier
+                            .fillMaxWidth()
+                            .wrapContentWidth()
+                            .size(64.dp)
+                            .padding(top = 56.dp)
+                    )
+                } else {
+                    LoginForm(loginFormUiState, onLoginClick = onLoginClick, Modifier.padding(16.dp))
+                }
             }
         }
+    }
 }
 
 @Composable
@@ -238,7 +252,6 @@ interface LoginFormUiState {
     val loginButtonEnabled: Boolean
 }
 
-@Stable
 class MutableLoginFormUiState : LoginFormUiState{
     override var serverUrl: String by mutableStateOf("")
     override var username: String  by mutableStateOf("")
@@ -246,11 +259,11 @@ class MutableLoginFormUiState : LoginFormUiState{
     override var useHttpAuthentication: Boolean by mutableStateOf(false)
     override var httpAuthUsername: String by mutableStateOf("")
     override var httpAuthPassword: String by mutableStateOf("")
-    override val canChangeUsernameOrUrl: Boolean by mutableStateOf(true)
-    override val serverUrlFieldErrorMsg: Int? by mutableStateOf(null)
-    override val usernameFieldErrorMsg: Int? by mutableStateOf(null)
-    override val passwordFieldErrorMsg: Int? by mutableStateOf(null)
-    override val loginButtonEnabled: Boolean by mutableStateOf(false)
+    override var canChangeUsernameOrUrl: Boolean by mutableStateOf(true)
+    override var serverUrlFieldErrorMsg: Int? by mutableStateOf(null)
+    override var usernameFieldErrorMsg: Int? by mutableStateOf(null)
+    override var passwordFieldErrorMsg: Int? by mutableStateOf(null)
+    override var loginButtonEnabled: Boolean by mutableStateOf(false)
 }
 
 @Composable
@@ -274,7 +287,7 @@ private fun LoginForm(
             leadingIcon = {
                 Icon(Icons.Default.Web, contentDescription = null)
             },
-            errorId = null,
+            errorId = uiState.serverUrlFieldErrorMsg,
             keyboardOptions= KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Next)
         )
 
@@ -287,7 +300,7 @@ private fun LoginForm(
             leadingIcon = {
                 Icon(Icons.Default.Person, contentDescription = null)
             },
-            errorId = null,
+            errorId = uiState.usernameFieldErrorMsg,
             keyboardOptions= KeyboardOptions(imeAction = ImeAction.Next),
             modifier = Modifier.padding(top = 16.dp)
         )
@@ -300,9 +313,14 @@ private fun LoginForm(
             leadingIcon = {
                 Icon(Icons.Default.Password, contentDescription = null)
             },
-            errorId = null,
+            errorId = uiState.passwordFieldErrorMsg,
             visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions= KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+            keyboardOptions= KeyboardOptions(keyboardType = KeyboardType.Password,
+                imeAction = if (uiState.useHttpAuthentication) ImeAction.Next else ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(onDone = {
+                onLoginClick()
+            }),
             modifier = Modifier.padding(top = 16.dp)
         )
 
@@ -343,6 +361,9 @@ private fun LoginForm(
                         keyboardType = KeyboardType.Password,
                         imeAction = ImeAction.Done
                     ),
+                    keyboardActions = KeyboardActions(onDone = {
+                        onLoginClick()
+                    }),
                     modifier = Modifier.padding(top = 16.dp)
                 )
             }
@@ -385,7 +406,7 @@ private fun OutlinedTextFieldWithError(
             keyboardActions = keyboardActions
         )
         val errorMsg = errorId?.let { stringResource(id = errorId) } ?: ""
-        Text(errorMsg, style = MaterialTheme.typography.caption)
+        Text(errorMsg, style = MaterialTheme.typography.caption, modifier = Modifier.padding(top = 4.dp))
     }
 }
 
@@ -396,7 +417,9 @@ fun PreviewLoginScreen() {
     BoxWithConstraints {
         val windowSizeClass = WindowSizeClass.calculateFromSize(DpSize(maxWidth, maxHeight) )
         AppTheme {
-            LoginScreen(windowSizeClass)
+            LoginScreen(windowSizeClass, loginInProgress = false,
+                loginFormUiState = MutableLoginFormUiState(),
+                onLoginClick = {})
         }
     }
 }
@@ -408,7 +431,9 @@ fun PreviewLoginScreenTablet() {
     BoxWithConstraints {
         val windowSizeClass = WindowSizeClass.calculateFromSize(DpSize(maxWidth, maxHeight) )
         AppTheme {
-            LoginScreen(windowSizeClass)
+            LoginScreen(windowSizeClass, loginInProgress = false,
+                loginFormUiState = MutableLoginFormUiState(),
+                onLoginClick = {})
         }
     }
 }

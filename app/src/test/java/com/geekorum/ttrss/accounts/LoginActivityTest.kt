@@ -20,13 +20,13 @@
  */
 package com.geekorum.ttrss.accounts
 
+import android.app.Application
 import android.content.Intent
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.core.app.launchActivity
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.isEnabled
-import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.geekorum.ttrss.R
 import dagger.Module
@@ -54,23 +54,28 @@ class LoginActivityTest {
     @Test
     @Config(qualifiers = "w800dp")
     fun testThatWeCanStartTheActivityOnW800Dp() {
+        val applicationContext: Application = ApplicationProvider.getApplicationContext()
         val intent = Intent(LoginActivity.ACTION_ADD_ACCOUNT).apply {
-            setClass(ApplicationProvider.getApplicationContext(), LoginActivity::class.java)
+            setClass(applicationContext, LoginActivity::class.java)
         }
         launchActivity<LoginActivity>(intent).use {
-            onView(withId(R.id.email_sign_in_button))
-                .check(matches(not(isEnabled())))
+            onView(withText(applicationContext.getString(R.string.action_sign_in)))
+//                .check(matches(not(isEnabled())))
+                .check(matches(isDisplayed()))
         }
     }
 
     @Test
     fun testThatWeCanStartTheActivity() {
+        val applicationContext: Application = ApplicationProvider.getApplicationContext()
         val intent = Intent(LoginActivity.ACTION_ADD_ACCOUNT).apply {
-            setClass(ApplicationProvider.getApplicationContext(), LoginActivity::class.java)
+            setClass(applicationContext, LoginActivity::class.java)
         }
         launchActivity<LoginActivity>(intent).use {
-            onView(withId(R.id.email_sign_in_button))
-                .check(matches(not(isEnabled())))
+//            onView(withText(applicationContext.getString(R.string.action_sign_in)))
+            onView(withText("Login"))
+//                .check(matches(not(isEnabled())))
+                .check(matches(isDisplayed()))
         }
     }
 

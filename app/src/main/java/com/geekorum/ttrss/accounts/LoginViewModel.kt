@@ -22,10 +22,13 @@ package com.geekorum.ttrss.accounts
 
 import android.security.NetworkSecurityPolicy
 import android.view.inputmethod.EditorInfo
-import androidx.annotation.StringRes
 import androidx.annotation.VisibleForTesting
-import androidx.databinding.InverseMethod
-import androidx.lifecycle.*
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.geekorum.geekdroid.app.lifecycle.Event
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
@@ -38,9 +41,9 @@ import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import retrofit2.HttpException
+import timber.log.Timber
 import java.io.IOException
 import javax.inject.Inject
-import timber.log.Timber
 
 /**
  * ViewModel for LoginActivity
@@ -52,28 +55,18 @@ internal class LoginViewModel @Inject constructor(
     private val dispatchers: CoroutineDispatchersProvider
 ) : ViewModel() {
 
-    var username = ""
-    var password = ""
-    var http_auth_username = ""
-    var http_auth_password = ""
-    var httpUrl: HttpUrl? = null
+    val loginFormUiState = VMMutableLoginFormUiState()
+
     private lateinit var action: String
     private var account: Account? = null
 
-    val loginInProgress = MutableLiveData<Boolean>()
-    val loginFailedEvent = MutableLiveData<Event<LoginFailedError>>()
+    var loginInProgress by mutableStateOf(false)
+        private set
+
+    var snackbarErrorMessageId by mutableStateOf<Int?>(null)
+        private set
+
     val actionCompleteEvent = MutableLiveData<Event<ActionCompleteEvent>>()
-    val fieldErrors = MutableLiveData<FieldErrorStatus>().apply {
-        value = FieldErrorStatus()
-    }
-
-    val areFieldsCorrect = fieldErrors.map {
-        val editionDone = (it.hasEditAllFields || (!canChangeUsernameOrUrl && it.hasEditPassword))
-        editionDone && it.areFieldsCorrect
-    }
-
-    val canChangeUsernameOrUrl: Boolean
-        get() = (action != LoginActivity.ACTION_CONFIRM_CREDENTIALS)
 
     fun initialize(action: String, account: Account? = null) {
         check(action in listOf(LoginActivity.ACTION_ADD_ACCOUNT, LoginActivity.ACTION_CONFIRM_CREDENTIALS)) {
@@ -81,50 +74,19 @@ internal class LoginViewModel @Inject constructor(
         }
         this.action = action
         this.account = account
-        username = account?.username ?: ""
-        httpUrl = account?.url?.toHttpUrlOrNull()
+        loginFormUiState.initialize(action, account)
     }
 
-    fun checkValidUrl(text: CharSequence) {
-        val current = checkNotNull(fieldErrors.value)
-        val invalidUrlMsgId = when {
-            text.isEmpty() -> R.string.error_field_required
-            httpUrl == null -> R.string.error_invalid_http_url
-            httpUrl?.pathSegments?.last()?.isNotEmpty() == true -> R.string.error_http_url_must_end_wish_slash
-            else -> null
-        }
-        fieldErrors.value = current.copy(invalidUrlMsgId = invalidUrlMsgId, hasEditUrl = true)
-    }
-
-    fun checkNonEmptyPassword(text: CharSequence) {
-        val current = checkNotNull(fieldErrors.value)
-        val invalidPasswordMsgId = when {
-            text.isEmpty() -> R.string.error_field_required
-            else -> null
-        }
-        fieldErrors.value = current.copy(invalidPasswordMsgId = invalidPasswordMsgId, hasEditPassword = true)
-    }
-
-    fun checkNonEmptyUsername(text: CharSequence) {
-        val current = checkNotNull(fieldErrors.value)
-        val invalidNameMsgId = when {
-            text.isEmpty() -> R.string.error_field_required
-            else -> null
-        }
-        fieldErrors.value = current.copy(invalidNameMsgId = invalidNameMsgId, hasEditName = true)
-    }
-
-    private fun checkFieldsCorrect(): Boolean {
-        val current = checkNotNull(fieldErrors.value)
-        fieldErrors.value = current.copy(hasAttemptLogin = true)
-        return httpUrl != null &&  fieldErrors.value!!.areFieldsCorrect
+    fun clearSnackbarMessage() {
+        snackbarErrorMessageId = null
     }
 
     @JvmOverloads
     fun confirmLogin(id: Int = EditorInfo.IME_NULL): Boolean {
         val handleAction = (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL)
-        if (handleAction && checkFieldsCorrect()) {
+        if (handleAction && loginFormUiState.areFieldsCorrect) {
             viewModelScope.launch {
+                loginFormUiState.hasAttemptLogin = true
                 doLogin()
             }
         }
@@ -133,17 +95,19 @@ internal class LoginViewModel @Inject constructor(
 
     @VisibleForTesting
     internal suspend fun doLogin() {
-        val serverUrl = requireNotNull(httpUrl)
-        val serverInformation = DataServerInformation(serverUrl.toString(), http_auth_username, http_auth_password)
+        val serverUrl = requireNotNull(convertStringToHttpUrl(loginFormUiState.serverUrl))
+        val serverInformation = with(loginFormUiState) {
+            DataServerInformation(serverUrl.toString(), httpAuthUsername, httpAuthPassword)
+        }
         val urlModule = TinyRssServerInformationModule(serverInformation)
         val networkComponent = networkComponentBuilder
             .tinyRssServerInformationModule(urlModule)
             .build()
         val tinyRssApi = networkComponent.getTinyRssApi()
-        val loginPayload = LoginRequestPayload(username, password)
+        val loginPayload = with(loginFormUiState) { LoginRequestPayload(username, password) }
 
         try {
-            loginInProgress.value = true
+            startLoginOperation()
             val response = tinyRssApi.login(loginPayload)
             response.checkStatus { "Login failed" }
             onUserLoggedIn()
@@ -154,7 +118,7 @@ internal class LoginViewModel @Inject constructor(
                 ApiCallException.ApiError.API_DISABLED -> R.string.error_api_disabled
                 else -> R.string.error_unknown
             }
-            loginFailedEvent.value = LoginFailedEvent(errorMsgId)
+            snackbarErrorMessageId = errorMsgId
         } catch (e: HttpException) {
             val errorMsgId = when (e.code()) {
                 401 -> R.string.error_http_unauthorized
@@ -162,7 +126,7 @@ internal class LoginViewModel @Inject constructor(
                 404 -> R.string.error_http_not_found
                 else -> R.string.error_unknown
             }
-            loginFailedEvent.value = LoginFailedEvent(errorMsgId)
+            snackbarErrorMessageId = errorMsgId
         } catch (e: IOException) {
             val isCleartextTrafficPermitted = NetworkSecurityPolicy.getInstance().isCleartextTrafficPermitted
             val errorMsgId = if (!serverUrl.isHttps && !isCleartextTrafficPermitted) {
@@ -170,13 +134,26 @@ internal class LoginViewModel @Inject constructor(
             } else {
                 R.string.error_unknown
             }
-            loginFailedEvent.value = LoginFailedEvent(errorMsgId)
+            snackbarErrorMessageId = errorMsgId
         } catch (e: Exception) {
             Timber.e(e, "Failed to login with unexpected exception")
-            loginFailedEvent.value = LoginFailedEvent(R.string.error_unknown)
+            snackbarErrorMessageId = R.string.error_unknown
         } finally {
-            loginInProgress.value = false
+            if (snackbarErrorMessageId in listOf(R.string.error_http_forbidden, R.string.error_http_unauthorized)) {
+                loginFormUiState.useHttpAuthentication = true
+            }
+            endLoginOperation()
         }
+    }
+
+    @VisibleForTesting
+    internal fun startLoginOperation() {
+        loginInProgress = true
+    }
+
+    @VisibleForTesting
+    internal fun endLoginOperation() {
+        loginInProgress = false
     }
 
 
@@ -188,7 +165,7 @@ internal class LoginViewModel @Inject constructor(
     }
 
     private fun onConfirmCredentialsSuccess() {
-        accountManager.updatePassword(account!!, password)
+        accountManager.updatePassword(account!!, loginFormUiState.password)
         actionCompleteEvent.value = ActionCompleteSuccessEvent(account!!)
     }
 
@@ -203,10 +180,12 @@ internal class LoginViewModel @Inject constructor(
 
     private suspend fun addAccount(): Account? {
         return withContext(dispatchers.io) {
-            val account = Account(username, httpUrl!!.toString())
-            val success = accountManager.addAccount(account, password)
+            val account = Account(loginFormUiState.username, loginFormUiState.serverUrl)
+            val success = accountManager.addAccount(account, loginFormUiState.password)
             if (success) {
-                val serverInformation = DataServerInformation(account.url, http_auth_username, http_auth_password)
+                val serverInformation = with(loginFormUiState) {
+                    DataServerInformation(account.url, httpAuthUsername, httpAuthPassword)
+                }
                 accountManager.updateServerInformation(account, serverInformation)
                 accountManager.initializeAccountSync(account)
                 return@withContext account
@@ -221,51 +200,129 @@ internal class LoginViewModel @Inject constructor(
         override val basicHttpAuthPassword: String? = null
     ) : ServerInformation()
 
-    data class LoginFailedError(@StringRes val errorMsgId: Int)
-    private fun LoginFailedEvent(errorMsgId: Int) = Event(LoginFailedError(errorMsgId))
-
     sealed class ActionCompleteEvent {
         class Success(val account: Account) : ActionCompleteEvent()
-        class Failed : ActionCompleteEvent()
+        object Failed : ActionCompleteEvent()
     }
 
     private fun ActionCompleteSuccessEvent(account: Account) = Event(ActionCompleteEvent.Success(account))
-    private fun ActionCompleteFailedEvent() = Event(ActionCompleteEvent.Failed())
+    private fun ActionCompleteFailedEvent() = Event(ActionCompleteEvent.Failed)
 
-    data class FieldErrorStatus(
-        val invalidUrlMsgId: Int? = null,
-        val invalidNameMsgId: Int? = null,
-        val invalidPasswordMsgId: Int? = null,
-        val hasEditUrl: Boolean = false,
-        val hasEditPassword: Boolean = false,
-        val hasEditName: Boolean = false,
-        val hasAttemptLogin: Boolean = false
-    ) {
-        val areFieldsCorrect= (invalidNameMsgId == null && invalidPasswordMsgId == null && invalidUrlMsgId == null)
+    inner class VMMutableLoginFormUiState : LoginFormUiState{
+        private var _serverUrl: String by mutableStateOf("")
+        override var serverUrl: String
+            get() = _serverUrl
+            set(value) {
+                _serverUrl = value
+                hasEditUrl = true
+                updateServerUrlError()
+            }
 
-        val hasEditAllFields = (hasEditUrl && hasEditName && hasEditPassword)
-    }
+        private var _username: String by mutableStateOf("")
+        override var username: String
+            get() = _username
+            set(value) {
+                _username = value
+                hasEditUsername = true
+                updateUsernameError()
+            }
 
-    companion object {
+        private var _password: String by mutableStateOf("")
+        override var password: String
+            get() = _password
+            set(value) {
+                _password = value
+                hasEditPassword = true
+                updatePasswordError()
+            }
 
-        @JvmStatic
-        @InverseMethod("convertHttpUrlToString")
-        fun convertStringToHttpUrl(url: String): HttpUrl? {
-            return url.toHttpUrlOrNull()?.newBuilder() // remove fragment and query
-                ?.query(null)
-                ?.encodedFragment(null)
-                ?.build()
+        override var useHttpAuthentication: Boolean by mutableStateOf(false)
+        override var httpAuthUsername: String by mutableStateOf("")
+        override var httpAuthPassword: String by mutableStateOf("")
+        override var canChangeUsernameOrUrl: Boolean by mutableStateOf(true)
+        override var serverUrlFieldErrorMsg: Int? by mutableStateOf(null)
+        override var usernameFieldErrorMsg: Int? by mutableStateOf(null)
+        override var passwordFieldErrorMsg: Int? by mutableStateOf(null)
+        override val loginButtonEnabled: Boolean
+            get() {
+                val hasEditAllFields = hasEditUrl && hasEditUsername && hasEditPassword
+                val editionDone =
+                    (hasEditAllFields || (!canChangeUsernameOrUrl && hasEditPassword))
+                return editionDone && areFieldsCorrect
+            }
+
+        private val hasValidServerUrl: Boolean
+            get() {
+                val url = convertStringToHttpUrl(serverUrl)
+                return when {
+                    url == null -> false
+                    url.pathSegments.last().isNotEmpty() -> false
+                    else -> true
+                }
+            }
+
+        private val hasValidUsername: Boolean
+            get() = username.isNotEmpty()
+
+        private val hasValidPassword: Boolean
+            get() = password.isNotEmpty()
+
+        val areFieldsCorrect: Boolean
+            get() = hasValidServerUrl && hasValidPassword && hasValidUsername
+
+        var hasAttemptLogin by mutableStateOf(false)
+
+        private var hasEditUrl: Boolean by mutableStateOf(false)
+        private var hasEditUsername: Boolean by mutableStateOf(false)
+        private var hasEditPassword: Boolean by mutableStateOf(false)
+
+        private fun updateUsernameError() {
+            val invalidNameMsgId = when {
+                username.isEmpty() -> R.string.error_field_required
+                else -> null
+            }
+            if (loginFormUiState.hasAttemptLogin) {
+                loginFormUiState.usernameFieldErrorMsg = invalidNameMsgId
+            }
         }
 
-        @JvmStatic
-        fun convertHttpUrlToString(url: HttpUrl?): String {
-            // this method is only called when binding the model to the view
-            // this doesn't happen when the user modify the content of the text field
-            // so basically it only happen with url == null :
-            // - on first initialisation
-            // - on view recreation ?
-            return url?.toString() ?: "https://"
+        private fun updatePasswordError() {
+            val invalidPasswordMsgId = when {
+                password.isEmpty() -> R.string.error_field_required
+                else -> null
+            }
+
+            if (loginFormUiState.hasAttemptLogin) {
+                loginFormUiState.passwordFieldErrorMsg = invalidPasswordMsgId
+            }
         }
 
+        private fun updateServerUrlError() {
+            val url = convertStringToHttpUrl(serverUrl)
+            val invalidUrlMsgId = when {
+                serverUrl.isEmpty() -> R.string.error_field_required
+                url == null -> R.string.error_invalid_http_url
+                url.pathSegments.last().isNotEmpty() -> R.string.error_http_url_must_end_wish_slash
+                else -> null
+            }
+            if (hasEditUrl) {
+                loginFormUiState.serverUrlFieldErrorMsg = invalidUrlMsgId
+            }
+        }
+
+        fun initialize(action: String, account: Account? = null) {
+            canChangeUsernameOrUrl = action != LoginActivity.ACTION_CONFIRM_CREDENTIALS
+            // use private properties to bypass setters checks
+            _username = account?.username ?: ""
+            _serverUrl = account?.url ?: "https://"
+        }
     }
+
+    private fun convertStringToHttpUrl(url: String): HttpUrl? {
+        return url.toHttpUrlOrNull()?.newBuilder() // remove fragment and query
+            ?.query(null)
+            ?.encodedFragment(null)
+            ?.build()
+    }
+
 }
