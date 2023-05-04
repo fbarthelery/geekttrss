@@ -37,12 +37,12 @@ import androidx.sqlite.db.SupportSQLiteDatabase
  */
 object MigrationFrom1To2 : Migration(1, 2) {
 
-    override fun migrate(database: SupportSQLiteDatabase) {
+    override fun migrate(db: SupportSQLiteDatabase) {
         // Migrate primitive field to add not null constraint
-        migrateCategoriesTable(database)
-        migrateFeedsTable(database)
-        migrateTransactionTable(database)
-        migrateArticlesTable(database)
+        migrateCategoriesTable(db)
+        migrateFeedsTable(db)
+        migrateTransactionTable(db)
+        migrateArticlesTable(db)
     }
 
     private fun migrateCategoriesTable(database: SupportSQLiteDatabase) {
@@ -134,11 +134,11 @@ object MigrationFrom1To2 : Migration(1, 2) {
 
 /** This migration makes fields non nullable **/
 object MigrationFrom2To3 : Migration(2, 3) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        migrateCategoriesTables(database)
-        migrateTransactionTable(database)
-        migrateFeedsTable(database)
-        migrateArticlesTable(database)
+    override fun migrate(db: SupportSQLiteDatabase) {
+        migrateCategoriesTables(db)
+        migrateTransactionTable(db)
+        migrateFeedsTable(db)
+        migrateArticlesTable(db)
     }
 
     private fun migrateCategoriesTables(database: SupportSQLiteDatabase) {
@@ -245,8 +245,8 @@ object MigrationFrom2To3 : Migration(2, 3) {
 
 /** This migration add some cascade on delete constraints **/
 object MigrationFrom3To4 : Migration(3, 4) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        migrateTransactionTable(database)
+    override fun migrate(db: SupportSQLiteDatabase) {
+        migrateTransactionTable(db)
     }
 
     private fun migrateTransactionTable(database: SupportSQLiteDatabase) {
@@ -274,8 +274,8 @@ object MigrationFrom3To4 : Migration(3, 4) {
  * This migration add virtual FTS tables
  */
 object MigrationFrom4To5 : Migration(4, 5) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        migrateArticleFTSTable(database)
+    override fun migrate(db: SupportSQLiteDatabase) {
+        migrateArticleFTSTable(db)
     }
 
     private fun migrateArticleFTSTable(database: SupportSQLiteDatabase) {
@@ -294,7 +294,7 @@ object MigrationFrom4To5 : Migration(4, 5) {
  * This migration is caused by an upgrade of room. No changes are necessary
  */
 object MigrationFrom5To6 : Migration(5, 6) {
-    override fun migrate(database: SupportSQLiteDatabase) {
+    override fun migrate(db: SupportSQLiteDatabase) {
         // nothing to do here
     }
 }
@@ -303,9 +303,9 @@ object MigrationFrom5To6 : Migration(5, 6) {
  * This migration changes some foreign keys constraints
  */
 object MigrationFrom6To7 : Migration(6, 7) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        migrateArticlesTable(database)
-        migrateFeedsTable(database)
+    override fun migrate(db: SupportSQLiteDatabase) {
+        migrateArticlesTable(db)
+        migrateFeedsTable(db)
     }
 
     private fun migrateArticlesTable(database: SupportSQLiteDatabase) {
@@ -372,8 +372,8 @@ object MigrationFrom6To7 : Migration(6, 7) {
  * This migration changes Feed table to add subscribed column
  */
 object MigrationFrom7To8 : Migration(7, 8) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        migrateFeedsTable(database)
+    override fun migrate(db: SupportSQLiteDatabase) {
+        migrateFeedsTable(db)
     }
 
     private fun migrateFeedsTable(database: SupportSQLiteDatabase) {
@@ -408,8 +408,8 @@ object MigrationFrom7To8 : Migration(7, 8) {
  * This migration adds the AccountInfo table
  */
 object MigrationFrom8To9 : Migration(8, 9) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        createAccountInfoTable(database)
+    override fun migrate(db: SupportSQLiteDatabase) {
+        createAccountInfoTable(db)
     }
 
     private fun createAccountInfoTable(database: SupportSQLiteDatabase) {
@@ -430,8 +430,8 @@ object MigrationFrom8To9 : Migration(8, 9) {
  * This migration adds the Feed.feed_icon_url column
  */
 object MigrationFrom9To10 : Migration(9, 10) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        migrateFeedsTable(database)
+    override fun migrate(db: SupportSQLiteDatabase) {
+        migrateFeedsTable(db)
     }
 
     private fun migrateFeedsTable(database: SupportSQLiteDatabase) {
@@ -466,8 +466,8 @@ object MigrationFrom9To10 : Migration(9, 10) {
  * This migration adds the attachments table
  */
 object MigrationFrom10To11 : Migration(10, 11) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        addAttachmentsTable(database)
+    override fun migrate(db: SupportSQLiteDatabase) {
+        addAttachmentsTable(db)
     }
 
     private fun addAttachmentsTable(database: SupportSQLiteDatabase) {
@@ -494,8 +494,8 @@ object MigrationFrom10To11 : Migration(10, 11) {
  * This migration adds an index on post_id of the attachments table
  */
 object MigrationFrom11To12 : Migration(11, 12) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        addPostIdIndex(database)
+    override fun migrate(db: SupportSQLiteDatabase) {
+        addPostIdIndex(db)
     }
 
     private fun addPostIdIndex(database: SupportSQLiteDatabase) {
@@ -510,9 +510,9 @@ object MigrationFrom11To12 : Migration(11, 12) {
  * This migration adds a relation table for articles_tags
  */
 object MigrationFrom12To13 : Migration(12, 13) {
-    override fun migrate(database: SupportSQLiteDatabase) {
-        addArticleTagsTable(database)
-        migrateArticleTags(database)
+    override fun migrate(db: SupportSQLiteDatabase) {
+        addArticleTagsTable(db)
+        migrateArticleTags(db)
     }
 
     private fun addArticleTagsTable(database: SupportSQLiteDatabase) {

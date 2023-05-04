@@ -23,11 +23,7 @@ package com.geekorum.ttrss.in_app_update
 import android.os.Looper
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.geekorum.ttrss.in_app_update.UpdateState.Status.DOWNLOADED
-import com.geekorum.ttrss.in_app_update.UpdateState.Status.DOWNLOADING
-import com.geekorum.ttrss.in_app_update.UpdateState.Status.FAILED
-import com.geekorum.ttrss.in_app_update.UpdateState.Status.PENDING
-import com.geekorum.ttrss.in_app_update.UpdateState.Status.UNKNOWN
+import com.geekorum.ttrss.in_app_update.UpdateState.Status.*
 import com.geekorum.ttrss.logging.CrashlyticsLoggingModule
 import com.google.android.play.core.appupdate.testing.FakeAppUpdateManager
 import com.google.android.play.core.install.model.InstallErrorCode
@@ -36,20 +32,13 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import dagger.hilt.android.testing.UninstallModules
 import io.mockk.mockk
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlinx.coroutines.yield
 import org.junit.runner.RunWith
 import org.robolectric.Shadows
 import org.robolectric.annotation.Config
@@ -70,8 +59,8 @@ class PlayStoreInAppUpdateManagerTest {
         Thread(it, "UI Thread")
     }.asCoroutineDispatcher()
 
-    lateinit var subject: PlayStoreInAppUpdateManager
-    lateinit var fakeAppUpdateManager: FakeAppUpdateManager
+    private lateinit var subject: PlayStoreInAppUpdateManager
+    private lateinit var fakeAppUpdateManager: FakeAppUpdateManager
 
     @BeforeTest
     fun setUp() {
@@ -87,7 +76,7 @@ class PlayStoreInAppUpdateManagerTest {
     }
 
     @Test
-    fun testUpdateAvailability() = runBlockingTest {
+    fun testUpdateAvailability() = runTest {
         fakeAppUpdateManager.setUpdateNotAvailable()
         var updateAvailability = subject.getUpdateAvailability()
         assertThat(updateAvailability).isEqualTo(UpdateAvailability.NO_UPDATE)
@@ -98,7 +87,7 @@ class PlayStoreInAppUpdateManagerTest {
     }
 
     @Test
-    fun testASuccessfulInstallFlow() = runBlockingTest {
+    fun testASuccessfulInstallFlow() = runTest {
         fakeAppUpdateManager.setUpdateAvailable(1234)
 
         val drivingFlow = subject.startUpdate(mockk(), 1234).onEach {
@@ -123,7 +112,7 @@ class PlayStoreInAppUpdateManagerTest {
     }
 
     @Test
-    fun testAFailureInstallFlow() = runBlockingTest {
+    fun testAFailureInstallFlow() = runTest {
         fakeAppUpdateManager.setUpdateAvailable(1234)
 
         val drivingFlow = subject.startUpdate(mockk(), 1234).onEach {
