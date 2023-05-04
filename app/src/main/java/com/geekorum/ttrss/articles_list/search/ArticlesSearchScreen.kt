@@ -29,6 +29,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
@@ -40,7 +41,8 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.ShareCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.itemsIndexed
+import androidx.paging.compose.itemContentType
+import androidx.paging.compose.itemKey
 import com.geekorum.ttrss.articles_list.ActivityViewModel
 import com.geekorum.ttrss.articles_list.ArticleCard
 import com.geekorum.ttrss.articles_list.PagingViewLoadState
@@ -83,9 +85,12 @@ fun SearchResultCardList(
         )).asPaddingValues(),
         modifier = modifier.fillMaxSize()
     ) {
-        itemsIndexed(pagingItems,
-            key = { _, articleWithFeed -> articleWithFeed.article.id }
-        ) { index, articleWithFeed ->
+        items(
+            count = pagingItems.itemCount,
+            key = pagingItems.itemKey {it.article.id },
+            contentType = pagingItems.itemContentType()
+        ) { index ->
+            val articleWithFeed = pagingItems[index]
             // initial state is visible if we don't animate
             val visibilityState = remember { MutableTransitionState(!animateItemAppearance) }
             // delay start of animation

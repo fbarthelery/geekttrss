@@ -31,17 +31,12 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.DismissDirection
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.PullRefreshState
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -56,7 +51,8 @@ import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.itemsIndexed
+import androidx.paging.compose.itemContentType
+import androidx.paging.compose.itemKey
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.*
 import com.geekorum.ttrss.ui.AppTheme
@@ -223,9 +219,12 @@ private fun ArticlesList(
         contentPadding = contentPadding,
         modifier = Modifier.fillMaxSize()
     ) {
-        itemsIndexed(articles,
-            key = { _, articleWithFeed -> articleWithFeed.article.id }
-        ) { index, articleWithFeed ->
+        items(
+            count = articles.itemCount,
+            key = articles.itemKey{ it.article.id },
+            contentType = articles.itemContentType()
+        ) { index ->
+            val articleWithFeed = articles[index]
             // initial state is visible if we don't animate
             val visibilityState = remember { MutableTransitionState(!animateItemAppearance) }
             // delay start of animation

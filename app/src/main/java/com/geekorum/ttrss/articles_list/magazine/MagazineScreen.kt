@@ -29,6 +29,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
@@ -48,9 +49,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ShareCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.paging.compose.LazyPagingItems
-import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.itemsIndexed
+import androidx.paging.compose.*
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.articles_list.*
 import com.geekorum.ttrss.data.Article
@@ -192,9 +191,12 @@ private fun ArticlesList(
         contentPadding = contentPadding,
         modifier = Modifier.fillMaxSize()
     ) {
-        itemsIndexed(pagingItems,
-            key = { _, articleWithFeed -> articleWithFeed.article.id }
-        ) { index, articleWithFeed ->
+        items(
+            count = pagingItems.itemCount,
+            key = pagingItems.itemKey { it.article.id },
+            contentType = pagingItems.itemContentType()
+        ) { index ->
+            val articleWithFeed = pagingItems[index]
             // initial state is visible if we don't animate
             val visibilityState = remember { MutableTransitionState(!animateItemAppearance) }
             // delay start of animation
