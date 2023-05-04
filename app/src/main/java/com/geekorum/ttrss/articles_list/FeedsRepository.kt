@@ -35,13 +35,13 @@ class FeedsRepository
 @Inject constructor(
     private val feedsDao: FeedsDao
 ) {
-    val allUnreadFeeds: Flow<List<Feed>> = feedsDao.allUnreadFeeds.map(this::addSpecialFeeds)
+    val allUnreadFeeds: Flow<List<Feed>> = feedsDao.getAllUnreadFeeds().map(this::addSpecialFeeds)
 
-    val allFeeds: Flow<List<Feed>> = feedsDao.allFeeds.map(this::addSpecialFeeds)
+    val allFeeds: Flow<List<Feed>> = feedsDao.getAllFeeds().map(this::addSpecialFeeds)
 
-    val allCategories: Flow<List<Category>> = feedsDao.allCategories
+    val allCategories: Flow<List<Category>> = feedsDao.getAllCategories()
 
-    val allUnreadCategories: Flow<List<Category>> = feedsDao.allUnreadCategories
+    val allUnreadCategories: Flow<List<Category>> = feedsDao.getAllUnreadCategories()
 
     fun getFeedById(feedId: Long): Flow<Feed?> {
         return when {

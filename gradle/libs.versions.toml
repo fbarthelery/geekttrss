@@ -65,6 +65,7 @@ coil = "2.2.2"
 geekdroid = "geekttrss-1.6.3"
 aboutoss = "0.1.0"
 kotlin = "1.8.21"
+kotlin-ksp = "1.8.21-1.0.11"
 
 [plugins]
 # these cannot be used for now because it will use multiple classpath and will make play-publisher-plugin fail
@@ -79,6 +80,7 @@ kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", vers
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "kotlin-ksp" }
 
 [libraries]
 accompanist-insets-ui = { module = "com.google.accompanist:accompanist-insets-ui", version.ref = "accompanist" }

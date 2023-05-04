@@ -31,6 +31,7 @@ plugins {
 //    alias(libs.plugins.kotlin.kapt)
     kotlin("android")
     kotlin("kapt")
+    alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.google.gms.oss.license)
     id("com.geekorum.build.android-tests")
     id("com.geekorum.build.android-signing")
@@ -144,10 +145,15 @@ kotlin {
 
 kapt {
     arguments {
-        arg("room.schemaLocation", "$projectDir/schemas")
         // assisted inject create a module without hilt annotation. will be fixed in 0.5.3
         arg("dagger.hilt.disableModulesHaveInstallInCheck", true)
     }
+}
+
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+    arg("room.incremental", "true")
+    arg("room.generateKotlin", "true")
 }
 
 
@@ -239,7 +245,7 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
 
 
-    kapt(libs.androidx.room.compiler)
+    ksp(libs.androidx.room.compiler)
     androidTestImplementation(libs.androidx.room.testing)
 
     androidTestImplementation(libs.androidx.work.testing)

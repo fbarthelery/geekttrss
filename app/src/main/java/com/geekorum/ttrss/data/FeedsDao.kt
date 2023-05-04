@@ -34,20 +34,20 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 abstract class FeedsDao {
 
-    @get:Query("SELECT * FROM feeds WHERE unread_count > 0 ORDER BY title")
-    abstract val allUnreadFeeds: Flow<List<Feed>>
+    @Query("SELECT * FROM feeds WHERE unread_count > 0 ORDER BY title")
+    abstract fun getAllUnreadFeeds(): Flow<List<Feed>>
 
-    @get:Query("SELECT * FROM feeds ORDER BY title")
-    abstract val allFeeds: Flow<List<Feed>>
+    @Query("SELECT * FROM feeds ORDER BY title")
+    abstract fun getAllFeeds(): Flow<List<Feed>>
 
     @Query("SELECT * FROM feeds")
     internal abstract suspend fun getAllFeedsList(): List<Feed>
 
-    @get:Query("SELECT * FROM categories ORDER BY title")
-    abstract val allCategories: Flow<List<Category>>
+    @Query("SELECT * FROM categories ORDER BY title")
+    abstract fun getAllCategories(): Flow<List<Category>>
 
-    @get:Query("SELECT * FROM categories WHERE unread_count > 0 ORDER BY title")
-    abstract val allUnreadCategories: Flow<List<Category>>
+    @Query("SELECT * FROM categories WHERE unread_count > 0 ORDER BY title")
+    abstract fun getAllUnreadCategories(): Flow<List<Category>>
 
     @Query("SELECT * FROM categories")
     internal abstract suspend fun getAllCategoriesList(): List<Category>

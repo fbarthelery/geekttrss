@@ -29,7 +29,8 @@ plugins {
 //    alias(libs.plugins.kotlin.android) apply false
 //    alias(libs.plugins.kotlin.jvm) apply false
 //    alias(libs.plugins.kotlin.kapt) apply false
-    kotlin("plugin.serialization") version libs.versions.kotlin.get() apply false
+    kotlin("plugin.serialization") version libs.versions.kotlin.asProvider().get() apply false
+    alias(libs.plugins.kotlin.ksp) apply false
     // these should not be needed but for an unknown reason they get applied
     // with bad ordering if not there. or they can't be applied dynamically
     // version used is in gradle.properties
