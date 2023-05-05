@@ -35,10 +35,12 @@ import kotlinx.coroutines.flow.Flow
 abstract class FeedsDao {
 
     @Query("SELECT * FROM feeds WHERE unread_count > 0 ORDER BY title")
-    abstract fun getAllUnreadFeeds(): Flow<List<Feed>>
+    @Transaction
+    abstract fun getAllUnreadFeeds(): Flow<List<FeedWithFavIcon>>
 
     @Query("SELECT * FROM feeds ORDER BY title")
-    abstract fun getAllFeeds(): Flow<List<Feed>>
+    @Transaction
+    abstract fun getAllFeeds(): Flow<List<FeedWithFavIcon>>
 
     @Query("SELECT * FROM feeds")
     internal abstract suspend fun getAllFeedsList(): List<Feed>

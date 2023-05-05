@@ -49,8 +49,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.lerp
+import coil.compose.rememberAsyncImagePainter
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Feed
+import com.geekorum.ttrss.data.FeedWithFavIcon
 import com.geekorum.ttrss.ui.AppTheme
 
 
@@ -164,7 +166,7 @@ fun AccountHeader(login: String, server: String) {
 
 @Composable
 fun FeedSection(
-    feeds: List<Feed>,
+    feeds: List<FeedWithFavIcon>,
     isMagazineSelected: Boolean,
     selectedFeed: Feed?,
     onMagazineSelected: () -> Unit,
@@ -175,7 +177,8 @@ fun FeedSection(
         icon = { Icon(painterResource(R.drawable.ic_newspaper_24), contentDescription = null) },
         selected = isMagazineSelected,
         onClick = onMagazineSelected)
-    for (feed in feeds) {
+    for (feedWithFavIcon in feeds) {
+        val feed = feedWithFavIcon.feed
         NavigationItem(
             feed.displayTitle.takeIf { it.isNotBlank() } ?: feed.title,
             selected = feed == selectedFeed,
@@ -194,7 +197,17 @@ fun FeedSection(
                 if (iconVector != null) {
                     Icon(iconVector, contentDescription = null)
                 } else {
-                    Icon(painterResource(id = R.drawable.ic_rss_box), contentDescription = null)
+                    val feedIconPainter = rememberAsyncImagePainter(
+                        model = feedWithFavIcon.favIcon?.url,
+                        placeholder = painterResource(R.drawable.ic_rss_feed_orange),
+                        fallback = painterResource(R.drawable.ic_rss_feed_orange),
+                        error = painterResource(R.drawable.ic_rss_feed_orange),
+                    )
+                    Image(painter = feedIconPainter,
+                        contentDescription = null,
+                        contentScale = ContentScale.FillBounds,
+                        modifier = Modifier.size(24.dp)
+                    )
                 }
             },
             badge = {
@@ -311,34 +324,52 @@ fun PreviewFeedListNavigationMenu() {
         ) {
             Surface(Modifier.requiredWidth(360.dp), elevation = 8.dp) {
                 val feeds = listOf(
-                    Feed(
-                        id = Feed.FEED_ID_ALL_ARTICLES,
-                        title = "All articles",
-                        unreadCount = 290,
+                    FeedWithFavIcon(
+                        feed = Feed(
+                            id = Feed.FEED_ID_ALL_ARTICLES,
+                            title = "All articles",
+                            unreadCount = 290,
+                        ),
+                        favIcon = null
                     ),
-                    Feed(
-                        id = Feed.FEED_ID_FRESH,
-                        title = "Fresh articles",
+                    FeedWithFavIcon(
+                        feed = Feed(
+                            id = Feed.FEED_ID_FRESH,
+                            title = "Fresh articles",
+                        ),
+                        favIcon = null
                     ),
-                    Feed(
-                        id = Feed.FEED_ID_STARRED,
-                        title = "Starred articles",
+                    FeedWithFavIcon(
+                        feed = Feed(
+                            id = Feed.FEED_ID_STARRED,
+                            title = "Starred articles",
+                        ),
+                        favIcon = null
                     ),
-                    Feed(
-                        id = 2,
-                        title = "Frandroid",
-                        unreadCount = 42,
+                    FeedWithFavIcon(
+                        feed = Feed(
+                            id = 2,
+                            title = "Frandroid",
+                            unreadCount = 42,
+                        ),
+                        favIcon = null
                     ),
-                    Feed(
-                        id = 3,
-                        title = "Gentoo universe",
-                        unreadCount = 10,
+                    FeedWithFavIcon(
+                        feed = Feed(
+                            id = 3,
+                            title = "Gentoo universe",
+                            unreadCount = 10,
+                        ),
+                        favIcon = null
                     ),
-                    Feed(
-                        id = 4,
-                        title = "LinuxFr",
-                        unreadCount = 8,
-                    )
+                    FeedWithFavIcon(
+                        feed = Feed(
+                            id = 4,
+                            title = "LinuxFr",
+                            unreadCount = 8,
+                        ),
+                        favIcon = null
+                    ),
                 )
                 FeedListNavigationMenu(
                     user = "test",

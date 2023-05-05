@@ -22,6 +22,7 @@ package com.geekorum.ttrss.articles_list
 
 import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
+import com.geekorum.ttrss.data.FeedWithFavIcon
 import com.geekorum.ttrss.data.FeedsDao
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
@@ -35,9 +36,9 @@ class FeedsRepository
 @Inject constructor(
     private val feedsDao: FeedsDao
 ) {
-    val allUnreadFeeds: Flow<List<Feed>> = feedsDao.getAllUnreadFeeds().map(this::addSpecialFeeds)
+    val allUnreadFeeds: Flow<List<FeedWithFavIcon>> = feedsDao.getAllUnreadFeeds().map(this::addSpecialFeeds)
 
-    val allFeeds: Flow<List<Feed>> = feedsDao.getAllFeeds().map(this::addSpecialFeeds)
+    val allFeeds: Flow<List<FeedWithFavIcon>> = feedsDao.getAllFeeds().map(this::addSpecialFeeds)
 
     val allCategories: Flow<List<Category>> = feedsDao.getAllCategories()
 
@@ -50,14 +51,20 @@ class FeedsRepository
         }
     }
 
-    private suspend fun addSpecialFeeds(feeds: List<Feed>): List<Feed> {
+    private fun addSpecialFeeds(feeds: List<FeedWithFavIcon>): List<FeedWithFavIcon> {
         // add special feeds
-        val totalUnread = feeds.sumOf { it.unreadCount }
-        val allArticles = Feed.createVirtualFeedForId(Feed.FEED_ID_ALL_ARTICLES, totalUnread)
+        val totalUnread = feeds.sumOf { it.feed.unreadCount }
+        val allArticles = FeedWithFavIcon(
+            feed = Feed.createVirtualFeedForId(Feed.FEED_ID_ALL_ARTICLES, totalUnread),
+            favIcon = null)
 
         //TODO calculate how much articles by special feeds
-        val freshArticles = Feed.createVirtualFeedForId(Feed.FEED_ID_FRESH)
-        val starredArticles = Feed.createVirtualFeedForId(Feed.FEED_ID_STARRED)
+        val freshArticles = FeedWithFavIcon(
+            feed = Feed.createVirtualFeedForId(Feed.FEED_ID_FRESH),
+            favIcon = null)
+        val starredArticles = FeedWithFavIcon(
+            feed = Feed.createVirtualFeedForId(Feed.FEED_ID_STARRED),
+            favIcon = null)
 
         return listOf(allArticles, freshArticles, starredArticles, *feeds.toTypedArray())
     }

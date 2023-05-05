@@ -108,7 +108,7 @@ class MagazineViewModel @Inject constructor (
 
 
     private suspend fun getRecentFeedIds(): List<Long> {
-        return feedsRepository.allFeeds.map { feeds -> feeds.map { it.id } }
+        return feedsRepository.allFeeds.map { feeds -> feeds.map { it.feed.id } }
             .firstOrNull()?.shuffled() ?: emptyList()
     }
 

@@ -95,7 +95,7 @@ class FeedsNavigationMenuPresenter(
                         val feeds by feedsViewModel.feeds.collectAsStateWithLifecycle()
                         FeedSection(
                             feeds,
-                            selectedFeed = feeds.find { it.id == currentFeedId },
+                            selectedFeed = feeds.find { it.feed.id == currentFeedId }?.feed,
                             isMagazineSelected = isMagazineFeed,
                             onFeedSelected = {
                                 navigateToFeed(it)
