@@ -69,6 +69,9 @@ class FeedsNavigationMenuPresenter(
                 val currentFeedId = run {
                     if (navBackStackEntry?.destination?.route == NavRoutes.ArticlesList) {
                         navBackStackEntry?.arguments?.getLong("feed_id")
+                    } else if (navBackStackEntry?.destination?.route == NavRoutes.ArticlesListByTag) {
+                        val listEntry = navController.getBackStackEntry(NavRoutes.ArticlesList)
+                        listEntry?.arguments?.getLong("feed_id")
                     } else {
                         null
                     }
