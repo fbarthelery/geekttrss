@@ -20,16 +20,32 @@
  */
 package com.geekorum.ttrss.settings
 
-import android.annotation.TargetApi
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import android.os.StrictMode
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.browser.customtabs.CustomTabsService
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.core.net.toUri
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -39,22 +55,36 @@ import androidx.preference.PreferenceFragmentCompat
 import com.geekorum.ttrss.BuildConfig
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.core.BaseActivity
-import com.geekorum.ttrss.databinding.ActivitySettingsBinding
+import com.geekorum.ttrss.databinding.SettingsPreferencesContainerBinding
 import com.geekorum.ttrss.debugtools.withStrictMode
+import com.geekorum.ttrss.ui.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
-    lateinit var binding: ActivitySettingsBinding
 
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         allowDiskReads()
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_settings)
-        setSupportActionBar(binding.toolbar)
-        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+        setContent {
+            AppTheme {
+                SettingsScreen(windowSizeClass = calculateWindowSizeClass(activity = this@SettingsActivity),
+                    onNavigateUpClick = {
+                        onSupportNavigateUp()
+                    })
+            }
+        }
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        if (supportFragmentManager.backStackEntryCount == 0) {
+            return super.onSupportNavigateUp()
+        }
+        supportFragmentManager.popBackStack()
+        return true
     }
 
     private fun allowDiskReads() {
@@ -76,7 +106,6 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
         return true
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     class SettingsFragment @Inject constructor(
         private val packageManager: PackageManager
     ) : PreferenceFragmentCompat() {
@@ -144,4 +173,83 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
         const val KEY_ABOUT_VERSION = "about_version"
     }
 
+}
+
+
+@Composable
+fun SettingsScreen(
+    windowSizeClass: WindowSizeClass,
+    onNavigateUpClick: () -> Unit,
+    scaffoldState: ScaffoldState = rememberScaffoldState(),
+) {
+    val useTabletLayout = windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Medium
+    Scaffold(
+        scaffoldState = scaffoldState,
+        topBar = {
+            TopAppBar(
+                elevation = if (useTabletLayout) 0.dp else AppBarDefaults.TopAppBarElevation,
+                title = {
+                    Text(stringResource(R.string.activity_settings_title))
+                },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateUpClick) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = null)
+                    }
+                }
+                )
+        },
+    ) {
+        if (useTabletLayout) {
+            TabletLayoutContent(Modifier.padding(it)) {
+                PreferencesContainer(Modifier.padding(4.dp))
+            }
+        } else {
+            PreferencesContainer()
+        }
+    }
+}
+
+@Composable
+private fun TabletLayoutContent(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    Box(
+        contentAlignment = Alignment.TopCenter,
+        modifier = modifier
+    ) {
+        Box(
+            modifier = Modifier
+                .height(136.dp) // 192.dp - 56.dp of appbar
+                .fillMaxWidth()
+                .background(MaterialTheme.colors.primarySurface)
+                .testTag("fakeAppBar")
+        )
+
+        Card(
+            Modifier
+                .width(512.dp)
+                .fillMaxSize()
+                .testTag("contentCard"),
+            content = content
+        )
+    }
+}
+
+@Composable
+private fun PreferencesContainer(modifier: Modifier = Modifier) {
+    AndroidViewBinding(factory = SettingsPreferencesContainerBinding::inflate, modifier)
+}
+
+
+@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
+@Preview
+@Composable
+fun PreviewSettingsScreen() {
+    AppTheme {
+        BoxWithConstraints {
+            val windowSizeClass = WindowSizeClass.calculateFromSize(DpSize(maxWidth, maxHeight))
+            SettingsScreen(windowSizeClass = windowSizeClass, onNavigateUpClick = {})
+        }
+    }
 }
