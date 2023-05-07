@@ -20,86 +20,131 @@
  */
 package com.geekorum.ttrss.settings.manage_features
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.RecyclerView
-import com.geekorum.geekdroid.app.lifecycle.EventObserver
-import com.geekorum.ttrss.databinding.FragmentManageFeaturesBinding
-import com.geekorum.ttrss.databinding.ItemFeatureBinding
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.geekorum.ttrss.R
+import com.geekorum.ttrss.ui.AppTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class ManageFeaturesFragment : Fragment() {
 
-    lateinit var binding: FragmentManageFeaturesBinding
     private val viewModel: ManageFeaturesViewModel by viewModels()
-    private lateinit var adapter: FeaturesAdapter
 
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentManageFeaturesBinding.inflate(inflater, container, false)
-        setupRecyclerView(binding.moduleList)
-        viewModel.features.observe(viewLifecycleOwner) {
-            adapter.items = it
-        }
-        viewModel.startInstallModuleEvent.observe(this, EventObserver {
-            val intent = Intent(requireContext(), InstallFeatureActivity::class.java).apply {
-                putExtra(InstallFeatureActivity.EXTRA_FEATURES_LIST, arrayOf(it))
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return ComposeView(requireContext()).apply {
+            setContent {
+                AppTheme {
+                    ManageFeaturesScreen(viewModel, onInstallFeatureClick = {
+                        val intent = Intent(context, InstallFeatureActivity::class.java).apply {
+                            putExtra(InstallFeatureActivity.EXTRA_FEATURES_LIST, arrayOf(it))
+                        }
+                        startActivity(intent)
+                    })
+                }
             }
-            startActivity(intent)
-        })
-
-        return binding.root
-    }
-
-    private fun setupRecyclerView(recyclerView: RecyclerView) {
-        adapter = FeaturesAdapter(layoutInflater, viewModel)
-        recyclerView.adapter = adapter
-        recyclerView.addItemDecoration(DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL))
-    }
-
-}
-
-class FeatureHolder(val binding: ItemFeatureBinding) : RecyclerView.ViewHolder(binding.root) {
-    fun setFeature(feature: FeatureStatus) {
-        binding.feature = feature
-    }
-
-    fun setViewModel(viewModel: ManageFeaturesViewModel) {
-        binding.viewModel = viewModel
-    }
-
-}
-
-class FeaturesAdapter(
-    private val layoutInflater: LayoutInflater,
-    private val viewModel: ManageFeaturesViewModel
-) : RecyclerView.Adapter<FeatureHolder>() {
-
-    var items = listOf<FeatureStatus>()
-        set(value) {
-            field = value
-            notifyDataSetChanged()
         }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeatureHolder {
-        val binding = ItemFeatureBinding.inflate(layoutInflater, parent, false)
-        return FeatureHolder(binding)
     }
+}
 
-    override fun getItemCount(): Int = items.size
+@Composable
+fun ManageFeaturesScreen(
+    viewModel: ManageFeaturesViewModel,
+    onInstallFeatureClick: (FeatureStatus) -> Unit
+) {
+    val features by viewModel.features.collectAsStateWithLifecycle()
+    ManageFeaturesScreen(
+        features = features,
+        isEditable = viewModel.canModify,
+        onInstallFeatureClick = onInstallFeatureClick,
+        onUninstallFeatureClick = {
+            viewModel.uninstallModule(it.name)
+        }
+    )
+}
 
-    override fun onBindViewHolder(holder: FeatureHolder, position: Int) {
-        val feature = items[position]
-        holder.setFeature(feature)
-        holder.setViewModel(viewModel)
-        holder.binding.executePendingBindings()
+@Composable
+fun ManageFeaturesScreen(
+    features: List<FeatureStatus>, isEditable: Boolean,
+    onInstallFeatureClick: (FeatureStatus) -> Unit,
+    onUninstallFeatureClick: (FeatureStatus) -> Unit
+) {
+    Scaffold { contentPadding ->
+        LazyColumn(contentPadding = contentPadding) {
+            itemsIndexed(
+                items = features,
+                key = { _, feat -> feat.name }
+            ) { idx, feature ->
+                Column(Modifier.fillMaxWidth()) {
+                    FeatureItem(feature, isEditable,
+                        onInstallClick = {
+                            onInstallFeatureClick(feature)
+                        },
+                        onUninstallClick = {
+                            onUninstallFeatureClick(feature)
+                        }
+                    )
+                    if (idx < features.lastIndex) {
+                        Divider()
+                    }
+                }
+            }
+        }
     }
+}
 
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun FeatureItem(
+    feature: FeatureStatus,
+    isEditable: Boolean,
+    onInstallClick: () -> Unit,
+    onUninstallClick: () -> Unit
+) {
+    ListItem(trailing = {
+        if (feature.installed && isEditable) {
+            TextButton(onClick = onUninstallClick) {
+                Text(stringResource(R.string.btn_uninstall_feature))
+            }
+        } else if (!feature.installed) {
+            TextButton(onClick = onInstallClick) {
+                Text(stringResource(R.string.btn_install_feature))
+            }
+        }
+    }) {
+        Text(feature.name)
+    }
+}
+
+@SuppressLint("UnusedMaterialScaffoldPaddingParameter")
+@Preview
+@Composable
+private fun PreviewManageFeaturesScreen() {
+    AppTheme {
+        val features = listOf(
+            FeatureStatus("manage feeds", true),
+            FeatureStatus("podcast feeds", false),
+            FeatureStatus("video feeds", false),
+        )
+        ManageFeaturesScreen(features, isEditable = true,
+            onInstallFeatureClick = {}, onUninstallFeatureClick = {})
+    }
 }

@@ -22,10 +22,7 @@ package com.geekorum.ttrss.settings.licenses
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.consumedWindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
@@ -139,7 +136,7 @@ fun OpenSourceLicenseScreen(
                 .then(pressIndicator)
                 .verticalScroll(scrollState)
                 .padding(paddingValues)
-                .consumedWindowInsets(paddingValues),
+                .consumeWindowInsets(paddingValues),
             onTextLayout = {
                 layoutResult.value = it
             }

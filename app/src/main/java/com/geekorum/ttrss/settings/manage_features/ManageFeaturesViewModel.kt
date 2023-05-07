@@ -20,38 +20,27 @@
  */
 package com.geekorum.ttrss.settings.manage_features
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.geekorum.geekdroid.app.lifecycle.Event
 import com.geekorum.ttrss.Features
 import com.geekorum.ttrss.on_demand_modules.ImmutableModuleManager
 import com.geekorum.ttrss.on_demand_modules.OnDemandModuleManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
 
 @HiltViewModel
 class ManageFeaturesViewModel @Inject constructor(
     private val moduleManager: OnDemandModuleManager
 ) : ViewModel() {
-    private val moduleStatus = MutableLiveData<List<FeatureStatus>>().apply {
+    private val moduleStatus = MutableStateFlow<List<FeatureStatus>>(emptyList()).apply {
         value = Features.allFeatures.map {
             FeatureStatus(it,it in moduleManager.installedModules)
         }
     }
 
-    val canModify: LiveData<Boolean> = MutableLiveData<Boolean>().apply {
-        value = moduleManager !is ImmutableModuleManager
-    }
-
-    private val _startInstallModuleEvent = MutableLiveData<Event<String>>()
-    val startInstallModuleEvent: LiveData<Event<String>> = _startInstallModuleEvent
-
-    val features: LiveData<List<FeatureStatus>> = moduleStatus
-
-    fun installModule(module: String) {
-        _startInstallModuleEvent.value = Event(module)
-    }
+    val canModify = moduleManager !is ImmutableModuleManager
+    val features = moduleStatus.asStateFlow()
 
     fun uninstallModule(module: String) {
         moduleManager.uninstall(module)
