@@ -1,2 +1,3 @@
-Correction d'un crash survenant lors de l'affichage d'un flux vide
+Amelioration des performances des requetes au serveur en cas d'utilisation de l'authentification HTTP
+Affichage du favicon du flux dans le menu
 Diverses corrections de bugs et améliorations

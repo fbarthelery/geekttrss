@@ -1,2 +1,3 @@
-Fix crash when trying to display an empty feed
+Improve efficiency of network requests to server when using HTTP authentication
+Display feed favicons in Menu drawer
 Various bug fixes and improvements
