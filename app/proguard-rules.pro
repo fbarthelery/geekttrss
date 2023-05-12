@@ -92,3 +92,9 @@
 -keepclassmembernames class kotlinx.** {
     volatile <fields>;
 }
+
+
+# various
+-dontwarn com.google.auto.service.AutoService
+-dontwarn javax.lang.model.**
+-dontwarn javax.tools.Diagnostic$Kind
