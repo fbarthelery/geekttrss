@@ -32,9 +32,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.*
 import com.geekorum.geekdroid.app.BottomSheetDialogActivity
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.applicationComponent
@@ -44,6 +42,7 @@ import com.geekorum.ttrss.manage_feeds.DaggerManageFeedComponent
 import com.geekorum.ttrss.manage_feeds.R
 import com.geekorum.ttrss.manage_feeds.databinding.ActivityAddFeedBinding
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import java.util.concurrent.TimeUnit
 import com.geekorum.ttrss.R as appR
@@ -104,9 +103,11 @@ class AddFeedActivity : BottomSheetDialogActivity() {
             }
 
             if (feeds.isEmpty()) {
-                lifecycleScope.launchWhenStarted {
-                    delay(TimeUnit.MILLISECONDS.toMillis(1500))
-                    finish()
+                lifecycleScope.launch {
+                    repeatOnLifecycle(Lifecycle.State.STARTED) {
+                        delay(TimeUnit.MILLISECONDS.toMillis(1500))
+                        finish()
+                    }
                 }
             }
         })
