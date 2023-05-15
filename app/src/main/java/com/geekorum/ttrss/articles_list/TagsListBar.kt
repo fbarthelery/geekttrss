@@ -26,15 +26,17 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.geekorum.ttrss.ui.AppTheme
+import com.geekorum.ttrss.ui.AppTheme3
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TagsListBar(
     tags: Set<String>,
@@ -51,13 +53,11 @@ fun TagsListBar(
                 .horizontalScroll(scrollState)
         ) {
             Spacer(Modifier.size(8.dp))
-            AppTheme(colors = MaterialTheme.colors.copy(primary = MaterialTheme.colors.secondaryVariant)) {
+            AppTheme3(colorScheme = MaterialTheme.colorScheme.copy(primary = MaterialTheme.colorScheme.secondary)) {
                 tags.forEach { tag ->
-                    Chip(text = tag, selected = tag == selectedTag,
-                        onClick = {
-                            selectedTagChange(tag.takeUnless { tag == selectedTag })
-                        }
-                    )
+                    FilterChip(selected = tag == selectedTag,
+                        onClick = {  selectedTagChange(tag.takeUnless { tag == selectedTag }) },
+                        label = { Text(tag) })
                 }
             }
             Spacer(Modifier.size(8.dp))
@@ -65,47 +65,6 @@ fun TagsListBar(
     }
 }
 
-
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-private fun Chip(
-    text: String,
-    selected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val backgroundColor = if (selected)
-        MaterialTheme.colors.secondaryVariant
-    else MaterialTheme.colors.onSurface
-    val backgroundColorAlpha = if (selected) {
-        0.24f
-    } else 0.10f
-    Card(
-        onClick = onClick,
-        modifier = modifier.height(32.dp),
-        shape = MaterialTheme.shapes.small.copy(topStart = CornerSize(50), bottomEnd = CornerSize(50)),
-        border = BorderStroke(1.dp, backgroundColor.copy(alpha = backgroundColorAlpha)),
-        elevation = 2.dp
-    ) {
-        Box(Modifier
-            .background(backgroundColor.copy(alpha = backgroundColorAlpha))
-        ) {
-            Row(
-                modifier = Modifier.fillMaxHeight()
-                    .padding(horizontal = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                val textColor = if (selected) {
-                    MaterialTheme.colors.primary
-                } else MaterialTheme.colors.onSurface.copy(alpha = 0.87f)
-                Text(text = text,
-                    style = MaterialTheme.typography.body2,
-                    color = textColor
-                )
-            }
-        }
-    }
-}
 
 @Preview
 @Composable

@@ -20,19 +20,21 @@
  */
 package com.geekorum.ttrss.articles_list
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.mapSaver
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -42,10 +44,10 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.geekorum.ttrss.R
-import com.geekorum.ttrss.ui.AppTheme
+import com.geekorum.ttrss.ui.AppTheme3
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArticlesListAppBar(
     title: @Composable () -> Unit,
@@ -57,86 +59,49 @@ fun ArticlesListAppBar(
     displaySearchButton: Boolean = true,
     navigationIcon: @Composable (() -> Unit)? = null,
 ) {
+    val isSearchVisibleAndOpen = displaySearchButton && appBarState.searchOpen
     TopAppBar(
         modifier = modifier,
-    ) {
-
-        val isSearchVisibleAndOpen = displaySearchButton && appBarState.searchOpen
-        val hasNavigationIcon = (isSearchVisibleAndOpen) || navigationIcon != null
-        if (!hasNavigationIcon) {
-            Spacer(Modifier.width(12.dp))
-        } else {
-            Row(
-                Modifier
-                    .fillMaxHeight()
-                    .width(68.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                    CompositionLocalProvider(
-                        LocalContentAlpha provides ContentAlpha.high,
-                        content = {
-                            if (isSearchVisibleAndOpen) {
-                                IconButton(onClick = {
-                                    appBarState.closeSearch()
-                                }) {
-                                    Icon(Icons.Default.ArrowBack, contentDescription = "back")
-                                }
-                            } else {
-                                navigationIcon!!.invoke()
-                            }
-                        }
-                    )
+        navigationIcon = {
+            if (isSearchVisibleAndOpen) {
+                IconButton(
+                    onClick = {
+                    appBarState.closeSearch()
+                }) {
+                    Icon(Icons.Default.ArrowBack, contentDescription = "back")
+                }
+            } else {
+                navigationIcon?.invoke()
             }
-        }
-
-
-        Row(
-            Modifier
-                .fillMaxHeight()
-                .weight(1f),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            ProvideTextStyle(value = MaterialTheme.typography.h6) {
-                CompositionLocalProvider(
-                    LocalContentAlpha provides ContentAlpha.high,
-                    content = {
-                        if (displaySearchButton && appBarState.searchOpen) {
-                            SearchTextField(
-                                value = appBarState.searchText ,
-                                onValueChange = { appBarState.searchText = it },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        } else {
-                            title()
-                        }
-                    }
+        },
+        title = {
+            if (displaySearchButton && appBarState.searchOpen) {
+                SearchTextField(
+                    value = appBarState.searchText ,
+                    onValueChange = { appBarState.searchText = it },
+                    modifier = Modifier
+                        .fillMaxWidth()
                 )
+            } else {
+                title()
             }
-        }
-
-        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-            Row(
-                Modifier.fillMaxHeight(),
-                horizontalArrangement = Arrangement.End,
-                verticalAlignment = Alignment.CenterVertically,
-                content = {
-                    if (!isSearchVisibleAndOpen) {
-                        if (displaySearchButton) {
-                            IconButton(onClick = {
-                                appBarState.openSearch()
-                            }) {
-                                Icon(Icons.Default.Search, contentDescription = "search")
-                            }
-                        }
-
-                        if (displaySortMenuButton) {
-                            SortMenuButton(sortOrder, onSortOrderChange)
-                        }
+        },
+        actions = {
+            if (!isSearchVisibleAndOpen) {
+                if (displaySearchButton) {
+                    IconButton(onClick = {
+                        appBarState.openSearch()
+                    }) {
+                        Icon(Icons.Default.Search, contentDescription = "search")
                     }
                 }
-            )
+
+                if (displaySortMenuButton) {
+                    SortMenuButton(sortOrder, onSortOrderChange)
+                }
+            }
         }
-    }
+    )
 }
 
 @Composable
@@ -224,53 +189,43 @@ private fun SearchTextField(
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    MaterialTheme(colors = MaterialTheme.colors.copy(
-        surface = MaterialTheme.colors.primarySurface,
-        onSurface = MaterialTheme.colors.contentColorFor(MaterialTheme.colors.primarySurface),
-        ),
-        typography = MaterialTheme.typography.copy(
-            subtitle1 = MaterialTheme.typography.h6
-        )
-    ) {
-        ProvideTextStyle(value = MaterialTheme.typography.h6) {
-            val focusRequester = remember {
-                FocusRequester()
-            }
-
-            LaunchedEffect(Unit) {
-                focusRequester.requestFocus()
-            }
-
-            TextField(
-                modifier = modifier.focusRequester(focusRequester),
-                value = value,
-                onValueChange = onValueChange,
-                placeholder = {
-                    Text(stringResource(R.string.placeholder_textfield_search))
-                },
-                trailingIcon = {
-                    if (value.isNotEmpty()) {
-                        IconButton(onClick = { onValueChange("") }) {
-                            Icon(Icons.Default.Clear, contentDescription = stringResource(R.string.content_desc_btn_clear))
-                        }
-                    }
-                },
-                singleLine = true,
-                maxLines = 1,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                keyboardActions = KeyboardActions(onSearch = {
-                    onValueChange(value)
-                }),
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.Transparent,
-                    cursorColor = MaterialTheme.colors.secondary,
-                    focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
-
-                )
-            )
-        }
+    val focusRequester = remember {
+        FocusRequester()
     }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+
+    TextField(
+        modifier = modifier.focusRequester(focusRequester),
+        value = value,
+        onValueChange = onValueChange,
+        placeholder = {
+            Text(stringResource(R.string.placeholder_textfield_search), style = MaterialTheme.typography.titleLarge)
+        },
+        trailingIcon = {
+            if (value.isNotEmpty()) {
+                IconButton(onClick = { onValueChange("") }) {
+                    Icon(Icons.Default.Clear, contentDescription = stringResource(R.string.content_desc_btn_clear))
+                }
+            }
+        },
+        singleLine = true,
+        maxLines = 1,
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+        keyboardActions = KeyboardActions(onSearch = {
+            onValueChange(value)
+        }),
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = Color.Transparent,
+            unfocusedContainerColor = Color.Transparent,
+            disabledContainerColor = Color.Transparent,
+            focusedIndicatorColor = Color.Transparent,
+            unfocusedIndicatorColor = Color.Transparent
+
+        )
+    )
 }
 
 @Composable
@@ -333,15 +288,14 @@ private fun SortMenuRadioGroup(
                 onClick = {
                     onSortOrderChange(current)
                     closeMenu()
+                },
+                text = {
+                    Text(current.getLabel())
+                },
+                trailingIcon = {
+                    RadioButton(selected = current == sortOrder, onClick = null)
                 }
-            ) {
-                Text(
-                    current.getLabel(),
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(end = 16.dp))
-                RadioButton(selected = current == sortOrder, onClick = null)
-            }
+            )
         }
     }
 }
@@ -349,7 +303,7 @@ private fun SortMenuRadioGroup(
 @Preview
 @Composable
 fun PreviewArticlesListAppBar() {
-    AppTheme {
+    AppTheme3 {
         var sortOrder by remember {
             mutableStateOf(SortOrder.MOST_RECENT_FIRST)
         }
