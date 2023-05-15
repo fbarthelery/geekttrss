@@ -176,6 +176,7 @@ dependencies {
     api(libs.androidx.compose.ui.util)
     api(libs.androidx.compose.foundation)
     api(libs.androidx.compose.material)
+    api(libs.androidx.compose.material3)
     api(libs.androidx.compose.material.icons.core)
     api(libs.androidx.compose.material.icons.extended)
     api(libs.androidx.compose.material3.window.sizes)
