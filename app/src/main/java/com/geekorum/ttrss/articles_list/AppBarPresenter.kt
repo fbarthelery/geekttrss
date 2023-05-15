@@ -25,11 +25,10 @@ import android.content.Context
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
@@ -71,12 +70,6 @@ internal class AppBarPresenter(
             )
 
             Column(modifier) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .windowInsetsTopHeight(WindowInsets.statusBars)
-                        .background(MaterialTheme.colors.primaryVariant)
-                )
                 Toolbar(
                     hasFixedDrawer,
                     currentDestination,
@@ -115,7 +108,8 @@ internal class AppBarPresenter(
             transitionSpec = {
                 fadeIn() + slideInVertically() with
                         fadeOut() + slideOutVertically() using SizeTransform(clip = false)
-            }
+            },
+            label = "TagBarVisibility"
         ) { visible ->
             if (visible) {
                 TagsListBar(tags = tagsSet,

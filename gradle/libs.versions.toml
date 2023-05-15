@@ -90,6 +90,7 @@ kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "kotlin-ksp" }
 accompanist-insets-ui = { module = "com.google.accompanist:accompanist-insets-ui", version.ref = "accompanist" }
 accompanist-drawablepainter = { module = "com.google.accompanist:accompanist-drawablepainter", version.ref = "accompanist" }
 accompanist-webview = { module = "com.google.accompanist:accompanist-webview", version.ref = "accompanist" }
+accompanist-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist" }
 
 androidx-core = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
 androidx-arch-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "androidx-arch-core-testing" }
