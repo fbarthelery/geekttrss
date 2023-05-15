@@ -23,10 +23,10 @@ package com.geekorum.ttrss.articles_list
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -77,6 +77,7 @@ internal class FabPresenter(
                         }
             },
             contentAlignment = Alignment.Center,
+            label = "AnimatedFabVisibility",
         ) { state ->
             if (state != null) {
                 FloatingActionButton(

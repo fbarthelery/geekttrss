@@ -49,6 +49,7 @@ import com.geekorum.ttrss.in_app_update.InAppUpdateViewModel
 import com.geekorum.ttrss.on_demand_modules.InstallModuleViewModel
 import com.geekorum.ttrss.session.SessionActivity
 import com.geekorum.ttrss.ui.AppTheme
+import com.geekorum.ttrss.ui.AppTheme3
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -122,6 +123,7 @@ class ArticleListActivity : SessionActivity() {
             }
 
             AppTheme {
+            AppTheme3 {
                 val coroutineScope = rememberCoroutineScope()
                 val scaffoldState = rememberScaffoldState()
 
@@ -183,6 +185,7 @@ class ArticleListActivity : SessionActivity() {
                 ) {
                     ArticlesListNavHost(activityViewModel, navController)
                 }
+            }
             }
         }
     }
