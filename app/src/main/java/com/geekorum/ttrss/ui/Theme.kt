@@ -126,8 +126,8 @@ object AppTheme {
         )
 }
 
-private val ExpletusSans = FontFamily(Font(R.font.expletus_sans_medium))
-private val Fenix = FontFamily(Font(R.font.fenix))
-private val Rubik = FontFamily(Font(R.font.rubik))
-private val RubikLight = FontFamily(Font(R.font.rubik_light))
+val ExpletusSans = FontFamily(Font(R.font.expletus_sans_medium))
+val Fenix = FontFamily(Font(R.font.fenix))
+val Rubik = FontFamily(Font(R.font.rubik))
+val RubikLight = FontFamily(Font(R.font.rubik_light))
 
