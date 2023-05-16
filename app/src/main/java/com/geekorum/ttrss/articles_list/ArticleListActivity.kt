@@ -23,7 +23,6 @@ package com.geekorum.ttrss.articles_list
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.animation.*
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.navigationBarsPadding
@@ -171,6 +170,7 @@ class ArticleListActivity : SessionActivity() {
                     },
                     navigationMenu = {
                         feedNavigationPresenter.Content(
+                            isModal = true, //TODO
                             hasFab = hasFabInFixedDrawer,
                             onNavigation = {
                                 coroutineScope.launch {

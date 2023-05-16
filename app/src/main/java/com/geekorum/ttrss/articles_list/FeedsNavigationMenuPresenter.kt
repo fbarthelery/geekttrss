@@ -23,14 +23,16 @@ package com.geekorum.ttrss.articles_list
 import android.app.Activity
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Tune
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -62,76 +64,92 @@ class FeedsNavigationMenuPresenter(
 ) {
 
     @Composable
-    fun Content(hasFab: Boolean, onNavigation: () -> Unit, modifier: Modifier = Modifier) {
-        AppTheme {
-            Surface(modifier) {
-                val navBackStackEntry by navController.currentBackStackEntryFlow.collectAsStateWithLifecycle(null)
-                val currentFeedId = run {
-                    if (navBackStackEntry?.destination?.route == NavRoutes.ArticlesList) {
-                        navBackStackEntry?.arguments?.getLong("feed_id")
-                    } else if (navBackStackEntry?.destination?.route == NavRoutes.ArticlesListByTag) {
-                        val listEntry = navController.getBackStackEntry(NavRoutes.ArticlesList)
-                        listEntry?.arguments?.getLong("feed_id")
-                    } else {
-                        null
-                    }
+    fun Content(hasFab: Boolean, onNavigation: () -> Unit, isModal: Boolean, modifier: Modifier = Modifier) {
+        val sheet: @Composable (@Composable ColumnScope.() -> Unit) -> Unit = if (isModal) {
+            { content ->
+                ModalDrawerSheet(
+                    windowInsets = WindowInsets.systemBars.only(WindowInsetsSides.Start),
+                    modifier = modifier,
+                    content = content
+                )
+            }
+        } else {
+            { content ->
+                PermanentDrawerSheet(
+                    windowInsets = WindowInsets.systemBars.only(WindowInsetsSides.Start),
+                    modifier = modifier,
+                    content = content
+                )
+            }
+        }
+
+        sheet {
+            val navBackStackEntry by navController.currentBackStackEntryFlow.collectAsStateWithLifecycle(null)
+            val currentFeedId = run {
+                if (navBackStackEntry?.destination?.route == NavRoutes.ArticlesList) {
+                    navBackStackEntry?.arguments?.getLong("feed_id")
+                } else if (navBackStackEntry?.destination?.route == NavRoutes.ArticlesListByTag) {
+                    val listEntry = navController.getBackStackEntry(NavRoutes.ArticlesList)
+                    listEntry.arguments?.getLong("feed_id")
+                } else {
+                    null
                 }
-                val isMagazineFeed = navBackStackEntry?.destination?.route == NavRoutes.Magazine
+            }
+            val isMagazineFeed = navBackStackEntry?.destination?.route == NavRoutes.Magazine
 
-                val account by accountViewModel.selectedAccount.observeAsState()
-                val server by accountViewModel.selectedAccountHost.observeAsState()
+            val account by accountViewModel.selectedAccount.observeAsState()
+            val server by accountViewModel.selectedAccountHost.observeAsState()
 
-                val fab: (@Composable () -> Unit)? = if (!hasFab) null else {
-                    @Composable {
-                        ExtendedFloatingActionButton(
-                            text = { Text(stringResource(R.string.btn_refresh)) },
-                            icon = { Icon(Icons.Default.Refresh, contentDescription = null) },
-                            onClick = {}
-                        )
-                    }
+            val fab: (@Composable () -> Unit)? = if (!hasFab) null else {
+                @Composable {
+                    ExtendedFloatingActionButton(
+                        text = { Text(stringResource(R.string.btn_refresh)) },
+                        icon = { Icon(Icons.Default.Refresh, contentDescription = null) },
+                        onClick = {}
+                    )
                 }
+            }
 
-                FeedListNavigationMenu(
-                    user = account?.name ?: "",
-                    server = server ?: "",
-                    feedSection = {
-                        val feeds by feedsViewModel.feeds.collectAsStateWithLifecycle()
-                        FeedSection(
-                            feeds,
-                            selectedFeed = feeds.find { it.feed.id == currentFeedId }?.feed,
-                            isMagazineSelected = isMagazineFeed,
-                            onFeedSelected = {
-                                navigateToFeed(it)
-                                onNavigation()
-                            },
-                            onMagazineSelected = {
-                                navController.navigateToMagazine()
-                                onNavigation()
+            FeedListNavigationMenu(
+                user = account?.name ?: "",
+                server = server ?: "",
+                feedSection = {
+                    val feeds by feedsViewModel.feeds.collectAsStateWithLifecycle()
+                    FeedSection(
+                        feeds,
+                        selectedFeed = feeds.find { it.feed.id == currentFeedId }?.feed,
+                        isMagazineSelected = isMagazineFeed,
+                        onFeedSelected = {
+                            navigateToFeed(it)
+                            onNavigation()
+                        },
+                        onMagazineSelected = {
+                            navController.navigateToMagazine()
+                            onNavigation()
+                        }
+                    )
+                },
+                manageFeedsSection = {
+                    ManageFeedSection(
+                        viewModel = installModuleViewModel,
+                        activity = activity,
+                        navigateToManageFeed = {
+                            check(installModuleViewModel.isModuleInstalled(Features.MANAGE_FEEDS)) {
+                                { "${Features.MANAGE_FEEDS} is not installed" }
                             },
                             onMarkFeedAsReadClick = {
                                 feedsViewModel.markFeedAsRead(it)
                             }
-                        )
-                    },
-                    manageFeedsSection = {
-                        ManageFeedSection(
-                            viewModel = installModuleViewModel,
-                            activity = activity,
-                            navigateToManageFeed = {
-                                check(installModuleViewModel.isModuleInstalled(Features.MANAGE_FEEDS)) {
-                                    { "${Features.MANAGE_FEEDS} is not installed" }
-                                }
-                                navController.navigateToManageFeeds()
-                                onNavigation()
-                            })
-                    },
-                    onSettingsClicked = {
-                        navController.navigateToSettings()
-                        onNavigation()
-                    },
-                    fab = fab
-                )
-            }
+                            navController.navigateToManageFeeds()
+                            onNavigation()
+                        })
+                },
+                onSettingsClicked = {
+                    navController.navigateToSettings()
+                    onNavigation()
+                },
+                fab = fab
+            )
         }
     }
 
@@ -180,7 +198,6 @@ private fun ManageFeedSection(
     )
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun ManageFeedSection(
     installInProgress: Boolean,
@@ -190,16 +207,16 @@ private fun ManageFeedSection(
     progressMax: Int,
     onItemClick: () -> Unit,
 ) {
-    Surface(onClick = onItemClick, modifier = Modifier.padding(horizontal = 12.dp)) {
+    Surface(onClick = onItemClick, modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)) {
         Column(Modifier.animateContentSize()) {
             ManageFeedItem()
 
             if (installInProgress) {
                 Column(Modifier.padding(start = 56.dp)) {
-                    Text(installationMessage, style = MaterialTheme.typography.caption)
+                    Text(installationMessage, style = MaterialTheme.typography.bodySmall)
                     if (indeterminateProgress) {
                         LinearProgressIndicator(
-                            color = MaterialTheme.colors.secondary,
+                            color = MaterialTheme.colorScheme.tertiary,
                             modifier = Modifier.padding(
                                 top = 8.dp,
                                 bottom = 16.dp
@@ -208,7 +225,7 @@ private fun ManageFeedSection(
                     } else {
                         LinearProgressIndicator(
                             progress = progress / progressMax.toFloat(),
-                            color = MaterialTheme.colors.secondary,
+                            color = MaterialTheme.colorScheme.tertiary,
                             modifier = Modifier.padding(top = 8.dp, bottom = 16.dp)
                         )
                     }
@@ -224,16 +241,16 @@ private fun ManageFeedItem(
 ) {
     Surface(
         modifier = modifier
-            .height(48.dp)
+            .height(56.dp)
     ) {
         NavigationItemLayout(
             icon = {
-            Icon(AppTheme.Icons.Tune, contentDescription = null)
-        },
+                Icon(AppTheme.Icons.Tune, contentDescription = null)
+            },
             label = {
                 Text(
                     stringResource(R.string.title_manage_feeds),
-                    style = MaterialTheme.typography.button,
+                    style = MaterialTheme.typography.labelLarge,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
@@ -241,6 +258,29 @@ private fun ManageFeedItem(
         )
     }
 }
+
+
+@Composable
+private fun NavigationItemLayout(
+    label: @Composable () -> Unit,
+    icon: @Composable (() -> Unit)? = null,
+) {
+    Row(
+        Modifier.padding(start = 16.dp, end = 24.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        if (icon != null) {
+            val iconColor = MaterialTheme.colorScheme.onSurfaceVariant
+            CompositionLocalProvider(LocalContentColor provides iconColor, content = icon)
+            Spacer(Modifier.width(12.dp))
+        }
+        Box(Modifier.weight(1f)) {
+            val labelColor = MaterialTheme.colorScheme.onSurfaceVariant
+            CompositionLocalProvider(LocalContentColor provides labelColor, content = label)
+        }
+    }
+}
+
 
 
 @Preview
