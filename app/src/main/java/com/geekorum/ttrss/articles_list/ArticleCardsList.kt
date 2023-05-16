@@ -31,11 +31,12 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.PullRefreshState
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,7 +45,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
@@ -218,13 +218,6 @@ private fun ArticlesList(
     onSwiped: (Article) -> Unit
 ) {
     var animateItemAppearance by remember { mutableStateOf(true) }
-    val navBarPadding = WindowInsets.navigationBars.asPaddingValues()
-/*    val contentPadding = PaddingValues(
-        start = navBarPadding.calculateStartPadding(LocalLayoutDirection.current) + 8.dp,
-        top = navBarPadding.calculateTopPadding() + 8.dp,
-        end = navBarPadding.calculateEndPadding(LocalLayoutDirection.current) + 8.dp,
-        bottom = navBarPadding.calculateBottomPadding() + additionalContentPaddingBottom
-    )*/
     LazyColumn(
         state = listState,
         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -285,7 +278,7 @@ fun FeedEmptyText(isRefreshing: Boolean) {
         contentAlignment = Alignment.TopCenter
     ) {
         Text(emptyText,
-            style = MaterialTheme.typography.h4,
+            style = MaterialTheme.typography.headlineMedium,
             textAlign = TextAlign.Center,
             modifier = Modifier
                 .padding(horizontal = 16.dp)
@@ -295,6 +288,7 @@ fun FeedEmptyText(isRefreshing: Boolean) {
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SwipeableArticleCard(
     articleWithFeed: ArticleWithFeed,
@@ -337,6 +331,7 @@ private fun SwipeableArticleCard(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ChangeReadBehindItem(dismissDirection: DismissDirection) {
     val horizontalArrangement = when (dismissDirection) {
@@ -353,15 +348,15 @@ private fun ChangeReadBehindItem(dismissDirection: DismissDirection) {
         if (dismissDirection == DismissDirection.StartToEnd) {
             Icon(painter = painterResource(R.drawable.ic_archive), contentDescription = text,
                 modifier = Modifier.padding(end = 8.dp),
-                tint = MaterialTheme.colors.secondary
+                tint = MaterialTheme.colorScheme.secondary
             )
         }
         Text(text,
-            style = MaterialTheme.typography.caption)
+            style = MaterialTheme.typography.bodySmall)
         if (dismissDirection == DismissDirection.EndToStart) {
             Icon(painter = painterResource(R.drawable.ic_archive), contentDescription = text,
                 modifier = Modifier.padding(start = 8.dp),
-                tint = MaterialTheme.colors.secondary
+                tint = MaterialTheme.colorScheme.secondary
             )
         }
     }

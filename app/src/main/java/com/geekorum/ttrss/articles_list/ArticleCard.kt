@@ -26,10 +26,10 @@ import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,15 +46,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
 import coil.request.ImageRequest
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.ui.AppTheme
 import kotlin.math.roundToInt
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SwipeableArticleCard(
     title: String,
@@ -113,7 +113,7 @@ fun SwipeableArticleCard(
 }
 
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArticleCard(
     title: String,
@@ -135,19 +135,17 @@ fun ArticleCard(
     ) {
         Column {
             TitleWithImage(title, flavorImageUrl, isUnread)
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                if (excerpt.isNotBlank()) {
-                    ArticleExcerpt(excerpt)
-                }
-                CardToolbar(
-                    feedNameOrAuthor, feedIconUrl,
-                    isStarred = isStarred,
-                    onOpenInBrowserClick = onOpenInBrowserClick,
-                    onStarChanged = onStarChanged,
-                    onShareClick = onShareClick,
-                    onToggleUnreadClick = onToggleUnreadClick,
-                )
+            if (excerpt.isNotBlank()) {
+                ArticleExcerpt(excerpt)
             }
+            CardToolbar(
+                feedNameOrAuthor, feedIconUrl,
+                isStarred = isStarred,
+                onOpenInBrowserClick = onOpenInBrowserClick,
+                onStarChanged = onStarChanged,
+                onShareClick = onShareClick,
+                onToggleUnreadClick = onToggleUnreadClick,
+            )
         }
     }
 }
@@ -155,12 +153,11 @@ fun ArticleCard(
 
 @Composable
 private fun ArticleExcerpt(excerpt: String) {
-    // TODO line spacing 2.sp is missing
     Text(excerpt,
         modifier = Modifier
             .padding(horizontal = 16.dp)
             .padding(bottom = 16.dp),
-        style = MaterialTheme.typography.body1,
+        style = MaterialTheme.typography.bodyLarge.copy(lineHeight = 22.sp),
         maxLines = 5,
         overflow = TextOverflow.Ellipsis
     )
@@ -207,15 +204,16 @@ private fun TitleWithImage(
 
         val imageScrimColor = if (hasImage) colorResource(id = R.color.image_scrim)
         else Color.Transparent
-        Box(Modifier
-            .fillMaxWidth()
-            .background(imageScrimColor)
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .background(imageScrimColor)
         ) {
             Text(title,
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
                     .padding(top = 24.dp, bottom = 16.dp),
-                style = MaterialTheme.typography.h5,
+                style = MaterialTheme.typography.headlineSmall,
                 fontWeight = FontWeight.Bold.takeIf { isUnread },
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis
@@ -256,7 +254,7 @@ private fun CardToolbar(
                 .padding(vertical = 16.dp)
                 .align(Alignment.CenterVertically)
                 .weight(1f),
-            style = MaterialTheme.typography.caption,
+            style = MaterialTheme.typography.bodySmall,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
@@ -286,12 +284,14 @@ private fun CardToolbar(
                     contentDescription = null)
             }
             DropdownMenu(expanded = showMorePopup, onDismissRequest = { showMorePopup = false }) {
-                DropdownMenuItem(onClick = {
-                    onToggleUnreadClick()
-                    showMorePopup = false
-                }) {
-                    Text(stringResource(R.string.context_selection_toggle_unread))
-                }
+                DropdownMenuItem(
+                    onClick = {
+                        onToggleUnreadClick()
+                        showMorePopup = false
+                    },
+                    text = {
+                        Text(stringResource(R.string.context_selection_toggle_unread))
+                    })
             }
         }
     }
