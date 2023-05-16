@@ -20,13 +20,14 @@
  */
 package com.geekorum.ttrss.articles_list
 
+import android.content.res.Configuration
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,7 +37,6 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -45,13 +45,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.lerp
 import coil.compose.rememberAsyncImagePainter
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.data.FeedWithFavIcon
-import com.geekorum.ttrss.ui.AppTheme
+import com.geekorum.ttrss.ui.AppTheme3
 
 
 @Composable
@@ -59,58 +58,46 @@ fun FeedListNavigationMenu(
     user: String,
     server: String,
     feedSection: @Composable ColumnScope.() -> Unit,
+    modifier: Modifier = Modifier,
     fab: (@Composable () -> Unit)? = null,
     manageFeedsSection: @Composable () -> Unit,
     onSettingsClicked: () -> Unit,
 ) {
-    BoxWithNavigationMenuTypography {
-        val scrollState = rememberScrollState()
-        Column(Modifier.verticalScroll(scrollState)
+    val scrollState = rememberScrollState()
+    Column(
+        modifier
+            .verticalScroll(scrollState)
             .withVerticalScrollBar(scrollState)
-        ) {
-            AppTheme(colors = AppTheme.DarkColors) {
-                AccountHeader(user, server)
-            }
-
-            if (fab != null) {
-                Box(Modifier
-                    .fillMaxWidth()
-                    .padding(ActiveIndicatorContentPadding),
-                    propagateMinConstraints = true){
-                    fab()
-                }
-            }
-
-            feedSection()
-
-            NavigationDivider()
-            manageFeedsSection()
-            NavigationDivider()
-            NavigationItem(
-                stringResource(R.string.activity_settings_title),
-                selected = false,
-                onClick = onSettingsClicked,
-                icon = {
-                    Icon(AppTheme.Icons.Settings, contentDescription = null)
-                },
-            )
-            Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.systemBars))
+    ) {
+        AppTheme3(colorScheme = AppTheme3.DarkColorScheme) {
+            AccountHeader(user, server)
         }
-    }
-}
 
-@Composable
-private inline fun BoxWithNavigationMenuTypography(
-    crossinline content: @Composable BoxScope.() -> Unit
-) {
-    val navTypography = MaterialTheme.typography.copy(
-        button = MaterialTheme.typography.button.copy(
-            letterSpacing = 0.4.sp,
-            fontWeight = FontWeight.SemiBold
+        if (fab != null) {
+            Box(
+                Modifier
+                    .fillMaxWidth()
+                    .padding(NavigationDrawerItemDefaults.ItemPadding)
+                    .padding(vertical = 12.dp),
+                propagateMinConstraints = true){
+                fab()
+            }
+        }
+
+        feedSection()
+
+        NavigationDivider()
+        manageFeedsSection()
+        NavigationDivider()
+        NavigationItem(
+            stringResource(R.string.activity_settings_title),
+            selected = false,
+            onClick = onSettingsClicked,
+            icon = {
+                Icon(AppTheme3.Icons.Settings, contentDescription = null)
+            },
         )
-    )
-    MaterialTheme(typography = navTypography) {
-        Box(content = content)
+        Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.systemBars))
     }
 }
 
@@ -120,7 +107,7 @@ private fun Modifier.withVerticalScrollBar(
     val scrollBarAlpha by animateFloatAsState(targetValue = if (scrollState.isScrollInProgress)
         0.5f else 0f, animationSpec = tween(500), label = "scrollBarAlpha"
     )
-    withVerticalScrollBar(scrollState, MaterialTheme.colors.onSurface, scrollBarAlpha)
+    withVerticalScrollBar(scrollState, MaterialTheme.colorScheme.onSurface, scrollBarAlpha)
 }
 
 private fun Modifier.withVerticalScrollBar(
@@ -144,18 +131,18 @@ private fun Modifier.withVerticalScrollBar(
 
 @Composable
 fun AccountHeader(login: String, server: String) {
-    Surface {
+    Surface(contentColor = MaterialTheme.colorScheme.onSurfaceVariant) {
         Box(contentAlignment = Alignment.BottomStart) {
             Image(painter = painterResource(id = R.drawable.drawer_header_dark),
                 contentDescription = null,
                 modifier = Modifier.fillMaxWidth(),
                 contentScale = ContentScale.Crop
             )
-            Column(Modifier
-                .height(56.dp)
-                .padding(horizontal = NavigationItemPadding)) {
-                Text(login, style = MaterialTheme.typography.body2, fontWeight = FontWeight.Bold)
-                Text(server, modifier = Modifier.padding(top = 5.dp), style = MaterialTheme.typography.body2)
+            Column(
+                Modifier
+                    .padding(horizontal = NavigationItemPadding, vertical = 16.dp)) {
+                Text(login, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+                Text(server, modifier = Modifier.padding(top = 5.dp), style = MaterialTheme.typography.bodyMedium)
             }
         }
     }
@@ -180,54 +167,46 @@ fun FeedSection(
         onClick = onMagazineSelected)
     for (feedWithFavIcon in feeds) {
         Box {
-            val feed = feedWithFavIcon.feed
-            var displayDropdownMenu by remember { mutableStateOf(false) }
-            NavigationItem(
-                feed.displayTitle.takeIf { it.isNotBlank() } ?: feed.title,
-                selected = feed == selectedFeed,
-                selectedForAction = displayDropdownMenu,
-                onClick = {
-                    onFeedSelected(feed)
-                },
-                onLongClick = {
-                    if (feed.isAllArticlesFeed || !Feed.isVirtualFeed(feed.id)) {
-                        displayDropdownMenu = true
-                    }
-                },
-                icon = {
-                    val iconVector = when {
-                        feed.isArchivedFeed -> AppTheme.Icons.Inventory2
-                        feed.isStarredFeed -> AppTheme.Icons.Star
-                        feed.isPublishedFeed -> AppTheme.Icons.CheckBox
-                        feed.isFreshFeed -> AppTheme.Icons.LocalCafe
-                        feed.isAllArticlesFeed -> AppTheme.Icons.FolderOpen
-                        else -> null
-                    }
-                    if (iconVector != null) {
-                        Icon(iconVector, contentDescription = null)
-                    } else {
-                        val feedIconPainter = rememberAsyncImagePainter(
-                            model = feedWithFavIcon.favIcon?.url,
-                            placeholder = painterResource(R.drawable.ic_rss_feed_orange),
-                            fallback = painterResource(R.drawable.ic_rss_feed_orange),
-                            error = painterResource(R.drawable.ic_rss_feed_orange),
-                        )
-                        Image(
-                            painter = feedIconPainter,
-                            contentDescription = null,
-                            contentScale = ContentScale.FillBounds,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                },
-                badge = {
-                    if (feed.unreadCount > 0) {
-                        Text(feed.unreadCount.toString())
-                    }
+        val feed = feedWithFavIcon.feed
+        NavigationItem(
+            feed.displayTitle.takeIf { it.isNotBlank() } ?: feed.title,
+            selected = feed == selectedFeed,
+            onClick = {
+                onFeedSelected(feed)
+            },
+            icon = {
+                val iconVector = when {
+                    feed.isArchivedFeed -> AppTheme3.Icons.Inventory2
+                    feed.isStarredFeed -> AppTheme3.Icons.Star
+                    feed.isPublishedFeed -> AppTheme3.Icons.CheckBox
+                    feed.isFreshFeed -> AppTheme3.Icons.LocalCafe
+                    feed.isAllArticlesFeed -> AppTheme3.Icons.FolderOpen
+                    else -> null
                 }
-            )
+                if (iconVector != null) {
+                    Icon(iconVector, contentDescription = null)
+                } else {
+                    val feedIconPainter = rememberAsyncImagePainter(
+                        model = feedWithFavIcon.favIcon?.url,
+                        placeholder = painterResource(R.drawable.ic_rss_feed_orange),
+                        fallback = painterResource(R.drawable.ic_rss_feed_orange),
+                        error = painterResource(R.drawable.ic_rss_feed_orange),
+                    )
+                    Image(painter = feedIconPainter,
+                        contentDescription = null,
+                        contentScale = ContentScale.FillBounds,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            },
+            badge = {
+                if (feed.unreadCount > 0) {
+                    Text(feed.unreadCount.toString())
+                }
+            }
+        )
 
-            DropdownMenu(expanded = displayDropdownMenu,
+ 	DropdownMenu(expanded = displayDropdownMenu,
                 onDismissRequest = { displayDropdownMenu = false },
                 offset = DpOffset(x = 16.dp, y = (-8).dp)
             ) {
@@ -237,8 +216,7 @@ fun FeedSection(
                 }) {
                     Text(stringResource(R.string.menu_item_mark_feed_as_read))
                 }
-            }
-        }
+	}
     }
 }
 
@@ -249,7 +227,6 @@ private fun NavigationDivider() {
         .padding(horizontal = NavigationItemPadding))
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NavigationItem(
     label: String,
@@ -261,96 +238,50 @@ fun NavigationItem(
     icon: (@Composable () -> Unit)? = null,
     badge: (@Composable () -> Unit)? = null,
 ) {
-    Surface(
-        modifier = modifier
+    NavigationDrawerItem(
+        label = {
+            Text(label,
+                style = MaterialTheme.typography.labelLarge,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis)
+        },
+        selected = selected || selectedForAction,
+        onClick = onClick,
+        icon = icon,
+        badge = badge,
+        modifier = modifier.
             .combinedClickable(
                 onLongClick = onLongClick,
                 onClick = onClick
-            )
-            .height(NavigationItemHeight)
-            .padding(horizontal = ActiveIndicatorPadding),
-        shape = if (selected || selectedForAction)
-            RoundedCornerShape(28.dp)
-        else RectangleShape,
-        color = when {
-            selectedForAction -> MaterialTheme.colors.primary
-            selected -> MaterialTheme.colors.secondary.copy(alpha = 0.4f)
-            else -> MaterialTheme.colors.surface
-        },
-    ) {
-        NavigationItemLayout(
-            icon = icon,
-            label = {
-                Text(
-                    label,
-                    style = MaterialTheme.typography.button,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            },
-            badge = badge
-        )
-    }
+            ).padding(NavigationDrawerItemDefaults.ItemPadding))
 }
 
-@Composable
-fun NavigationItemLayout(
-    label: @Composable () -> Unit,
-    icon: @Composable (() -> Unit)? = null,
-    badge: @Composable (() -> Unit)? = null
-) {
-    Row(
-        modifier = Modifier.fillMaxSize(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            Modifier
-                .padding(start = ActiveIndicatorContentPadding, end = 12.dp)
-                .size(24.dp)
-        ) {
-            if (icon != null) {
-                icon()
-            }
-        }
-
-        Box(Modifier.weight(1f)) {
-            label()
-        }
-
-        if (badge != null) {
-            Box(Modifier.padding(start = 12.dp, end = 24.dp)) {
-                CompositionLocalProvider(LocalContentAlpha provides 0.4f) {
-                    badge()
-                }
-            }
-        }
-    }
-}
 
 @Composable
 private fun SectionLabel(title: String) {
     Box(modifier = Modifier
         .height(NavigationItemHeight)
         .fillMaxWidth()
-        .padding(start = NavigationItemPadding),
+        .padding(horizontal = NavigationItemPadding),
         contentAlignment = Alignment.CenterStart
     ) {
         Text(title,
-            style = MaterialTheme.typography.button,
-            color = MaterialTheme.colors.onSurface
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
 
 
 @Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL)
 @Composable
 fun PreviewFeedListNavigationMenu() {
-    AppTheme {
+    AppTheme3 {
         Surface(color = Color.Black.copy(alpha = 0.4f),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Surface(Modifier.requiredWidth(360.dp), elevation = 8.dp) {
+            ModalDrawerSheet {
                 val feeds = listOf(
                     FeedWithFavIcon(
                         feed = Feed(
@@ -402,6 +333,16 @@ fun PreviewFeedListNavigationMenu() {
                 FeedListNavigationMenu(
                     user = "test",
                     server = "example.org",
+                    fab = {
+                        ExtendedFloatingActionButton(
+                            onClick = {},
+                            icon = {
+                                Icon(Icons.Default.Refresh, contentDescription = null)
+                            },
+                            text = {
+                                Text("Refresh")
+                            })
+                    },
                     feedSection = {
                         var selectedFeed by remember {
                             mutableStateOf<Feed?>(null)
@@ -430,7 +371,7 @@ fun PreviewFeedListNavigationMenu() {
                             selected = false,
                             onClick = {},
                             icon = {
-                                Icon(AppTheme.Icons.Tune, contentDescription = null)
+                                Icon(AppTheme3.Icons.Tune, contentDescription = null)
                             },
                         )
                     },
@@ -441,7 +382,5 @@ fun PreviewFeedListNavigationMenu() {
     }
 }
 
-private val NavigationItemHeight = 48.dp // 56.dp
-private val ActiveIndicatorPadding = 12.dp
-private val ActiveIndicatorContentPadding = 16.dp
-private val NavigationItemPadding = ActiveIndicatorPadding + ActiveIndicatorContentPadding
+private val NavigationItemHeight = 56.dp
+private val NavigationItemPadding = 28.dp
