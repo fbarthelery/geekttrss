@@ -69,9 +69,7 @@ fun FeedListNavigationMenu(
             .verticalScroll(scrollState)
             .withVerticalScrollBar(scrollState)
     ) {
-        AppTheme3(colorScheme = AppTheme3.DarkColorScheme) {
-            AccountHeader(user, server)
-        }
+        AccountHeader(user, server)
 
         if (fab != null) {
             Box(
@@ -131,7 +129,7 @@ private fun Modifier.withVerticalScrollBar(
 
 @Composable
 fun AccountHeader(login: String, server: String) {
-    Surface(contentColor = MaterialTheme.colorScheme.onSurfaceVariant) {
+    Surface(contentColor = Color.White) {
         Box(contentAlignment = Alignment.BottomStart) {
             Image(painter = painterResource(id = R.drawable.drawer_header_dark),
                 contentDescription = null,
