@@ -72,7 +72,7 @@ class InAppUpdatePresenter(
     }
 
     @Composable
-    fun Content() {
+    fun Content(modifier: Modifier = Modifier) {
         val isUpdateAvailable by inAppUpdateViewModel.isUpdateAvailable.collectAsState(false )
         val isUpdateReadyToInstall by inAppUpdateViewModel.isUpdateReadyToInstall.collectAsState(false )
         var showBanner by remember { mutableStateOf(false) }
@@ -84,7 +84,7 @@ class InAppUpdatePresenter(
         AnimatedVisibility(showBanner,
             enter = slideInVertically(initialOffsetY = { it }),
             exit = slideOutVertically(targetOffsetY = { it}),
-            modifier = Modifier.layout { measurable, constraints ->
+            modifier = modifier.layout { measurable, constraints ->
                 val placeable = measurable.measure(constraints)
                 sheetHeigth = placeable.height
                 layout(placeable.width, placeable.height) {
