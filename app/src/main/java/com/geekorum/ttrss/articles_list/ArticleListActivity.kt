@@ -171,7 +171,6 @@ class ArticleListActivity : SessionActivity() {
                     },
                     navigationMenu = {
                         feedNavigationPresenter.Content(
-                            isModal = true, //TODO
                             hasFab = hasFabInFixedDrawer,
                             onNavigation = {
                                 coroutineScope.launch {

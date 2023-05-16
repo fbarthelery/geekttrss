@@ -111,10 +111,13 @@ private fun ArticleListScaffold(
         PermanentNavigationDrawer(
             modifier = modifier,
             drawerContent = {
-            PermanentDrawerSheet {
-                navigationMenu()
+                PermanentDrawerSheet(
+                    windowInsets = WindowInsets.systemBars.only(WindowInsetsSides.Start),
+                    modifier = modifier,
+                    content = navigationMenu
+                )
             }
-        }) {
+        ) {
             contentScaffold()
         }
     } else  {
@@ -123,10 +126,13 @@ private fun ArticleListScaffold(
             drawerState = drawerState,
             gesturesEnabled = drawerGesturesEnabled,
             drawerContent = {
-            ModalDrawerSheet {
-                navigationMenu()
+                ModalDrawerSheet(
+                    windowInsets = WindowInsets.systemBars.only(WindowInsetsSides.Start),
+                    modifier = modifier,
+                    content = navigationMenu
+                )
             }
-        }) {
+        ){
             contentScaffold()
             // need to be called after content so if there is a navhost in content
             // this is registered latter
@@ -169,9 +175,6 @@ private fun ArticlesListContentScaffold(
             SnackbarHostWithCustomSnackBar(snackbarHostState, undoUnreadSnackBar)
         },
         content = { contentPadding ->
-            SideEffect {
-                Timber.i("content scaffold content padding $contentPadding")
-            }
             ContentWithBottomBanner(
                 bannerHeightState = bannerHeightState,
                 contentPadding = contentPadding,
