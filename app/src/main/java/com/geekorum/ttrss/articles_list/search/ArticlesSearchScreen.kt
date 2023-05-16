@@ -26,9 +26,7 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Surface
@@ -36,6 +34,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -74,11 +73,19 @@ fun SearchResultCardList(
         }
     }
 
+    val ltr = LocalLayoutDirection.current
+    val lazyListContentPadding = PaddingValues(
+        start = contentPadding.calculateStartPadding(ltr),
+        end = contentPadding.calculateEndPadding(ltr),
+        bottom = contentPadding.calculateBottomPadding() + 8.dp,
+        top = contentPadding.calculateTopPadding() + 8.dp
+    )
+
     LazyColumn(
         state = listState,
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        contentPadding = contentPadding,
+        contentPadding = lazyListContentPadding,
         modifier = modifier.fillMaxSize()
     ) {
         items(

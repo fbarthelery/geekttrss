@@ -163,19 +163,20 @@ private fun ArticleCardList(
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     val ltr = LocalLayoutDirection.current
-    val topContentPadding = PaddingValues(
+    val pullRefreshBoxContentPadding = PaddingValues(
         start = contentPadding.calculateStartPadding(ltr),
         end = contentPadding.calculateEndPadding(ltr),
         top = contentPadding.calculateTopPadding()
     )
 
-    val bottomContentPadding = PaddingValues(
+    val lazyListContentPadding = PaddingValues(
         start = contentPadding.calculateStartPadding(ltr),
         end = contentPadding.calculateEndPadding(ltr),
-        bottom = contentPadding.calculateBottomPadding()
+        bottom = contentPadding.calculateBottomPadding() + 8.dp,
+        top = 8.dp
     )
 
-    Box(modifier.padding(topContentPadding).pullRefresh(pullRefreshState)) {
+    Box(modifier.padding(pullRefreshBoxContentPadding).pullRefresh(pullRefreshState)) {
         val loadState by pagingViewStateFor(articles)
         val isEmpty = articles.itemCount == 0
         if (isEmpty && loadState == PagingViewLoadState.LOADED) {
@@ -185,7 +186,7 @@ private fun ArticleCardList(
                 articles,
                 listState,
                 isMultiFeedList,
-                bottomContentPadding,
+                lazyListContentPadding,
                 onCardClick,
                 onOpenInBrowserClick,
                 onShareClick,

@@ -20,6 +20,8 @@
  */
 package com.geekorum.ttrss.articles_list.magazine
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
@@ -43,6 +45,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ShareCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -52,9 +55,17 @@ import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.articles_list.*
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleWithFeed
-import com.geekorum.ttrss.share.createShareArticleIntent
-import com.geekorum.ttrss.ui.AppTheme
 import kotlinx.coroutines.delay
+
+
+private fun createShareIntent(context: Context, article: Article): Intent {
+    val shareIntent = ShareCompat.IntentBuilder(context)
+    shareIntent.setSubject(article.title)
+        .setHtmlText(article.content)
+        .setText(article.link)
+        .setType("text/plain")
+    return shareIntent.createChooserIntent()
+}
 
 
 @Composable
@@ -112,19 +123,20 @@ private fun ArticlesMagazine(
         viewModel.refreshMagazine()
     })
     val ltr = LocalLayoutDirection.current
-    val topContentPadding = PaddingValues(
+    val pullRefreshBoxContentPadding = PaddingValues(
         start = contentPadding.calculateStartPadding(ltr),
         end = contentPadding.calculateEndPadding(ltr),
         top = contentPadding.calculateTopPadding()
     )
 
-    val bottomContentPadding = PaddingValues(
+    val lazyListContentPadding = PaddingValues(
         start = contentPadding.calculateStartPadding(ltr),
         end = contentPadding.calculateEndPadding(ltr),
-        bottom = contentPadding.calculateBottomPadding()
+        bottom = contentPadding.calculateBottomPadding() + 8.dp,
+        top = 8.dp
     )
 
-    Box(modifier.padding(topContentPadding).pullRefresh(pullRefreshState)) {
+    Box(modifier.padding(pullRefreshBoxContentPadding).pullRefresh(pullRefreshState)) {
         val pagingItems = viewModel.articles.collectAsLazyPagingItems()
         val loadState by pagingViewStateFor(pagingItems)
         val isEmpty = pagingItems.itemCount == 0
@@ -146,7 +158,7 @@ private fun ArticlesMagazine(
                 viewModel,
                 pagingItems,
                 listState,
-                bottomContentPadding,
+                lazyListContentPadding,
                 onCardClick,
                 onOpenInBrowserClick,
                 onShareClick
