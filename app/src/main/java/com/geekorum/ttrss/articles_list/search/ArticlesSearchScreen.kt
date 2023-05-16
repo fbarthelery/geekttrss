@@ -26,16 +26,16 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.Surface
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -60,7 +60,7 @@ fun SearchResultCardList(
     onShareClick: (Article) -> Unit,
     onOpenInBrowserClick: (Article) -> Unit,
     modifier: Modifier = Modifier,
-    additionalContentPaddingBottom: Dp = 0.dp,
+    contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     val pagingItems = viewModel.articles.collectAsLazyPagingItems()
 
@@ -78,10 +78,7 @@ fun SearchResultCardList(
         state = listState,
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        contentPadding = WindowInsets.navigationBars.add(WindowInsets(
-            bottom = additionalContentPaddingBottom,
-            left = 8.dp, right = 8.dp, top = 8.dp
-        )).asPaddingValues(),
+        contentPadding = contentPadding,
         modifier = modifier.fillMaxSize()
     ) {
         items(
@@ -156,12 +153,10 @@ private fun ArticleCard(
 @Composable
 fun ArticlesSearchScreen(
     activityViewModel: ActivityViewModel,
-    searchViewModel: SearchViewModel = hiltViewModel()
+    searchViewModel: SearchViewModel = hiltViewModel(),
+    contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     AppTheme {
-        val appBarHeightDp = with(LocalDensity.current) {
-            activityViewModel.appBarHeight.toDp()
-        }
         LaunchedEffect(activityViewModel, searchViewModel) {
             activityViewModel.searchQuery.collect {
                 searchViewModel.setSearchQuery(it)
@@ -179,7 +174,7 @@ fun ArticlesSearchScreen(
                 onOpenInBrowserClick = {
                     activityViewModel.displayArticleInBrowser(context, it)
                 },
-                additionalContentPaddingBottom = appBarHeightDp,
+                contentPadding = contentPadding,
                 modifier = Modifier
                     .fillMaxSize()
             )
@@ -190,5 +185,14 @@ fun ArticlesSearchScreen(
 
 
 private fun onShareClicked(context: Context, article: Article) {
-    context.startActivity(createShareArticleIntent(context, article))
+    context.startActivity(createShareIntent(context, article))
+}
+
+private fun createShareIntent(context: Context, article: Article): Intent {
+    val shareIntent = ShareCompat.IntentBuilder(context)
+    shareIntent.setSubject(article.title)
+        .setHtmlText(article.content)
+        .setText(article.link)
+        .setType("text/plain")
+    return shareIntent.createChooserIntent()
 }
