@@ -64,56 +64,54 @@ private fun BaseArticlesListScreen(
     articlesListViewModel: BaseArticlesViewModel,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
-    AppTheme {
-        val viewLifecycleOwner = LocalLifecycleOwner.current
+    val viewLifecycleOwner = LocalLifecycleOwner.current
 
-        val pendingArticlesSetUnread by articlesListViewModel.pendingArticlesSetUnread.collectAsStateWithLifecycle()
-        LaunchedEffect(pendingArticlesSetUnread, activityViewModel) {
-            val snackBarMessage = UndoReadSnackbarMessage(pendingArticlesSetUnread,
-                onAction = articlesListViewModel::undoSetUnreadActions,
-                onDismiss = articlesListViewModel::commitSetUnreadActions)
-            activityViewModel.setUndoReadSnackBarMessge(snackBarMessage)
+    val pendingArticlesSetUnread by articlesListViewModel.pendingArticlesSetUnread.collectAsStateWithLifecycle()
+    LaunchedEffect(pendingArticlesSetUnread, activityViewModel) {
+        val snackBarMessage = UndoReadSnackbarMessage(pendingArticlesSetUnread,
+            onAction = articlesListViewModel::undoSetUnreadActions,
+            onDismiss = articlesListViewModel::commitSetUnreadActions)
+        activityViewModel.setUndoReadSnackBarMessge(snackBarMessage)
+    }
+
+    LaunchedEffect(activityViewModel, articlesListViewModel, viewLifecycleOwner) {
+        activityViewModel.refreshClickedEvent.observe(viewLifecycleOwner, EventObserver {
+            articlesListViewModel.refresh()
+        })
+
+        activityViewModel.mostRecentSortOrder.observe(viewLifecycleOwner) {
+            articlesListViewModel.setSortByMostRecentFirst(it)
         }
 
-        LaunchedEffect(activityViewModel, articlesListViewModel, viewLifecycleOwner) {
-            activityViewModel.refreshClickedEvent.observe(viewLifecycleOwner, EventObserver {
-                articlesListViewModel.refresh()
-            })
-
-            activityViewModel.mostRecentSortOrder.observe(viewLifecycleOwner) {
-                articlesListViewModel.setSortByMostRecentFirst(it)
-            }
-
-            activityViewModel.onlyUnreadArticles.observe(viewLifecycleOwner) {
-                articlesListViewModel.setNeedUnread(it)
-            }
+        activityViewModel.onlyUnreadArticles.observe(viewLifecycleOwner) {
+            articlesListViewModel.setNeedUnread(it)
         }
+    }
 
-        val lazyListState = rememberLazyListState()
-        val isScrollingUp = lazyListState.isScrollingUp()
-        LaunchedEffect(activityViewModel, isScrollingUp) {
-            activityViewModel.setIsScrollingUp(isScrollingUp)
-        }
+    val lazyListState = rememberLazyListState()
+    val isScrollingUp = lazyListState.isScrollingUp()
+    LaunchedEffect(activityViewModel, isScrollingUp) {
+        activityViewModel.setIsScrollingUp(isScrollingUp)
+    }
 
-        Surface(
-            Modifier.fillMaxSize()
-        ) {
-            val context = LocalContext.current
-            ArticleCardList(
-                viewModel = articlesListViewModel,
-                listState = lazyListState,
-                onCardClick = activityViewModel::displayArticle,
-                onShareClick = {
-                    onShareClicked(context, it)
-                },
-                onOpenInBrowserClick = {
-                    activityViewModel.displayArticleInBrowser(context, it)
-                },
-                contentPadding = contentPadding,
-                modifier = Modifier
-                    .fillMaxSize()
-            )
-        }
+    Surface(
+        Modifier.fillMaxSize()
+    ) {
+        val context = LocalContext.current
+        ArticleCardList(
+            viewModel = articlesListViewModel,
+            listState = lazyListState,
+            onCardClick = activityViewModel::displayArticle,
+            onShareClick = {
+                onShareClicked(context, it)
+            },
+            onOpenInBrowserClick = {
+                activityViewModel.displayArticleInBrowser(context, it)
+            },
+            contentPadding = contentPadding,
+            modifier = Modifier
+                .fillMaxSize()
+        )
     }
 }
 

@@ -55,7 +55,7 @@ import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.*
-import com.geekorum.ttrss.ui.AppTheme
+import com.geekorum.ttrss.ui.AppTheme3
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
@@ -417,7 +417,7 @@ fun LazyListState.isScrollingUp(): Boolean {
 @Preview
 @Composable
 fun PreviewArticleCardList() {
-    AppTheme {
+    AppTheme3 {
         ArticleCardList()
     }
 }

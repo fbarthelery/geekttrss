@@ -163,31 +163,28 @@ fun ArticlesSearchScreen(
     searchViewModel: SearchViewModel = hiltViewModel(),
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
-    AppTheme {
-        LaunchedEffect(activityViewModel, searchViewModel) {
-            activityViewModel.searchQuery.collect {
-                searchViewModel.setSearchQuery(it)
-            }
-        }
-
-        Surface(Modifier.fillMaxSize()) {
-            val context = LocalContext.current
-            SearchResultCardList(
-                viewModel = searchViewModel,
-                onCardClick = activityViewModel::displayArticle,
-                onShareClick = {
-                    onShareClicked(context, it)
-                },
-                onOpenInBrowserClick = {
-                    activityViewModel.displayArticleInBrowser(context, it)
-                },
-                contentPadding = contentPadding,
-                modifier = Modifier
-                    .fillMaxSize()
-            )
+    LaunchedEffect(activityViewModel, searchViewModel) {
+        activityViewModel.searchQuery.collect {
+            searchViewModel.setSearchQuery(it)
         }
     }
 
+    Surface(Modifier.fillMaxSize()) {
+        val context = LocalContext.current
+        SearchResultCardList(
+            viewModel = searchViewModel,
+            onCardClick = activityViewModel::displayArticle,
+            onShareClick = {
+                onShareClicked(context, it)
+            },
+            onOpenInBrowserClick = {
+                activityViewModel.displayArticleInBrowser(context, it)
+            },
+            contentPadding = contentPadding,
+            modifier = Modifier
+                .fillMaxSize()
+        )
+    }
 }
 
 
