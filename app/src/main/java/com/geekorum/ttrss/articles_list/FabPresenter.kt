@@ -22,15 +22,17 @@ package com.geekorum.ttrss.articles_list
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
@@ -55,7 +57,6 @@ internal class FabPresenter(
         }
 
         val fabVisible = fabVisibleInDestination && isScrollingUpOrRest
-
         val targetState = if (fabVisible) {
             val feedId = if (navBackStackEntry?.destination?.route == NavRoutes.ArticlesList) {
                 navBackStackEntry?.arguments?.getLong("feed_id")
@@ -65,8 +66,10 @@ internal class FabPresenter(
                 feedId = feedId
             )
         } else null
+        // as M3 scaffold remove the fab if size is 0 we need to have a size
+        // so that even when fab is not visible it is still added in composition
         AnimatedContent(
-            modifier = modifier,
+            modifier = modifier.size(56.dp),
             targetState = targetState,
             transitionSpec = {
                 scaleIn(tween(300, delayMillis = 100)) with
@@ -81,7 +84,6 @@ internal class FabPresenter(
         ) { state ->
             if (state != null) {
                 FloatingActionButton(
-                    modifier = Modifier.navigationBarsPadding(),
                     onClick = onClick
                 ) {
                     Icon(Icons.Default.Refresh, stringResource(R.string.btn_refresh))
