@@ -49,7 +49,6 @@ import com.geekorum.ttrss.article_details.ArticleDetailActivity
 import com.geekorum.ttrss.in_app_update.InAppUpdateViewModel
 import com.geekorum.ttrss.on_demand_modules.InstallModuleViewModel
 import com.geekorum.ttrss.session.SessionActivity
-import com.geekorum.ttrss.ui.AppTheme
 import com.geekorum.ttrss.ui.AppTheme3
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
@@ -124,7 +123,6 @@ class ArticleListActivity : SessionActivity() {
                 }
             }
 
-            AppTheme {
             AppTheme3 {
                 val systemUiController = rememberSystemUiController()
                 val useDarkIcons = !isSystemInDarkTheme()
@@ -156,6 +154,7 @@ class ArticleListActivity : SessionActivity() {
                 val drawerLayoutPresenter = rememberDrawerLayoutPresenter(
                     navController,
                 )
+
 
                 val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
                 ArticlesListScaffold(
@@ -196,7 +195,6 @@ class ArticleListActivity : SessionActivity() {
                 ) { contentPadding ->
                     ArticlesListNavHost(activityViewModel, navController, contentPadding)
                 }
-            }
             }
         }
     }

@@ -51,7 +51,7 @@ import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.geekorum.ttrss.R
-import com.geekorum.ttrss.ui.AppTheme
+import com.geekorum.ttrss.ui.AppTheme3
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -260,7 +260,7 @@ private fun CardToolbar(
         )
 
         IconButton(onClick = onOpenInBrowserClick) {
-            Icon(AppTheme.Icons.OpenInBrowser,
+            Icon(AppTheme3.Icons.OpenInBrowser,
                 contentDescription = stringResource(R.string.open_article_in_browser))
         }
 
@@ -273,14 +273,14 @@ private fun CardToolbar(
             )
         }
         IconButton(onClick = onShareClick) {
-            Icon(AppTheme.Icons.Share,
+            Icon(AppTheme3.Icons.Share,
                 contentDescription = null)
         }
 
         Box {
             var showMorePopup by remember { mutableStateOf(false) }
             IconButton(onClick = { showMorePopup = true }) {
-                Icon(AppTheme.Icons.MoreVert,
+                Icon(AppTheme3.Icons.MoreVert,
                     contentDescription = null)
             }
             DropdownMenu(expanded = showMorePopup, onDismissRequest = { showMorePopup = false }) {
@@ -300,7 +300,7 @@ private fun CardToolbar(
 @Preview
 @Composable
 private fun PreviewArticleCard() {
-    AppTheme {
+    AppTheme3 {
         Column(Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {

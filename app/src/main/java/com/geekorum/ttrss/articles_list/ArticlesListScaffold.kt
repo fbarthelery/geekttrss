@@ -48,7 +48,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.geekorum.ttrss.R
-import com.geekorum.ttrss.ui.AppTheme
+import com.geekorum.ttrss.ui.AppTheme3
 import kotlinx.coroutines.launch
 
 @Composable
@@ -262,7 +262,7 @@ private fun ContentWithBottomBanner(
 fun PreviewArticlesListScaffoldPhone() {
     BoxWithConstraints {
         val windowSizeClass = WindowSizeClass.calculateFromSize(DpSize(maxWidth, maxHeight) )
-        AppTheme {
+        AppTheme3 {
             val snackbarHostState = remember { SnackbarHostState() }
             val drawerState = rememberDrawerState(DrawerValue.Closed)
             val coroutineScope = rememberCoroutineScope()
@@ -298,7 +298,7 @@ fun PreviewArticlesListScaffoldPhone() {
                                 selected = false,
                                 onClick = {},
                                 icon = {
-                                    Icon(AppTheme.Icons.Tune, contentDescription = null)
+                                    Icon(AppTheme3.Icons.Tune, contentDescription = null)
                                 },
                             )
                         },
@@ -339,7 +339,7 @@ fun PreviewArticlesListScaffoldPhone() {
 fun PreviewArticlesListScaffoldTablet() {
     BoxWithConstraints {
         val windowSizeClass = WindowSizeClass.calculateFromSize(DpSize(maxWidth, maxHeight) )
-        AppTheme {
+        AppTheme3 {
             val snackbarHostState = remember { SnackbarHostState() }
             val drawerState = rememberDrawerState(DrawerValue.Closed)
 
@@ -372,7 +372,7 @@ fun PreviewArticlesListScaffoldTablet() {
                                 selected = false,
                                 onClick = {},
                                 icon = {
-                                    Icon(AppTheme.Icons.Tune, contentDescription = null)
+                                    Icon(AppTheme3.Icons.Tune, contentDescription = null)
                                 },
                             )
                         },

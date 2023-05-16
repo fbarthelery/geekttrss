@@ -46,7 +46,7 @@ import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.on_demand_modules.InstallModuleViewModel
 import com.geekorum.ttrss.on_demand_modules.InstallSession
-import com.geekorum.ttrss.ui.AppTheme
+import com.geekorum.ttrss.ui.AppTheme3
 
 
 private const val CODE_REQUEST_USER_CONFIRMATION = 1
@@ -225,7 +225,7 @@ private fun ManageFeedItem(
     ) {
         NavigationItemLayout(
             icon = {
-                Icon(AppTheme.Icons.Tune, contentDescription = null)
+                Icon(AppTheme3.Icons.Tune, contentDescription = null)
             },
             label = {
                 Text(
@@ -266,7 +266,7 @@ private fun NavigationItemLayout(
 @Preview
 @Composable
 fun PreviewManageFeedSection() {
-    AppTheme {
+    AppTheme3 {
         ManageFeedSection(installInProgress = false,
             installationMessage = "",
             indeterminateProgress = false,
@@ -279,7 +279,7 @@ fun PreviewManageFeedSection() {
 @Preview
 @Composable
 fun PreviewManageFeedSectionInstallInProgress() {
-    AppTheme {
+    AppTheme3 {
         ManageFeedSection(installInProgress = true,
             installationMessage = "Installing",
             indeterminateProgress = false,

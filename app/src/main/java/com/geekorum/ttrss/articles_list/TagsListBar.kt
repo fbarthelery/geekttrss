@@ -30,7 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.geekorum.ttrss.ui.AppTheme
+import com.geekorum.ttrss.ui.AppTheme3
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -66,7 +66,7 @@ fun TagsListBar(
 @Preview
 @Composable
 private fun PreviewTagsListBar() {
-    AppTheme {
+    AppTheme3 {
         var selected: String? by remember { mutableStateOf("phone") }
         TagsListBar(setOf("tv", "games", "phone", "android"),
             selectedTag = selected,
