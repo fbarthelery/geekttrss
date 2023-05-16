@@ -28,11 +28,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.SnackbarDefaults
-import androidx.compose.material.rememberScaffoldState
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.*
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
@@ -142,7 +138,7 @@ class ArticleListActivity : SessionActivity() {
                 }
 
                 val coroutineScope = rememberCoroutineScope()
-                val scaffoldState = rememberScaffoldState()
+                val drawerState =  rememberDrawerState(DrawerValue.Closed)
 
                 val undoUnreadSnackbarMessage by activityViewModel.undoReadSnackBarMessage.collectAsStateWithLifecycle()
                 val nbArticles = undoUnreadSnackbarMessage?.nbArticles ?: 0
@@ -163,13 +159,13 @@ class ArticleListActivity : SessionActivity() {
                 )
 
                 ArticlesListScaffold(
-                    scaffoldState = scaffoldState,
                     windowSizeClass = windowSizeClass,
+                    drawerState = drawerState,
                     topBar = {
                         appBarPresenter.ToolbarContent(
                             onNavigationMenuClick = {
                                 coroutineScope.launch {
-                                    scaffoldState.drawerState.open()
+                                    drawerState.open()
                                 }
                             })
                     },
@@ -179,7 +175,7 @@ class ArticleListActivity : SessionActivity() {
                             hasFab = hasFabInFixedDrawer,
                             onNavigation = {
                                 coroutineScope.launch {
-                                    scaffoldState.drawerState.close()
+                                    drawerState.close()
                                 }
                             })
                     },
@@ -200,8 +196,8 @@ class ArticleListActivity : SessionActivity() {
                     },
                     undoUnreadSnackBar = undoUnreadSnackbarComposable,
                     drawerGesturesEnabled = drawerLayoutPresenter.drawerGesturesEnabled
-                ) {
-                    ArticlesListNavHost(activityViewModel, navController)
+                ) { contentPadding ->
+                    ArticlesListNavHost(activityViewModel, navController, contentPadding)
                 }
             }
             }

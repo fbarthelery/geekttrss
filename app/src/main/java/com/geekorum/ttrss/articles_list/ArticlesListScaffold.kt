@@ -28,14 +28,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.ZeroCornerSize
-import androidx.compose.material.*
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Refresh
@@ -63,7 +55,8 @@ import kotlinx.coroutines.launch
 fun ArticlesListScaffold(
     windowSizeClass: WindowSizeClass,
     modifier: Modifier = Modifier,
-    scaffoldState: ScaffoldState = rememberScaffoldState(),
+    drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     topBar: @Composable () -> Unit,
     navigationMenu: @Composable (ColumnScope.() -> Unit),
     drawerGesturesEnabled: Boolean = true,
@@ -74,8 +67,9 @@ fun ArticlesListScaffold(
 ) {
     ArticleListScaffold(
         modifier = modifier,
-        scaffoldState = scaffoldState,
-        hasFixedDrawer = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded,
+        drawerState = drawerState,
+        snackbarHostState = snackbarHostState,
+        hasPermanentDrawer = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded,
         drawerGesturesEnabled = drawerGesturesEnabled,
         topBar = topBar,
         navigationMenu = navigationMenu,
@@ -89,75 +83,104 @@ fun ArticlesListScaffold(
 @Composable
 private fun ArticleListScaffold(
     modifier: Modifier = Modifier,
-    scaffoldState: ScaffoldState = rememberScaffoldState(),
+    drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     topBar: @Composable () -> Unit,
     navigationMenu: @Composable (ColumnScope.() -> Unit),
-    hasFixedDrawer: Boolean = false,
+    hasPermanentDrawer: Boolean = false,
     drawerGesturesEnabled: Boolean = true,
     floatingActionButton: @Composable () -> Unit = {},
     bannerContent: @Composable (PaddingValues) -> Unit,
     undoUnreadSnackBar: @Composable (() -> Unit)? = null,
     content: @Composable (PaddingValues) -> Unit,
 ) {
-    val drawerContent: (@Composable ColumnScope.() -> Unit)? =
-        if (hasFixedDrawer) null else {
-        {
-            navigationMenu()
-        }
-    }
-
-    Surface {
-        Row {
-            if (hasFixedDrawer) {
-                Column(
-                    Modifier
-                        .width(360.dp)
-                        .fillMaxHeight()) {
-                    navigationMenu()
-                }
-            }
-
-            val bannerHeightState = remember { mutableStateOf<Float?>(null) }
-
-            //TODO reimplement our own Scaffold and ScaffoldLayout
-            Scaffold(
-                modifier = modifier,
-                scaffoldState = scaffoldState,
+    val contentScaffold = remember {
+        movableContentOf {
+            ArticlesListContentScaffold(
+                snackbarHostState = snackbarHostState,
                 topBar = topBar,
-                floatingActionButton = {
-                    val paddingBottom  = with(LocalDensity.current) {
-                        (bannerHeightState.value ?: 0f).toDp()
-                    }
-                    Box(Modifier.padding(bottom = paddingBottom)) {
-                        floatingActionButton()
-                    }
-                },
-                drawerContent = drawerContent,
-                drawerShape = MaterialTheme.shapes.large.copy(topStart = ZeroCornerSize, bottomStart = ZeroCornerSize),
-                drawerGesturesEnabled = drawerGesturesEnabled,
-                snackbarHost = { snackbarHostState ->
-                    SnackbarHostWithCustomSnackBar(snackbarHostState, undoUnreadSnackBar)
-                },
-                content = { contentPadding ->
-                    ContentWithBottomBanner(
-                        bannerHeightState = bannerHeightState,
-                        contentPadding = contentPadding,
-                        bannerContent = bannerContent,
-                        content = content
-                    )
-
-                    // need to be called after content so if there is a navhost in content
-                    // this is registered latter
-                    val coroutineScope = rememberCoroutineScope()
-                    BackHandler(enabled = scaffoldState.drawerState.isOpen) {
-                        coroutineScope.launch {
-                            scaffoldState.drawerState.close()
-                        }
-                    }
-                }
+                bannerContent = bannerContent,
+                floatingActionButton = floatingActionButton,
+                undoUnreadSnackBar = undoUnreadSnackBar,
+                content = content
             )
         }
     }
+
+    if (hasPermanentDrawer) {
+        PermanentNavigationDrawer(
+            modifier = modifier,
+            drawerContent = {
+            PermanentDrawerSheet {
+                navigationMenu()
+            }
+        }) {
+            contentScaffold()
+        }
+    } else  {
+        ModalNavigationDrawer(
+            modifier = modifier,
+            drawerState = drawerState,
+            gesturesEnabled = drawerGesturesEnabled,
+            drawerContent = {
+            ModalDrawerSheet {
+                navigationMenu()
+            }
+        }) {
+            contentScaffold()
+            // need to be called after content so if there is a navhost in content
+            // this is registered latter
+            val coroutineScope = rememberCoroutineScope()
+            BackHandler(enabled = drawerState.isOpen) {
+                coroutineScope.launch {
+                    drawerState.close()
+                }
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun ArticlesListContentScaffold(
+    modifier: Modifier = Modifier,
+    snackbarHostState: SnackbarHostState,
+    topBar: @Composable () -> Unit,
+    floatingActionButton: @Composable () -> Unit = {},
+    bannerContent: @Composable (PaddingValues) -> Unit,
+    undoUnreadSnackBar: @Composable (() -> Unit)? = null,
+    content: @Composable (PaddingValues) -> Unit
+) {
+    val bannerHeightState = remember { mutableStateOf<Float?>(null) }
+
+    //TODO reimplement our own Scaffold and ScaffoldLayout
+    Scaffold(
+        modifier = modifier,
+        topBar = topBar,
+        floatingActionButton = {
+            val paddingBottom  = with(LocalDensity.current) {
+                (bannerHeightState.value ?: 0f).toDp()
+            }
+            Box(Modifier.padding(bottom = paddingBottom)) {
+                floatingActionButton()
+            }
+        },
+        snackbarHost = {
+            SnackbarHostWithCustomSnackBar(snackbarHostState, undoUnreadSnackBar)
+        },
+        content = { contentPadding ->
+            SideEffect {
+                Timber.i("content scaffold content padding $contentPadding")
+            }
+            ContentWithBottomBanner(
+                bannerHeightState = bannerHeightState,
+                contentPadding = contentPadding,
+                bannerContent = bannerContent,
+                content = content
+            )
+
+        }
+    )
 }
 
 @Composable
@@ -230,20 +253,22 @@ private fun ContentWithBottomBanner(
     }
 }
 
-@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
+@OptIn(ExperimentalMaterial3WindowSizeClassApi::class, ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun PreviewArticlesListScaffoldPhone() {
     BoxWithConstraints {
         val windowSizeClass = WindowSizeClass.calculateFromSize(DpSize(maxWidth, maxHeight) )
         AppTheme {
-            val scaffoldState = rememberScaffoldState()
+            val snackbarHostState = remember { SnackbarHostState() }
+            val drawerState = rememberDrawerState(DrawerValue.Closed)
             val coroutineScope = rememberCoroutineScope()
             var showBanner by remember { mutableStateOf(false) }
 
             ArticlesListScaffold(
                 windowSizeClass = windowSizeClass,
-                scaffoldState = scaffoldState,
+                snackbarHostState = snackbarHostState,
+                drawerState = drawerState,
                 topBar = {
                     TopAppBar(
                         title = { Text("Magazine") },
@@ -251,7 +276,7 @@ fun PreviewArticlesListScaffoldPhone() {
                             IconButton(
                                 onClick = {
                                     coroutineScope.launch {
-                                        scaffoldState.drawerState.open()
+                                        drawerState.open()
                                     }
                                 }) {
                                 Icon(Icons.Default.Menu, contentDescription = null)
@@ -305,33 +330,25 @@ fun PreviewArticlesListScaffoldPhone() {
     }
 }
 
-@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
+@OptIn(ExperimentalMaterial3WindowSizeClassApi::class, ExperimentalMaterial3Api::class)
 @Preview(device = "spec:width=1280dp,height=800dp,dpi=240")
 @Composable
 fun PreviewArticlesListScaffoldTablet() {
     BoxWithConstraints {
         val windowSizeClass = WindowSizeClass.calculateFromSize(DpSize(maxWidth, maxHeight) )
         AppTheme {
-            val scaffoldState = rememberScaffoldState()
-            val coroutineScope = rememberCoroutineScope()
+            val snackbarHostState = remember { SnackbarHostState() }
+            val drawerState = rememberDrawerState(DrawerValue.Closed)
+
             var showBanner by remember { mutableStateOf(false) }
 
             ArticlesListScaffold(
                 windowSizeClass = windowSizeClass,
-                scaffoldState = scaffoldState,
+                drawerState = drawerState,
+                snackbarHostState = snackbarHostState,
                 topBar = {
                     TopAppBar(
                         title = { Text("Magazine") },
-                        navigationIcon = {
-                            IconButton(
-                                onClick = {
-                                    coroutineScope.launch {
-                                        scaffoldState.drawerState.open()
-                                    }
-                                }) {
-                                Icon(Icons.Default.Menu, contentDescription = null)
-                            }
-                        },
                     )
                 },
                 navigationMenu = {
@@ -398,11 +415,11 @@ private fun SampleBanner(showBanner: Boolean) {
                     .widthIn(max = 640.dp)
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
-                color = MaterialTheme.colors.secondaryVariant
+                color = MaterialTheme.colorScheme.secondaryContainer
             ) {
                 Text(
                     "Hello banner",
-                    style = MaterialTheme.typography.h6,
+                    style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.padding(24.dp)
                 )
             }
