@@ -36,23 +36,18 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.in_app_update.InAppUpdateViewModel
 import com.geekorum.ttrss.in_app_update.IntentSenderForResultStarter
-import com.geekorum.ttrss.ui.AppTheme
 import com.google.accompanist.drawablepainter.rememberDrawablePainter
 
 private const val CODE_START_IN_APP_UPDATE = 1
@@ -78,34 +73,32 @@ class InAppUpdatePresenter(
 
     @Composable
     fun Content() {
-        AppTheme {
-            val isUpdateAvailable by inAppUpdateViewModel.isUpdateAvailable.collectAsState(false )
-            val isUpdateReadyToInstall by inAppUpdateViewModel.isUpdateReadyToInstall.collectAsState(false )
-            var showBanner by remember { mutableStateOf(false) }
-            LaunchedEffect(isUpdateAvailable, isUpdateReadyToInstall) {
-                showBanner = isUpdateAvailable || isUpdateReadyToInstall
-            }
+        val isUpdateAvailable by inAppUpdateViewModel.isUpdateAvailable.collectAsState(false )
+        val isUpdateReadyToInstall by inAppUpdateViewModel.isUpdateReadyToInstall.collectAsState(false )
+        var showBanner by remember { mutableStateOf(false) }
+        LaunchedEffect(isUpdateAvailable, isUpdateReadyToInstall) {
+            showBanner = isUpdateAvailable || isUpdateReadyToInstall
+        }
 
-            var sheetHeigth by remember { mutableStateOf(0) }
-            AnimatedVisibility(showBanner,
-                enter = slideInVertically(initialOffsetY = { it }),
-                exit = slideOutVertically(targetOffsetY = { it}),
-                modifier = Modifier.layout { measurable, constraints ->
-                    val placeable = measurable.measure(constraints)
-                    sheetHeigth = placeable.height
-                    layout(placeable.width, placeable.height) {
-                        placeable.placeRelative(0, 0)
-                    }
+        var sheetHeigth by remember { mutableStateOf(0) }
+        AnimatedVisibility(showBanner,
+            enter = slideInVertically(initialOffsetY = { it }),
+            exit = slideOutVertically(targetOffsetY = { it}),
+            modifier = Modifier.layout { measurable, constraints ->
+                val placeable = measurable.measure(constraints)
+                sheetHeigth = placeable.height
+                layout(placeable.width, placeable.height) {
+                    placeable.placeRelative(0, 0)
                 }
-            ) {
-                SheetContent(
-                    isUpdateAvailable = isUpdateAvailable,
-                    isUpdateReadyToInstall = isUpdateReadyToInstall,
-                    dismissSheet = {
-                        showBanner = false
-                    }
-                )
             }
+        ) {
+            SheetContent(
+                isUpdateAvailable = isUpdateAvailable,
+                isUpdateReadyToInstall = isUpdateReadyToInstall,
+                dismissSheet = {
+                    showBanner = false
+                }
+            )
         }
     }
 
@@ -121,11 +114,9 @@ class InAppUpdatePresenter(
             }
         }
 
-        Card(shape = RoundedCornerShape(0.dp),
-            backgroundColor =  if (MaterialTheme.colors.isLight)
-                colorResource(R.color.material_blue_grey_100)
-            else MaterialTheme.colors.surface,
-            elevation = 8.dp,
+        Card(
+            shape = RoundedCornerShape(0.dp),
+            elevation = CardDefaults.cardElevation(8.dp)
         ) {
             Box(modifier = Modifier
                 .windowInsetsPadding(WindowInsets.navigationBars)
@@ -159,34 +150,32 @@ class InAppUpdatePresenter(
     @Composable
     private fun UpdateAvailableBanner(onInstallClick: () -> Unit, onDismissClick: () -> Unit) {
         Column {
-            Row(Modifier
-                .padding(top = 24.dp)
-                .padding(horizontal = 16.dp)) {
+            Row(
+                Modifier
+                    .padding(top = 24.dp)
+                    .padding(horizontal = 16.dp)) {
                 val painter = rememberMipmapPainter(R.mipmap.ic_launcher)
 
                 Image(painter = painter, contentDescription = null,
                     modifier = Modifier.size(56.dp)
                 )
                 Text(stringResource(R.string.banner_update_msg),
-                    style = MaterialTheme.typography.subtitle1,
+                    style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(start = 16.dp))
             }
 
-            AppTheme(
-                colors = MaterialTheme.colors.copy(primary = MaterialTheme.colors.secondary)
-            ) {
-                Row(Modifier
+            Row(
+                Modifier
                     .align(Alignment.End)
                     .padding(top = 12.dp, end = 8.dp, bottom = 8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    TextButton(onClick = onDismissClick) {
-                        Text(stringResource(R.string.banner_dismiss_btn))
-                    }
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                TextButton(onClick = onDismissClick) {
+                    Text(stringResource(R.string.banner_dismiss_btn))
+                }
 
-                    TextButton(onClick = onInstallClick) {
-                        Text(stringResource(R.string.banner_update_btn))
-                    }
+                TextButton(onClick = onInstallClick) {
+                    Text(stringResource(R.string.banner_update_btn))
                 }
             }
         }
@@ -195,25 +184,22 @@ class InAppUpdatePresenter(
     @Composable
     private fun UpdateReadyBanner(onRestartClick: () -> Unit) {
         Column {
-            Row(Modifier
-                .padding(top = 24.dp)
-                .padding(horizontal = 16.dp)) {
+            Row(
+                Modifier
+                    .padding(top = 24.dp)
+                    .padding(horizontal = 16.dp)) {
                 Image(painter = rememberMipmapPainter(R.mipmap.ic_launcher), contentDescription = null,
                     Modifier.size(56.dp))
                 Text(stringResource(R.string.banner_update_install_msg),
-                    style = MaterialTheme.typography.subtitle1,
+                    style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(start = 16.dp))
             }
-            AppTheme(
-                colors = MaterialTheme.colors.copy(primary = MaterialTheme.colors.secondary)
+            TextButton(onClick = onRestartClick,
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .padding(top = 12.dp, end = 8.dp, bottom = 8.dp)
             ) {
-                TextButton(onClick = onRestartClick,
-                    modifier = Modifier
-                        .align(Alignment.End)
-                        .padding(top = 12.dp, end = 8.dp, bottom = 8.dp)
-                ) {
-                    Text(stringResource(R.string.banner_install_btn))
-                }
+                Text(stringResource(R.string.banner_install_btn))
             }
         }
     }
