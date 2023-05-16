@@ -83,7 +83,7 @@ fun ArticlesListNavHost(
 ) {
     NavHost(navController = navController, startDestination = "magazine") {
         composable(NavRoutes.Magazine) {
-            MagazineScreen(activityViewModel = activityViewModel)
+            MagazineScreen(activityViewModel = activityViewModel, contentPadding = contentPadding)
         }
         composable(NavRoutes.ArticlesList, arguments = listOf(
             navArgument("feed_id") {
