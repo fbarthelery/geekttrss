@@ -99,7 +99,7 @@ fun ArticleCardList(
     onShareClick: (Article) -> Unit,
     onOpenInBrowserClick: (Article) -> Unit,
     modifier: Modifier = Modifier,
-    additionalContentPaddingBottom: Dp = 0.dp,
+    contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
     val pullRefreshState = rememberPullRefreshState(isRefreshing, onRefresh = {
@@ -140,7 +140,7 @@ fun ArticleCardList(
             viewModel.setArticleUnread(it.id, false)
         },
         modifier = modifier,
-        additionalContentPaddingBottom = additionalContentPaddingBottom
+        contentPadding = contentPadding
     )
 
 }
@@ -160,9 +160,22 @@ private fun ArticleCardList(
     onSwiped: (Article) -> Unit,
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
-    additionalContentPaddingBottom: Dp = 0.dp,
+    contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
-    Box(modifier.pullRefresh(pullRefreshState)) {
+    val ltr = LocalLayoutDirection.current
+    val topContentPadding = PaddingValues(
+        start = contentPadding.calculateStartPadding(ltr),
+        end = contentPadding.calculateEndPadding(ltr),
+        top = contentPadding.calculateTopPadding()
+    )
+
+    val bottomContentPadding = PaddingValues(
+        start = contentPadding.calculateStartPadding(ltr),
+        end = contentPadding.calculateEndPadding(ltr),
+        bottom = contentPadding.calculateBottomPadding()
+    )
+
+    Box(modifier.padding(topContentPadding).pullRefresh(pullRefreshState)) {
         val loadState by pagingViewStateFor(articles)
         val isEmpty = articles.itemCount == 0
         if (isEmpty && loadState == PagingViewLoadState.LOADED) {
@@ -171,8 +184,8 @@ private fun ArticleCardList(
             ArticlesList(
                 articles,
                 listState,
-                additionalContentPaddingBottom,
                 isMultiFeedList,
+                bottomContentPadding,
                 onCardClick,
                 onOpenInBrowserClick,
                 onShareClick,
@@ -195,8 +208,8 @@ private fun ArticleCardList(
 private fun ArticlesList(
     articles: LazyPagingItems<ArticleWithFeed>,
     listState: LazyListState,
-    additionalContentPaddingBottom: Dp,
     isMultiFeedList: Boolean,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     onCardClick: (Int, Article) -> Unit,
     onOpenInBrowserClick: (Article) -> Unit,
     onShareClick: (Article) -> Unit,
@@ -206,12 +219,12 @@ private fun ArticlesList(
 ) {
     var animateItemAppearance by remember { mutableStateOf(true) }
     val navBarPadding = WindowInsets.navigationBars.asPaddingValues()
-    val contentPadding = PaddingValues(
+/*    val contentPadding = PaddingValues(
         start = navBarPadding.calculateStartPadding(LocalLayoutDirection.current) + 8.dp,
         top = navBarPadding.calculateTopPadding() + 8.dp,
         end = navBarPadding.calculateEndPadding(LocalLayoutDirection.current) + 8.dp,
         bottom = navBarPadding.calculateBottomPadding() + additionalContentPaddingBottom
-    )
+    )*/
     LazyColumn(
         state = listState,
         verticalArrangement = Arrangement.spacedBy(16.dp),
