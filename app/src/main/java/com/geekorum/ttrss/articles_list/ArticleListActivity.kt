@@ -189,9 +189,7 @@ class ArticleListActivity : SessionActivity() {
                         }
                     },
                     bannerContent = {
-                        Box(Modifier.padding(it)){
-                            inAppUpdatePresenter.Content()
-                        }
+                        inAppUpdatePresenter.Content(Modifier.padding(it))
                     },
                     undoUnreadSnackBar = undoUnreadSnackbarComposable,
                     drawerGesturesEnabled = drawerLayoutPresenter.drawerGesturesEnabled
