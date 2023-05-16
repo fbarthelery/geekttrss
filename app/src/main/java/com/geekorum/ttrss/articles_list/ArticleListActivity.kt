@@ -24,7 +24,6 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.SnackbarDefaults
 import androidx.compose.material3.*
@@ -182,9 +181,7 @@ class ArticleListActivity : SessionActivity() {
                             val isScrollingUp by activityViewModel.isScrollingUp.collectAsStateWithLifecycle()
                             fabPresenter.Content(
                                 isScrollingUpOrRest = isScrollingUp,
-                                onClick = { activityViewModel.refresh() },
-                                modifier = Modifier.navigationBarsPadding()
-                            )
+                                onClick = { activityViewModel.refresh() })
                         }
                     },
                     bannerContent = {
