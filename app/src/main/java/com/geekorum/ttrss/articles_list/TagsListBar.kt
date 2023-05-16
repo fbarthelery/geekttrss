@@ -53,13 +53,11 @@ fun TagsListBar(
                 .horizontalScroll(scrollState)
         ) {
             Spacer(Modifier.size(8.dp))
-            AppTheme3(colorScheme = MaterialTheme.colorScheme.copy(primary = MaterialTheme.colorScheme.secondary)) {
                 tags.forEach { tag ->
                     FilterChip(selected = tag == selectedTag,
                         onClick = {  selectedTagChange(tag.takeUnless { tag == selectedTag }) },
                         label = { Text(tag) })
                 }
-            }
             Spacer(Modifier.size(8.dp))
         }
     }
