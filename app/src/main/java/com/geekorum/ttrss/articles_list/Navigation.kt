@@ -102,7 +102,7 @@ fun ArticlesListNavHost(
         }
 
         composable(NavRoutes.Search) {
-            ArticlesSearchScreen(activityViewModel = activityViewModel)
+            ArticlesSearchScreen(activityViewModel = activityViewModel, contentPadding = contentPadding)
         }
     }
 }
