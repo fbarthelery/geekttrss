@@ -97,7 +97,7 @@ class ArticleListActivity : SessionActivity() {
         setContent()
     }
 
-    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class, ExperimentalMaterial3Api::class)
     private fun setContent() {
         setContent {
             val navController = rememberNavController()
@@ -157,11 +157,14 @@ class ArticleListActivity : SessionActivity() {
                     navController,
                 )
 
+                val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
                 ArticlesListScaffold(
+                    modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
                     windowSizeClass = windowSizeClass,
                     drawerState = drawerState,
                     topBar = {
                         appBarPresenter.ToolbarContent(
+                            scrollBehavior = scrollBehavior,
                             onNavigationMenuClick = {
                                 coroutineScope.launch {
                                     drawerState.open()

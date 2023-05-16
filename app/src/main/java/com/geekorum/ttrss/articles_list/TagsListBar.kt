@@ -20,20 +20,17 @@
  */
 package com.geekorum.ttrss.articles_list
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.geekorum.ttrss.ui.AppTheme
-import com.geekorum.ttrss.ui.AppTheme3
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,9 +39,11 @@ fun TagsListBar(
     tags: Set<String>,
     selectedTag: String?,
     selectedTagChange: (String?) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.surface,
+    contentColor: Color = contentColorFor(color)
 ) {
-    Surface(modifier = modifier) {
+    Surface(modifier = modifier, color = color, contentColor = contentColor) {
         val scrollState = rememberScrollState()
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment = Alignment.CenterVertically,
