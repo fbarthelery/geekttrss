@@ -64,93 +64,73 @@ class FeedsNavigationMenuPresenter(
 ) {
 
     @Composable
-    fun Content(hasFab: Boolean, onNavigation: () -> Unit, isModal: Boolean, modifier: Modifier = Modifier) {
-        val sheet: @Composable (@Composable ColumnScope.() -> Unit) -> Unit = if (isModal) {
-            { content ->
-                ModalDrawerSheet(
-                    windowInsets = WindowInsets.systemBars.only(WindowInsetsSides.Start),
-                    modifier = modifier,
-                    content = content
-                )
+    fun Content(hasFab: Boolean, onNavigation: () -> Unit, modifier: Modifier = Modifier) {
+        val navBackStackEntry by navController.currentBackStackEntryFlow.collectAsStateWithLifecycle(null)
+        val currentFeedId = run {
+            if (navBackStackEntry?.destination?.route == NavRoutes.ArticlesList) {
+                navBackStackEntry?.arguments?.getLong("feed_id")
+            } else if (navBackStackEntry?.destination?.route == NavRoutes.ArticlesListByTag) {
+                val listEntry = navController.getBackStackEntry(NavRoutes.ArticlesList)
+                listEntry.arguments?.getLong("feed_id")
+            } else {
+                null
             }
-        } else {
-            { content ->
-                PermanentDrawerSheet(
-                    windowInsets = WindowInsets.systemBars.only(WindowInsetsSides.Start),
-                    modifier = modifier,
-                    content = content
+        }
+        val isMagazineFeed = navBackStackEntry?.destination?.route == NavRoutes.Magazine
+
+        val account by accountViewModel.selectedAccount.observeAsState()
+        val server by accountViewModel.selectedAccountHost.observeAsState()
+
+        val fab: (@Composable () -> Unit)? = if (!hasFab) null else {
+            @Composable {
+                ExtendedFloatingActionButton(
+                    text = { Text(stringResource(R.string.btn_refresh)) },
+                    icon = { Icon(Icons.Default.Refresh, contentDescription = null) },
+                    onClick = {}
                 )
             }
         }
 
-        sheet {
-            val navBackStackEntry by navController.currentBackStackEntryFlow.collectAsStateWithLifecycle(null)
-            val currentFeedId = run {
-                if (navBackStackEntry?.destination?.route == NavRoutes.ArticlesList) {
-                    navBackStackEntry?.arguments?.getLong("feed_id")
-                } else if (navBackStackEntry?.destination?.route == NavRoutes.ArticlesListByTag) {
-                    val listEntry = navController.getBackStackEntry(NavRoutes.ArticlesList)
-                    listEntry.arguments?.getLong("feed_id")
-                } else {
-                    null
-                }
-            }
-            val isMagazineFeed = navBackStackEntry?.destination?.route == NavRoutes.Magazine
-
-            val account by accountViewModel.selectedAccount.observeAsState()
-            val server by accountViewModel.selectedAccountHost.observeAsState()
-
-            val fab: (@Composable () -> Unit)? = if (!hasFab) null else {
-                @Composable {
-                    ExtendedFloatingActionButton(
-                        text = { Text(stringResource(R.string.btn_refresh)) },
-                        icon = { Icon(Icons.Default.Refresh, contentDescription = null) },
-                        onClick = {}
-                    )
-                }
-            }
-
-            FeedListNavigationMenu(
-                user = account?.name ?: "",
-                server = server ?: "",
-                feedSection = {
-                    val feeds by feedsViewModel.feeds.collectAsStateWithLifecycle()
-                    FeedSection(
-                        feeds,
-                        selectedFeed = feeds.find { it.feed.id == currentFeedId }?.feed,
-                        isMagazineSelected = isMagazineFeed,
-                        onFeedSelected = {
-                            navigateToFeed(it)
-                            onNavigation()
-                        },
-                        onMagazineSelected = {
-                            navController.navigateToMagazine()
-                            onNavigation()
+        FeedListNavigationMenu(
+            user = account?.name ?: "",
+            server = server ?: "",
+            feedSection = {
+                val feeds by feedsViewModel.feeds.collectAsStateWithLifecycle()
+                FeedSection(
+                    feeds,
+                    selectedFeed = feeds.find { it.feed.id == currentFeedId }?.feed,
+                    isMagazineSelected = isMagazineFeed,
+                    onFeedSelected = {
+                        navigateToFeed(it)
+                        onNavigation()
+                    },
+                    onMagazineSelected = {
+                        navController.navigateToMagazine()
+                        onNavigation()
+                    }
+                )
+            },
+            manageFeedsSection = {
+                ManageFeedSection(
+                    viewModel = installModuleViewModel,
+                    activity = activity,
+                    navigateToManageFeed = {
+                        check(installModuleViewModel.isModuleInstalled(Features.MANAGE_FEEDS)) {
+                            { "${Features.MANAGE_FEEDS} is not installed" }
                         }
-                    )
-                },
-                manageFeedsSection = {
-                    ManageFeedSection(
-                        viewModel = installModuleViewModel,
-                        activity = activity,
-                        navigateToManageFeed = {
-                            check(installModuleViewModel.isModuleInstalled(Features.MANAGE_FEEDS)) {
-                                { "${Features.MANAGE_FEEDS} is not installed" }
-                            },
-                            onMarkFeedAsReadClick = {
-                                feedsViewModel.markFeedAsRead(it)
-                            }
-                            navController.navigateToManageFeeds()
-                            onNavigation()
-                        })
-                },
-                onSettingsClicked = {
-                    navController.navigateToSettings()
-                    onNavigation()
-                },
-                fab = fab
-            )
-        }
+                        navController.navigateToManageFeeds()
+                        onNavigation()
+                    },
+		     onMarkFeedAsReadClick = {
+                       feedsViewModel.markFeedAsRead(it)
+                    })
+            },
+            onSettingsClicked = {
+                navController.navigateToSettings()
+                onNavigation()
+            },
+            fab = fab
+        )
     }
 
     private fun navigateToFeed(feed: Feed) {
