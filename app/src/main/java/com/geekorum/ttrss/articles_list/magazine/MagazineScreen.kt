@@ -30,22 +30,24 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Surface
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.paging.compose.*
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemContentType
+import androidx.paging.compose.itemKey
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.articles_list.*
 import com.geekorum.ttrss.data.Article
@@ -58,7 +60,8 @@ import kotlinx.coroutines.delay
 @Composable
 fun MagazineScreen(
     activityViewModel: ActivityViewModel,
-    magazineViewModel: MagazineViewModel = hiltViewModel()
+    magazineViewModel: MagazineViewModel = hiltViewModel(),
+    contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     val viewLifecycleOwner = LocalLifecycleOwner.current
     LaunchedEffect(activityViewModel, magazineViewModel, viewLifecycleOwner) {
@@ -67,33 +70,27 @@ fun MagazineScreen(
         })
     }
 
-    AppTheme {
-        val appBarHeightDp = with(LocalDensity.current) {
-            activityViewModel.appBarHeight.toDp()
+    Surface(Modifier.fillMaxSize()) {
+        val context = LocalContext.current
+        val lazyListState = rememberLazyListState()
+        val isScrollingUp = lazyListState.isScrollingUp()
+        LaunchedEffect(activityViewModel, isScrollingUp) {
+            activityViewModel.setIsScrollingUp(isScrollingUp)
         }
-
-        Surface(Modifier.fillMaxSize()) {
-            val context = LocalContext.current
-            val lazyListState = rememberLazyListState()
-            val isScrollingUp = lazyListState.isScrollingUp()
-            LaunchedEffect(activityViewModel, isScrollingUp) {
-                activityViewModel.setIsScrollingUp(isScrollingUp)
-            }
-            ArticlesMagazine(
-                viewModel = magazineViewModel,
-                listState = lazyListState,
-                onCardClick = activityViewModel::displayArticle,
-                onShareClick = { article ->
-                    context.startActivity(createShareArticleIntent(context, article))
-                },
-                onOpenInBrowserClick = {
-                    activityViewModel.displayArticleInBrowser(context, it)
-                },
-                additionalContentPaddingBottom = appBarHeightDp,
-                modifier = Modifier
-                    .fillMaxSize()
-            )
-        }
+        ArticlesMagazine(
+            viewModel = magazineViewModel,
+            listState = lazyListState,
+            onCardClick = activityViewModel::displayArticle,
+            onShareClick = { article ->
+                context.startActivity(createShareIntent(context, article))
+            },
+            onOpenInBrowserClick = {
+                activityViewModel.displayArticleInBrowser(context, it)
+            },
+            contentPadding = contentPadding,
+            modifier = Modifier
+                .fillMaxSize()
+        )
     }
 }
 
@@ -107,14 +104,27 @@ private fun ArticlesMagazine(
     onOpenInBrowserClick: (Article) -> Unit,
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
-    additionalContentPaddingBottom: Dp = 0.dp,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
 
     val isRefreshing by viewModel.isRefreshing.observeAsState(false)
     val pullRefreshState = rememberPullRefreshState(isRefreshing, onRefresh = {
         viewModel.refreshMagazine()
     })
-    Box(modifier.pullRefresh(pullRefreshState)) {
+    val ltr = LocalLayoutDirection.current
+    val topContentPadding = PaddingValues(
+        start = contentPadding.calculateStartPadding(ltr),
+        end = contentPadding.calculateEndPadding(ltr),
+        top = contentPadding.calculateTopPadding()
+    )
+
+    val bottomContentPadding = PaddingValues(
+        start = contentPadding.calculateStartPadding(ltr),
+        end = contentPadding.calculateEndPadding(ltr),
+        bottom = contentPadding.calculateBottomPadding()
+    )
+
+    Box(modifier.padding(topContentPadding).pullRefresh(pullRefreshState)) {
         val pagingItems = viewModel.articles.collectAsLazyPagingItems()
         val loadState by pagingViewStateFor(pagingItems)
         val isEmpty = pagingItems.itemCount == 0
@@ -136,7 +146,7 @@ private fun ArticlesMagazine(
                 viewModel,
                 pagingItems,
                 listState,
-                additionalContentPaddingBottom,
+                bottomContentPadding,
                 onCardClick,
                 onOpenInBrowserClick,
                 onShareClick
@@ -146,7 +156,9 @@ private fun ArticlesMagazine(
         PullRefreshIndicator(
             isRefreshing,
             pullRefreshState,
-            Modifier.align(Alignment.TopCenter)
+            backgroundColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.align(Alignment.TopCenter)
         )
     }
 
@@ -158,19 +170,12 @@ private fun ArticlesList(
     viewModel: MagazineViewModel,
     pagingItems: LazyPagingItems<ArticleWithFeed>,
     listState: LazyListState,
-    additionalContentPaddingBottom: Dp,
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     onCardClick: (Int, Article) -> Unit,
     onOpenInBrowserClick: (Article) -> Unit,
     onShareClick: (Article) -> Unit
 ) {
     var animateItemAppearance by remember { mutableStateOf(true) }
-    val navBarPadding = WindowInsets.navigationBars.asPaddingValues()
-    val contentPadding = PaddingValues(
-        start = navBarPadding.calculateStartPadding(LocalLayoutDirection.current) + 8.dp,
-        top = navBarPadding.calculateTopPadding() + 8.dp,
-        end = navBarPadding.calculateEndPadding(LocalLayoutDirection.current) + 8.dp,
-        bottom = navBarPadding.calculateBottomPadding() + additionalContentPaddingBottom
-    )
     LazyColumn(
         state = listState,
         verticalArrangement = Arrangement.spacedBy(16.dp),
