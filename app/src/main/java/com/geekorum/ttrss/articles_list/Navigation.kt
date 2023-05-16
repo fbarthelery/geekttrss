@@ -24,7 +24,9 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -76,7 +78,8 @@ class ArticlesListScreenArgs(
 @Composable
 fun ArticlesListNavHost(
     activityViewModel: ActivityViewModel = hiltViewModel(),
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     NavHost(navController = navController, startDestination = "magazine") {
         composable(NavRoutes.Magazine) {
