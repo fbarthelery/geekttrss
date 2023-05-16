@@ -23,20 +23,26 @@ package com.geekorum.ttrss.articles_list
 import android.app.Activity
 import android.content.Context
 import androidx.compose.animation.*
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.*
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.FloatingWindow
@@ -45,7 +51,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Feed.Companion.FEED_ID_ALL_ARTICLES
-import com.geekorum.ttrss.ui.AppTheme
 
 
 /**
@@ -58,17 +63,41 @@ internal class AppBarPresenter(
     private val navController: NavController,
 ) {
 
-    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class, ExperimentalMaterial3Api::class)
     @Composable
-    fun ToolbarContent(modifier: Modifier = Modifier, onNavigationMenuClick: () -> Unit) {
+    fun ToolbarContent(modifier: Modifier = Modifier, scrollBehavior: TopAppBarScrollBehavior? = null, onNavigationMenuClick: () -> Unit) {
         val windowSizeClass = calculateWindowSizeClass(activity)
         val hasFixedDrawer = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded
 
-        AppTheme {
-            val currentDestination by navController.currentBackStackEntryFlow.collectAsStateWithLifecycle(
-                null
-            )
+        val currentDestination by navController.currentBackStackEntryFlow.collectAsStateWithLifecycle(
+            null
+        )
 
+        val colors = TopAppBarDefaults.toolbarAppBarColors()
+
+        // Sets the app bar's height offset to collapse the entire bar's height when content is
+        // scrolled
+        val heightOffsetLimit =
+            with(LocalDensity.current) { ((-64).dp).toPx() }
+        SideEffect {
+            if (scrollBehavior?.state?.heightOffsetLimit != heightOffsetLimit) {
+                scrollBehavior?.state?.heightOffsetLimit = heightOffsetLimit
+            }
+        }
+
+        // Obtain the container color from the TopAppBarColors using the `overlapFraction`. This
+        // ensures that the colors will adjust whether the app bar behavior is pinned or scrolled.
+        // This may potentially animate or interpolate a transition between the container-color and the
+        // container's scrolled-color according to the app bar's scroll state.
+        val colorTransitionFraction = scrollBehavior?.state?.overlappedFraction ?: 0f
+        val fraction = if (colorTransitionFraction > 0.01f) 1f else 0f
+        val appBarContainerColor by animateColorAsState(
+            targetValue = colors.containerColor(fraction),
+            animationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+            label = "ToolbarContainerColor"
+        )
+
+        Surface(color = appBarContainerColor) {
             Column(modifier) {
                 Toolbar(
                     hasFixedDrawer,
@@ -112,7 +141,9 @@ internal class AppBarPresenter(
             label = "TagBarVisibility"
         ) { visible ->
             if (visible) {
-                TagsListBar(tags = tagsSet,
+                TagsListBar(
+                    color = Color.Transparent,
+                    tags = tagsSet,
                     selectedTag = currentTag,
                     selectedTagChange = { tag ->
                         if (tag == null) {
@@ -128,6 +159,7 @@ internal class AppBarPresenter(
         }
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     private fun Toolbar(
         hasFixedDrawer: Boolean,
@@ -186,6 +218,8 @@ internal class AppBarPresenter(
 
         ArticlesListAppBar(
             appBarState = appbarState,
+            // transparent container colors, the surface colors will be handled by parent
+            colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent, scrolledContainerColor = Color.Transparent),
             title = {
                 AppBarTitleText(toolbarTitle)
             },
@@ -216,5 +250,96 @@ internal class AppBarPresenter(
         NavRoutes.ArticlesListByTag -> true
 
         else -> false
+    }
+}
+
+
+/**
+ * Copy of [TopAppBarColors] to allow using [TopAppBarColors.containerColor]
+ */
+@ExperimentalMaterial3Api
+@Stable
+private class ToolbarAppBarColors internal constructor(
+    private val containerColor: Color,
+    private val scrolledContainerColor: Color,
+    internal val navigationIconContentColor: Color,
+    internal val titleContentColor: Color,
+    internal val actionIconContentColor: Color,
+) {
+
+    /**
+     * Represents the container color used for the top app bar.
+     *
+     * A [colorTransitionFraction] provides a percentage value that can be used to generate a color.
+     * Usually, an app bar implementation will pass in a [colorTransitionFraction] read from
+     * the [TopAppBarState.collapsedFraction] or the [TopAppBarState.overlappedFraction].
+     *
+     * @param colorTransitionFraction a `0.0` to `1.0` value that represents a color transition
+     * percentage
+     */
+    @Composable
+    internal fun containerColor(colorTransitionFraction: Float): Color {
+        return lerp(
+            containerColor,
+            scrolledContainerColor,
+            FastOutLinearInEasing.transform(colorTransitionFraction)
+        )
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || other !is ToolbarAppBarColors) return false
+
+        if (containerColor != other.containerColor) return false
+        if (scrolledContainerColor != other.scrolledContainerColor) return false
+        if (navigationIconContentColor != other.navigationIconContentColor) return false
+        if (titleContentColor != other.titleContentColor) return false
+        if (actionIconContentColor != other.actionIconContentColor) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = containerColor.hashCode()
+        result = 31 * result + scrolledContainerColor.hashCode()
+        result = 31 * result + navigationIconContentColor.hashCode()
+        result = 31 * result + titleContentColor.hashCode()
+        result = 31 * result + actionIconContentColor.hashCode()
+
+        return result
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TopAppBarDefaults.toolbarAppBarColors(
+    containerColor: Color = MaterialTheme.colorScheme.surface,
+    scrolledContainerColor: Color = MaterialTheme.colorScheme.applyTonalElevation(
+        backgroundColor = containerColor,
+        elevation = 3.dp
+    ),
+    navigationIconContentColor: Color = MaterialTheme.colorScheme.onSurface,
+    titleContentColor: Color = MaterialTheme.colorScheme.onSurface,
+    actionIconContentColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+): ToolbarAppBarColors =
+    ToolbarAppBarColors(
+        containerColor,
+        scrolledContainerColor,
+        navigationIconContentColor,
+        titleContentColor,
+        actionIconContentColor
+    )
+
+/**
+ * Returns the new background [Color] to use, representing the original background [color] with an
+ * overlay corresponding to [elevation] applied. The overlay will only be applied to
+ * [ColorScheme.surface].
+ */
+internal fun ColorScheme.applyTonalElevation(backgroundColor: Color, elevation: Dp): Color {
+    return if (backgroundColor == surface) {
+        surfaceColorAtElevation(elevation)
+    } else {
+        backgroundColor
     }
 }

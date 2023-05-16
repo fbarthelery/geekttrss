@@ -57,11 +57,13 @@ fun ArticlesListAppBar(
     appBarState: ArticlesListAppbarState = rememberArticlesListAppBarState(),
     displaySortMenuButton: Boolean = true,
     displaySearchButton: Boolean = true,
+    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
     navigationIcon: @Composable (() -> Unit)? = null,
 ) {
     val isSearchVisibleAndOpen = displaySearchButton && appBarState.searchOpen
     TopAppBar(
         modifier = modifier,
+        colors = colors,
         navigationIcon = {
             if (isSearchVisibleAndOpen) {
                 IconButton(
@@ -300,6 +302,7 @@ private fun SortMenuRadioGroup(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun PreviewArticlesListAppBar() {
