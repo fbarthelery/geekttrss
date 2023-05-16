@@ -94,11 +94,11 @@ fun ArticlesListNavHost(
                 defaultValue = "All Articles"
             }
         )) {
-            ArticlesListScreen(activityViewModel = activityViewModel)
+            ArticlesListScreen(activityViewModel = activityViewModel, contentPadding = contentPadding)
         }
 
         composable(NavRoutes.ArticlesListByTag) {
-            ArticlesListByTagScreen(activityViewModel = activityViewModel)
+            ArticlesListByTagScreen(activityViewModel = activityViewModel, contentPadding = contentPadding)
         }
 
         composable(NavRoutes.Search) {

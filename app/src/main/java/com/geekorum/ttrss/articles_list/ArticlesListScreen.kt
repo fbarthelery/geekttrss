@@ -21,18 +21,17 @@
 package com.geekorum.ttrss.articles_list
 
 import android.content.Context
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.Surface
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
@@ -44,23 +43,26 @@ import com.geekorum.ttrss.ui.AppTheme
 @Composable
 fun ArticlesListScreen(
     activityViewModel: ActivityViewModel,
-    articlesListViewModel: ArticlesListViewModel = hiltViewModel()
+    articlesListViewModel: ArticlesListViewModel = hiltViewModel(),
+    contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
-    BaseArticlesListScreen(activityViewModel = activityViewModel, articlesListViewModel)
+    BaseArticlesListScreen(activityViewModel = activityViewModel, articlesListViewModel, contentPadding)
 }
 
 @Composable
 fun ArticlesListByTagScreen(
     activityViewModel: ActivityViewModel,
-    articlesListByTagViewModel: ArticlesListByTagViewModel = hiltViewModel()
+    articlesListByTagViewModel: ArticlesListByTagViewModel = hiltViewModel(),
+    contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
-    BaseArticlesListScreen(activityViewModel = activityViewModel, articlesListByTagViewModel)
+    BaseArticlesListScreen(activityViewModel = activityViewModel, articlesListByTagViewModel, contentPadding)
 }
 
 @Composable
 private fun BaseArticlesListScreen(
     activityViewModel: ActivityViewModel,
-    articlesListViewModel: BaseArticlesViewModel
+    articlesListViewModel: BaseArticlesViewModel,
+    contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     AppTheme {
         val viewLifecycleOwner = LocalLifecycleOwner.current
@@ -87,23 +89,14 @@ private fun BaseArticlesListScreen(
             }
         }
 
-        val appBarHeightDp = with(LocalDensity.current) {
-            activityViewModel.appBarHeight.toDp()
-        }
-
         val lazyListState = rememberLazyListState()
         val isScrollingUp = lazyListState.isScrollingUp()
         LaunchedEffect(activityViewModel, isScrollingUp) {
             activityViewModel.setIsScrollingUp(isScrollingUp)
         }
 
-        val nestedScrollInterop = rememberNestedScrollInteropConnection()
         Surface(
-            Modifier
-                .fillMaxSize()
-                // seems to be much better in compose 1.3.0 but keep a look on it
-                // https://issuetracker.google.com/issues/236451818
-                .nestedScroll(nestedScrollInterop)
+            Modifier.fillMaxSize()
         ) {
             val context = LocalContext.current
             ArticleCardList(
@@ -116,7 +109,7 @@ private fun BaseArticlesListScreen(
                 onOpenInBrowserClick = {
                     activityViewModel.displayArticleInBrowser(context, it)
                 },
-                additionalContentPaddingBottom = appBarHeightDp,
+                contentPadding = contentPadding,
                 modifier = Modifier
                     .fillMaxSize()
             )
@@ -125,6 +118,14 @@ private fun BaseArticlesListScreen(
 }
 
 private fun onShareClicked(context: Context, article: Article) {
-    context.startActivity(createShareArticleIntent(context, article))
+    context.startActivity(createShareIntent(context, article))
 }
 
+private fun createShareIntent(context: Context, article: Article): Intent {
+    val shareIntent = ShareCompat.IntentBuilder(context)
+    shareIntent.setSubject(article.title)
+        .setHtmlText(article.content)
+        .setText(article.link)
+        .setType("text/plain")
+    return shareIntent.createChooserIntent()
+}
