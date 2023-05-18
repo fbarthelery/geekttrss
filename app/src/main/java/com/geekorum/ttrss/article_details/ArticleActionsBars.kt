@@ -20,124 +20,212 @@
  */
 package com.geekorum.ttrss.article_details
 
-import android.content.res.ColorStateList
-import android.view.Gravity
-import android.view.LayoutInflater
+import android.content.res.Configuration
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.material.*
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.coordinatorlayout.widget.CoordinatorLayout.LayoutParams
-import androidx.core.content.getSystemService
-import androidx.core.view.updatePadding
+import androidx.compose.ui.unit.dp
 import com.geekorum.ttrss.R
-import com.geekorum.ttrss.databinding.ToolbarArticleDetailsBinding
-import com.geekorum.ttrss.ui.AppTheme
-import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.rememberInsetsPaddingValues
-import com.google.accompanist.insets.ui.TopAppBar
-import com.google.android.material.bottomappbar.BottomAppBar
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.geekorum.ttrss.ui.AppTheme3
 
 
 @Composable
-fun ArticleBottomActionsBar(
-    articleDetailsViewModel: ArticleDetailsViewModel,
-    bottomAppBarIsVisible: Boolean,
-    background: ColorStateList?,
-    onFabClicked: () -> Unit,
+fun AnimatedArticleBottomAppBar(
+    isVisible: MutableTransitionState<Boolean>,
+    isUnread: Boolean,
+    isStarred: Boolean,
     modifier: Modifier = Modifier,
-    applyNavigationBarInsets: Boolean = true,
+    floatingActionButton: @Composable (() -> Unit)? = null,
+    onToggleUnreadClick: () -> Unit,
+    onStarredChange: (Boolean) -> Unit,
+    onShareClick: () -> Unit,
 ) {
-    val bapPaddingBottom = if (applyNavigationBarInsets) {
-        WindowInsets.navigationBars.getBottom(LocalDensity.current)
-    } else 0
-    val lifecycleOwner = LocalLifecycleOwner.current
-    val layoutInflater: LayoutInflater = LocalContext.current.getSystemService()!!
-    //TODO looks like the star don't animate to checked state on creation
-    val toolbarBinding = remember {
-        ToolbarArticleDetailsBinding.inflate(layoutInflater).apply {
-            this.lifecycleOwner = lifecycleOwner
-            viewModel = articleDetailsViewModel
+    Box(modifier.fillMaxWidth()) {
+        AnimatedVisibility(isVisible,
+            enter = slideInVertically(tween(225, easing = LinearOutSlowInEasing)) { it },
+            exit = slideOutVertically(tween(175, easing = FastOutLinearInEasing)) { it },
+        ) {
+            ArticleBottomAppBar(
+                isUnread = isUnread,
+                isStarred = isStarred,
+                floatingActionButton = if (isVisible.targetState && isVisible.isIdle)
+                    floatingActionButton else null,
+                onToggleUnreadClick = onToggleUnreadClick,
+                onStarredChange = onStarredChange,
+                onShareClick = onShareClick
+            )
+        }
+
+        if (!isVisible.targetState || !isVisible.isIdle) {
+            Box(
+                Modifier
+                    .padding(end = 16.dp, bottom = 12.dp)
+                    .windowInsetsPadding(WindowInsets.navigationBars)
+                    .align(Alignment.BottomEnd)
+            ) {
+                floatingActionButton?.invoke()
+            }
         }
     }
-    AndroidView(modifier = modifier,
-        factory = {
-            val root = CoordinatorLayout(it)
-            val bottomAppBar = BottomAppBar(
-                it, null, com.google.android.material.R.attr.bottomAppBarStyle
-            ).apply {
-                id = R.id.bottom_app_bar
-                fabAlignmentMode = BottomAppBar.FAB_ALIGNMENT_MODE_END
+}
+
+@OptIn(ExperimentalAnimationGraphicsApi::class)
+@Composable
+fun ArticleBottomAppBar(
+    isUnread: Boolean,
+    isStarred: Boolean,
+    floatingActionButton: @Composable (() -> Unit)? = null,
+    onToggleUnreadClick: () -> Unit,
+    onStarredChange: (Boolean) -> Unit,
+    onShareClick: () -> Unit,
+) {
+    val containerColor = if (isUnread)
+        MaterialTheme.colorScheme.primary
+    else
+        MaterialTheme.colorScheme.surface
+    BottomAppBar(
+        containerColor = containerColor,
+        actions = {
+            IconButton(onClick = onToggleUnreadClick) {
+                Icon(Icons.Default.Archive, contentDescription = null)
             }
-            bottomAppBar.addView(toolbarBinding.root)
-            val fab = FloatingActionButton(it).apply {
-                id = R.id.fab
-                setImageResource(R.drawable.ic_open_in_browser_24)
+            IconToggleButton(isStarred, onCheckedChange = onStarredChange) {
+                val image =
+                    AnimatedImageVector.animatedVectorResource(id = R.drawable.avd_ic_star_filled)
+                val starColor = if (isStarred) {
+                    Color.Unspecified
+                } else {
+                    LocalContentColor.current
+                }
+                Icon(
+                    painter = rememberAnimatedVectorPainter(image, atEnd = isStarred),
+                    contentDescription = null,
+                    tint = starColor,
+                )
             }
-            root.addView(fab, LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT).apply {
-                anchorId = bottomAppBar.id
-            })
-            root.addView(bottomAppBar, LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT).apply {
-                gravity = Gravity.BOTTOM
-            })
-            return@AndroidView root
+            IconButton(onClick = onShareClick) {
+                Icon(Icons.Default.Share, contentDescription = null)
+            }
         },
-        update = {
-            val fab = it.findViewById<FloatingActionButton>(R.id.fab)
-            fab.setOnClickListener { onFabClicked() }
-            val bap = it.findViewById<BottomAppBar>(R.id.bottom_app_bar).apply {
-                backgroundTint = background
-                updatePadding(bottom = bapPaddingBottom)
+        floatingActionButton = floatingActionButton
+    )
+}
+
+@Preview
+@Composable
+fun PreviewAnimatedArticleBottomAppBar() {
+    AppTheme3 {
+        Surface(Modifier.fillMaxWidth().height(150.dp)) {
+            Box {
+                val isVisible = remember { MutableTransitionState(true) }
+                AnimatedArticleBottomAppBar(
+                    modifier = Modifier.align(Alignment.BottomCenter),
+                    isVisible = isVisible,
+                    isUnread = true,
+                    isStarred = false,
+                    onToggleUnreadClick = { isVisible.targetState = false },
+                    floatingActionButton = {
+                        FloatingActionButton(
+                            onClick = {
+                                isVisible.targetState = true
+                            }) {
+                            Icon(
+                                Icons.Default.OpenInBrowser,
+                                contentDescription = null
+                            )
+                        }
+                    },
+                    onStarredChange = {},
+                    onShareClick = {}
+                )
             }
-            if (bottomAppBarIsVisible) {
-                bap.performShow()
-            } else {
-                bap.performHide()
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ArticleTopAppBar(
+    scrollBehavior: TopAppBarScrollBehavior? = null,
+    onNavigateUpClick: () -> Unit,
+) {
+    TopAppBar(
+        scrollBehavior = scrollBehavior,
+        title = {},
+        navigationIcon = {
+            IconButton(onClick = onNavigateUpClick) {
+                Icon(Icons.Default.ArrowBack, contentDescription = null)
             }
         }
     )
 }
 
-@OptIn(ExperimentalAnimationGraphicsApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL)
+@Composable
+fun PreviewM3ArticleTopAppBar() {
+    AppTheme3 {
+        ArticleTopAppBar(onNavigateUpClick = {})
+    }
+}
+
+@OptIn(ExperimentalAnimationGraphicsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ArticleTopActionsBar(
     title: @Composable () -> Unit,
+    isUnread: Boolean,
     isStarred: Boolean,
-    background: ColorStateList?,
-    elevation: Dp = AppBarDefaults.TopAppBarElevation,
+    scrollBehavior: TopAppBarScrollBehavior? = null,
     onNavigateUpClick: () -> Unit,
     onToggleUnreadClick: () -> Unit,
     onStarredChange: (Boolean) -> Unit,
     onShareClick: () -> Unit,
 ) {
+    val containerColor = if (isUnread)
+        MaterialTheme.colorScheme.primary
+    else
+        MaterialTheme.colorScheme.surface
+    val contentColor = if (isUnread)
+        MaterialTheme.colorScheme.onPrimary
+    else
+        MaterialTheme.colorScheme.onSurface
+
+    val actionContentColor = if (isUnread)
+        MaterialTheme.colorScheme.onPrimary
+    else
+        MaterialTheme.colorScheme.onSurfaceVariant
+
+    val colors = TopAppBarDefaults.topAppBarColors(
+        containerColor = containerColor,
+        navigationIconContentColor = contentColor,
+        titleContentColor = contentColor,
+        actionIconContentColor = actionContentColor
+    )
     TopAppBar(
         title = title,
-        backgroundColor = background?.defaultColor?.let { Color(it) }
-            ?: MaterialTheme.colors.primarySurface,
-        contentColor = contentColorFor(backgroundColor = MaterialTheme.colors.primarySurface),
-        elevation = elevation,
-        contentPadding = WindowInsets.statusBars.asPaddingValues(),
+        colors = colors,
+        scrollBehavior = scrollBehavior,
         navigationIcon = {
             IconButton(onClick = onNavigateUpClick) {
                 Icon(Icons.Default.ArrowBack, contentDescription = null)
@@ -152,7 +240,7 @@ fun ArticleTopActionsBar(
                 val starColor = if (isStarred) {
                     Color.Unspecified
                 } else {
-                    LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
+                    LocalContentColor.current
                 }
                 Icon(
                     painter = rememberAnimatedVectorPainter(image, atEnd = isStarred),
@@ -167,14 +255,15 @@ fun ArticleTopActionsBar(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun PreviewArticleTopActionsBar() {
-    AppTheme {
+fun PreviewM3ArticleTopActionsBar() {
+    AppTheme3 {
         ArticleTopActionsBar(
             title = { Text("Article title") },
+            isUnread = true,
             isStarred = false,
-            background = null,
             onNavigateUpClick = { },
             onToggleUnreadClick = { },
             onStarredChange = { },
