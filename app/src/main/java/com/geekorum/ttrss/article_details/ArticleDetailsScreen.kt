@@ -24,11 +24,8 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import androidx.annotation.ColorRes
 import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material3.*
@@ -54,6 +51,7 @@ import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleContentIndexed
 import com.geekorum.ttrss.ui.AppTheme3
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.accompanist.web.AccompanistWebViewClient
 import kotlinx.coroutines.delay
 import java.util.Locale
@@ -149,6 +147,23 @@ fun ArticleDetailsScreenHero(
     val articleDetailsScreenState = rememberArticleDetailsScreenState()
 
     val article by articleDetailsViewModel.article.observeAsState()
+    val systemUiController = rememberSystemUiController()
+    val useStatusBarDarkIcons = when {
+        // in dark theme
+        isSystemInDarkTheme() && article?.isTransientUnread == true -> true
+        isSystemInDarkTheme() -> false
+        // in light theme
+        article?.isTransientUnread == true -> false
+        else -> true
+    }
+    DisposableEffect(systemUiController, useStatusBarDarkIcons) {
+        systemUiController.setSystemBarsColor(
+            color = androidx.compose.ui.graphics.Color.Transparent,
+            darkIcons = useStatusBarDarkIcons
+        )
+        onDispose {}
+    }
+
     val context = LocalContext.current
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -277,8 +292,34 @@ fun ArticleDetailsScreen(
     webViewClient: AccompanistWebViewClient,
 ) {
     val articleDetailsScreenState = rememberArticleDetailsScreenState()
+    val bottomAppBarIsVisible = articleDetailsScreenState.bottomAppBarIsVisible
 
     val article by articleDetailsViewModel.article.observeAsState()
+    val systemUiController = rememberSystemUiController()
+    val useStatusBarDarkIcons = !isSystemInDarkTheme()
+    DisposableEffect(systemUiController, useStatusBarDarkIcons) {
+        systemUiController.setStatusBarColor(
+            color = androidx.compose.ui.graphics.Color.Transparent,
+            darkIcons = useStatusBarDarkIcons
+        )
+        onDispose {}
+    }
+    val useNavigationBarDarkIcons = when {
+        // in dark theme
+        isSystemInDarkTheme() && article?.isTransientUnread == true && !bottomAppBarIsVisible -> false
+        isSystemInDarkTheme() && article?.isTransientUnread == true -> true
+        isSystemInDarkTheme() -> false
+        // in light theme
+        article?.isTransientUnread == true && bottomAppBarIsVisible -> false
+        else -> true
+    }
+    DisposableEffect(systemUiController, useNavigationBarDarkIcons) {
+        systemUiController.setNavigationBarColor(
+            color = androidx.compose.ui.graphics.Color.Transparent,
+            darkIcons = useNavigationBarDarkIcons,
+        )
+        onDispose {}
+    }
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
