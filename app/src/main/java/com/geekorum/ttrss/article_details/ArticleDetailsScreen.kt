@@ -20,30 +20,31 @@
  */
 package com.geekorum.ttrss.article_details
 
-import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Color
-import android.webkit.WebViewClient
 import androidx.annotation.ColorRes
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.*
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.OpenInBrowser
+import androidx.compose.material3.*
 import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.net.toUri
@@ -52,12 +53,10 @@ import coil.request.ImageRequest
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleContentIndexed
-import com.geekorum.ttrss.ui.AppTheme
-import com.google.accompanist.insets.ui.Scaffold
+import com.geekorum.ttrss.ui.AppTheme3
 import com.google.accompanist.web.AccompanistWebViewClient
-import com.google.accompanist.web.rememberWebViewStateWithHTMLData
 import kotlinx.coroutines.delay
-import java.util.*
+import java.util.Locale
 
 
 @Composable
@@ -81,14 +80,6 @@ class ArticleDetailsScreenState(
                 _bottomAppBarIsVisible = false
             }
             return _bottomAppBarIsVisible
-        }
-
-    val appBarElevation: Dp
-        @Composable get() {
-            val result by animateDpAsState(if (scrollState.value > 0)
-                AppBarDefaults.TopAppBarElevation
-            else 0.dp)
-            return result
         }
 
     val isAtEndOfArticle: Boolean by derivedStateOf {
@@ -148,6 +139,7 @@ fun ArticleDetailsScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArticleDetailsScreenHero(
     articleDetailsViewModel: ArticleDetailsViewModel,
@@ -159,18 +151,15 @@ fun ArticleDetailsScreenHero(
     val article by articleDetailsViewModel.article.observeAsState()
     val context = LocalContext.current
 
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
+        modifier  = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            val backgroundColorId = if (article?.isTransientUnread == true) {
-                R.color.article_detail_bottom_appbar_unread
-            } else {
-                R.color.article_detail_bottom_appbar_read
-            }
             ArticleTopActionsBar(
+                scrollBehavior = scrollBehavior,
                 title = { Text(article?.title ?: "") },
+                isUnread = article?.isTransientUnread == true,
                 isStarred = article?.isStarred ?: false,
-                background = getColorStateList(backgroundColorId),
-                elevation = articleDetailsScreenState.appBarElevation,
                 onNavigateUpClick = onNavigateUpClick,
                 onToggleUnreadClick = { articleDetailsViewModel.toggleArticleRead() },
                 onStarredChange = { articleDetailsViewModel.onStarChanged(it) },
@@ -227,10 +216,10 @@ private fun ArticleDetailsHeroContent(
         modifier = modifier,
         scrollState = scrollState,
     ) {
-        val context = LocalContext.current
+        val colorScheme = MaterialTheme.colorScheme
         val baseUrl = article.link.toUri().let { "${it.scheme}://${it.host}/" }
-        val content = remember(context, article) {
-            val cssOverride = createCssOverride(context)
+        val content = remember(colorScheme, article) {
+            val cssOverride = createCssOverride(colorScheme)
             prepareArticleContent(article.content, cssOverride)
         }
         ArticleContentWebView(baseUrl = baseUrl, content = content,
@@ -279,6 +268,7 @@ private fun ArticleDetailsHeroContent(
 
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArticleDetailsScreen(
     articleDetailsViewModel: ArticleDetailsViewModel,
@@ -290,29 +280,30 @@ fun ArticleDetailsScreen(
 
     val article by articleDetailsViewModel.article.observeAsState()
 
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
-            val appBarElevation = articleDetailsScreenState.appBarElevation
-            ArticleTopAppBar(appBarElevation, onNavigateUpClick)
+            ArticleTopAppBar(scrollBehavior = scrollBehavior, onNavigateUpClick = onNavigateUpClick)
         },
         bottomBar = {
             val context = LocalContext.current
-            val backgroundColorId = if (article?.isTransientUnread == true) {
-                R.color.article_detail_bottom_appbar_unread
-            } else {
-                R.color.article_detail_bottom_appbar_read
-            }
-
-            ArticleBottomActionsBar(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(100.dp),
-                articleDetailsViewModel = articleDetailsViewModel,
-                bottomAppBarIsVisible = articleDetailsScreenState.bottomAppBarIsVisible,
-                background = getColorStateList(backgroundColorId),
-                onFabClicked = {
-                    article?.let { articleDetailsViewModel.openArticleInBrowser(context, it) }
+            val isVisible = remember { MutableTransitionState(false) }
+            isVisible.targetState = articleDetailsScreenState.bottomAppBarIsVisible
+            AnimatedArticleBottomAppBar(
+                isVisible = isVisible,
+                isUnread = article?.isTransientUnread == true,
+                isStarred = article?.isStarred == true,
+                floatingActionButton = {
+                    FloatingActionButton(onClick = {
+                        article?.let { articleDetailsViewModel.openArticleInBrowser(context, it) }
+                    }) {
+                        Icon(Icons.Default.OpenInBrowser, contentDescription = null)
+                    }
                 },
+                onToggleUnreadClick = { articleDetailsViewModel.toggleArticleRead() },
+                onStarredChange = { articleDetailsViewModel.onStarChanged(it) },
+                onShareClick = { articleDetailsViewModel.shareArticle(context) }
             )
         }
     ) { padding ->
@@ -338,23 +329,6 @@ fun ArticleDetailsScreen(
 }
 
 @Composable
-private fun ArticleTopAppBar(appBarElevation: Dp, onNavigateUpClick: () -> Unit) {
-    Surface(elevation = appBarElevation) {
-        TopAppBar(
-            modifier = Modifier.statusBarsPadding(),
-            title = {},
-            elevation = 0.dp,
-            backgroundColor = MaterialTheme.colors.surface,
-            navigationIcon = {
-                IconButton(onClick = onNavigateUpClick) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = null)
-                }
-            },
-        )
-    }
-}
-
-@Composable
 private fun OpenInBrowserExtendedFab(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -362,7 +336,7 @@ private fun OpenInBrowserExtendedFab(
     val text = stringResource(R.string.open_article_in_browser)
     ExtendedFloatingActionButton(
         text = { Text(text) },
-        icon = { Icon(AppTheme.Icons.OpenInBrowser, contentDescription = text) },
+        icon = { Icon(AppTheme3.Icons.OpenInBrowser, contentDescription = text) },
         modifier = modifier,
         onClick = onClick)
 }
@@ -378,9 +352,9 @@ private fun ArticleDetailsContent(
 ) {
     ArticleDetailsContent(article, readMoreArticles, onArticleClick , modifier, scrollState) {
         val baseUrl = article.link.toUri().let { "${it.scheme}://${it.host}/" }
-        val context = LocalContext.current
-        val content = remember(context, article) {
-            val cssOverride = createCssOverride(context)
+        val colorScheme = MaterialTheme.colorScheme
+        val content = remember(colorScheme, article) {
+            val cssOverride = createCssOverride(colorScheme)
             prepareArticleContent(article.content, cssOverride)
         }
         val verticalPadding = if (article.content.isNotBlank()) 16.dp else 0.dp
@@ -460,9 +434,9 @@ private fun ArticleHeaderWithoutImage(
         .fillMaxWidth()
         .padding(top = 36.dp)
     ) {
-        Text(title, style = MaterialTheme.typography.h4, color = MaterialTheme.colors.primary)
+        Text(title, style = MaterialTheme.typography.headlineLarge, color = MaterialTheme.colorScheme.primary)
         Text(date,
-            style = MaterialTheme.typography.caption,
+            style = MaterialTheme.typography.bodySmall,
             modifier = Modifier
                 .padding(top = 16.dp)
                 .align(Alignment.End)
@@ -502,8 +476,8 @@ private fun ArticleHeaderWithFlavorImage(
             .align(Alignment.CenterHorizontally)
         ) {
             Text(title,
-                style = MaterialTheme.typography.h3,
-                color = MaterialTheme.colors.primary,
+                style = MaterialTheme.typography.displaySmall,
+                color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .padding(top = 16.dp)
             )
@@ -515,7 +489,7 @@ private fun ArticleHeaderWithFlavorImage(
                 else -> ""
             }
             Text(authorDateText,
-                style = MaterialTheme.typography.h6,
+                style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier
                     .padding(top = 16.dp)
                     .align(Alignment.End)
@@ -532,12 +506,10 @@ private fun getColorStateList(@ColorRes colorRes: Int): ColorStateList? {
 }
 
 
-private fun createCssOverride(context: Context): String {
-    val theme = context.theme
-    val colors = WebViewColors.fromTheme(theme)
-    val backgroundHexColor = colors.backgroundColor.toRgbaCall()
-    val textColor = colors.textColor.toRgbaCall()
-    val linkHexColor = colors.linkColor.toRgbaCall()
+private fun createCssOverride(colorScheme: ColorScheme): String {
+    val backgroundHexColor = colorScheme.surface.toRgbaCall()
+    val textColor = colorScheme.onSurface.toRgbaCall()
+    val linkHexColor = colorScheme.primary.toRgbaCall()
     return """
                 @font-face {
                     font-family: "TextAppearance.AppTheme.Body1";
@@ -557,9 +529,10 @@ private fun createCssOverride(context: Context): String {
                 """.trimIndent()
 }
 
-private fun Int.toRgbaCall(): String {
+private fun androidx.compose.ui.graphics.Color.toRgbaCall(): String {
+    val argb = toArgb()
     return "rgba(%d, %d, %d, %.2f)".format(Locale.ENGLISH,
-        Color.red(this), Color.green(this), Color.blue(this), Color.alpha(this) / 255f)
+        Color.red(argb), Color.green(argb), Color.blue(argb), Color.alpha(argb) / 255f)
 }
 
 
@@ -628,7 +601,7 @@ fun PreviewArticleDetailsHeroContent() {
 }
 
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReadMoreSection(
     articles: List<ArticleWithTag>,
@@ -637,7 +610,7 @@ fun ReadMoreSection(
 ) {
     Column(modifier) {
         Text(stringResource(R.string.lbl_read_more),
-            style = MaterialTheme.typography.h6,
+            style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.padding(bottom = 16.dp)
         )
         for ((article, tag) in articles) {
@@ -655,11 +628,11 @@ fun ReadMoreSection(
                         contentDescription = null
                     )
                     Column(Modifier.padding(horizontal = 16.dp)) {
-                        Text(article.title, style = MaterialTheme.typography.subtitle1,
+                        Text(article.title, style = MaterialTheme.typography.titleMedium,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.heightIn(max = 56.dp)
                         )
-                        Text("#$tag", style = MaterialTheme.typography.caption)
+                        Text("#$tag", style = MaterialTheme.typography.bodySmall)
                     }
                 }
             }
@@ -671,7 +644,7 @@ fun ReadMoreSection(
 @Preview
 @Composable
 fun PreviewReadMoreSection() {
-    AppTheme {
+    AppTheme3 {
         ReadMoreSection(
             listOf(
                 ArticleWithTag(

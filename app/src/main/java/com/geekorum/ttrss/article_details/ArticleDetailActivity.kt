@@ -37,6 +37,7 @@ import com.geekorum.ttrss.articles_list.ArticleListActivity
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.session.SessionActivity
 import com.geekorum.ttrss.ui.AppTheme
+import com.geekorum.ttrss.ui.AppTheme3
 import com.geekorum.ttrss.ui.component1
 import com.geekorum.ttrss.ui.component2
 import com.google.accompanist.web.AccompanistWebViewClient
@@ -71,7 +72,7 @@ class ArticleDetailActivity : SessionActivity() {
         articleDetailsViewModel.init(ContentUris.parseId(articleUri))
 
         setContent {
-            AppTheme {
+            AppTheme3 {
                 val (widthSizeClass, heightSizeClass) = calculateWindowSizeClass(this)
 
                 ArticleDetailsScreen(articleDetailsViewModel,
