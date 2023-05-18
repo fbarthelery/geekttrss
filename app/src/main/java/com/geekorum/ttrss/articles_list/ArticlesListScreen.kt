@@ -21,6 +21,7 @@
 package com.geekorum.ttrss.articles_list
 
 import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -32,12 +33,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ShareCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.share.createShareArticleIntent
-import com.geekorum.ttrss.ui.AppTheme
 
 
 @Composable
@@ -71,7 +72,7 @@ private fun BaseArticlesListScreen(
         val snackBarMessage = UndoReadSnackbarMessage(pendingArticlesSetUnread,
             onAction = articlesListViewModel::undoSetUnreadActions,
             onDismiss = articlesListViewModel::commitSetUnreadActions)
-        activityViewModel.setUndoReadSnackBarMessge(snackBarMessage)
+        activityViewModel.setUndoReadSnackBarMessage(snackBarMessage)
     }
 
     LaunchedEffect(activityViewModel, articlesListViewModel, viewLifecycleOwner) {

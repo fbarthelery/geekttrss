@@ -28,6 +28,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.SnackbarDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Refresh
@@ -43,12 +44,14 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.ui.AppTheme3
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -57,25 +60,25 @@ fun ArticlesListScaffold(
     modifier: Modifier = Modifier,
     drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    undoUnreadSnackbarHostState: UndoUnreadSnackbarHostState = remember { UndoUnreadSnackbarHostState() },
     topBar: @Composable () -> Unit,
     navigationMenu: @Composable (ColumnScope.() -> Unit),
     drawerGesturesEnabled: Boolean = true,
     floatingActionButton: @Composable () -> Unit = {},
     bannerContent: @Composable (PaddingValues) -> Unit = {},
-    undoUnreadSnackBar: (@Composable () -> Unit)? = null,
     content: @Composable (PaddingValues) -> Unit,
 ) {
     ArticleListScaffold(
         modifier = modifier,
         drawerState = drawerState,
         snackbarHostState = snackbarHostState,
+        undoUnreadSnackbarHostState = undoUnreadSnackbarHostState,
         hasPermanentDrawer = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded,
         drawerGesturesEnabled = drawerGesturesEnabled,
         topBar = topBar,
         navigationMenu = navigationMenu,
         floatingActionButton = floatingActionButton,
         bannerContent = bannerContent,
-        undoUnreadSnackBar = undoUnreadSnackBar,
         content = content,
     )
 }
@@ -85,13 +88,13 @@ private fun ArticleListScaffold(
     modifier: Modifier = Modifier,
     drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    undoUnreadSnackbarHostState: UndoUnreadSnackbarHostState = remember { UndoUnreadSnackbarHostState() },
     topBar: @Composable () -> Unit,
     navigationMenu: @Composable (ColumnScope.() -> Unit),
     hasPermanentDrawer: Boolean = false,
     drawerGesturesEnabled: Boolean = true,
     floatingActionButton: @Composable () -> Unit = {},
     bannerContent: @Composable (PaddingValues) -> Unit,
-    undoUnreadSnackBar: @Composable (() -> Unit)? = null,
     content: @Composable (PaddingValues) -> Unit,
 ) {
     val contentScaffold = remember {
@@ -101,7 +104,7 @@ private fun ArticleListScaffold(
                 topBar = topBar,
                 bannerContent = bannerContent,
                 floatingActionButton = floatingActionButton,
-                undoUnreadSnackBar = undoUnreadSnackBar,
+                undoUnreadSnackbarHostState = undoUnreadSnackbarHostState,
                 content = content
             )
         }
@@ -151,10 +154,10 @@ private fun ArticleListScaffold(
 private fun ArticlesListContentScaffold(
     modifier: Modifier = Modifier,
     snackbarHostState: SnackbarHostState,
+    undoUnreadSnackbarHostState: UndoUnreadSnackbarHostState,
     topBar: @Composable () -> Unit,
     floatingActionButton: @Composable () -> Unit = {},
     bannerContent: @Composable (PaddingValues) -> Unit,
-    undoUnreadSnackBar: @Composable (() -> Unit)? = null,
     content: @Composable (PaddingValues) -> Unit
 ) {
     val bannerHeightState = remember { mutableStateOf<Float?>(null) }
@@ -172,7 +175,7 @@ private fun ArticlesListContentScaffold(
             }
         },
         snackbarHost = {
-            SnackbarHostWithCustomSnackBar(snackbarHostState, undoUnreadSnackBar)
+            SnackbarHostWithCustomSnackBar(snackbarHostState, undoUnreadSnackbarHostState)
         },
         content = { contentPadding ->
             ContentWithBottomBanner(
@@ -190,13 +193,15 @@ private fun ArticlesListContentScaffold(
 @OptIn(ExperimentalAnimationApi::class)
 private fun SnackbarHostWithCustomSnackBar(
     snackBarHostState: SnackbarHostState,
-    customSnackBar: @Composable (() -> Unit)?
+    undoUnreadSnackbarHostState: UndoUnreadSnackbarHostState,
 ) {
     Box {
         SnackbarHost(snackBarHostState) {
             Snackbar(it)
         }
-        val showCustomSnackbar = customSnackBar != null
+
+        val currentUndoMessage = undoUnreadSnackbarHostState.currentSnackbarMessage
+        val showCustomSnackbar = (currentUndoMessage?.nbArticles ?: 0) > 0
         AnimatedVisibility(
             visible = showCustomSnackbar,
             enter = fadeIn(tween(150, easing = LinearEasing)) + scaleIn(
@@ -212,8 +217,46 @@ private fun SnackbarHostWithCustomSnackBar(
                 ), targetScale = 0.8f
             )
         ) {
-            customSnackBar?.invoke()
+            if (currentUndoMessage != null) {
+                UndoUnreadSnackBar(undoUnreadSnackbarMessage = currentUndoMessage)
+            }
         }
+    }
+}
+
+@Stable
+class UndoUnreadSnackbarHostState {
+    var currentSnackbarMessage by mutableStateOf<UndoReadSnackbarMessage?>(null)
+}
+
+data class UndoReadSnackbarMessage(
+    val nbArticles: Int,
+    val onAction: () -> Unit,
+    val onDismiss: () -> Unit
+)
+
+@Composable
+private fun UndoUnreadSnackBar(undoUnreadSnackbarMessage: UndoReadSnackbarMessage) {
+    Snackbar(modifier = Modifier.padding(12.dp),
+        action = @Composable {
+            TextButton(
+                colors = ButtonDefaults.textButtonColors(contentColor = SnackbarDefaults.primaryActionColor),
+                onClick = { undoUnreadSnackbarMessage.onAction() },
+                content = { Text(stringResource(R.string.undo_set_articles_read_btn)) }
+            )
+        }) {
+        val nbArticles = undoUnreadSnackbarMessage.nbArticles
+        Text(
+            pluralStringResource(
+                R.plurals.undo_set_articles_read_text,
+                nbArticles,
+                nbArticles
+            )
+        )
+    }
+    LaunchedEffect(undoUnreadSnackbarMessage.nbArticles) {
+        delay(2_750)
+        undoUnreadSnackbarMessage.onDismiss()
     }
 }
 
@@ -264,6 +307,7 @@ fun PreviewArticlesListScaffoldPhone() {
         val windowSizeClass = WindowSizeClass.calculateFromSize(DpSize(maxWidth, maxHeight) )
         AppTheme3 {
             val snackbarHostState = remember { SnackbarHostState() }
+            val undoUnreadSnackbarHostState = remember { UndoUnreadSnackbarHostState() }
             val drawerState = rememberDrawerState(DrawerValue.Closed)
             val coroutineScope = rememberCoroutineScope()
             var showBanner by remember { mutableStateOf(false) }
@@ -271,6 +315,7 @@ fun PreviewArticlesListScaffoldPhone() {
             ArticlesListScaffold(
                 windowSizeClass = windowSizeClass,
                 snackbarHostState = snackbarHostState,
+                undoUnreadSnackbarHostState = undoUnreadSnackbarHostState,
                 drawerState = drawerState,
                 topBar = {
                     TopAppBar(
@@ -316,9 +361,6 @@ fun PreviewArticlesListScaffoldPhone() {
                 },
                 bannerContent = {
                     SampleBanner(showBanner)
-                },
-                undoUnreadSnackBar = {
-                    SampleUndoSnackbar()
                 },
                 content = { contentPadding ->
                     val items = List(100) { "Item $it" }

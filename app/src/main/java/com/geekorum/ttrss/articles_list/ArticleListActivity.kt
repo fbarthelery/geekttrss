@@ -25,8 +25,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.SnackbarDefaults
-import androidx.compose.material3.*
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
@@ -35,15 +37,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
-import com.geekorum.ttrss.R
 import com.geekorum.ttrss.app_reviews.AppReviewViewModel
 import com.geekorum.ttrss.article_details.ArticleDetailActivity
 import com.geekorum.ttrss.in_app_update.InAppUpdateViewModel
@@ -52,7 +50,6 @@ import com.geekorum.ttrss.session.SessionActivity
 import com.geekorum.ttrss.ui.AppTheme3
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
@@ -137,14 +134,11 @@ class ArticleListActivity : SessionActivity() {
                 val coroutineScope = rememberCoroutineScope()
                 val drawerState =  rememberDrawerState(DrawerValue.Closed)
 
+                val undoUnreadSnackbarHostState = remember { UndoUnreadSnackbarHostState() }
                 val undoUnreadSnackbarMessage by activityViewModel.undoReadSnackBarMessage.collectAsStateWithLifecycle()
-                val nbArticles = undoUnreadSnackbarMessage?.nbArticles ?: 0
-                val undoUnreadSnackbarComposable: (@Composable () -> Unit)? = if (nbArticles > 0) {
-                    @Composable {
-                        UndoUnreadSnackBar(undoUnreadSnackbarMessage = undoUnreadSnackbarMessage!!)
-                    }
-                } else null
-
+                LaunchedEffect(undoUnreadSnackbarMessage) {
+                    undoUnreadSnackbarHostState.currentSnackbarMessage = undoUnreadSnackbarMessage
+                }
                 val windowSizeClass = calculateWindowSizeClass(this)
                 val hasFabInFixedDrawer = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded
                 val fabPresenter = remember {
@@ -160,6 +154,7 @@ class ArticleListActivity : SessionActivity() {
                 ArticlesListScaffold(
                     modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
                     windowSizeClass = windowSizeClass,
+                    undoUnreadSnackbarHostState = undoUnreadSnackbarHostState,
                     drawerState = drawerState,
                     topBar = {
                         appBarPresenter.ToolbarContent(
@@ -190,7 +185,6 @@ class ArticleListActivity : SessionActivity() {
                     bannerContent = {
                         inAppUpdatePresenter.Content(Modifier.padding(it))
                     },
-                    undoUnreadSnackBar = undoUnreadSnackbarComposable,
                     drawerGesturesEnabled = drawerLayoutPresenter.drawerGesturesEnabled
                 ) { contentPadding ->
                     ArticlesListNavHost(activityViewModel, navController, contentPadding)
@@ -222,29 +216,4 @@ class ArticleListActivity : SessionActivity() {
             feedsViewModel, accountViewModel, activityViewModel, installModuleViewModel, this)
     }
 
-}
-
-@Composable
-private fun UndoUnreadSnackBar(undoUnreadSnackbarMessage: UndoReadSnackbarMessage) {
-    Snackbar(modifier = Modifier.padding(12.dp),
-        action = @Composable {
-            TextButton(
-                colors = ButtonDefaults.textButtonColors(contentColor = SnackbarDefaults.primaryActionColor),
-                onClick = { undoUnreadSnackbarMessage.onAction() },
-                content = { Text(stringResource(R.string.undo_set_articles_read_btn)) }
-            )
-        }) {
-        val nbArticles = undoUnreadSnackbarMessage.nbArticles
-        Text(
-            pluralStringResource(
-                R.plurals.undo_set_articles_read_text,
-                nbArticles,
-                nbArticles
-            )
-        )
-    }
-    LaunchedEffect(undoUnreadSnackbarMessage.nbArticles) {
-        delay(2_750)
-        undoUnreadSnackbarMessage.onDismiss()
-    }
 }
