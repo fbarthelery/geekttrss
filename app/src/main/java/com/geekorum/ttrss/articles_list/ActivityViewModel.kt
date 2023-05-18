@@ -162,7 +162,7 @@ class ActivityViewModel @Inject constructor(
     private fun ArticleSelectedEvent(position: Int, article: Article) =
         Event(ArticleSelectedParameters(position, article))
 
-    fun setUndoReadSnackBarMessge(snackBarMessage: UndoReadSnackbarMessage?) {
+    fun setUndoReadSnackBarMessage(snackBarMessage: UndoReadSnackbarMessage?) {
         _undoReadSnackBarMessage.value = snackBarMessage
     }
 
@@ -170,10 +170,4 @@ class ActivityViewModel @Inject constructor(
         _isScrollingUp.value = up
     }
 }
-
-data class UndoReadSnackbarMessage(
-    val nbArticles: Int,
-    val onAction: () -> Unit,
-    val onDismiss: () -> Unit
-)
 
