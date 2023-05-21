@@ -22,30 +22,37 @@ package com.geekorum.ttrss.settings
 
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.os.Bundle
 import android.os.StrictMode
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.browser.customtabs.CustomTabsService
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.*
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.core.net.toUri
+import androidx.core.view.WindowCompat
 import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -57,7 +64,8 @@ import com.geekorum.ttrss.R
 import com.geekorum.ttrss.core.BaseActivity
 import com.geekorum.ttrss.databinding.SettingsPreferencesContainerBinding
 import com.geekorum.ttrss.debugtools.withStrictMode
-import com.geekorum.ttrss.ui.AppTheme
+import com.geekorum.ttrss.ui.AppTheme3
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -68,9 +76,16 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         allowDiskReads()
         setContent {
-            AppTheme {
+            AppTheme3 {
+                val sysUiController = rememberSystemUiController()
+                val useDarkIcons = !isSystemInDarkTheme()
+                DisposableEffect(sysUiController, useDarkIcons) {
+                    sysUiController.setSystemBarsColor(Color.Transparent, darkIcons = useDarkIcons)
+                    onDispose {  }
+                }
                 SettingsScreen(windowSizeClass = calculateWindowSizeClass(activity = this@SettingsActivity),
                     onNavigateUpClick = {
                         onSupportNavigateUp()
@@ -176,18 +191,26 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     windowSizeClass: WindowSizeClass,
     onNavigateUpClick: () -> Unit,
-    scaffoldState: ScaffoldState = rememberScaffoldState(),
 ) {
     val useTabletLayout = windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Medium
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
-        scaffoldState = scaffoldState,
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
+            val colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = if (useTabletLayout) MaterialTheme.colorScheme.primaryContainer
+                    else MaterialTheme.colorScheme.surface,
+                titleContentColor = if (useTabletLayout) MaterialTheme.colorScheme.onPrimaryContainer
+                    else MaterialTheme.colorScheme.onSurface
+            )
             TopAppBar(
-                elevation = if (useTabletLayout) 0.dp else AppBarDefaults.TopAppBarElevation,
+                scrollBehavior = scrollBehavior,
+                colors = colors,
                 title = {
                     Text(stringResource(R.string.activity_settings_title))
                 },
@@ -204,7 +227,7 @@ fun SettingsScreen(
                 PreferencesContainer(Modifier.padding(4.dp))
             }
         } else {
-            PreferencesContainer()
+            PreferencesContainer(Modifier.padding(it))
         }
     }
 }
@@ -212,7 +235,7 @@ fun SettingsScreen(
 @Composable
 private fun TabletLayoutContent(
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
+    content: @Composable ColumnScope.() -> Unit
 ) {
     Box(
         contentAlignment = Alignment.TopCenter,
@@ -222,11 +245,11 @@ private fun TabletLayoutContent(
             modifier = Modifier
                 .height(136.dp) // 192.dp - 56.dp of appbar
                 .fillMaxWidth()
-                .background(MaterialTheme.colors.primarySurface)
+                .background(MaterialTheme.colorScheme.primaryContainer)
                 .testTag("fakeAppBar")
         )
 
-        Card(
+        ElevatedCard(
             Modifier
                 .width(512.dp)
                 .fillMaxSize()
@@ -244,9 +267,13 @@ private fun PreferencesContainer(modifier: Modifier = Modifier) {
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Preview
-@Composable
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL)
+@Preview(device = Devices.TABLET)
+@Preview(device = Devices.TABLET,
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+)@Composable
 fun PreviewSettingsScreen() {
-    AppTheme {
+    AppTheme3 {
         BoxWithConstraints {
             val windowSizeClass = WindowSizeClass.calculateFromSize(DpSize(maxWidth, maxHeight))
             SettingsScreen(windowSizeClass = windowSizeClass, onNavigateUpClick = {})
