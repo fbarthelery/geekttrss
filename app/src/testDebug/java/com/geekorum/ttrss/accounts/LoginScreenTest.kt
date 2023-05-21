@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.geekorum.ttrss.R
-import com.geekorum.ttrss.ui.AppTheme
+import com.geekorum.ttrss.ui.AppTheme3
 import org.junit.Rule
 import org.junit.runner.RunWith
 import org.robolectric.shadows.ShadowLog
@@ -53,7 +53,7 @@ class LoginScreenTest {
     @Test
     fun testThatLargeScreenUseLargeLayout() {
         composeTestRule.setContent {
-            AppTheme {
+            AppTheme3 {
                 val sizeClass = WindowSizeClass.calculateFromSize(DpSize(width=1280.dp, height=800.dp))
                 LoginScreen(sizeClass, loginInProgress = false, loginFormUiState = MutableLoginFormUiState(), onLoginClick = {})
             }
@@ -65,7 +65,7 @@ class LoginScreenTest {
     @Test
     fun testThatSmallScreenUseNormalLayout() {
         composeTestRule.setContent {
-            AppTheme {
+            AppTheme3 {
                 val sizeClass = WindowSizeClass.calculateFromSize(DpSize(width=400.dp, height=700.dp))
                 LoginScreen(sizeClass, loginInProgress = false, loginFormUiState = MutableLoginFormUiState(), onLoginClick = {})
             }
@@ -77,7 +77,7 @@ class LoginScreenTest {
     @Test
     fun testErrorsMessageAreDisplayed() {
         composeTestRule.setContent {
-            AppTheme {
+            AppTheme3 {
                 val sizeClass = WindowSizeClass.calculateFromSize(DpSize(width=400.dp, height=700.dp))
                 val uiState = MutableLoginFormUiState().apply {
                     serverUrlFieldErrorMsg = R.string.error_invalid_http_url
@@ -97,7 +97,7 @@ class LoginScreenTest {
     fun testHttpAuthFieldsAreDisplayedWhenHttpAuthIsUsed() {
         val uiState = MutableLoginFormUiState()
         composeTestRule.setContent {
-            AppTheme {
+            AppTheme3 {
                 val sizeClass = WindowSizeClass.calculateFromSize(DpSize(width=400.dp, height=700.dp))
                 LoginScreen(sizeClass, loginInProgress = false, loginFormUiState = uiState, onLoginClick = {})
             }
@@ -124,7 +124,7 @@ class LoginScreenTest {
     @Test
     fun testCircularLoadingIsDisplayed() {
         composeTestRule.setContent {
-            AppTheme {
+            AppTheme3 {
                 val uiState = MutableLoginFormUiState().apply {
                     loginButtonEnabled = true
                 }
@@ -153,7 +153,7 @@ class LoginScreenTest {
     @Test
     fun testUsernameUrlFieldsAreDisabled() {
         composeTestRule.setContent {
-            AppTheme {
+            AppTheme3 {
                 val uiState = MutableLoginFormUiState().apply {
                     canChangeUsernameOrUrl = false
                 }

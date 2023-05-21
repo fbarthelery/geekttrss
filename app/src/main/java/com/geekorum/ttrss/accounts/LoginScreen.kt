@@ -20,6 +20,7 @@
  */
 package com.geekorum.ttrss.accounts
 
+import android.content.res.Configuration
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
@@ -29,17 +30,18 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Password
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Web
+import androidx.compose.material3.*
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -52,16 +54,15 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.geekorum.ttrss.R
-import com.geekorum.ttrss.ui.AppTheme
+import com.geekorum.ttrss.ui.AppTheme3
 
 @Composable
 internal fun LoginScreen(windowSizeClass: WindowSizeClass, viewModel: LoginViewModel = hiltViewModel()) {
-    val scaffoldState = rememberScaffoldState()
+    val snackbarHostState = remember { SnackbarHostState() }
     LoginScreen(
         windowSizeClass = windowSizeClass,
         loginInProgress = viewModel.loginInProgress,
         loginFormUiState = viewModel.loginFormUiState,
-        scaffoldState = scaffoldState,
         onLoginClick = {
             viewModel.confirmLogin()
         })
@@ -69,28 +70,36 @@ internal fun LoginScreen(windowSizeClass: WindowSizeClass, viewModel: LoginViewM
     viewModel.snackbarErrorMessageId?.let { messageId ->
         val message = stringResource(messageId)
         LaunchedEffect(message) {
-            scaffoldState.snackbarHostState.showSnackbar(message)
+            snackbarHostState.showSnackbar(message)
             viewModel.clearSnackbarMessage()
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     windowSizeClass: WindowSizeClass,
     loginInProgress: Boolean,
     loginFormUiState: LoginFormUiState,
-    scaffoldState: ScaffoldState = rememberScaffoldState(),
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     onLoginClick: () -> Unit
 ) {
     val useTabletLayout = windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Medium
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
-        scaffoldState = scaffoldState,
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        snackbarHost = { SnackbarHost(snackbarHostState)  },
         topBar = {
-            TopAppBar(
-                elevation = if (useTabletLayout) 0.dp else AppBarDefaults.TopAppBarElevation,
+            val colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+            CenterAlignedTopAppBar(
+                scrollBehavior = scrollBehavior,
+                colors = colors,
                 title = {
-                    Text(stringResource(R.string.app_name))
+                    Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineSmall)
                 })
         },
     ) {
@@ -145,7 +154,7 @@ fun LoginScreen(
 @Composable
 private fun TabletLayoutContent(
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
+    content: @Composable ColumnScope.() -> Unit
 ) {
     Box(
         contentAlignment = Alignment.TopCenter,
@@ -155,11 +164,11 @@ private fun TabletLayoutContent(
             modifier = Modifier
                 .height(136.dp) // 192.dp - 56.dp of appbar
                 .fillMaxWidth()
-                .background(MaterialTheme.colors.primarySurface)
+                .background(MaterialTheme.colorScheme.primaryContainer)
                 .testTag("fakeAppBar")
         )
 
-        Card(
+        ElevatedCard(
             Modifier
                 .width(560.dp)
                 .fillMaxSize()
@@ -267,7 +276,7 @@ private fun LoginForm(
         ) {
             Text(
                 stringResource(R.string.lbl_use_http_authentication),
-                style = MaterialTheme.typography.subtitle1,
+                style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.weight(1f)
             )
             Switch(checked = uiState.useHttpAuthentication,
@@ -353,7 +362,7 @@ private fun OutlinedTextFieldWithError(
         val errorMsg = errorId?.let { stringResource(id = errorId) } ?: ""
         Text(
             errorMsg,
-            style = MaterialTheme.typography.caption,
+            style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.padding(top = 4.dp)
         )
     }
@@ -361,12 +370,16 @@ private fun OutlinedTextFieldWithError(
 
 @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL)
 @Preview(device = Devices.TABLET)
+@Preview(device = Devices.TABLET,
+    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+)
 @Composable
 fun PreviewLoginScreen() {
     BoxWithConstraints {
         val windowSizeClass = WindowSizeClass.calculateFromSize(DpSize(maxWidth, maxHeight))
-        AppTheme {
+        AppTheme3 {
             LoginScreen(windowSizeClass, loginInProgress = false,
                 loginFormUiState = MutableLoginFormUiState(),
                 onLoginClick = {})
