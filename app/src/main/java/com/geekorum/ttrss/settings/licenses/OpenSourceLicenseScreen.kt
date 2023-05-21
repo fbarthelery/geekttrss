@@ -20,39 +20,24 @@
  */
 package com.geekorum.ttrss.settings.licenses
 
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.ExperimentalTextApi
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextLayoutResult
-import androidx.compose.ui.text.UrlAnnotation
-import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.*
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withAnnotation
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -79,7 +64,7 @@ fun OpenSourceLicenseScreen(
     )
 }
 
-@OptIn(ExperimentalLayoutApi::class, ExperimentalTextApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalTextApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun OpenSourceLicenseScreen(
     dependency: String,
@@ -96,13 +81,11 @@ fun OpenSourceLicenseScreen(
     }
 
     val scrollState = rememberScrollState()
-    val hasScrolled by remember {
-        derivedStateOf { scrollState.value > 0 }
-    }
-    val topBarElevation by animateDpAsState(
-        if (hasScrolled) 4.dp else 0.dp
-    )
-    Scaffold(topBar = {
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+
+    Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
         TopAppBar(title = { Text(dependency, overflow = TextOverflow.Ellipsis, maxLines = 1) },
             navigationIcon = {
                 IconButton(onClick = onBackClick) {
@@ -112,7 +95,6 @@ fun OpenSourceLicenseScreen(
                     )
                 }
             },
-            elevation = topBarElevation
         )
     }) { paddingValues ->
         val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
@@ -153,7 +135,7 @@ private val UrlRegexp = """https?://(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{
 @Composable
 private fun linkifyText(text: String): AnnotatedString {
     val style = SpanStyle(
-        color = MaterialTheme.colors.secondary,
+        color = MaterialTheme.colorScheme.primary,
         textDecoration = TextDecoration.Underline
     )
     return remember(text, style) {
