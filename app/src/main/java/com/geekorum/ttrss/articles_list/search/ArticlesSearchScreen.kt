@@ -75,8 +75,8 @@ fun SearchResultCardList(
 
     val ltr = LocalLayoutDirection.current
     val lazyListContentPadding = PaddingValues(
-        start = contentPadding.calculateStartPadding(ltr),
-        end = contentPadding.calculateEndPadding(ltr),
+        start = contentPadding.calculateStartPadding(ltr) + 8.dp,
+        end = contentPadding.calculateEndPadding(ltr) + 8.dp,
         bottom = contentPadding.calculateBottomPadding() + 8.dp,
         top = contentPadding.calculateTopPadding() + 8.dp
     )
