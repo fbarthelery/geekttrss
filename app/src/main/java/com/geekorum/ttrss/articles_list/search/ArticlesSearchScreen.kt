@@ -21,6 +21,7 @@
 package com.geekorum.ttrss.articles_list.search
 
 import android.content.Context
+import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
@@ -36,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.core.app.ShareCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
@@ -46,8 +48,6 @@ import com.geekorum.ttrss.articles_list.PagingViewLoadState
 import com.geekorum.ttrss.articles_list.pagingViewStateFor
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleWithFeed
-import com.geekorum.ttrss.share.createShareArticleIntent
-import com.geekorum.ttrss.ui.AppTheme
 import kotlinx.coroutines.delay
 import timber.log.Timber
 
