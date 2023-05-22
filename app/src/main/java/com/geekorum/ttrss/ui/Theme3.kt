@@ -29,9 +29,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.geekorum.ttrss.R
 
 
 @Composable
@@ -63,6 +66,13 @@ fun AppTheme3(colorScheme: ColorScheme, content: @Composable () -> Unit) {
         content = content
     )
 }
+
+
+private val ExpletusSans = FontFamily(Font(R.font.expletus_sans_medium))
+private val Fenix = FontFamily(Font(R.font.fenix))
+private val Rubik = FontFamily(Font(R.font.rubik))
+private val RubikLight = FontFamily(Font(R.font.rubik_light))
+
 
 
 object AppTheme3 {

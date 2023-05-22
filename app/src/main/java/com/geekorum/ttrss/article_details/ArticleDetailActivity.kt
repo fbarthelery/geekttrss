@@ -25,7 +25,6 @@ import android.app.assist.AssistContent
 import android.content.ContentUris
 import android.content.Intent
 import android.os.Bundle
-import android.webkit.WebViewClient
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
@@ -36,7 +35,6 @@ import com.geekorum.ttrss.R
 import com.geekorum.ttrss.articles_list.ArticleListActivity
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.session.SessionActivity
-import com.geekorum.ttrss.ui.AppTheme
 import com.geekorum.ttrss.ui.AppTheme3
 import com.geekorum.ttrss.ui.component1
 import com.geekorum.ttrss.ui.component2
