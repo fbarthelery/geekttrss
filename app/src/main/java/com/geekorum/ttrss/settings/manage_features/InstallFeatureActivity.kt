@@ -29,12 +29,12 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -50,7 +50,7 @@ import androidx.lifecycle.lifecycleScope
 import com.geekorum.ttrss.core.BaseActivity
 import com.geekorum.ttrss.on_demand_modules.InstallModuleViewModel
 import com.geekorum.ttrss.on_demand_modules.InstallSession.State.Status.*
-import com.geekorum.ttrss.ui.AppTheme
+import com.geekorum.ttrss.ui.AppTheme3
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
@@ -72,9 +72,9 @@ class InstallFeatureActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            AppTheme {
+            AppTheme3 {
                 InstallFeatureScreen(activity = this, viewModel, onAppInstalled = {
-                    setResult(Activity.RESULT_OK)
+                    setResult(RESULT_OK)
                     lifecycleScope.launch {
                         delay(1000)
                         finish()
@@ -167,23 +167,21 @@ fun InstallFeatureScreen(
 
             Image(imageVector = Icons.Default.Settings, contentDescription = null,
                 contentScale = ContentScale.FillWidth,
-                colorFilter = ColorFilter.tint(MaterialTheme.colors.primary),
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary),
                 modifier = Modifier
                     .size(200.dp)
                     .rotate(logoAnimation.value)
             )
 
             Text(installationMessage,
-                style = MaterialTheme.typography.h6,
+                style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(top = 32.dp))
 
             if (indeterminateProgress) {
                 LinearProgressIndicator(
-                    color = MaterialTheme.colors.secondary,
                     modifier = Modifier.padding(vertical = 16.dp))
             } else {
                 LinearProgressIndicator(progress = progress/progressMax.toFloat(),
-                    color = MaterialTheme.colors.secondary,
                     modifier = Modifier.padding(vertical = 16.dp))
             }
         }
@@ -194,7 +192,7 @@ fun InstallFeatureScreen(
 @Preview
 @Composable
 fun PreviewInstallFeatureScreen() {
-    AppTheme {
+    AppTheme3 {
         var animate by remember { mutableStateOf(true) }
         InstallFeatureScreen(
             installationMessage = "Installation en cours",
