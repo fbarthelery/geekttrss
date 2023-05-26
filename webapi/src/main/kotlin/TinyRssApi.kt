@@ -65,5 +65,8 @@ interface TinyRssApi {
     suspend fun unsubscribeFromFeed(@Body unsubscribeFeedRequestPayload: UnsubscribeFeedRequestPayload): UnsubscribeFeedResponsePayload
 
     @POST("api/")
+    suspend fun catchupFeed(@Body catchupFeedRequestPayload: CatchupFeedRequestPayload): CatchupFeedResponsePayload
+
+    @POST("api/")
     suspend fun getFeedIcon(@Body getFeedIconPayload: GetFeedIconPayload): ResponseBody
 }
