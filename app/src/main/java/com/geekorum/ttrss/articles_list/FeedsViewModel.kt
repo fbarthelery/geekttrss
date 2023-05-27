@@ -48,6 +48,7 @@ class FeedsViewModel @Inject constructor(
     private val state: SavedStateHandle,
     private val dispatchers: CoroutineDispatchersProvider,
     private val feedsRepository: FeedsRepository,
+    private val articlesRepository: ArticlesRepository,
     componentFactory: SessionActivityComponent.Factory
 ) : ViewModel() {
 
@@ -126,6 +127,14 @@ class FeedsViewModel @Inject constructor(
         startRefreshFeedsJob()
     }.onCompletion {
         cancelRefreshFeedsJob()
+    }
+
+    fun markFeedAsRead(feed: Feed) = viewModelScope.launch {
+        withContext(dispatchers.io) {
+            apiService.markFeedAsRead(feed.id)
+            articlesRepository.setArticlesUnreadForFeed(feed.id, false)
+            refreshFeeds()
+        }
     }
 
 }

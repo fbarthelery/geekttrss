@@ -100,9 +100,6 @@ object ArticlesContract {
         enum class Field(val apiInteger: Int) {
             STARRED(0), PUBLISHED(1), UNREAD(2), NOTE(3);
 
-            @Deprecated("use property", ReplaceWith("apiInteger"))
-            fun asApiInteger(): Int = apiInteger
-
         }
     }
 

@@ -130,6 +130,10 @@ class ArticlesRepository
         articleDao.updateArticleMarked(articleId, newValue)
     }
 
+    suspend fun setArticlesUnreadForFeed(feedId: Long, newValue: Boolean) {
+        articleDao.updateArticleUnreadForFeed(feedId, newValue)
+    }
+
     fun searchArticles(query: String): PagingSource<Int, ArticleWithFeed> {
         return articleDao.searchArticles(query)
     }
