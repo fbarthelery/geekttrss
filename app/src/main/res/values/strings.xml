@@ -47,6 +47,7 @@
     <string name="title_article_search">Search</string>
     <string name="label_feed_name">{feed_name}</string>
     <string name="label_tag">#{tag}</string>
+    <string name="menu_item_mark_feed_as_read">Mark as read</string>
 
     <!-- activity article details -->
     <string name="title_article_details">Article details</string>

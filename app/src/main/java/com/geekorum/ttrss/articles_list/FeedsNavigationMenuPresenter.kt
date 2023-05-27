@@ -107,6 +107,9 @@ class FeedsNavigationMenuPresenter(
                             onMagazineSelected = {
                                 navController.navigateToMagazine()
                                 onNavigation()
+                            },
+                            onMarkFeedAsReadClick = {
+                                feedsViewModel.markFeedAsRead(it)
                             }
                         )
                     },

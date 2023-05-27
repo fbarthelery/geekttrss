@@ -22,12 +22,9 @@ package com.geekorum.ttrss.articles_list
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
@@ -46,6 +43,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.lerp
@@ -170,52 +168,75 @@ fun FeedSection(
     isMagazineSelected: Boolean,
     selectedFeed: Feed?,
     onMagazineSelected: () -> Unit,
-    onFeedSelected: (Feed) -> Unit
+    onFeedSelected: (Feed) -> Unit,
+    onMarkFeedAsReadClick: (Feed) -> Unit,
 ) {
     SectionLabel(stringResource(R.string.title_feeds_menu))
     NavigationItem(stringResource(R.string.title_magazine),
         icon = { Icon(painterResource(R.drawable.ic_newspaper_24), contentDescription = null) },
         selected = isMagazineSelected,
+        selectedForAction = false,
+        onLongClick = null,
         onClick = onMagazineSelected)
     for (feedWithFavIcon in feeds) {
-        val feed = feedWithFavIcon.feed
-        NavigationItem(
-            feed.displayTitle.takeIf { it.isNotBlank() } ?: feed.title,
-            selected = feed == selectedFeed,
-            onClick = {
-                onFeedSelected(feed)
-            },
-            icon = {
-                val iconVector = when {
-                    feed.isArchivedFeed -> AppTheme.Icons.Inventory2
-                    feed.isStarredFeed -> AppTheme.Icons.Star
-                    feed.isPublishedFeed -> AppTheme.Icons.CheckBox
-                    feed.isFreshFeed -> AppTheme.Icons.LocalCafe
-                    feed.isAllArticlesFeed -> AppTheme.Icons.FolderOpen
-                    else -> null
+        Box {
+            val feed = feedWithFavIcon.feed
+            var displayDropdownMenu by remember { mutableStateOf(false) }
+            NavigationItem(
+                feed.displayTitle.takeIf { it.isNotBlank() } ?: feed.title,
+                selected = feed == selectedFeed,
+                selectedForAction = displayDropdownMenu,
+                onClick = {
+                    onFeedSelected(feed)
+                },
+                onLongClick = {
+                    displayDropdownMenu = true
+                },
+                icon = {
+                    val iconVector = when {
+                        feed.isArchivedFeed -> AppTheme.Icons.Inventory2
+                        feed.isStarredFeed -> AppTheme.Icons.Star
+                        feed.isPublishedFeed -> AppTheme.Icons.CheckBox
+                        feed.isFreshFeed -> AppTheme.Icons.LocalCafe
+                        feed.isAllArticlesFeed -> AppTheme.Icons.FolderOpen
+                        else -> null
+                    }
+                    if (iconVector != null) {
+                        Icon(iconVector, contentDescription = null)
+                    } else {
+                        val feedIconPainter = rememberAsyncImagePainter(
+                            model = feedWithFavIcon.favIcon?.url,
+                            placeholder = painterResource(R.drawable.ic_rss_feed_orange),
+                            fallback = painterResource(R.drawable.ic_rss_feed_orange),
+                            error = painterResource(R.drawable.ic_rss_feed_orange),
+                        )
+                        Image(
+                            painter = feedIconPainter,
+                            contentDescription = null,
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                },
+                badge = {
+                    if (feed.unreadCount > 0) {
+                        Text(feed.unreadCount.toString())
+                    }
                 }
-                if (iconVector != null) {
-                    Icon(iconVector, contentDescription = null)
-                } else {
-                    val feedIconPainter = rememberAsyncImagePainter(
-                        model = feedWithFavIcon.favIcon?.url,
-                        placeholder = painterResource(R.drawable.ic_rss_feed_orange),
-                        fallback = painterResource(R.drawable.ic_rss_feed_orange),
-                        error = painterResource(R.drawable.ic_rss_feed_orange),
-                    )
-                    Image(painter = feedIconPainter,
-                        contentDescription = null,
-                        contentScale = ContentScale.FillBounds,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-            },
-            badge = {
-                if (feed.unreadCount > 0) {
-                    Text(feed.unreadCount.toString())
+            )
+
+            DropdownMenu(expanded = displayDropdownMenu,
+                onDismissRequest = { displayDropdownMenu = false },
+                offset = DpOffset(x = 16.dp, y = (-8).dp)
+            ) {
+                DropdownMenuItem(onClick = {
+                    onMarkFeedAsReadClick(feed)
+                    displayDropdownMenu = false
+                }) {
+                    Text(stringResource(R.string.menu_item_mark_feed_as_read))
                 }
             }
-        )
+        }
     }
 }
 
@@ -226,29 +247,34 @@ private fun NavigationDivider() {
         .padding(horizontal = NavigationItemPadding))
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NavigationItem(
     label: String,
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    selectedForAction: Boolean = false,
+    onLongClick: (() -> Unit)? = null,
     icon: (@Composable () -> Unit)? = null,
     badge: (@Composable () -> Unit)? = null,
 ) {
     Surface(
         modifier = modifier
+            .combinedClickable(
+                onLongClick = onLongClick,
+                onClick = onClick
+            )
             .height(NavigationItemHeight)
             .padding(horizontal = ActiveIndicatorPadding),
-        shape = if (selected)
+        shape = if (selected || selectedForAction)
             RoundedCornerShape(28.dp)
         else RectangleShape,
-        color = if (selected) {
-            MaterialTheme.colors.secondary.copy(alpha = 0.4f)
-        } else {
-            MaterialTheme.colors.surface
+        color = when {
+            selectedForAction -> MaterialTheme.colors.primary
+            selected -> MaterialTheme.colors.secondary.copy(alpha = 0.4f)
+            else -> MaterialTheme.colors.surface
         },
-        onClick = onClick
     ) {
         NavigationItemLayout(
             icon = icon,
@@ -392,7 +418,8 @@ fun PreviewFeedListNavigationMenu() {
                             onMagazineSelected = {
                                 selectedFeed = null
                                 isMagazineSelected = true
-                            }
+                            },
+                            onMarkFeedAsReadClick = { }
                         )
                     },
                     manageFeedsSection = {
