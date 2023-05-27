@@ -61,6 +61,9 @@ interface ApiService {
     @Throws(ApiCallException::class)
     suspend fun getFeedIcon(feedId: Long): BufferedSource
 
+    @Throws(ApiCallException::class)
+    suspend fun markFeedAsRead(feedId: Long)
+
     companion object {
         val ALL_ARTICLES_FEED_ID: Long = -4
     }

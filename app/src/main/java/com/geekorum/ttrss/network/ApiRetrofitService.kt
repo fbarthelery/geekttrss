@@ -117,6 +117,13 @@ class ApiRetrofitService(
         }
     }
 
+    override suspend fun markFeedAsRead(feedId: Long) {
+        val payload = CatchupFeedRequestPayload(feedId, isCategory = false)
+        executeOrFail("Unable to mark feed as read") {
+            tinyrssApi.catchupFeed(payload)
+        }
+    }
+
     override suspend fun getServerInfo(): ServerInfo = supervisorScope {
         val versionDeferred = async {
             val payload = GetVersionRequestPayload()
