@@ -170,7 +170,7 @@ class FeedIconSynchronizer @AssistedInject constructor(
         return "$baseFeedsIconsUrl/${feed.id}.ico"
     }
 
-    private fun findFavicons(url: HttpUrl) : Collection<FaviconInfo> {
+    private suspend fun findFavicons(url: HttpUrl) : Collection<FaviconInfo> {
         val httpsUrl = url.newBuilder().scheme("https").build()
         try {
             return faviKonSnoop.findFavicons(httpsUrl)

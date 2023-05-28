@@ -28,6 +28,7 @@ import com.geekorum.favikonsnoop.snoopers.WhatWgSnooper
 import com.geekorum.ttrss.accounts.NetworkLoginModule
 import com.geekorum.ttrss.accounts.PerAccount
 import com.geekorum.ttrss.accounts.ServerInformation
+import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.sync.DatabaseService
 import com.geekorum.ttrss.sync.FeedIconApiDownloader
@@ -73,11 +74,11 @@ interface SyncWorkerComponent {
 internal object FaviKonModule {
 
     @Provides
-    fun providesFaviKonSnoop(okHttpClient: OkHttpClient): FaviKonSnoop {
+    fun providesFaviKonSnoop(okHttpClient: OkHttpClient, coroutineDispatchersProvider: CoroutineDispatchersProvider): FaviKonSnoop {
         val snoopers = listOf(
-                AppManifestSnooper(),
-                WhatWgSnooper(),
-                AppleTouchIconSnooper())
-        return FaviKonSnoop(snoopers, okHttpClient)
+                AppManifestSnooper(coroutineDispatchersProvider.io),
+                WhatWgSnooper(coroutineDispatchersProvider.io),
+                AppleTouchIconSnooper(coroutineDispatchersProvider.io))
+        return FaviKonSnoop(snoopers, okHttpClient, coroutineDispatchersProvider.io)
     }
 }
