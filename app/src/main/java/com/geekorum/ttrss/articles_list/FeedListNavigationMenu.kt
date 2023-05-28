@@ -23,8 +23,14 @@ package com.geekorum.ttrss.articles_list
 import android.content.res.Configuration
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -37,9 +43,14 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerEventTimeoutCancellationException
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.onLongClick
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -165,56 +176,66 @@ fun FeedSection(
         onClick = onMagazineSelected)
     for (feedWithFavIcon in feeds) {
         Box {
-        val feed = feedWithFavIcon.feed
-        NavigationItem(
-            feed.displayTitle.takeIf { it.isNotBlank() } ?: feed.title,
-            selected = feed == selectedFeed,
-            onClick = {
-                onFeedSelected(feed)
-            },
-            icon = {
-                val iconVector = when {
-                    feed.isArchivedFeed -> AppTheme3.Icons.Inventory2
-                    feed.isStarredFeed -> AppTheme3.Icons.Star
-                    feed.isPublishedFeed -> AppTheme3.Icons.CheckBox
-                    feed.isFreshFeed -> AppTheme3.Icons.LocalCafe
-                    feed.isAllArticlesFeed -> AppTheme3.Icons.FolderOpen
-                    else -> null
+            var displayDropdownMenu by remember { mutableStateOf(false) }
+            val feed = feedWithFavIcon.feed
+            NavigationItem(
+                feed.displayTitle.takeIf { it.isNotBlank() } ?: feed.title,
+                selected = feed == selectedFeed,
+                selectedForAction = displayDropdownMenu,
+                onClick = {
+                    onFeedSelected(feed)
+                },
+                onLongClick = {
+                    displayDropdownMenu = true
+                },
+                icon = {
+                    val iconVector = when {
+                        feed.isArchivedFeed -> AppTheme3.Icons.Inventory2
+                        feed.isStarredFeed -> AppTheme3.Icons.Star
+                        feed.isPublishedFeed -> AppTheme3.Icons.CheckBox
+                        feed.isFreshFeed -> AppTheme3.Icons.LocalCafe
+                        feed.isAllArticlesFeed -> AppTheme3.Icons.FolderOpen
+                        else -> null
+                    }
+                    if (iconVector != null) {
+                        Icon(iconVector, contentDescription = null)
+                    } else {
+                        val feedIconPainter = rememberAsyncImagePainter(
+                            model = feedWithFavIcon.favIcon?.url,
+                            placeholder = painterResource(R.drawable.ic_rss_feed_orange),
+                            fallback = painterResource(R.drawable.ic_rss_feed_orange),
+                            error = painterResource(R.drawable.ic_rss_feed_orange),
+                        )
+                        Image(
+                            painter = feedIconPainter,
+                            contentDescription = null,
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                },
+                badge = {
+                    if (feed.unreadCount > 0) {
+                        Text(feed.unreadCount.toString())
+                    }
                 }
-                if (iconVector != null) {
-                    Icon(iconVector, contentDescription = null)
-                } else {
-                    val feedIconPainter = rememberAsyncImagePainter(
-                        model = feedWithFavIcon.favIcon?.url,
-                        placeholder = painterResource(R.drawable.ic_rss_feed_orange),
-                        fallback = painterResource(R.drawable.ic_rss_feed_orange),
-                        error = painterResource(R.drawable.ic_rss_feed_orange),
-                    )
-                    Image(painter = feedIconPainter,
-                        contentDescription = null,
-                        contentScale = ContentScale.FillBounds,
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
-            },
-            badge = {
-                if (feed.unreadCount > 0) {
-                    Text(feed.unreadCount.toString())
-                }
-            }
-        )
+            )
 
  	DropdownMenu(expanded = displayDropdownMenu,
                 onDismissRequest = { displayDropdownMenu = false },
                 offset = DpOffset(x = 16.dp, y = (-8).dp)
             ) {
-                DropdownMenuItem(onClick = {
-                    onMarkFeedAsReadClick(feed)
-                    displayDropdownMenu = false
-                }) {
-                    Text(stringResource(R.string.menu_item_mark_feed_as_read))
-                }
-	}
+                DropdownMenuItem(
+                    text = {
+                        Text(stringResource(R.string.menu_item_mark_feed_as_read))
+                    },
+                    onClick = {
+                        onMarkFeedAsReadClick(feed)
+                        displayDropdownMenu = false
+                    }
+                )
+            }
+        }
     }
 }
 
@@ -236,6 +257,13 @@ fun NavigationItem(
     icon: (@Composable () -> Unit)? = null,
     badge: (@Composable () -> Unit)? = null,
 ) {
+    val colors = if (selectedForAction)
+        NavigationDrawerItemDefaults.colors(
+            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            selectedTextColor = MaterialTheme.colorScheme.onPrimaryContainer
+        )
+    else NavigationDrawerItemDefaults.colors()
     NavigationDrawerItem(
         label = {
             Text(label,
@@ -244,14 +272,44 @@ fun NavigationItem(
                 overflow = TextOverflow.Ellipsis)
         },
         selected = selected || selectedForAction,
+        colors = colors,
         onClick = onClick,
         icon = icon,
         badge = badge,
-        modifier = modifier.
-            .combinedClickable(
-                onLongClick = onLongClick,
-                onClick = onClick
-            ).padding(NavigationDrawerItemDefaults.ItemPadding))
+        modifier = modifier
+            .interceptLongClick(onLongClick)
+            .padding(NavigationDrawerItemDefaults.ItemPadding)
+    )
+}
+
+private fun Modifier.interceptLongClick(
+    onLongClick: (() -> Unit)?,
+): Modifier {
+    return if (onLongClick != null) {
+        pointerInput(onLongClick) {
+            awaitEachGesture {
+                val longPressTimeout = viewConfiguration.longPressTimeoutMillis
+                awaitFirstDown(pass = PointerEventPass.Initial)
+                try {
+                    withTimeout(longPressTimeout) {
+                        waitForUpOrCancellation(PointerEventPass.Initial)
+                    }
+                } catch (e: PointerEventTimeoutCancellationException) {
+                    // we got the long press
+                    onLongClick()
+
+                    // consume the children's click handling
+                    val event = awaitPointerEvent(pass = PointerEventPass.Initial)
+                    event.changes.forEach { it.consume() }
+                }
+            }
+        }.semantics(mergeDescendants = true) {
+            this.onLongClick(action = {
+                onLongClick()
+                true
+            })
+        }
+    } else Modifier
 }
 
 

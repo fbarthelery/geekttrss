@@ -107,7 +107,8 @@ class FeedsNavigationMenuPresenter(
                     onMagazineSelected = {
                         navController.navigateToMagazine()
                         onNavigation()
-                    }
+                    },
+                    onMarkFeedAsReadClick = feedsViewModel::markFeedAsRead
                 )
             },
             manageFeedsSection = {
@@ -120,10 +121,8 @@ class FeedsNavigationMenuPresenter(
                         }
                         navController.navigateToManageFeeds()
                         onNavigation()
-                    },
-		     onMarkFeedAsReadClick = {
-                       feedsViewModel.markFeedAsRead(it)
-                    })
+                    }
+                )
             },
             onSettingsClicked = {
                 navController.navigateToSettings()
