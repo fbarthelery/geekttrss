@@ -22,6 +22,7 @@ package com.geekorum.favikonsnoop.snoopers
 
 import com.geekorum.favikonsnoop.FaviconInfo
 import com.geekorum.favikonsnoop.Snooper
+import com.geekorum.favikonsnoop.await
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -86,7 +87,7 @@ class AppManifestSnooper internal constructor(
             .url(url)
             .get()
             .build()
-        val response = okHttpClient.newCall(request).execute()
+        val response = okHttpClient.newCall(request).await()
         response.use {
             if (response.isSuccessful) {
                 response.body?.source()?.let {

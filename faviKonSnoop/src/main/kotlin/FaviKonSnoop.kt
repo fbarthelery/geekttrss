@@ -22,11 +22,12 @@ package com.geekorum.favikonsnoop
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import okhttp3.HttpUrl
-import okhttp3.OkHttpClient
-import okhttp3.Request
+import okhttp3.*
 import java.io.IOException
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 class FaviKonSnoop(
     private val snoopers: Collection<Snooper>,
@@ -46,11 +47,28 @@ class FaviKonSnoop(
             .url(url)
             .get()
             .build()
-        val response = okHttpClient.newCall(request).execute()
+        val response = okHttpClient.newCall(request).await()
         response.body?.source()?.use { content ->
             snoopers.flatMap {
                 it.snoop(url, content.peek())
             }
         } ?: emptyList()
+    }
+}
+
+
+internal suspend fun Call.await() = suspendCancellableCoroutine { cont ->
+    val callback = object : Callback {
+        override fun onFailure(call: Call, e: IOException) {
+            cont.resumeWithException(e)
+        }
+
+        override fun onResponse(call: Call, response: Response) {
+            cont.resume(response)
+        }
+    }
+    enqueue(callback)
+    cont.invokeOnCancellation {
+        cancel()
     }
 }

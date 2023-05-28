@@ -21,11 +21,10 @@
 package com.geekorum.favikonsnoop.snoopers
 
 import com.geekorum.favikonsnoop.FaviconInfo
+import com.geekorum.favikonsnoop.await
 import com.geekorum.favikonsnoop.source
 import com.google.common.truth.Truth.assertThat
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.slot
+import io.mockk.*
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -145,9 +144,11 @@ class AppManifestSnooperTest {
 
     @Test
     fun testHtmlWithInvalidManifestReturnsEmpty() = testScope.runTest {
+        mockkStatic("com.geekorum.favikonsnoop.FaviKonSnoopKt")
         subject.okHttpClient = mockk()
         val requestSlot = slot<Request>()
-        every { subject.okHttpClient.newCall(capture(requestSlot)).execute() } answers {
+
+        coEvery { subject.okHttpClient.newCall(capture(requestSlot)).await() } answers {
             Response.Builder()
                 .code(200)
                 .request(requestSlot.captured)
@@ -166,9 +167,10 @@ class AppManifestSnooperTest {
 
     @Test
     fun testHtmlWithSimpleManifestReturnsSimpleResult() = testScope.runTest {
+        mockkStatic("com.geekorum.favikonsnoop.FaviKonSnoopKt")
         subject.okHttpClient = mockk()
         val requestSlot = slot<Request>()
-        every { subject.okHttpClient.newCall(capture(requestSlot)).execute() } answers {
+        coEvery { subject.okHttpClient.newCall(capture(requestSlot)).await() } answers {
             Response.Builder()
                 .code(200)
                 .request(requestSlot.captured)
