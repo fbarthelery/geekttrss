@@ -190,7 +190,9 @@ fun FeedSection(
                     onFeedSelected(feed)
                 },
                 onLongClick = {
-                    displayDropdownMenu = true
+                    if (feed.isAllArticlesFeed || !Feed.isVirtualFeed(feed.id)) {
+                        displayDropdownMenu = true
+                    }
                 },
                 icon = {
                     val iconVector = when {

@@ -130,6 +130,10 @@ class ArticlesRepository
         articleDao.updateArticleMarked(articleId, newValue)
     }
 
+    suspend fun setAllArticlesUnread(newValue: Boolean) {
+        articleDao.updateAllArticleUnread(newValue)
+    }
+
     suspend fun setArticlesUnreadForFeed(feedId: Long, newValue: Boolean) {
         articleDao.updateArticleUnreadForFeed(feedId, newValue)
     }

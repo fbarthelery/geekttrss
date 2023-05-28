@@ -145,6 +145,9 @@ interface ArticleDao {
     @Query("UPDATE articles SET transiant_unread=:isUnread, unread=:isUnread WHERE _id=:articleId")
     suspend fun updateArticleUnread(articleId: Long, isUnread: Boolean): Int
 
+    @Query("UPDATE articles SET transiant_unread=:isUnread, unread=:isUnread")
+    suspend fun updateAllArticleUnread(isUnread: Boolean): Int
+
     @Query("UPDATE articles SET transiant_unread=:isUnread, unread=:isUnread WHERE feed_id=:feedId")
     suspend fun updateArticleUnreadForFeed(feedId: Long, isUnread: Boolean): Int
 
