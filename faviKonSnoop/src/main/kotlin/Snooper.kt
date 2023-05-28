@@ -32,12 +32,12 @@ abstract class Snooper {
 
     internal lateinit var okHttpClient: OkHttpClient
 
-    internal fun snoop(baseUrl: String, content: BufferedSource): Collection<FaviconInfo> {
+    internal suspend fun snoop(baseUrl: String, content: BufferedSource): Collection<FaviconInfo> {
         return snoop(baseUrl.toHttpUrl(), content)
     }
 
     /**
      * Find favicon for this url and optional information like size and mime types
      */
-    abstract fun snoop(baseUrl: HttpUrl, content: BufferedSource) : Collection<FaviconInfo>
+    abstract suspend fun snoop(baseUrl: HttpUrl, content: BufferedSource) : Collection<FaviconInfo>
 }

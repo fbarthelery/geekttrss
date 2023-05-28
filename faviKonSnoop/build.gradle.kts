@@ -36,6 +36,8 @@ dependencies {
     api(platform(libs.okhttp.bom))
     api(libs.okhttp)
     api(libs.okio)
+    implementation(platform(libs.kotlinx.coroutines.bom))
+    api(libs.kotlinx.coroutines.core)
     implementation(libs.javax.inject)
     implementation(libs.jsoup)
     implementation(libs.kotlinx.serialization.json.okio)
@@ -43,4 +45,5 @@ dependencies {
     testImplementation(libs.truth)
     testImplementation(kotlin("test-junit"))
     testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
 }

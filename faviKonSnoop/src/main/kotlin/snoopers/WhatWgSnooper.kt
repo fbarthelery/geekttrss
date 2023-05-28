@@ -21,14 +21,18 @@
 package com.geekorum.favikonsnoop.snoopers
 
 import com.geekorum.favikonsnoop.FaviconInfo
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import okhttp3.HttpUrl
 import okio.BufferedSource
 
 /**
  * https://html.spec.whatwg.org/#rel-icon
  */
-class WhatWgSnooper : LinkRelSnooper("icon") {
-    override fun snoop(baseUrl: HttpUrl, content: BufferedSource): Collection<FaviconInfo> {
+class WhatWgSnooper(
+    ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+) : LinkRelSnooper("icon", ioDispatcher) {
+    override suspend fun snoop(baseUrl: HttpUrl, content: BufferedSource): Collection<FaviconInfo> {
         val linksResult = super.snoop(baseUrl, content)
         val legacy = baseUrl.resolve("/favicon.ico") ?.let { faviconLegacyUrl ->
             FaviconInfo(faviconLegacyUrl)

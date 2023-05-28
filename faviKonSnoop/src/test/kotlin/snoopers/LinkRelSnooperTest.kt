@@ -25,6 +25,9 @@ import com.geekorum.favikonsnoop.FaviconInfo
 import com.geekorum.favikonsnoop.FixedDimension
 import com.geekorum.favikonsnoop.source
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -77,15 +80,17 @@ private val INVALID_HTML =
 
 class LinkRelSnooperTest {
     lateinit var subject: LinkRelSnooper
+    private val testDispatcher = StandardTestDispatcher()
+    private val testScope = TestScope(testDispatcher)
 
     @BeforeTest
     fun setUp() {
-        subject = LinkRelSnooper("icon")
+        subject = LinkRelSnooper("icon", testDispatcher)
     }
 
 
     @Test
-    fun testInvalidReturnsEmpty() {
+    fun testInvalidReturnsEmpty() = testScope.runTest {
         val result = INVALID_HTML.source().use {
             subject.snoop("http://exemple.com", it)
         }
@@ -94,7 +99,7 @@ class LinkRelSnooperTest {
     }
 
     @Test
-    fun testNoLinkReturnsEmpty() {
+    fun testNoLinkReturnsEmpty() = testScope.runTest {
         val result = NO_LINK_HTML.source().use {
             subject.snoop("http://exemple.com", it)
         }
@@ -103,7 +108,7 @@ class LinkRelSnooperTest {
     }
 
     @Test
-    fun testSimpleLinkReturnsCorrectResult() {
+    fun testSimpleLinkReturnsCorrectResult() = testScope.runTest {
         val result = SIMPLE_LINK_HTML.source().use {
             subject.snoop("http://exemple.com", it)
         }
@@ -116,7 +121,7 @@ class LinkRelSnooperTest {
     }
 
     @Test
-    fun testMultiSizeLinkReturnsCorrectResult() {
+    fun testMultiSizeLinkReturnsCorrectResult() = testScope.runTest {
         val result = MULTISIZE_LINK_HTML.source().use {
             subject.snoop("http://exemple.com", it)
         }
@@ -138,7 +143,7 @@ class LinkRelSnooperTest {
     }
 
     @Test
-    fun testManyLinkReturnsCorrectResult() {
+    fun testManyLinkReturnsCorrectResult() = testScope.runTest {
         val result = MANY_HTML.source().use {
             subject.snoop("http://exemple.com", it)
         }

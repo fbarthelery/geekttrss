@@ -22,18 +22,22 @@ package com.geekorum.favikonsnoop.snoopers
 
 import com.geekorum.favikonsnoop.FaviconInfo
 import com.geekorum.favikonsnoop.Snooper
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
 import okio.BufferedSource
 import org.jsoup.Jsoup
 
 open class LinkRelSnooper internal constructor(
-    private val relValue: String
+    private val relValue: String,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : Snooper() {
 
-    override fun snoop(baseUrl: HttpUrl, content: BufferedSource): Collection<FaviconInfo> {
+    override suspend fun snoop(baseUrl: HttpUrl, content: BufferedSource): Collection<FaviconInfo> = withContext(ioDispatcher) {
         val document = runCatching { Jsoup.parse(content.inputStream() , null, baseUrl.toString()) }
 
-        return document.getOrNull()?.head()?.let { head ->
+        document.getOrNull()?.head()?.let { head ->
             head.getElementsByTag("link")
                 .filter {
                     relValue in it.attr("rel").split("\\s".toRegex())

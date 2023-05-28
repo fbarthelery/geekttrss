@@ -20,7 +20,12 @@
  */
 package com.geekorum.favikonsnoop.snoopers
 
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+
 /**
  * https://developer.apple.com/library/archive/documentation/AppleApplications/Reference/SafariWebContent/ConfiguringWebApplications/ConfiguringWebApplications.html
  */
-class AppleTouchIconSnooper : LinkRelSnooper("apple-touch-icon")
+class AppleTouchIconSnooper(
+    ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+) : LinkRelSnooper("apple-touch-icon", ioDispatcher)

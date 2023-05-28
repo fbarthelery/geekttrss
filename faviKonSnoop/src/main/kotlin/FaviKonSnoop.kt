@@ -20,6 +20,9 @@
  */
 package com.geekorum.favikonsnoop
 
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -27,7 +30,8 @@ import java.io.IOException
 
 class FaviKonSnoop(
     private val snoopers: Collection<Snooper>,
-    private val okHttpClient: OkHttpClient
+    private val okHttpClient: OkHttpClient,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
 
     init {
@@ -37,13 +41,13 @@ class FaviKonSnoop(
     }
 
     @Throws(IOException::class)
-    fun findFavicons(url: HttpUrl): Collection<FaviconInfo> {
+    suspend fun findFavicons(url: HttpUrl): Collection<FaviconInfo> = withContext(ioDispatcher) {
         val request = Request.Builder()
             .url(url)
             .get()
             .build()
         val response = okHttpClient.newCall(request).execute()
-        return response.body?.source()?.use { content ->
+        response.body?.source()?.use { content ->
             snoopers.flatMap {
                 it.snoop(url, content.peek())
             }

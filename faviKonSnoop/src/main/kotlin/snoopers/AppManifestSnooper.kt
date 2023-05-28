@@ -22,6 +22,9 @@ package com.geekorum.favikonsnoop.snoopers
 
 import com.geekorum.favikonsnoop.FaviconInfo
 import com.geekorum.favikonsnoop.Snooper
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
@@ -40,12 +43,13 @@ import org.jsoup.Jsoup
  * https://www.w3.org/TR/appmanifest/
  */
 class AppManifestSnooper internal constructor(
-    private val webAppManifestParser: WebAppManifestParser
+    private val webAppManifestParser: WebAppManifestParser,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) : Snooper() {
 
-    constructor() : this(WebAppManifestParser())
+    constructor(ioDispatcher: CoroutineDispatcher = Dispatchers.IO) : this(WebAppManifestParser(), ioDispatcher)
 
-    override fun snoop(baseUrl: HttpUrl, content: BufferedSource): Collection<FaviconInfo> {
+    override suspend fun snoop(baseUrl: HttpUrl, content: BufferedSource): Collection<FaviconInfo> = withContext(ioDispatcher) {
         val document = runCatching { Jsoup.parse(content.inputStream() , null, baseUrl.toString()) }
 
         val manifestUrl = document.getOrNull()?.head()?.let { head ->
@@ -59,7 +63,7 @@ class AppManifestSnooper internal constructor(
             getAppManifest(it)
         }
 
-        return appManifest?.icons?.flatMap {
+        appManifest?.icons?.flatMap {
             val url = manifestUrl.resolve(it.src) ?: return@flatMap emptyList<FaviconInfo>()
             val sizes = parseSizes(it.sizes ?: "")
             if (sizes.isEmpty()) {
@@ -77,13 +81,13 @@ class AppManifestSnooper internal constructor(
         } ?: emptyList()
     }
 
-    private fun getAppManifest(url: HttpUrl): WebAppManifest? {
+    private suspend fun getAppManifest(url: HttpUrl): WebAppManifest? = withContext(ioDispatcher) {
         val request = Request.Builder()
             .url(url)
             .get()
             .build()
         val response = okHttpClient.newCall(request).execute()
-        return response.use {
+        response.use {
             if (response.isSuccessful) {
                 response.body?.source()?.let {
                     webAppManifestParser.parseManifest(it)

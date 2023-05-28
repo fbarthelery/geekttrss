@@ -25,6 +25,9 @@ import com.geekorum.favikonsnoop.FaviconInfo
 import com.geekorum.favikonsnoop.FixedDimension
 import com.geekorum.favikonsnoop.source
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -50,14 +53,16 @@ private val INVALID_HTML =
 
 class WhatWgSnooperTest {
     lateinit var subject: LinkRelSnooper
+    private val testDispatcher = StandardTestDispatcher()
+    private val testScope = TestScope(testDispatcher)
 
     @BeforeTest
     fun setUp() {
-        subject = WhatWgSnooper()
+        subject = WhatWgSnooper(testDispatcher)
     }
 
     @Test
-    fun testInvalidReturnsFallbackFavicon() {
+    fun testInvalidReturnsFallbackFavicon() = testScope.runTest {
         val result = INVALID_HTML.source().use {
             subject.snoop("http://exemple.com/crazy/story.html", it)
         }
@@ -66,7 +71,7 @@ class WhatWgSnooperTest {
     }
 
     @Test
-    fun testManyLinkReturnsCorrectResult() {
+    fun testManyLinkReturnsCorrectResult() = testScope.runTest {
         val result = MANY_HTML.source().use {
             subject.snoop("http://exemple.com", it)
         }

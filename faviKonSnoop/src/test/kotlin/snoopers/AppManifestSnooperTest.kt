@@ -26,6 +26,9 @@ import com.google.common.truth.Truth.assertThat
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runTest
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Protocol.HTTP_1_1
 import okhttp3.Request
@@ -114,14 +117,16 @@ private val WITH_MANIFEST_HTML = """
 
 class AppManifestSnooperTest {
     lateinit var subject: AppManifestSnooper
+    private val testDispatcher = StandardTestDispatcher()
+    private val testScope = TestScope(testDispatcher)
 
     @BeforeTest
     fun setUp() {
-        subject = AppManifestSnooper()
+        subject = AppManifestSnooper(testDispatcher)
     }
 
     @Test
-    fun testInvalidHtmlReturnsEmpty() {
+    fun testInvalidHtmlReturnsEmpty() = testScope.runTest {
         val result = INVALID_HTML.source().use {
             subject.snoop("http://exemple.com", it)
         }
@@ -130,7 +135,7 @@ class AppManifestSnooperTest {
     }
 
     @Test
-    fun testHtmlWithoutManifestReturnsEmpty() {
+    fun testHtmlWithoutManifestReturnsEmpty() = testScope.runTest {
         val result = NO_MANIFEST_HTML.source().use {
             subject.snoop("http://exemple.com", it)
         }
@@ -139,7 +144,7 @@ class AppManifestSnooperTest {
     }
 
     @Test
-    fun testHtmlWithInvalidManifestReturnsEmpty() {
+    fun testHtmlWithInvalidManifestReturnsEmpty() = testScope.runTest {
         subject.okHttpClient = mockk()
         val requestSlot = slot<Request>()
         every { subject.okHttpClient.newCall(capture(requestSlot)).execute() } answers {
@@ -160,7 +165,7 @@ class AppManifestSnooperTest {
     }
 
     @Test
-    fun testHtmlWithSimpleManifestReturnsSimpleResult() {
+    fun testHtmlWithSimpleManifestReturnsSimpleResult() = testScope.runTest {
         subject.okHttpClient = mockk()
         val requestSlot = slot<Request>()
         every { subject.okHttpClient.newCall(capture(requestSlot)).execute() } answers {
