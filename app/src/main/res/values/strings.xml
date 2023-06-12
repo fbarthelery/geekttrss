@@ -118,6 +118,11 @@
     <!-- activity add feed -->
     <string name="activity_add_feed_title">Subscribe to feed</string>
 
+    <!--  activity ShareToPublish   -->
+    <string name="activity_share_to_publish_toolbar_title">Publishing article</string>
+    <string name="activity_share_to_publish_article_title">Publish article</string>
+    <string name="lbl_publishing_in_progress">Publishing in progress</string>
+
     <!-- Menus -->
     <string name="share_article">Share article</string>
     <string name="context_selection_toggle_unread">(Un)Read</string>

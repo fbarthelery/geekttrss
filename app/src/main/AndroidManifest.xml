@@ -115,6 +115,12 @@
             android:exported="false"
             />
 
+        <activity android:name=".publish_article.ShareToPublishArticleActivity"
+            android:label="@string/activity_share_to_publish_article_title"
+            android:theme="@style/AppTheme.ShareToPublishArticleActivity"
+            android:noHistory="true"
+            android:exported="false"/>
+
         <activity android:name=".settings.licenses.OpenSourceLicensesActivity"
             android:theme="@style/AppTheme.NoActionBar"
             android:parentActivityName="com.geekorum.ttrss.settings.SettingsActivity"
