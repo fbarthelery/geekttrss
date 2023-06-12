@@ -39,7 +39,7 @@ plugins {
 }
 
 // some extra properties
-extra["compileSdkInt"] = 33
+extra["compileSdkInt"] = 34
 
 allprojects {
     repositories {
