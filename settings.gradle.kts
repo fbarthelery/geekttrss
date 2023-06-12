@@ -24,6 +24,12 @@ pluginManagement {
         gradlePluginPortal()
         mavenCentral()
         google()
+
+        maven {
+            // Waiting for feedback on https://github.com/google/play-services-plugins/pull/268
+            // we publish oss-licenses-plugin 0.10.6.1 for reproducible build
+            url = uri("https://raw.githubusercontent.com/fbarthelery/play-services-plugins/master/repo/")
+        }
     }
     resolutionStrategy {
         eachPlugin {

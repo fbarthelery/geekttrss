@@ -73,7 +73,7 @@ kotlin-ksp = "1.8.21-1.0.11"
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
 android-dynamic-feature = { id = "com.android.dynamic-feature", version.ref = "android-gradle-plugin" }
 google-gms-google-services = { id = "com.google.gms.google-services", version = "4.3.14" }
-google-gms-oss-license = { id = "com.google.android.gms.oss-licenses-plugin", version = "0.10.5" }
+google-gms-oss-license = { id = "com.google.android.gms.oss-licenses-plugin", version = "0.10.6.1" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version = "2.9.2" }
 androidx-navigation-safeargs-kotlin = { id = "androidx.navigation.safeargs.kotlin", version.ref = "androidx-navigation" }
 dagger-hilt-android = { id = "dagger.hilt.android.plugin", version.ref = "dagger" }
