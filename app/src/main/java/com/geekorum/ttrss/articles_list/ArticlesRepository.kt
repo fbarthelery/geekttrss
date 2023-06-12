@@ -192,8 +192,10 @@ open class SetArticleFieldAction(
 
     class Factory @Inject internal constructor(
         private val setUnreadActionFactory: SetUnreadAction.Factory,
-        private val setStarredActionFactory: SetStarredAction.Factory
-    ) : SetUnreadAction.Factory by setUnreadActionFactory, SetStarredAction.Factory by setStarredActionFactory
+        private val setStarredActionFactory: SetStarredAction.Factory,
+        private val setPublishedActionFactory: SetPublishedAction.Factory
+    ) : SetUnreadAction.Factory by setUnreadActionFactory, SetStarredAction.Factory by setStarredActionFactory,
+            SetPublishedAction.Factory by setPublishedActionFactory
 
 }
 
@@ -252,3 +254,32 @@ internal class SetStarredAction @AssistedInject internal constructor(
     }
 
 }
+
+/**
+ * Action to set the published field value of an article.
+ */
+internal class SetPublishedAction @AssistedInject internal constructor(
+    dispatchers: CoroutineDispatchersProvider,
+    private val articleDao: ArticleDao,
+    transactionsDao: TransactionsDao,
+    val apiService: ApiService,
+    @Assisted val articleId: Long,
+    @Assisted newValue: Boolean,
+    @Assisted scope: CoroutineScope
+) : SetArticleFieldAction(dispatchers, scope, transactionsDao, apiService, articleId,
+    ArticlesContract.Transaction.Field.PUBLISHED, newValue) {
+
+    override suspend fun updateArticleField(value: Boolean) {
+        val changed = articleDao.updateArticlePublished(articleId, value)
+        if (changed > 0) {
+            super.updateArticleField(value)
+        }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun createSetPublishedAction(scope: CoroutineScope, articleId: Long, newValue: Boolean): SetPublishedAction
+    }
+
+}
+

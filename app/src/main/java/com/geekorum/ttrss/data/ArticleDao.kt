@@ -154,6 +154,9 @@ interface ArticleDao {
     @Query("UPDATE articles SET marked=:isMarked WHERE _id=:articleId")
     suspend fun updateArticleMarked(articleId: Long, isMarked: Boolean): Int
 
+    @Query("UPDATE articles SET published=:isPublished WHERE _id=:articleId")
+    suspend fun updateArticlePublished(articleId: Long, isPublished: Boolean): Int
+
     @Query("SELECT articles.* FROM ArticleFTS JOIN articles ON (ArticleFTS.rowid = _id) "
         + "WHERE ArticleFTS MATCH :query "
         + "ORDER BY last_time_update DESC")
