@@ -24,7 +24,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
 import android.net.Uri
-import androidx.core.app.ShareCompat
 import androidx.core.net.toUri
 import androidx.core.text.parseAsHtml
 import androidx.lifecycle.*
@@ -32,6 +31,7 @@ import com.geekorum.ttrss.articles_list.ArticlesRepository
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.network.TtRssBrowserLauncher
 import com.geekorum.ttrss.session.SessionActivityComponent
+import com.geekorum.ttrss.share.createShareArticleIntent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
@@ -128,13 +128,8 @@ class ArticleDetailsViewModel @Inject constructor(
     fun openUrlInBrowser(context: Context, uri: Uri) = browserLauncher.launchUrl(context, uri)
 
     fun shareArticle(activity: Activity) {
-        val shareIntent = ShareCompat.IntentBuilder(activity)
         article.value?.let {
-            shareIntent.setSubject(it.title)
-                .setHtmlText(it.content)
-                .setText(it.link)
-                .setType("text/plain")
-            activity.startActivity(shareIntent.createChooserIntent())
+            activity.startActivity(createShareArticleIntent(activity, it))
         }
     }
 

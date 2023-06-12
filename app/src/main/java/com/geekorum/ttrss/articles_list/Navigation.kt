@@ -141,7 +141,9 @@ fun NavController.navigateToSettings() {
 
 fun NavController.navigateToArticle(articleId: Long) {
     val intent = Intent(context, ArticleDetailActivity::class.java).apply {
-        data = "content://com.geekorum.ttrss.free.providers.articles/${articleId}".toUri()
+        data = context.getString(R.string.article_details_data_pattern)
+            .replace("{article_id}", articleId.toString())
+            .toUri()
     }
     context.startActivity(intent)
 }

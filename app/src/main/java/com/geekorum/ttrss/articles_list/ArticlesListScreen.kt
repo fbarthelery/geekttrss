@@ -21,25 +21,23 @@
 package com.geekorum.ttrss.articles_list
 
 import android.content.Context
-import android.content.Intent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
-import androidx.core.app.ShareCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.data.Article
+import com.geekorum.ttrss.share.createShareArticleIntent
 import com.geekorum.ttrss.ui.AppTheme
 
 
@@ -127,14 +125,6 @@ private fun BaseArticlesListScreen(
 }
 
 private fun onShareClicked(context: Context, article: Article) {
-    context.startActivity(createShareIntent(context, article))
+    context.startActivity(createShareArticleIntent(context, article))
 }
 
-private fun createShareIntent(context: Context, article: Article): Intent {
-    val shareIntent = ShareCompat.IntentBuilder(context)
-    shareIntent.setSubject(article.title)
-        .setHtmlText(article.content)
-        .setText(article.link)
-        .setType("text/plain")
-    return shareIntent.createChooserIntent()
-}

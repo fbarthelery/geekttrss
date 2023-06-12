@@ -21,7 +21,6 @@
 package com.geekorum.ttrss.articles_list.search
 
 import android.content.Context
-import android.content.Intent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
@@ -29,16 +28,15 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.*
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.core.app.ShareCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
@@ -49,6 +47,7 @@ import com.geekorum.ttrss.articles_list.PagingViewLoadState
 import com.geekorum.ttrss.articles_list.pagingViewStateFor
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleWithFeed
+import com.geekorum.ttrss.share.createShareArticleIntent
 import com.geekorum.ttrss.ui.AppTheme
 import kotlinx.coroutines.delay
 import timber.log.Timber
@@ -191,14 +190,5 @@ fun ArticlesSearchScreen(
 
 
 private fun onShareClicked(context: Context, article: Article) {
-    context.startActivity(createShareIntent(context, article))
-}
-
-private fun createShareIntent(context: Context, article: Article): Intent {
-    val shareIntent = ShareCompat.IntentBuilder(context)
-    shareIntent.setSubject(article.title)
-        .setHtmlText(article.content)
-        .setText(article.link)
-        .setType("text/plain")
-    return shareIntent.createChooserIntent()
+    context.startActivity(createShareArticleIntent(context, article))
 }
