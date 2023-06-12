@@ -79,6 +79,10 @@ internal open class MockApiService : ApiService {
         TODO("Not yet implemented")
     }
 
+    override suspend fun markFeedAsRead(feedId: Long) {
+        TODO("Not yet implemented")
+    }
+
 }
 
 
