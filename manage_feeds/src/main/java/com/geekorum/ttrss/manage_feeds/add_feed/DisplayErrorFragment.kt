@@ -24,23 +24,53 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.StringRes
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
-import com.geekorum.ttrss.manage_feeds.databinding.FragmentAddFeedDisplayErrorBinding
+import com.geekorum.ttrss.manage_feeds.R
+import com.geekorum.ttrss.ui.AppTheme
 
 
 class DisplayErrorFragment : Fragment() {
 
-    private lateinit var binding: FragmentAddFeedDisplayErrorBinding
-
     val args: DisplayErrorFragmentArgs by navArgs()
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentAddFeedDisplayErrorBinding.inflate(inflater, container, false)
-        return binding.root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        return ComposeView(requireContext()).apply {
+            setContent {
+                AppTheme {
+                    DisplayErrorScreen(errorMsgId = args.errorMsgId)
+                }
+            }
+        }
     }
+}
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        binding.lblError.setText(args.errorMsgId)
+
+@Composable
+fun DisplayErrorScreen(@StringRes errorMsgId: Int) {
+    Box(Modifier.padding(16.dp).fillMaxSize()) {
+        Text(stringResource(errorMsgId))
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewDisplayErrorScreen() {
+    AppTheme {
+        Surface {
+            DisplayErrorScreen(R.string.fragment_display_error_no_feeds_found)
+        }
     }
 }
