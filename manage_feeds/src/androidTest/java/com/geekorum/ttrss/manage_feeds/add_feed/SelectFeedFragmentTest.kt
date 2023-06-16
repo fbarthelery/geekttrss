@@ -20,45 +20,32 @@
  */
 package com.geekorum.ttrss.manage_feeds.add_feed
 
-import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavController
-import androidx.test.espresso.Espresso
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.ViewActions.click
-import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
-import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.espresso.matcher.ViewMatchers.withSpinnerText
-import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.compose.ui.test.*
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.WorkManager
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
-import com.geekorum.ttrss.manage_feeds.R
 import com.geekorum.ttrss.manage_feeds.add_feed.FeedsFinder.FeedResult
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
-import org.hamcrest.Matchers.allOf
-import org.hamcrest.Matchers.anything
-import org.hamcrest.Matchers.not
+import org.junit.Rule
 import org.junit.runner.RunWith
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-import com.google.android.material.R as matR
 
 @RunWith(AndroidJUnit4::class)
 class SelectFeedFragmentTest {
-    lateinit var viewModelProvider: ViewModelProvider.Factory
     lateinit var subscribeToFeedViewModel: SubscribeToFeedViewModel
-    lateinit var navController: NavController
     lateinit var workManager: WorkManager
+
+    @get:Rule
+    val composeTestRule = createComposeRule()
 
     @BeforeTest
     fun setUp() {
         workManager = mockk(relaxed = true)
         val dispatchers = CoroutineDispatchersProvider(Dispatchers.Main, Dispatchers.IO, Dispatchers.Default)
         subscribeToFeedViewModel = SubscribeToFeedViewModel(dispatchers, mockk(), workManager, mockk())
-        navController = mockk(relaxed = true)
-        viewModelProvider = createViewModelFactoryFor(subscribeToFeedViewModel)
     }
 
     @Test
@@ -68,29 +55,28 @@ class SelectFeedFragmentTest {
             FeedResult(FeedsFinder.Source.HTML, "http://my.second.feed", title = "Second")
         )
 
-        val scenario = launchFragmentInViewModelProvidedActivity(
-            viewModelProviderFactory = viewModelProvider,
-            themeResId = matR.style.Theme_MaterialComponents_Light) {
-            SelectFeedFragment()
-        }
-
-        scenario.onFragment {
+        composeTestRule.runOnUiThread {
             subscribeToFeedViewModel._feedsFound.value = feeds
         }
+        composeTestRule.setContent {
+            SelectFeedScreen(subscribeToFeedViewModel)
+        }
 
-        onView(withId(R.id.available_feeds_single))
-            .check(matches(not(isDisplayed())))
+        composeTestRule.onNodeWithText("We found 2 feeds", substring = true)
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText("First")
+            .assertIsDisplayed()
 
-        onView(withId(R.id.available_feeds))
-            .check(matches(isDisplayed()))
-            .perform(click())
+        // open drop down and select second item
+        composeTestRule.onNodeWithText("First")
+            .performClick()
+        composeTestRule.onNodeWithText("Second")
+            .performClick()
 
-        Espresso.onData(anything())
-            .atPosition(1)
-            .perform(click())
-
-        onView(withId(R.id.available_feeds))
-            .check(matches(withSpinnerText(feeds[1].toString())))
+        composeTestRule.onNodeWithText("Second")
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText("First")
+            .assertDoesNotExist()
     }
 
     @Test
@@ -99,24 +85,17 @@ class SelectFeedFragmentTest {
             FeedResult(FeedsFinder.Source.HTML, "http://my.feed", title = "First")
         )
 
-        val scenario = launchFragmentInViewModelProvidedActivity(
-            viewModelProviderFactory = viewModelProvider,
-            themeResId = matR.style.Theme_MaterialComponents_Light) {
-            SelectFeedFragment()
-        }
-
-        scenario.onFragment {
+        composeTestRule.runOnUiThread {
             subscribeToFeedViewModel._feedsFound.value = feeds
         }
+        composeTestRule.setContent {
+            SelectFeedScreen(subscribeToFeedViewModel)
+        }
 
-        onView(withId(R.id.available_feeds_single))
-            .check(matches(allOf(
-                isDisplayed(),
-                withText(feeds[0].title)
-            )))
-
-        onView(withId(R.id.available_feeds))
-            .check(matches(not(isDisplayed())))
+        composeTestRule.onNodeWithText("We found this feed", substring = true)
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText("First")
+            .assertIsDisplayed()
     }
 
     @Test
@@ -125,25 +104,15 @@ class SelectFeedFragmentTest {
             FeedResult(FeedsFinder.Source.HTML, "http://my.feed", title = "First")
         )
 
-        val scenario = launchFragmentInViewModelProvidedActivity(
-            viewModelProviderFactory = viewModelProvider,
-            themeResId = matR.style.Theme_MaterialComponents_Light) {
-            SelectFeedFragment()
-        }
-
-        var expectedMessage = ""
-        scenario.onFragment {
+        composeTestRule.runOnUiThread {
             subscribeToFeedViewModel._feedsFound.value = feeds
-            expectedMessage = it.resources.getQuantityString(R.plurals.fragment_select_feed_label, feeds.size, feeds.size)
+        }
+        composeTestRule.setContent {
+            SelectFeedScreen(subscribeToFeedViewModel)
         }
 
-
-        onView(withId(R.id.lbl_select))
-            .check(matches(allOf(
-                isDisplayed(),
-                withText(expectedMessage)
-            )))
-
+        composeTestRule.onNodeWithText("We found this feed on this website. Do you want to subscribe ?")
+            .assertIsDisplayed()
     }
 
     @Test
@@ -153,25 +122,15 @@ class SelectFeedFragmentTest {
             FeedResult(FeedsFinder.Source.HTML, "http://my.second.feed", title = "Second")
         )
 
-        val scenario = launchFragmentInViewModelProvidedActivity(
-            viewModelProviderFactory = viewModelProvider,
-            themeResId = matR.style.Theme_MaterialComponents_Light) {
-            SelectFeedFragment()
-        }
-
-        var expectedMessage = ""
-        scenario.onFragment {
+        composeTestRule.runOnUiThread {
             subscribeToFeedViewModel._feedsFound.value = feeds
-            expectedMessage = it.resources.getQuantityString(R.plurals.fragment_select_feed_label, feeds.size, feeds.size)
+        }
+        composeTestRule.setContent {
+            SelectFeedScreen(subscribeToFeedViewModel)
         }
 
-
-        onView(withId(R.id.lbl_select))
-            .check(matches(allOf(
-                isDisplayed(),
-                withText(expectedMessage)
-            )))
-
+        composeTestRule.onNodeWithText("We found 2 feeds on this website. Select the one you want to subscribe to.")
+            .assertIsDisplayed()
     }
 
 

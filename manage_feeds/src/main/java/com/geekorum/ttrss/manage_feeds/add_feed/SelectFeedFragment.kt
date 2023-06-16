@@ -24,36 +24,154 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.geekorum.ttrss.manage_feeds.R
-import com.geekorum.ttrss.manage_feeds.databinding.FragmentAddFeedSelectFeedBinding
+import com.geekorum.ttrss.ui.AppTheme
 
 class SelectFeedFragment : Fragment() {
 
-    private lateinit var binding: FragmentAddFeedSelectFeedBinding
     private val viewModel: SubscribeToFeedViewModel by activityViewModels()
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentAddFeedSelectFeedBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        binding.viewModel = viewModel
-        binding.lifecycleOwner = viewLifecycleOwner
-        val feedAdapter = FeedAdapter(requireContext())
-        binding.availableFeeds.adapter = feedAdapter
-
-        viewModel.feedsFound.observe(viewLifecycleOwner) {
-            val text = it?.firstOrNull()?.title ?: getString(
-                R.string.activity_add_feed_no_feeds_available)
-            binding.availableFeedsSingle.text = text
-            with(feedAdapter) {
-                clear()
-                addAll(it ?: emptyList())
+        return ComposeView(requireContext()).apply {
+            setContent {
+                AppTheme {
+                    SelectFeedScreen(viewModel)
+                }
             }
+        }
+    }
+}
+
+
+@Composable
+fun SelectFeedScreen(viewModel: SubscribeToFeedViewModel = viewModel()) {
+    val feeds by viewModel.feedsFound.observeAsState()
+    var selectedFeed by remember { mutableStateOf(feeds?.firstOrNull()) }
+    SelectFeedScreen(
+        feeds = feeds ?: emptyList(),
+        selectedFeed = selectedFeed,
+        onFeedSelected = {
+            selectedFeed = it
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun SelectFeedScreen(
+    feeds: List<FeedsFinder.FeedResult>,
+    selectedFeed: FeedsFinder.FeedResult? = feeds.firstOrNull(),
+    onFeedSelected: (FeedsFinder.FeedResult) -> Unit,
+) {
+    Column(Modifier.padding(16.dp)) {
+        Text(pluralStringResource(id = R.plurals.fragment_select_feed_label, count = feeds.size, feeds.size))
+
+        if (feeds.size > 1) {
+            var expanded by remember { mutableStateOf(false) }
+
+            ExposedDropdownMenuBox(
+                modifier = Modifier.padding(top = 32.dp),
+                expanded = expanded,
+                onExpandedChange = {
+                    expanded = it
+                }) {
+                TextField(
+                    readOnly = true,
+                    textStyle = MaterialTheme.typography.subtitle1,
+                    value = selectedFeed?.title ?: "",
+                    singleLine = true,
+                    onValueChange = { },
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(
+                            expanded = expanded
+                        )
+                    },
+                    colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                // Use DropDownMenu instead of exposed, to workaround bug
+                // https://issuetracker.google.com/issues/205589613
+                // ExposedDropdownMenu(
+                DropdownMenu(
+                    modifier = Modifier.exposedDropdownSize(),
+                    expanded = expanded, onDismissRequest = { expanded = false }) {
+                    for (feed in feeds) {
+                        DropdownMenuItem(
+                            onClick = {
+                                onFeedSelected(feed)
+                                expanded = false
+                            }
+                        ) {
+                            Text(feed.title)
+                        }
+                    }
+                }
+            }
+        } else {
+            val text = feeds.firstOrNull()?.title ?: stringResource(R.string.activity_add_feed_no_feeds_available)
+            Text(text, style = MaterialTheme.typography.subtitle1, modifier = Modifier.padding(top = 24.dp))
+        }
+    }
+}
+
+
+@Preview
+@Composable
+private fun PreviewSelectFeedScreen() {
+    AppTheme {
+        Surface(Modifier.fillMaxSize()) {
+            val feeds = listOf(
+                FeedsFinder.FeedResult(
+                    FeedsFinder.Source.HTML,
+                    href = "https://site.com/feeds/rss",
+                    title = "RSS feed",
+                ),
+                FeedsFinder.FeedResult(
+                    FeedsFinder.Source.HTML,
+                    href = "https://site.com/feeds/atom",
+                    title = "Atom feed",
+                )
+            )
+            var selectedFeed by remember { mutableStateOf(feeds.firstOrNull()) }
+            SelectFeedScreen(feeds,
+                selectedFeed = selectedFeed,
+                onFeedSelected = {
+                    selectedFeed = it
+                }
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewSelectFeedScreenSingle() {
+    AppTheme {
+        Surface(Modifier.fillMaxSize()) {
+            val feeds = listOf(
+                FeedsFinder.FeedResult(FeedsFinder.Source.HTML,
+                    href = "https://site.com/feeds/rss",
+                    title = "RSS feed",
+                ))
+            SelectFeedScreen(feeds, onFeedSelected = {})
         }
     }
 }

@@ -111,6 +111,7 @@ dependencies {
     implementation(libs.android.material)
 
     // compose
+    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.ui.tooling.preview)
 
     // necessary for compose previews
@@ -137,5 +138,9 @@ dependencies {
 
     debugImplementation(libs.androidx.fragment.testing.manifest)
     androidTestImplementation(libs.androidx.fragment.testing)
+
+    testImplementation(libs.androidx.compose.ui.test.junit4)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
 
 }
