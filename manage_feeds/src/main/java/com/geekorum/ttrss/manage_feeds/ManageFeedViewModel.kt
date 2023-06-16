@@ -22,6 +22,9 @@ package com.geekorum.ttrss.manage_feeds
 
 import android.accounts.Account
 import android.app.Application
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -53,13 +56,21 @@ class ManageFeedViewModel @Inject constructor(
     private val feedsDao: ManageFeedsDao
 ): ViewModel() {
 
+    var feedToUnsubscribe by mutableStateOf<Feed?>(null)
+
     val feeds: Flow<PagingData<FeedWithFavIcon>> by lazy {
         Pager(PagingConfig(40)) {
             feedsDao.getAllSubscribedFeeds()
         }.flow
     }
 
-    fun unsubscribeFeed(feedId: Long) {
+    fun unsubscribeFeed() {
+        val feed = checkNotNull(feedToUnsubscribe)
+        unsubscribeFeed(feed.id)
+        feedToUnsubscribe = null
+    }
+
+    private fun unsubscribeFeed(feedId: Long) {
         viewModelScope.launch {
             feedsDao.updateIsSubscribedFeed(feedId, false)
         }

@@ -20,7 +20,6 @@
  */
 package com.geekorum.ttrss.manage_feeds
 
-import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -29,30 +28,27 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ListItem
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
@@ -62,9 +58,7 @@ import com.geekorum.geekdroid.views.doOnApplyWindowInsets
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.data.FeedWithFavIcon
 import com.geekorum.ttrss.manage_feeds.databinding.ActivityManageFeedsBinding
-import com.geekorum.ttrss.manage_feeds.databinding.DialogUnsubscribeFeedBinding
 import com.geekorum.ttrss.ui.AppTheme
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import com.geekorum.ttrss.R as appR
@@ -111,25 +105,16 @@ class ManageFeedsFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 AppTheme {
-                    ManageFeedsListScreen(viewModel, onFeedClick = {
-                        showConfirmationDialog(it.feed)
-                    })
+                    ManageFeedsListScreen(viewModel)
                 }
             }
         }
-    }
-
-    private fun showConfirmationDialog(feed: Feed) {
-        val direction = ManageFeedsFragmentDirections.actionConfirmUnsubscribe(
-            feed.id, feed.title, feed.url)
-        findNavController().navigate(direction)
     }
 }
 
 @Composable
 fun ManageFeedsListScreen(
     viewModel: ManageFeedViewModel = viewModel(),
-    onFeedClick: (FeedWithFavIcon) -> Unit
 ) {
     val contentPadding = PaddingValues(
         top = 8.dp,
@@ -138,9 +123,19 @@ fun ManageFeedsListScreen(
 
     ManageFeedsListScreen(
         feedsData = viewModel.feeds,
-        onFeedClick = onFeedClick,
+        onFeedClick = {
+            viewModel.feedToUnsubscribe = it.feed
+        },
         contentPadding = contentPadding
     )
+
+    viewModel.feedToUnsubscribe?.let {
+        ConfirmUnsubscribeDialog(feed = it,
+            onDismissRequest = { viewModel.feedToUnsubscribe = null },
+            onConfirmClick = {
+                viewModel.unsubscribeFeed()
+            })
+    }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -225,27 +220,50 @@ private fun PreviewManageFeedsListScreen() {
 }
 
 
-class ConfirmUnsubscribeFragment : DialogFragment() {
-
-    private val viewModel: ManageFeedViewModel by activityViewModels()
-    private val args: ConfirmUnsubscribeFragmentArgs by navArgs()
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val inflater = requireActivity().layoutInflater
-
-        val binding = DialogUnsubscribeFeedBinding.inflate(inflater, null, false)
-        with(args) {
-            binding.title = feedTitle
-            binding.url = feedUrl
-        }
-        val feedId = args.feedId
-        return MaterialAlertDialogBuilder(requireActivity())
-            .setView(binding.root)
-            .setTitle(R.string.fragment_confirmation_title)
-            .setPositiveButton(R.string.btn_confirm) { _, _ ->
-                viewModel.unsubscribeFeed(feedId)
+@Composable
+fun ConfirmUnsubscribeDialog(
+    feed: Feed,
+    onDismissRequest: () -> Unit,
+    onConfirmClick: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        confirmButton = {
+            TextButton(onClick = onConfirmClick) {
+                Text(stringResource(R.string.btn_confirm))
             }
-            .setNegativeButton(R.string.btn_cancel, null)
-            .create()
+        },
+        dismissButton = {
+            TextButton(onClick = onDismissRequest) {
+                Text(stringResource(R.string.btn_cancel))
+            }
+        },
+        title = {
+            Text(stringResource(R.string.fragment_confirmation_title),
+                style = MaterialTheme.typography.h6)
+        },
+        text = {
+            Column {
+                Text(stringResource(R.string.lbl_unsubscribe_msg), style = MaterialTheme.typography.body1)
+                Text(feed.title, style = MaterialTheme.typography.body1, fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(top = 24.dp))
+                Text(feed.url)
+            }
+        })
+}
+
+@Preview
+@Composable
+private fun PreviewConfirmUnsubscribeDialog() {
+    AppTheme {
+        val feed = Feed(
+            id = 4,
+            title = "LinuxFr",
+            url = "https://linuxfr.org/feed",
+            unreadCount = 8,
+        )
+        ConfirmUnsubscribeDialog(feed,
+            onDismissRequest = {},
+            onConfirmClick = {})
     }
 }

@@ -29,24 +29,11 @@
 
     <fragment android:id="@+id/manageFeedsFragment"
             android:name="com.geekorum.ttrss.manage_feeds.ManageFeedsFragment"
-            tools:layout="@layout/fragment_manage_feeds"
             android:label="ManageFeedsFragment" >
-
-        <action android:id="@+id/action_confirm_unsubscribe"
-                app:destination="@id/confirmUnsubscribeFragment" />
 
         <action android:id="@+id/action_subscribe_to_feed"
                 app:destination="@id/subscribeToFeedActivity" />
     </fragment>
-
-    <dialog android:id="@+id/confirmUnsubscribeFragment"
-            android:name="com.geekorum.ttrss.manage_feeds.ConfirmUnsubscribeFragment"
-            tools:layout="@layout/dialog_unsubscribe_feed"
-            android:label="ConfirmUnsubscribeFragment" >
-        <argument android:name="feed_id" app:argType="long" />
-        <argument android:name="feed_title" app:argType="string" />
-        <argument android:name="feed_url" app:argType="string" />
-    </dialog>
 
     <activity android:id="@+id/subscribeToFeedActivity"
             android:name="com.geekorum.ttrss.manage_feeds.add_feed.SubscribeToFeedActivity"
