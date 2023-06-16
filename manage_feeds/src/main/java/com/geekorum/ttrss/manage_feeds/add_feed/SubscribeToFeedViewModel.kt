@@ -21,6 +21,9 @@
 package com.geekorum.ttrss.manage_feeds.add_feed
 
 import android.accounts.Account
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -62,7 +65,7 @@ open class SubscribeToFeedViewModel @Inject constructor(
     internal val _ioError = MutableLiveData<Event<IOException>>()
     val ioErrorEvent: LiveData<Event<IOException>> = _ioError
 
-    var urlTyped: String = ""
+    var urlTyped: String by mutableStateOf("")
 
     internal var selectedFeed: FeedResult? = null
 

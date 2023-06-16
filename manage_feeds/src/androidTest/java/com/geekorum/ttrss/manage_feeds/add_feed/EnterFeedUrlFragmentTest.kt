@@ -20,130 +20,127 @@
  */
 package com.geekorum.ttrss.manage_feeds.add_feed
 
-import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavController
-import androidx.navigation.Navigation
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.WorkManager
 import com.geekorum.geekdroid.app.lifecycle.Event
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
-import com.geekorum.ttrss.manage_feeds.R
-import com.google.android.material.textfield.TextInputLayout
+import com.google.common.truth.Truth.assertThat
 import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify
-import junit.framework.AssertionFailedError
 import kotlinx.coroutines.Dispatchers
+import org.junit.Rule
 import org.junit.runner.RunWith
 import java.io.IOException
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-import com.google.android.material.R as matR
 
 
 @RunWith(AndroidJUnit4::class)
 class EnterFeedUrlFragmentTest {
-    lateinit var viewModelProvider: ViewModelProvider.Factory
     lateinit var subscribeToFeedViewModel: SubscribeToFeedViewModel
-    lateinit var navController: NavController
     lateinit var workManager: WorkManager
+
+    @get:Rule
+    val composeRule = createComposeRule()
 
     @BeforeTest
     fun setUp() {
         workManager = mockk(relaxed = true)
         val dispatchers = CoroutineDispatchersProvider(Dispatchers.Main, Dispatchers.IO, Dispatchers.Default)
         subscribeToFeedViewModel = spyk(SubscribeToFeedViewModel(dispatchers, mockk(), workManager, mockk()))
-        navController = mockk(relaxed = true)
-        viewModelProvider = createViewModelFactoryFor(subscribeToFeedViewModel)
     }
 
     @Test
     fun testThatErrorEventSetErrorOnInputField() {
-        launchFragmentInViewModelProvidedActivity(viewModelProviderFactory = viewModelProvider,
-            themeResId = matR.style.Theme_MaterialComponents_Light) {
-            EnterFeedUrlFragment()
+        composeRule.setContent {
+            EnterFeedUrlScreen(viewModel = subscribeToFeedViewModel,
+                navigateToShowAvailableFeeds = {},
+                navigateToDisplayError = {},
+                finishActivity = {} )
         }
 
         subscribeToFeedViewModel.submitUrl("invalid url")
 
-        onView(withId(R.id.feed_url))
-            .check { view, _ ->
-                assert(view is TextInputLayout) { "view $view is not a TextInputLayout" }
-                val v = view as TextInputLayout
-                assert(v.error.toString() == "Invalid url") { "Error value is not correct" }
-            }
+        composeRule.onNodeWithText("Invalid http(s) url")
+            .assertIsDisplayed()
     }
 
 
     @Test
     fun testThatWhenIOErrorNavigateToDisplayError() {
-        val scenario = launchFragmentInViewModelProvidedActivity(
-            viewModelProviderFactory = viewModelProvider,
-            themeResId = matR.style.Theme_MaterialComponents_Light) {
-            EnterFeedUrlFragment()
+        var navigateToError = false
+        composeRule.setContent {
+            EnterFeedUrlScreen(viewModel = subscribeToFeedViewModel,
+                navigateToShowAvailableFeeds = {},
+                navigateToDisplayError = { navigateToError = true },
+                finishActivity = {}
+            )
         }
 
-        scenario.onFragment {
-            Navigation.setViewNavController(it.requireView(), navController)
+        composeRule.runOnUiThread {
             subscribeToFeedViewModel._ioError.value = Event(IOException("error"))
         }
 
-        val expectedNavigation = EnterFeedUrlFragmentDirections.actionDisplayError(
-            R.string.fragment_display_error_io_error)
-        verify { navController.navigate(eq(expectedNavigation)) }
+        assertThat(navigateToError).isTrue()
     }
 
     @Test
     fun testThatWhenNoFeedsAreFoundNavigateToDisplayError() {
-        val scenario = launchFragmentInViewModelProvidedActivity(
-            viewModelProviderFactory = viewModelProvider,
-            themeResId = matR.style.Theme_MaterialComponents_Light) {
-            EnterFeedUrlFragment()
+        var navigateToError = false
+        composeRule.setContent {
+            EnterFeedUrlScreen(viewModel = subscribeToFeedViewModel,
+                navigateToShowAvailableFeeds = {},
+                navigateToDisplayError = { navigateToError = true },
+                finishActivity = {}
+            )
         }
-
-        scenario.onFragment {
-            Navigation.setViewNavController(it.requireView(), navController)
+        composeRule.runOnUiThread {
             subscribeToFeedViewModel._feedsFound.value = emptyList()
         }
 
-        val expectedNavigation = EnterFeedUrlFragmentDirections.actionDisplayError(
-            R.string.fragment_display_error_no_feeds_found)
-        verify { navController.navigate(eq(expectedNavigation)) }
+        composeRule.waitForIdle()
+        assertThat(navigateToError).isTrue()
     }
 
 
     @Test
-    fun testThatWhenManyFeedsAreFoundNavigateToSelectFeed() {
-        val scenario = launchFragmentInViewModelProvidedActivity(
-            viewModelProviderFactory = viewModelProvider,
-            themeResId = matR.style.Theme_MaterialComponents_Light) {
-            EnterFeedUrlFragment()
+    fun testThatWhenManyFeedsAreFoundNavigateToSelectFeeds() {
+        var navigateToFeeds = false
+        composeRule.setContent {
+            EnterFeedUrlScreen(viewModel = subscribeToFeedViewModel,
+                navigateToShowAvailableFeeds = {
+                    navigateToFeeds = true
+                },
+                navigateToDisplayError = { },
+                finishActivity = {}
+            )
         }
-
-        scenario.onFragment {
-            Navigation.setViewNavController(it.requireView(), navController)
+        composeRule.runOnUiThread {
             subscribeToFeedViewModel._feedsFound.value = listOf(mockk(), mockk())
         }
 
-        val expectedNavigation = EnterFeedUrlFragmentDirections.actionShowAvailableFeeds()
-        verify { navController.navigate(eq(expectedNavigation)) }
+        composeRule.waitForIdle()
+        assertThat(navigateToFeeds).isTrue()
     }
 
 
     @Test
     fun testThatWhenOnlyOneFeedsFromUrlSubscribe() {
-        val scenario = launchFragmentInViewModelProvidedActivity(
-            viewModelProviderFactory = viewModelProvider,
-            themeResId = matR.style.Theme_MaterialComponents_Light) {
-            EnterFeedUrlFragment()
+        composeRule.setContent {
+            EnterFeedUrlScreen(viewModel = subscribeToFeedViewModel,
+                navigateToShowAvailableFeeds = {},
+                navigateToDisplayError = { },
+                finishActivity = {}
+            )
         }
-
-        scenario.onFragment {
-            Navigation.setViewNavController(it.requireView(), navController)
+        composeRule.runOnUiThread {
             subscribeToFeedViewModel._feedsFound.value = listOf(FeedsFinder.FeedResult(FeedsFinder.Source.URL, "url"))
         }
+        composeRule.waitForIdle()
 
         verify {
             // enqueue() is final and cannot be mocked on api < 28, so we spy the call to subscribeToFeed instead
@@ -153,26 +150,20 @@ class EnterFeedUrlFragmentTest {
     }
 
     @Test
-    fun testThatWhenOnlyOneFeedsFromHtmlSubscribe() {
-        val scenario = launchFragmentInViewModelProvidedActivity(
-            viewModelProviderFactory = viewModelProvider,
-            themeResId = matR.style.Theme_MaterialComponents_Light) {
-            EnterFeedUrlFragment()
+    fun testThatWhenOnlyOneFeedsFromHtmlNavigateToSelectFeeds() {
+        var navigateToFeeds = false
+        composeRule.setContent {
+            EnterFeedUrlScreen(viewModel = subscribeToFeedViewModel,
+                navigateToShowAvailableFeeds = { navigateToFeeds = true},
+                navigateToDisplayError = { },
+                finishActivity = {}
+            )
         }
-
-        scenario.onFragment {
-            Navigation.setViewNavController(it.requireView(), navController)
+        composeRule.runOnUiThread {
             subscribeToFeedViewModel._feedsFound.value = listOf(FeedsFinder.FeedResult(FeedsFinder.Source.HTML, "url"))
         }
 
-        val expectedNavigation = EnterFeedUrlFragmentDirections.actionShowAvailableFeeds()
-        verify { navController.navigate(eq(expectedNavigation)) }
+        composeRule.waitForIdle()
+        assertThat(navigateToFeeds).isTrue()
     }
-
-}
-
-
-private inline fun assert(value: Boolean, lazyMsg: () -> String = { "Assertion failed" }) {
-    if (!value)
-        throw AssertionFailedError(lazyMsg())
 }
