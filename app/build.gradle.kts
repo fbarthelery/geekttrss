@@ -188,6 +188,7 @@ dependencies {
     api(libs.accompanist.drawablepainter)
     api(libs.accompanist.webview)
     api(libs.androidx.compose.ui.tooling)
+    api(libs.coil.compose)
 
 
     // for layout inspector
@@ -217,7 +218,6 @@ dependencies {
     implementation(libs.okhttp.logging.interceptor)
     testImplementation(libs.okhttp.mockwebserver)
     implementation(libs.coil)
-    implementation(libs.coil.compose)
 
     implementation(libs.jsoup)
 

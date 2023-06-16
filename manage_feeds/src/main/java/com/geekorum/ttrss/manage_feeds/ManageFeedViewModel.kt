@@ -53,9 +53,6 @@ class ManageFeedViewModel @Inject constructor(
     private val feedsDao: ManageFeedsDao
 ): ViewModel() {
 
-    private val _feedClickedEvent = MutableLiveData<Event<Feed>>()
-    val feedClickedEvent: LiveData<Event<Feed>> = _feedClickedEvent
-
     val feeds: Flow<PagingData<FeedWithFavIcon>> by lazy {
         Pager(PagingConfig(40)) {
             feedsDao.getAllSubscribedFeeds()
@@ -75,10 +72,6 @@ class ManageFeedViewModel @Inject constructor(
             .setInputData(UnsubscribeWorker.getInputData(account, feedId))
             .build()
         workManager.enqueue(request)
-    }
-
-    fun onFeedClicked(feed: Feed) {
-        _feedClickedEvent.value = Event(feed)
     }
 }
 

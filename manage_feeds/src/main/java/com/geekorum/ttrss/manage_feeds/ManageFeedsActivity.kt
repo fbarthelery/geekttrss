@@ -25,33 +25,49 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ListItem
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.updatePadding
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.paging.PagingDataAdapter
-import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.RecyclerView
-import coil.load
-import com.geekorum.geekdroid.app.lifecycle.EventObserver
+import androidx.paging.PagingData
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemContentType
+import androidx.paging.compose.itemKey
+import coil.compose.rememberAsyncImagePainter
 import com.geekorum.geekdroid.views.doOnApplyWindowInsets
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.data.FeedWithFavIcon
 import com.geekorum.ttrss.manage_feeds.databinding.ActivityManageFeedsBinding
 import com.geekorum.ttrss.manage_feeds.databinding.DialogUnsubscribeFeedBinding
-import com.geekorum.ttrss.manage_feeds.databinding.FragmentManageFeedsBinding
-import com.geekorum.ttrss.manage_feeds.databinding.ItemFeedBinding
+import com.geekorum.ttrss.ui.AppTheme
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import com.geekorum.ttrss.R as appR
 
 class ManageFeedsActivity : BaseSessionActivity() {
     private lateinit var binding: ActivityManageFeedsBinding
@@ -87,37 +103,19 @@ class ManageFeedsActivity : BaseSessionActivity() {
 
 class ManageFeedsFragment : Fragment() {
 
-    private lateinit var binding: FragmentManageFeedsBinding
     private val viewModel: ManageFeedViewModel by activityViewModels()
-    private val adapter = FeedsAdapter()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View? {
-        binding = FragmentManageFeedsBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        binding.recyclerView.adapter = adapter
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.feeds.collectLatest {
-                adapter.submitData(it)
+    ): View {
+        return ComposeView(requireContext()).apply {
+            setContent {
+                AppTheme {
+                    ManageFeedsListScreen(viewModel, onFeedClick = {
+                        showConfirmationDialog(it.feed)
+                    })
+                }
             }
-        }
-
-        viewModel.feedClickedEvent.observe(viewLifecycleOwner, EventObserver {
-            showConfirmationDialog(it)
-        })
-        setupEdgeToEdge()
-    }
-
-    private fun setupEdgeToEdge() {
-        binding.recyclerView.doOnApplyWindowInsets { view, windowInsets, padding ->
-            val insets = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars())
-            view.updatePadding(bottom = padding.bottom + insets.bottom)
-            windowInsets
         }
     }
 
@@ -126,59 +124,106 @@ class ManageFeedsFragment : Fragment() {
             feed.id, feed.title, feed.url)
         findNavController().navigate(direction)
     }
+}
 
+@Composable
+fun ManageFeedsListScreen(
+    viewModel: ManageFeedViewModel = viewModel(),
+    onFeedClick: (FeedWithFavIcon) -> Unit
+) {
+    val contentPadding = PaddingValues(
+        top = 8.dp,
+        bottom = WindowInsets.safeDrawing.asPaddingValues().calculateBottomPadding(),
+    )
 
-    private inner class FeedsAdapter : PagingDataAdapter<FeedWithFavIcon, FeedViewHolder>(DiffFeed) {
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FeedViewHolder {
-            val itemFeedBinding = ItemFeedBinding.inflate(layoutInflater, parent, false)
-            return FeedViewHolder(itemFeedBinding)
-        }
+    ManageFeedsListScreen(
+        feedsData = viewModel.feeds,
+        onFeedClick = onFeedClick,
+        contentPadding = contentPadding
+    )
+}
 
-        override fun onBindViewHolder(holder: FeedViewHolder, position: Int) {
-            val feed = getItem(position)
-            checkNotNull(feed)
-            holder.setFeed(feed)
-            holder.setViewModel(viewModel)
-            holder.binding.executePendingBindings()
-        }
-    }
-
-    class FeedViewHolder(val binding: ItemFeedBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun setFeed(feedWithFavIcon: FeedWithFavIcon?) {
-            val feed = feedWithFavIcon?.feed
-            val favIcon = feedWithFavIcon?.favIcon
-            val title = feed?.displayTitle?.takeIf { it.isNotEmpty() } ?: feed?.title
-            binding.setVariable(BR.name, title)
-            binding.setVariable(BR.feed, feed)
-            with(binding.feedIcon) {
-                // set the tint for errors and place holder drawable
-                imageTintList = resources.getColorStateList(R.color.rss_feed_orange, null)
-                load(favIcon?.url) {
-                    error(R.drawable.ic_rss_feed_black_24dp)
-                    placeholder(R.drawable.ic_rss_feed_black_24dp)
-                    listener { _, _ ->
-                        binding.feedIcon.imageTintList = null
-                    }
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun ManageFeedsListScreen(
+    feedsData: Flow<PagingData<FeedWithFavIcon>>,
+    onFeedClick: (FeedWithFavIcon) -> Unit,
+    contentPadding: PaddingValues = PaddingValues(0.dp)
+) {
+    Surface(Modifier.fillMaxSize()) {
+        val feedsPagingItem = feedsData.collectAsLazyPagingItems()
+        val nestedScrollInterop = rememberNestedScrollInteropConnection()
+        LazyColumn(
+            modifier = Modifier.nestedScroll(nestedScrollInterop),
+            contentPadding = contentPadding
+        ) {
+            items(feedsPagingItem.itemCount,
+                key = feedsPagingItem.itemKey { it.feed.id },
+                contentType = feedsPagingItem.itemContentType { "Feed" }) { idx ->
+                val feedItem = feedsPagingItem[idx]
+                ListItem(
+                    modifier = Modifier.clickable {
+                        if (feedItem != null)
+                            onFeedClick(feedItem)
+                    },
+                    icon = {
+                        val feedIconPainter = rememberAsyncImagePainter(
+                            model = feedItem?.favIcon?.url,
+                            placeholder = painterResource(appR.drawable.ic_rss_feed_orange),
+                            fallback = painterResource(appR.drawable.ic_rss_feed_orange),
+                            error = painterResource(appR.drawable.ic_rss_feed_orange),
+                        )
+                        Image(
+                            painter = feedIconPainter,
+                            contentDescription = null,
+                            contentScale = ContentScale.FillBounds,
+                            modifier = Modifier.size(40.dp)
+                        )
+                    }) {
+                    Text(feedItem?.feed?.title ?: "", overflow = TextOverflow.Ellipsis, maxLines = 1)
                 }
             }
         }
-
-        fun setViewModel(viewModel: ManageFeedViewModel) {
-            binding.setVariable(BR.viewModel, viewModel)
-        }
     }
-
-    private object DiffFeed : DiffUtil.ItemCallback<FeedWithFavIcon>() {
-        override fun areItemsTheSame(oldItem: FeedWithFavIcon, newItem: FeedWithFavIcon): Boolean {
-            return oldItem.feed.id == newItem.feed.id
-        }
-
-        override fun areContentsTheSame(oldItem: FeedWithFavIcon, newItem: FeedWithFavIcon): Boolean {
-            return oldItem == newItem
-        }
-    }
-
 }
+
+@Preview
+@Composable
+private fun PreviewManageFeedsListScreen() {
+    AppTheme {
+        val feeds = PagingData.from(
+            data = listOf(
+                FeedWithFavIcon(
+                    feed = Feed(
+                        id = 2,
+                        title = "Frandroid",
+                        unreadCount = 42,
+                    ),
+                    favIcon = null
+                ),
+                FeedWithFavIcon(
+                    feed = Feed(
+                        id = 3,
+                        title = "Gentoo universe",
+                        unreadCount = 10,
+                    ),
+                    favIcon = null
+                ),
+                FeedWithFavIcon(
+                    feed = Feed(
+                        id = 4,
+                        title = "LinuxFr",
+                        unreadCount = 8,
+                    ),
+                    favIcon = null
+                ),
+            )
+        )
+        val pagingFlow = MutableStateFlow(feeds)
+        ManageFeedsListScreen(pagingFlow, onFeedClick = {})
+    }
+}
+
 
 class ConfirmUnsubscribeFragment : DialogFragment() {
 

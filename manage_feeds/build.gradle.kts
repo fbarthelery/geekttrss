@@ -43,7 +43,13 @@ android {
 
     buildFeatures {
         dataBinding = true
+        compose = true
     }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = libs.versions.androidx.compose.compiler.get()
+    }
+
 
     flavorDimensions += "distribution"
     productFlavors {
@@ -103,6 +109,14 @@ dependencies {
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.coordinatorlayout)
     implementation(libs.android.material)
+
+    // compose
+    implementation(libs.androidx.compose.ui.tooling.preview)
+
+    // necessary for compose previews
+    implementation(libs.androidx.compose.ui.tooling)
+    implementation(libs.androidx.paging.compose)
+    implementation(libs.coil.compose)
 
     implementation(libs.androidx.core)
 
