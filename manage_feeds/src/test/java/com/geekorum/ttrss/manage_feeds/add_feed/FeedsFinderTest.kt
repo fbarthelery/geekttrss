@@ -106,7 +106,7 @@ class FeedsFinderTest {
             FeedInformation("url1", "application/rss+xml", "feed 1"),
             FeedInformation("url2", "application/atom+xml", "feed 2")
         )
-        every { feedExtractor.extract(any<String>()) } returns feedsFound
+        every { feedExtractor.extract(any<String>(), any()) } returns feedsFound
 
         val expected = feedsFound.map {
             FeedResult(source = Source.HTML, href = it.href, type = it.type, title = it.title )
