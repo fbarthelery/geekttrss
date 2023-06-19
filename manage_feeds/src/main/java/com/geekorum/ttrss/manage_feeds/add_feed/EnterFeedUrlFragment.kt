@@ -20,10 +20,6 @@
  */
 package com.geekorum.ttrss.manage_feeds.add_feed
 
-import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -34,54 +30,18 @@ import androidx.compose.material.icons.filled.Error
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.fragment.findNavController
 import com.geekorum.geekdroid.app.lifecycle.Event
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.manage_feeds.R
 import com.geekorum.ttrss.ui.AppTheme
 import com.geekorum.ttrss.R as appR
 
-class EnterFeedUrlFragment : Fragment() {
-
-    private val viewModel: SubscribeToFeedViewModel by activityViewModels()
-    private val navController by lazy { findNavController() }
-
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View {
-        return ComposeView(requireContext()).apply {
-            setContent {
-                AppTheme {
-                    EnterFeedUrlScreen(
-                        viewModel,
-                        navigateToDisplayError = {
-                            val action = EnterFeedUrlFragmentDirections.actionDisplayError(
-                                R.string.fragment_display_error_no_feeds_found
-                            )
-                            navController.navigate(action)
-                        },
-                        navigateToShowAvailableFeeds = {
-                            navController.navigate(EnterFeedUrlFragmentDirections.actionShowAvailableFeeds())
-                        },
-                        finishActivity = {
-                            requireActivity().finish()
-                        }
-                    )
-                }
-            }
-        }
-    }
-}
 
 @Composable
 fun EnterFeedUrlScreen(

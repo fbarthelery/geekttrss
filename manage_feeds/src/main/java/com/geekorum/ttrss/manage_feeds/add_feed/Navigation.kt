@@ -21,6 +21,7 @@
 package com.geekorum.ttrss.manage_feeds.add_feed
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -37,11 +38,12 @@ val ROUTE_DISPLAY_ERROR = "display_error?errorMsgId={errorMsgId}"
 
 @Composable
 fun SubscribeToFeedNavHost(
+    modifier: Modifier = Modifier,
     viewModel: SubscribeToFeedViewModel = viewModel(),
     navController: NavHostController = rememberNavController(),
     finishActivity: () -> Unit,
 ) {
-    NavHost(navController = navController, startDestination = ROUTE_ENTER_FEED_URL) {
+    NavHost(modifier = modifier, navController = navController, startDestination = ROUTE_ENTER_FEED_URL) {
         composable(ROUTE_ENTER_FEED_URL) {
             // TODO animation with navigation 1.7.x
             EnterFeedUrlScreen(viewModel,
