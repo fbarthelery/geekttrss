@@ -59,16 +59,15 @@
         </com.google.android.material.appbar.AppBarLayout>
 
 
-        <fragment android:id="@+id/nav_host_fragment"
-                android:name="androidx.navigation.fragment.NavHostFragment"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/app_bar"
-                app:layout_constraintBottom_toTopOf="@id/next"
-                app:defaultNavHost="true"
-                app:navGraph="@navigation/subscribe_to_feed" />
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/compose_nav_host"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/app_bar"
+            app:layout_constraintBottom_toTopOf="@id/next"
+            />
 
 
         <Button android:id="@+id/next"

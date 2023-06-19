@@ -22,57 +22,78 @@ package com.geekorum.ttrss.manage_feeds.add_feed
 
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.findNavController
 import com.geekorum.ttrss.manage_feeds.BaseSessionActivity
 import com.geekorum.ttrss.manage_feeds.R
 import com.geekorum.ttrss.manage_feeds.databinding.ActivitySubscribeToFeedBinding
+import com.geekorum.ttrss.ui.AppTheme
 
 
 class SubscribeToFeedActivity : BaseSessionActivity() {
 
     private lateinit var binding: ActivitySubscribeToFeedBinding
     private val viewModel: SubscribeToFeedViewModel by viewModels()
-    private lateinit var navController: NavController
+    private lateinit var navController: NavHostController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_subscribe_to_feed)
-        navController = findNavController(R.id.nav_host_fragment)
 
         binding.cancel.setOnClickListener {
             if (!navController.popBackStack())
                 finish()
         }
 
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            when (destination.id) {
-                R.id.enter_feed_url -> {
-                    binding.cancel.setText(R.string.activity_subscribe_feed_btn_cancel)
-                    binding.next.setText(R.string.activity_subscribe_feed_btn_subscribe)
-                    binding.next.setOnClickListener {
-                        viewModel.submitUrl(viewModel.urlTyped)
-                    }
-                    viewModel.resetAvailableFeeds()
-                }
-
-                R.id.select_feed -> {
-                    binding.cancel.setText(R.string.activity_subscribe_feed_btn_back)
-                    binding.next.setText(R.string.activity_subscribe_feed_btn_subscribe)
-                    binding.next.setOnClickListener {
-                        if (viewModel.selectedFeed != null) {
-                            viewModel.subscribeToFeed(viewModel.selectedFeed!!.toFeedInformation())
-                            finish()
-                        }
-                    }
-                }
-
-                R.id.display_error -> {
-                    binding.cancel.setText(R.string.activity_subscribe_feed_btn_back)
-                    binding.next.setText(R.string.activity_subscribe_feed_btn_close)
-                    binding.next.setOnClickListener {
+        binding.composeNavHost.setContent {
+            AppTheme {
+                navController = rememberNavController()
+                SubscribeToFeedNavHost(
+                    viewModel = viewModel,
+                    navController = navController,
+                    finishActivity = {
                         finish()
+                    }
+                )
+
+                val currentBackStackEntry by navController.currentBackStackEntryAsState()
+                    val destination = currentBackStackEntry?.destination
+                SideEffect {
+                    when (destination?.route) {
+                        ROUTE_ENTER_FEED_URL -> {
+                            binding.cancel.setText(R.string.activity_subscribe_feed_btn_cancel)
+                            binding.next.setText(R.string.activity_subscribe_feed_btn_subscribe)
+                            binding.next.setOnClickListener {
+                                viewModel.submitUrl(viewModel.urlTyped)
+                            }
+                            viewModel.resetAvailableFeeds()
+                        }
+
+                        ROUTE_SELECT_FEED -> {
+                            binding.cancel.setText(R.string.activity_subscribe_feed_btn_back)
+                            binding.next.setText(R.string.activity_subscribe_feed_btn_subscribe)
+                            binding.next.setOnClickListener {
+                                if (viewModel.selectedFeed != null) {
+                                    viewModel.subscribeToFeed(viewModel.selectedFeed!!.toFeedInformation())
+                                    finish()
+                                }
+                            }
+                        }
+
+                        ROUTE_DISPLAY_ERROR -> {
+                            binding.cancel.setText(R.string.activity_subscribe_feed_btn_back)
+                            binding.next.setText(R.string.activity_subscribe_feed_btn_close)
+                            binding.next.setOnClickListener {
+                                finish()
+                            }
+                        }
                     }
                 }
             }
