@@ -29,5 +29,5 @@ import org.jsoup.nodes.Document
 abstract class HtmlExtractor<out T> {
     abstract fun extract(document: Document) : Collection<T>
 
-    fun extract(html: String, baseUri: String) = extract(Jsoup.parse(html, baseUri))
+    fun extract(html: String, baseUri: String = "") = extract(Jsoup.parse(html, baseUri))
 }
