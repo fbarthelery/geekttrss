@@ -62,19 +62,19 @@ class FeedsFinder @Inject constructor(
             // remove charset if any
             "${it.type}/${it.subtype}".toMediaType()
         }
+        val url = response.request.url.toString()
         return if (contentType in FEED_MIMETYPES) {
-            val url = response.request.url.toString()
             listOf(FeedResult(source = Source.URL, href = url,
                 type = contentType.toString()))
         } else { // assume html
-            getResultFromHtml(body)
+            getResultFromHtml(body,  url)
         }
     }
 
-    private fun getResultFromHtml(body: ResponseBody?): List<FeedResult> {
+    private fun getResultFromHtml(body: ResponseBody?, baseUri: String = ""): List<FeedResult> {
         val document = body?.string()
         val feeds = document?.let {
-            feedExtractor.extract(it)
+            feedExtractor.extract(it, baseUri)
         } ?: emptyList()
 
         return feeds.map { it.toFeedResult() }

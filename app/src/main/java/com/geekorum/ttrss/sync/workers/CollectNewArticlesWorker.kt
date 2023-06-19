@@ -177,7 +177,7 @@ class CollectNewArticlesWorker @AssistedInject constructor(
         if (!backgroundDataUsageManager.canDownloadArticleImages()) {
             return
         }
-        imageUrlExtractor.extract(article.content)
+        imageUrlExtractor.extract(article.content, baseUri = article.link)
                 .mapNotNull { it.toHttpUrlOrNull() }
                 .filter { it.canBeCache() }
                 .forEach {
