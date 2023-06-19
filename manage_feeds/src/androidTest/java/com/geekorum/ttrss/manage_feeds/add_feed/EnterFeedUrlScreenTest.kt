@@ -40,7 +40,7 @@ import kotlin.test.Test
 
 
 @RunWith(AndroidJUnit4::class)
-class EnterFeedUrlFragmentTest {
+class EnterFeedUrlScreenTest {
     lateinit var subscribeToFeedViewModel: SubscribeToFeedViewModel
     lateinit var workManager: WorkManager
 

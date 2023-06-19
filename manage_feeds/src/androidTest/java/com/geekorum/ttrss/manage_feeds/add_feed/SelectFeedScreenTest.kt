@@ -34,7 +34,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 @RunWith(AndroidJUnit4::class)
-class SelectFeedFragmentTest {
+class SelectFeedScreenTest {
     lateinit var subscribeToFeedViewModel: SubscribeToFeedViewModel
     lateinit var workManager: WorkManager
 
