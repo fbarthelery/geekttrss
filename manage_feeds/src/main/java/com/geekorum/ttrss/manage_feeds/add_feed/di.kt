@@ -34,11 +34,11 @@ abstract class AddFeedModule
     SubscribeToFeedViewModel_HiltModules.KeyModule::class,
 ])
 @DisableInstallInCheck
-private abstract class SubscribeToFeedActivityModule
+internal abstract class SubscribeToFeedActivityModule
 
 @Module(includes = [
     AddFeedViewModel_HiltModules.BindsModule::class,
     AddFeedViewModel_HiltModules.KeyModule::class
 ])
 @DisableInstallInCheck
-private abstract class AddFeedActivityModule
+internal abstract class AddFeedActivityModule

@@ -42,7 +42,7 @@ import dagger.hilt.components.SingletonComponent
 
 @Module(subcomponents = [SyncComponent::class])
 @InstallIn(ServiceComponent::class)
-private object SyncComponentModule
+internal object SyncComponentModule
 
 
 @Subcomponent(modules = [

@@ -93,7 +93,7 @@ interface ActivityComponent {
     ManageFeedViewModel_HiltModules.KeyModule::class
 ])
 @DisableInstallInCheck
-private class ManageFeedModule
+internal class ManageFeedModule
 
 @Module
 @DisableInstallInCheck
