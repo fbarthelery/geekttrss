@@ -32,7 +32,7 @@ plugins {
     kotlin("android")
     kotlin("kapt")
     alias(libs.plugins.kotlin.ksp)
-    alias(libs.plugins.google.gms.oss.license)
+    alias(libs.plugins.com.geekorum.gms.oss.license)
     id("com.geekorum.build.android-tests")
     id("com.geekorum.build.android-signing")
     id("com.geekorum.build.android-avdl")

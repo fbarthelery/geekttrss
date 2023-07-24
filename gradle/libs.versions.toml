@@ -73,7 +73,10 @@ kotlin-ksp = "1.9.0-1.0.11"
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
 android-dynamic-feature = { id = "com.android.dynamic-feature", version.ref = "android-gradle-plugin" }
 google-gms-google-services = { id = "com.google.gms.google-services", version = "4.3.14" }
-google-gms-oss-license = { id = "com.google.android.gms.oss-licenses-plugin", version = "0.10.6.1" }
+# Use our fork of oss-license-plugin to have reproducible builds
+# Waiting for feedback on https://github.com/google/play-services-plugins/pull/268
+# google-gms-oss-license = { id = "com.google.android.gms.oss-licenses-plugin", version = "0.10.6.1" }
+com-geekorum-gms-oss-license = { id = "com.geekorum.gms.oss-licenses-plugin", version = "0.10.6" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version = "2.9.2" }
 androidx-navigation-safeargs-kotlin = { id = "androidx.navigation.safeargs.kotlin", version.ref = "androidx-navigation" }
 dagger-hilt-android = { id = "dagger.hilt.android.plugin", version.ref = "dagger" }
