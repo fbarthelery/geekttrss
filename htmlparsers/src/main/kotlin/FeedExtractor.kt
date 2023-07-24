@@ -31,17 +31,16 @@ class FeedExtractor @Inject constructor() : HtmlExtractor<FeedInformation>() {
 
     private val VALID_FEED_MIMETYPE = listOf("application/rss+xml", "application/atom+xml")
 
-    override fun extract(document: Document): Collection<FeedInformation>  {
-        document.head()?.let {head ->
-            return head.getElementsByTag("link")
-                .filter { isValidLinkFeed(it) }
-                .map {
-                    FeedInformation(href = it.attr("abs:href")!!,
-                        type = it.attr("type"),
-                        title = it.attr("title"))
-                }
-        }
-        return emptyList()
+    override fun extract(document: Document): Collection<FeedInformation> {
+        return document.head().getElementsByTag("link")
+            .filter { element -> isValidLinkFeed(element) }
+            .map {
+                FeedInformation(
+                    href = it.attr("abs:href"),
+                    type = it.attr("type"),
+                    title = it.attr("title")
+                )
+            }
     }
 
     private fun isValidLinkFeed(elem: Element): Boolean {

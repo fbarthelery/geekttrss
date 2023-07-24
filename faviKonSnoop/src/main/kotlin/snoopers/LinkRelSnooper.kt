@@ -39,8 +39,8 @@ open class LinkRelSnooper internal constructor(
 
         document.getOrNull()?.head()?.let { head ->
             head.getElementsByTag("link")
-                .filter {
-                    relValue in it.attr("rel").split("\\s".toRegex())
+                .filter { element ->
+                    relValue in element.attr("rel").split("\\s".toRegex())
                 }
                 .flatMap {
                     val url = it.attr("abs:href")
