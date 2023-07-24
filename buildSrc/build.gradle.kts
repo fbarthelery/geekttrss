@@ -37,7 +37,7 @@ dependencies {
 
     implementation("com.android.tools.build:gradle-api:8.0.2")
     implementation("gradle.plugin.com.hierynomus.gradle.plugins:license-gradle-plugin:0.16.1")
-    implementation("com.github.triplet.gradle:play-publisher:3.8.3")
+    implementation("com.github.triplet.gradle:play-publisher:3.8.4")
     implementation("com.geekorum.gradle.avdl:flydroid:0.0.4")
 
     // fix https://github.com/google/dagger/issues/3068

@@ -74,7 +74,7 @@ class ApiServiceTest {
 
 
 @Module
-private class ServerModule(val serverUrl: String) {
+internal class ServerModule(val serverUrl: String) {
 
     @Provides
     fun providesServerInformation(): ServerInformation = object : ServerInformation() {
