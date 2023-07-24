@@ -21,10 +21,7 @@
 package com.geekorum.ttrss.webapi.model
 
 import androidx.annotation.Keep
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.Serializer
+import kotlinx.serialization.*
 import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.encoding.CompositeDecoder
@@ -75,6 +72,7 @@ data class CatchupFeedResponsePayload(
         override var error: Error? = null
     ): BaseContent()
 
+    @OptIn(ExperimentalSerializationApi::class)
     @Serializer(CatchupFeedResponsePayload::class)
     internal object OwnSerializer : KSerializer<CatchupFeedResponsePayload> {
         override fun serialize(encoder: Encoder, value: CatchupFeedResponsePayload) {

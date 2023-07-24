@@ -144,8 +144,6 @@ data class ListContent<T>(
     override var error: Error? = null
 ) : BaseContent() {
 
-    // Workaround for kapt bug
-    @Serializer(ListContent::class)
     internal class OwnSerializer<E>(
         val contentSerializer: KSerializer<E>
     ) : KSerializer<ListContent<E>> {
@@ -208,7 +206,6 @@ data class ListResponsePayload<T>(
     val result: List<T>
         get() = content.list
 
-    @Serializer(ListResponsePayload::class)
     internal class OwnSerializer<E>(
         private val contentSerializer: KSerializer<E>
     ) : KSerializer<ListResponsePayload<E>> {
