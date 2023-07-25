@@ -40,7 +40,7 @@ const val robolectricVersion = "4.9.2"
  * Configuration for espresso and robolectric usage in an Android project
  */
 internal fun Project.configureTests() {
-    extensions.configure<CommonExtension<*,*,*,*>>("android") {
+    extensions.configure<CommonExtension<*,*,*,*,*>>("android") {
         defaultConfig {
             testInstrumentationRunner = "com.geekorum.ttrss.HiltRunner"
             testInstrumentationRunnerArguments += mapOf(

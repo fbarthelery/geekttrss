@@ -29,7 +29,7 @@ import org.gradle.kotlin.dsl.dependencies
 /**
  * Configure java version compile options based on minSdkVersion value
  */
-fun CommonExtension<*,*,*,*>.configureJavaVersion() {
+fun CommonExtension<*,*,*,*,*>.configureJavaVersion() {
     val version = JavaVersion.VERSION_11
     compileOptions {
         sourceCompatibility = version
