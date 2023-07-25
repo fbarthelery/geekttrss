@@ -1,3 +1,3 @@
-Improve efficiency of network requests to server when using HTTP authentication
-Display feed favicons in Menu drawer
+By long pressing the feed in the drawer, you can mark all its articles as read
+Allow to add an article to TinyTinyRss published articles feed when using the share dialog
 Various bug fixes and improvements

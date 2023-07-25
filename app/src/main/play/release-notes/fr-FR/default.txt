@@ -1,3 +1,3 @@
-Amelioration des performances des requetes au serveur en cas d'utilisation de l'authentification HTTP
-Affichage du favicon du flux dans le menu
+Un appui long sur un feed permet de marquer tous ses articles comme lus
+Il est possible d'ajouter un article au flux Articles publiés de TinyTinyRss en utilisant le dialogue de partage
 Diverses corrections de bugs et améliorations
