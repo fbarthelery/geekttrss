@@ -1,0 +1,3 @@
+* By long pressing the feed in the drawer, you can mark all its articles as read (Fix #19)
+* Allow to add an article to TinyTinyRss published articles feed when using the share dialog (Fix #15 )
+* Various bug fixes and improvements
