@@ -42,7 +42,7 @@ import androidx.lifecycle.viewModelScope
 import com.geekorum.geekdroid.app.BottomSheetDialogActivity
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.session.SessionActivityComponent
-import com.geekorum.ttrss.ui.AppTheme
+import com.geekorum.ttrss.ui.AppTheme3
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
@@ -67,7 +67,7 @@ class ShareToPublishArticleActivity : BottomSheetDialogActivity() {
             return
         }
         setContent {
-            AppTheme {
+            AppTheme3 {
                 SharingToPublishScreen(
                     articleId = articleId,
                     onComplete = {
@@ -136,7 +136,7 @@ fun SharingToPublishScreen() {
 @Preview
 @Composable
 fun SharingToPublishScreenPreview() {
-    AppTheme {
+    AppTheme3 {
         SharingToPublishScreen()
     }
 }
