@@ -20,20 +20,25 @@
  */
 package com.geekorum.ttrss.manage_feeds
 
+import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlaylistAdd
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -42,90 +47,62 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
-import androidx.databinding.DataBindingUtil
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import androidx.navigation.findNavController
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import coil.compose.rememberAsyncImagePainter
-import com.geekorum.geekdroid.views.doOnApplyWindowInsets
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.data.FeedWithFavIcon
-import com.geekorum.ttrss.manage_feeds.databinding.ActivityManageFeedsBinding
+import com.geekorum.ttrss.manage_feeds.add_feed.SubscribeToFeedActivity
 import com.geekorum.ttrss.ui.AppTheme3
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import com.geekorum.ttrss.R as appR
 
 class ManageFeedsActivity : BaseSessionActivity() {
-    private lateinit var binding: ActivityManageFeedsBinding
-    private lateinit var navController: NavController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_manage_feeds)
-        navController = findNavController(R.id.nav_host_fragment)
-
-        binding.fab.setOnClickListener {
-            startSubscribeToFeed()
-        }
         setupEdgeToEdge()
+        setContent {
+            AppTheme3 {
+                val systemUiController = rememberSystemUiController()
+                val useDarkIcons = !isSystemInDarkTheme()
+                DisposableEffect(systemUiController, useDarkIcons) {
+                    systemUiController.setSystemBarsColor(Color.Transparent, useDarkIcons)
+                    onDispose {  }
+                }
+                ManageFeedsListScreen(navigateToSubscribeToFeed = {
+                    startSubscribeToFeed()
+                })
+            }
+        }
     }
 
     private fun startSubscribeToFeed() {
-        val direction = ManageFeedsFragmentDirections.actionSubscribeToFeed()
-        navController.navigate(direction)
+        val intent = Intent(this, SubscribeToFeedActivity::class.java)
+        startActivity(intent)
     }
 
     private fun setupEdgeToEdge() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
-
-
-        // CollapsingToolbar consumes the insets by default.
-        // override it to not consume them so that they can be dispathed to the recycler view
-        binding.collapsingToolbar.doOnApplyWindowInsets { _, insets, _ ->
-            insets
-        }
-    }
-}
-
-class ManageFeedsFragment : Fragment() {
-
-    private val viewModel: ManageFeedViewModel by activityViewModels()
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-    ): View {
-        return ComposeView(requireContext()).apply {
-            setContent {
-                AppTheme3 {
-                    ManageFeedsListScreen(viewModel)
-                }
-            }
-        }
     }
 }
 
 @Composable
 fun ManageFeedsListScreen(
     viewModel: ManageFeedViewModel = viewModel(),
+    navigateToSubscribeToFeed: () -> Unit,
 ) {
-    val contentPadding = PaddingValues(
-        top = 8.dp,
-        bottom = WindowInsets.safeDrawing.asPaddingValues().calculateBottomPadding(),
-    )
-
     ManageFeedsListScreen(
         feedsData = viewModel.feeds,
         onFeedClick = {
             viewModel.feedToUnsubscribe = it.feed
         },
-        contentPadding = contentPadding
+        onAddFeedClick = navigateToSubscribeToFeed
     )
 
     viewModel.feedToUnsubscribe?.let {
@@ -137,13 +114,30 @@ fun ManageFeedsListScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ManageFeedsListScreen(
     feedsData: Flow<PagingData<FeedWithFavIcon>>,
     onFeedClick: (FeedWithFavIcon) -> Unit,
-    contentPadding: PaddingValues = PaddingValues(0.dp)
+    onAddFeedClick: () -> Unit,
 ) {
-    Surface(Modifier.fillMaxSize()) {
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            LargeTopAppBar(
+                colors = TopAppBarDefaults.largeTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+                ),
+                title = { Text(stringResource(id = R.string.activity_manage_feed_title)) },
+                scrollBehavior = scrollBehavior)
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = onAddFeedClick) {
+                Icon(Icons.Default.PlaylistAdd, contentDescription = null)
+            }
+        }
+    ) { contentPadding ->
         val feedsPagingItem = feedsData.collectAsLazyPagingItems()
         val nestedScrollInterop = rememberNestedScrollInteropConnection()
         LazyColumn(
@@ -218,7 +212,7 @@ private fun PreviewManageFeedsListScreen() {
             )
         )
         val pagingFlow = MutableStateFlow(feeds)
-        ManageFeedsListScreen(pagingFlow, onFeedClick = {})
+        ManageFeedsListScreen(pagingFlow, onFeedClick = {}, onAddFeedClick = {})
     }
 }
 

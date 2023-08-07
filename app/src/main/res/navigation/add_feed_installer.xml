@@ -47,7 +47,6 @@
         android:name="com.geekorum.ttrss.manage_feeds.add_feed.AddFeedActivity"
         app:moduleName="manage_feeds"
         app:action="android.intent.action.SEND"
-        tools:layout="@layout/activity_manage_feeds"
         >
         <argument android:name="android.intent.extra.TEXT"
             app:nullable="true"
