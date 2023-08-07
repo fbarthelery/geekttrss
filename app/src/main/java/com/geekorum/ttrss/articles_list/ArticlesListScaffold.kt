@@ -28,7 +28,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.SnackbarDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Refresh
@@ -243,7 +242,7 @@ private fun UndoUnreadSnackBar(undoUnreadSnackbarMessage: UndoReadSnackbarMessag
     Snackbar(modifier = Modifier.padding(12.dp),
         action = @Composable {
             TextButton(
-                colors = ButtonDefaults.textButtonColors(contentColor = SnackbarDefaults.primaryActionColor),
+                colors = ButtonDefaults.textButtonColors(contentColor = LocalContentColor.current),
                 onClick = { undoUnreadSnackbarMessage.onAction() },
                 content = { Text(stringResource(R.string.undo_set_articles_read_btn)) }
             )
@@ -476,12 +475,21 @@ private fun SampleBanner(showBanner: Boolean) {
 }
 
 @Composable
-private fun SampleUndoSnackbar() {
-    Snackbar(modifier = Modifier.padding(12.dp),
-        action = {
-            Text("Undo")
-        }) {
-        Text("4 articles marked as read")
+@Preview
+private fun PreviewUndoUnreadSnackbar() {
+    AppTheme3 {
+        Column {
+            val msg = UndoReadSnackbarMessage(3, onAction = {}, onDismiss = {})
+            UndoUnreadSnackBar(undoUnreadSnackbarMessage = msg)
+            Spacer(modifier = Modifier.height(32.dp))
+            Snackbar(modifier = Modifier.padding(12.dp),
+                action = {
+                    Text("Undo")
+                }) {
+                Text("With a normal snackbar")
+            }
+
+        }
     }
 }
 

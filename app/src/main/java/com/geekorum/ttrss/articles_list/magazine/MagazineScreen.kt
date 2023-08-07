@@ -168,8 +168,8 @@ private fun ArticlesMagazine(
         PullRefreshIndicator(
             isRefreshing,
             pullRefreshState,
-            backgroundColor = MaterialTheme.colorScheme.surface,
-            contentColor = MaterialTheme.colorScheme.onSurface,
+            backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.align(Alignment.TopCenter)
         )
     }
