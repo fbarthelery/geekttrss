@@ -21,7 +21,7 @@ The project builds in 2 flavors :
    * The Google flavor is distributed on the [Google Play store](https://play.google.com/store/apps/details?id=com.geekorum.ttrss).
      It uses Crashlytics and other Google Play services to retrieve crash reports.
 
-   * The free flavor is not distributed but can be build from the sources. It doesn't contains any Google Play services.
+   * The free/libre flavor is distributed on [F-Droid](https://f-droid.org/packages/com.geekorum.ttrss.free/), and can also be built from the sources. It doesn't contains any Google Play services. The APK of the latest version of this flavor can also be downloaded from the [Releases Section](https://github.com/fbarthelery/geekttrss/releases/latest).
 
 
 Build instructions
