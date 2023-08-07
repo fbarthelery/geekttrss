@@ -24,15 +24,15 @@ import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.geekorum.ttrss.manage_feeds.R
-import com.geekorum.ttrss.ui.AppTheme
+import com.geekorum.ttrss.ui.AppTheme3
 
 
 @Composable
@@ -45,7 +45,7 @@ fun DisplayErrorScreen(@StringRes errorMsgId: Int) {
 @Preview
 @Composable
 private fun PreviewDisplayErrorScreen() {
-    AppTheme {
+    AppTheme3 {
         Surface {
             DisplayErrorScreen(R.string.fragment_display_error_no_feeds_found)
         }

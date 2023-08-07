@@ -24,7 +24,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
@@ -34,7 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.geekorum.ttrss.manage_feeds.R
-import com.geekorum.ttrss.ui.AppTheme
+import com.geekorum.ttrss.ui.AppTheme3
 
 @Composable
 fun SelectFeedScreen(viewModel: SubscribeToFeedViewModel = viewModel()) {
@@ -49,7 +49,7 @@ fun SelectFeedScreen(viewModel: SubscribeToFeedViewModel = viewModel()) {
     )
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SelectFeedScreen(
     feeds: List<FeedsFinder.FeedResult>,
@@ -70,7 +70,7 @@ fun SelectFeedScreen(
                 }) {
                 TextField(
                     readOnly = true,
-                    textStyle = MaterialTheme.typography.subtitle1,
+                    textStyle = MaterialTheme.typography.titleMedium,
                     value = selectedFeed?.title ?: "",
                     singleLine = true,
                     onValueChange = { },
@@ -94,16 +94,17 @@ fun SelectFeedScreen(
                             onClick = {
                                 onFeedSelected(feed)
                                 expanded = false
+                            },
+                            text = {
+                                Text(feed.title)
                             }
-                        ) {
-                            Text(feed.title)
-                        }
+                        )
                     }
                 }
             }
         } else {
             val text = feeds.firstOrNull()?.title ?: stringResource(R.string.activity_add_feed_no_feeds_available)
-            Text(text, style = MaterialTheme.typography.subtitle1, modifier = Modifier.padding(top = 24.dp))
+            Text(text, style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 24.dp))
         }
     }
 }
@@ -112,7 +113,7 @@ fun SelectFeedScreen(
 @Preview
 @Composable
 private fun PreviewSelectFeedScreen() {
-    AppTheme {
+    AppTheme3 {
         Surface(Modifier.fillMaxSize()) {
             val feeds = listOf(
                 FeedsFinder.FeedResult(
@@ -140,7 +141,7 @@ private fun PreviewSelectFeedScreen() {
 @Preview
 @Composable
 private fun PreviewSelectFeedScreenSingle() {
-    AppTheme {
+    AppTheme3 {
         Surface(Modifier.fillMaxSize()) {
             val feeds = listOf(
                 FeedsFinder.FeedResult(FeedsFinder.Source.HTML,

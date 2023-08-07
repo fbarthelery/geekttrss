@@ -24,7 +24,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.runtime.*
@@ -39,7 +39,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.geekorum.geekdroid.app.lifecycle.Event
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.manage_feeds.R
-import com.geekorum.ttrss.ui.AppTheme
+import com.geekorum.ttrss.ui.AppTheme3
 import com.geekorum.ttrss.R as appR
 
 
@@ -121,7 +121,7 @@ fun EnterFeedUrlScreen(
                 .fillMaxWidth()
         )
         if (errorMessage != null) {
-            Text(errorMessage, style = MaterialTheme.typography.caption, modifier = Modifier.padding(top = 4.dp))
+            Text(errorMessage, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(top = 4.dp))
         }
     }
 }
@@ -129,7 +129,7 @@ fun EnterFeedUrlScreen(
 @Preview
 @Composable
 private fun PreviewEnterFeedUrlScreen() {
-    AppTheme {
+    AppTheme3 {
         Surface {
             var url by remember { mutableStateOf("") }
             val errorMessage by remember {
