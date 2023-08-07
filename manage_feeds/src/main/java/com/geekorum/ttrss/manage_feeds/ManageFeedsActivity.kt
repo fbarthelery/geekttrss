@@ -28,9 +28,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
@@ -58,7 +57,7 @@ import com.geekorum.geekdroid.views.doOnApplyWindowInsets
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.data.FeedWithFavIcon
 import com.geekorum.ttrss.manage_feeds.databinding.ActivityManageFeedsBinding
-import com.geekorum.ttrss.ui.AppTheme
+import com.geekorum.ttrss.ui.AppTheme3
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import com.geekorum.ttrss.R as appR
@@ -104,7 +103,7 @@ class ManageFeedsFragment : Fragment() {
     ): View {
         return ComposeView(requireContext()).apply {
             setContent {
-                AppTheme {
+                AppTheme3 {
                     ManageFeedsListScreen(viewModel)
                 }
             }
@@ -138,7 +137,6 @@ fun ManageFeedsListScreen(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun ManageFeedsListScreen(
     feedsData: Flow<PagingData<FeedWithFavIcon>>,
@@ -161,7 +159,7 @@ fun ManageFeedsListScreen(
                         if (feedItem != null)
                             onFeedClick(feedItem)
                     },
-                    icon = {
+                    leadingContent = {
                         val feedIconPainter = rememberAsyncImagePainter(
                             model = feedItem?.favIcon?.url,
                             placeholder = painterResource(appR.drawable.ic_rss_feed_orange),
@@ -174,9 +172,14 @@ fun ManageFeedsListScreen(
                             contentScale = ContentScale.FillBounds,
                             modifier = Modifier.size(40.dp)
                         )
-                    }) {
-                    Text(feedItem?.feed?.title ?: "", overflow = TextOverflow.Ellipsis, maxLines = 1)
-                }
+                    },
+                    headlineContent = {
+                        Text(
+                            feedItem?.feed?.title ?: "",
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1
+                        )
+                    })
             }
         }
     }
@@ -185,7 +188,7 @@ fun ManageFeedsListScreen(
 @Preview
 @Composable
 private fun PreviewManageFeedsListScreen() {
-    AppTheme {
+    AppTheme3 {
         val feeds = PagingData.from(
             data = listOf(
                 FeedWithFavIcon(
@@ -240,12 +243,12 @@ fun ConfirmUnsubscribeDialog(
         },
         title = {
             Text(stringResource(R.string.fragment_confirmation_title),
-                style = MaterialTheme.typography.h6)
+                style = MaterialTheme.typography.titleLarge)
         },
         text = {
             Column {
-                Text(stringResource(R.string.lbl_unsubscribe_msg), style = MaterialTheme.typography.body1)
-                Text(feed.title, style = MaterialTheme.typography.body1, fontWeight = FontWeight.Bold,
+                Text(stringResource(R.string.lbl_unsubscribe_msg), style = MaterialTheme.typography.bodyLarge)
+                Text(feed.title, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold,
                     modifier = Modifier.padding(top = 24.dp))
                 Text(feed.url)
             }
@@ -255,7 +258,7 @@ fun ConfirmUnsubscribeDialog(
 @Preview
 @Composable
 private fun PreviewConfirmUnsubscribeDialog() {
-    AppTheme {
+    AppTheme3 {
         val feed = Feed(
             id = 4,
             title = "LinuxFr",
