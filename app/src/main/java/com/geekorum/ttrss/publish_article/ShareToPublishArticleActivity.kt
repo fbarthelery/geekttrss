@@ -25,10 +25,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -120,7 +117,11 @@ fun SharingToPublishScreen(
 fun SharingToPublishScreen() {
     Surface {
         Column {
-            TopAppBar(title = { Text(text = stringResource(R.string.activity_share_to_publish_toolbar_title)) })
+            TopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+                ),
+                title = { Text(text = stringResource(R.string.activity_share_to_publish_toolbar_title)) })
             Column(Modifier.padding(16.dp)) {
                 Text(stringResource(R.string.lbl_publishing_in_progress))
                 LinearProgressIndicator(

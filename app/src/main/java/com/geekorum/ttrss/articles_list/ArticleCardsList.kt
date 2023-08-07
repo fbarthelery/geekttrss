@@ -199,7 +199,9 @@ private fun ArticleCardList(
         PullRefreshIndicator(
             isRefreshing,
             pullRefreshState,
-            Modifier.align(Alignment.TopCenter)
+            backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
+            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.align(Alignment.TopCenter)
         )
     }
 }
