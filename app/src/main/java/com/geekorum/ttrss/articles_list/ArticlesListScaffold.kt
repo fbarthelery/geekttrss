@@ -139,10 +139,13 @@ private fun ArticleListScaffold(
             contentScaffold()
             // need to be called after content so if there is a navhost in content
             // this is registered latter
+            // this doesn't seem to work anymore with movableContentOf or m3
             val coroutineScope = rememberCoroutineScope()
-            BackHandler(enabled = drawerState.isOpen) {
-                coroutineScope.launch {
-                    drawerState.close()
+            if (drawerState.isOpen) {
+                BackHandler {
+                    coroutineScope.launch {
+                        drawerState.close()
+                    }
                 }
             }
         }
