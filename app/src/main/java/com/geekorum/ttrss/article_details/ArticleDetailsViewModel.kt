@@ -73,6 +73,8 @@ class ArticleDetailsViewModel @Inject constructor(
         .map(::getAdditionalArticlesForTags)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
+    val browserIcon = browserLauncher.browserIcon.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
     init {
         browserLauncher.warmUp()
     }
