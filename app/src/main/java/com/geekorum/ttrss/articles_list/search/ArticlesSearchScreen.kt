@@ -22,6 +22,7 @@ package com.geekorum.ttrss.articles_list.search
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
@@ -39,6 +40,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ShareCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
@@ -55,6 +57,7 @@ import timber.log.Timber
 @Composable
 fun SearchResultCardList(
     viewModel: SearchViewModel,
+    browserApplicationIcon: Drawable?,
     onCardClick: (Int, Article) -> Unit,
     onShareClick: (Article) -> Unit,
     onOpenInBrowserClick: (Article) -> Unit,
@@ -117,6 +120,7 @@ fun SearchResultCardList(
                     ArticleCard(
                         articleWithFeed = articleWithFeed,
                         viewModel = viewModel,
+                        browserApplicationIcon = browserApplicationIcon,
                         onCardClick = { onCardClick(index, articleWithFeed.article) },
                         onOpenInBrowserClick = onOpenInBrowserClick,
                         onShareClick = onShareClick)
@@ -130,6 +134,7 @@ fun SearchResultCardList(
 private fun ArticleCard(
     articleWithFeed: ArticleWithFeed,
     viewModel: SearchViewModel,
+    browserApplicationIcon: Drawable?,
     onCardClick: () -> Unit,
     onOpenInBrowserClick: (Article) -> Unit,
     onShareClick: (Article) -> Unit
@@ -144,6 +149,7 @@ private fun ArticleCard(
         excerpt = article.contentExcerpt,
         feedNameOrAuthor = feedNameOrAuthor,
         feedIconUrl = favIcon?.url,
+        browserApplicationIcon = browserApplicationIcon,
         isUnread = article.isUnread,
         isStarred = article.isStarred,
         onCardClick = onCardClick,
@@ -169,11 +175,13 @@ fun ArticlesSearchScreen(
         }
     }
 
+    val browserApplicationIcon by activityViewModel.browserIcon.collectAsStateWithLifecycle()
     Surface(Modifier.fillMaxSize()) {
         val context = LocalContext.current
         SearchResultCardList(
             viewModel = searchViewModel,
             onCardClick = activityViewModel::displayArticle,
+            browserApplicationIcon = browserApplicationIcon,
             onShareClick = {
                 onShareClicked(context, it)
             },
