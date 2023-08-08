@@ -22,11 +22,11 @@ package com.geekorum.ttrss.article_details
 
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.graphics.drawable.Drawable
 import androidx.annotation.ColorRes
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material3.*
 import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
@@ -45,12 +45,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.net.toUri
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleContentIndexed
 import com.geekorum.ttrss.ui.AppTheme3
+import com.geekorum.ttrss.ui.components.OpenInBrowserIcon
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.accompanist.web.AccompanistWebViewClient
 import kotlinx.coroutines.delay
@@ -147,6 +149,7 @@ fun ArticleDetailsScreenHero(
     val articleDetailsScreenState = rememberArticleDetailsScreenState()
 
     val article by articleDetailsViewModel.article.observeAsState()
+    val browserIcon by articleDetailsViewModel.browserIcon.collectAsStateWithLifecycle()
     val systemUiController = rememberSystemUiController()
     val useStatusBarDarkIcons = when {
         // in dark theme
@@ -183,6 +186,7 @@ fun ArticleDetailsScreenHero(
         },
         floatingActionButton = {
             OpenInBrowserExtendedFab(
+                browserIcon,
                 modifier = Modifier.padding(8.dp),
                 onClick = {
                     article?.let { articleDetailsViewModel.openArticleInBrowser(context, it) }
@@ -297,6 +301,7 @@ fun ArticleDetailsScreen(
     val article by articleDetailsViewModel.article.observeAsState()
     val systemUiController = rememberSystemUiController()
     val useStatusBarDarkIcons = !isSystemInDarkTheme()
+    val browserIcon by articleDetailsViewModel.browserIcon.collectAsStateWithLifecycle()
     DisposableEffect(systemUiController, useStatusBarDarkIcons) {
         systemUiController.setStatusBarColor(
             color = androidx.compose.ui.graphics.Color.Transparent,
@@ -339,7 +344,7 @@ fun ArticleDetailsScreen(
                     FloatingActionButton(onClick = {
                         article?.let { articleDetailsViewModel.openArticleInBrowser(context, it) }
                     }) {
-                        Icon(Icons.Default.OpenInBrowser, contentDescription = null)
+                        OpenInBrowserIcon(browserIcon, contentDescription = stringResource(R.string.open_article_in_browser))
                     }
                 },
                 onToggleUnreadClick = { articleDetailsViewModel.toggleArticleRead() },
@@ -371,13 +376,14 @@ fun ArticleDetailsScreen(
 
 @Composable
 private fun OpenInBrowserExtendedFab(
+    browserIcon: Drawable?,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val text = stringResource(R.string.open_article_in_browser)
     ExtendedFloatingActionButton(
         text = { Text(text) },
-        icon = { Icon(AppTheme3.Icons.OpenInBrowser, contentDescription = text) },
+        icon = { OpenInBrowserIcon(browserIcon, contentDescription = text) },
         modifier = modifier,
         onClick = onClick)
 }
