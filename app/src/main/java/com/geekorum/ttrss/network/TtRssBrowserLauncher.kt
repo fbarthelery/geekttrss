@@ -22,12 +22,14 @@ package com.geekorum.ttrss.network
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
 import com.geekorum.geekdroid.network.BrowserLauncher
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.settings.SettingsActivity
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 /**
@@ -35,9 +37,15 @@ import javax.inject.Inject
  */
 class TtRssBrowserLauncher @Inject constructor(
     private val delegate: BrowserLauncher,
-    private val appPreferences: SharedPreferences
+    private val appPreferences: SharedPreferences,
+    private val packageManager: PackageManager
 ) {
     private val PREFFERED_PACKAGES_LIST = arrayOf("org.mozilla.focus")
+
+    val browserIcon = delegate.browserComponent
+        .map { component ->
+            component?.packageName?.let { packageManager.getApplicationIcon(it) }
+        }
 
     fun warmUp() {
         delegate.warmUp(this::orderPreferredPackages)
