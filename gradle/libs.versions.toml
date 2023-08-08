@@ -26,7 +26,7 @@ androidx-arch-core-testing = "2.2.0"
 androidx-appcompat = "1.6.1"
 androidx-activity = "1.7.2"
 androidx-browser = "1.5.0"
-androidx-fragment = "1.6.0"
+androidx-fragment = "1.6.1"
 androidx-constraintlayout = "2.1.4"
 androidx-coordinatorlayout = "1.2.0"
 androidx-compose-bom = "2023.06.01"
@@ -36,15 +36,14 @@ androidx-hilt-navigation-compose = "1.0.0"
 androidx-hilt-work = "1.0.0"
 androidx-lifecycle = "2.6.1"
 androidx-navigation = "2.6.0"
-androidx-paging = "3.1.1"
-androidx-paging-compose = "1.0.0-alpha20"
+androidx-paging = "3.2.0"
 androidx-preferences = "1.2.0"
 androidx-room = "2.6.0-alpha02" # alpha for latest kotlin support
 androidx-startup = "1.1.1"
 androidx-work = "2.8.1"
-androidx-recyclerview = "1.3.0"
+androidx-recyclerview = "1.3.1"
 android-material = "1.9.0"
-kotlinx-coroutines = "1.7.1"
+kotlinx-coroutines = "1.7.3"
 kotlinx-datetime = "0.4.0"
 kotlinx-serialization = "1.5.1"
 dagger = "2.47"
@@ -53,7 +52,7 @@ okhttp = "4.10.0"
 timber = "5.0.1"
 truth = "1.1.3"
 mockk = "1.13.5"
-firebase-bom = "32.2.0"
+firebase-bom = "32.2.1"
 google-play-core = "2.1.0"
 google-play-core-review = "2.0.1"
 gms-play-services-base = "18.2.0"
@@ -63,7 +62,7 @@ retrofit = "2.9.0"
 retrofit-kotlinx-serialization-converter = "1.0.0"
 leakcanary = "2.9.1"
 coil = "2.3.0"
-geekdroid = "geekttrss-1.6.5"
+geekdroid = "master-SNAPSHOT"
 aboutoss = "0.1.0"
 kotlin = "1.9.0"
 kotlin-ksp = "1.9.0-1.0.11"
@@ -72,12 +71,12 @@ kotlin-ksp = "1.9.0-1.0.11"
 # these cannot be used for now because it will use multiple classpath and will make play-publisher-plugin fail
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
 android-dynamic-feature = { id = "com.android.dynamic-feature", version.ref = "android-gradle-plugin" }
-google-gms-google-services = { id = "com.google.gms.google-services", version = "4.3.14" }
+google-gms-google-services = { id = "com.google.gms.google-services", version = "4.3.15" }
 # Use our fork of oss-license-plugin to have reproducible builds
 # Waiting for feedback on https://github.com/google/play-services-plugins/pull/268
 # google-gms-oss-license = { id = "com.google.android.gms.oss-licenses-plugin", version = "0.10.6.1" }
 com-geekorum-gms-oss-license = { id = "com.geekorum.gms.oss-licenses-plugin", version = "0.10.6" }
-firebase-crashlytics = { id = "com.google.firebase.crashlytics", version = "2.9.2" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version = "2.9.8" }
 androidx-navigation-safeargs-kotlin = { id = "androidx.navigation.safeargs.kotlin", version.ref = "androidx-navigation" }
 dagger-hilt-android = { id = "dagger.hilt.android.plugin", version.ref = "dagger" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
@@ -144,7 +143,7 @@ androidx-navigation-fragment = { module = "androidx.navigation:navigation-fragme
 androidx-navigation-ui = { module = "androidx.navigation:navigation-ui", version.ref = "androidx-navigation"}
 
 androidx-paging = { module = "androidx.paging:paging-runtime-ktx", version.ref = "androidx-paging" }
-androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "androidx-paging-compose" }
+androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "androidx-paging" }
 
 androidx-preferences = { module = "androidx.preference:preference-ktx", version.ref = "androidx-preferences"}
 
