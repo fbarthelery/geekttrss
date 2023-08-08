@@ -113,6 +113,7 @@ fun SharingToPublishScreen(
     SharingToPublishScreen()
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SharingToPublishScreen() {
     Surface {
