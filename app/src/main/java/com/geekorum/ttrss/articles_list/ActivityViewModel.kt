@@ -93,6 +93,8 @@ class ActivityViewModel @Inject constructor(
     private val _isScrollingUp = MutableStateFlow(true)
     val isScrollingUp = _isScrollingUp.asStateFlow()
 
+    val browserIcon = browserLauncher.browserIcon.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+
     init {
         browserLauncher.warmUp()
         prefs.registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener)

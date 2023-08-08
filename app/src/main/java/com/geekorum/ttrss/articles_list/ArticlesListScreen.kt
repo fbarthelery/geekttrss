@@ -95,6 +95,7 @@ private fun BaseArticlesListScreen(
         activityViewModel.setIsScrollingUp(isScrollingUp)
     }
 
+    val browserIcon by activityViewModel.browserIcon.collectAsStateWithLifecycle()
     Surface(
         Modifier.fillMaxSize()
     ) {
@@ -102,6 +103,7 @@ private fun BaseArticlesListScreen(
         ArticleCardList(
             viewModel = articlesListViewModel,
             listState = lazyListState,
+            browserApplicationIcon = browserIcon,
             onCardClick = activityViewModel::displayArticle,
             onShareClick = {
                 onShareClicked(context, it)

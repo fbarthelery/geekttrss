@@ -20,6 +20,7 @@
  */
 package com.geekorum.ttrss.articles_list
 
+import android.graphics.drawable.Drawable
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
@@ -27,7 +28,6 @@ import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -52,6 +52,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.ui.AppTheme3
+import com.geekorum.ttrss.ui.components.OpenInBrowserIcon
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,6 +63,7 @@ fun SwipeableArticleCard(
     excerpt: String,
     feedNameOrAuthor: String,
     feedIconUrl: String?,
+    browserApplicationIcon: Drawable?,
     isUnread: Boolean,
     isStarred: Boolean,
     onCardClick: () -> Unit,
@@ -100,6 +102,7 @@ fun SwipeableArticleCard(
                 excerpt = excerpt,
                 feedNameOrAuthor = feedNameOrAuthor,
                 feedIconUrl = feedIconUrl,
+                browserApplicationIcon = browserApplicationIcon,
                 isUnread = isUnread,
                 isStarred = isStarred,
                 onCardClick = onCardClick,
@@ -121,6 +124,7 @@ fun ArticleCard(
     excerpt: String,
     feedNameOrAuthor: String,
     feedIconUrl: String?,
+    browserApplicationIcon: Drawable?,
     isUnread: Boolean,
     isStarred: Boolean,
     onCardClick: () -> Unit,
@@ -140,6 +144,7 @@ fun ArticleCard(
             }
             CardToolbar(
                 feedNameOrAuthor, feedIconUrl,
+                browserApplicationIcon = browserApplicationIcon,
                 isStarred = isStarred,
                 onOpenInBrowserClick = onOpenInBrowserClick,
                 onStarChanged = onStarChanged,
@@ -228,6 +233,7 @@ private fun CardToolbar(
     feedNameOrAuthor: String,
     feedIconUrl: String?,
     isStarred: Boolean,
+    browserApplicationIcon: Drawable?,
     onOpenInBrowserClick: () -> Unit,
     onStarChanged: (Boolean) -> Unit,
     onShareClick: () -> Unit,
@@ -260,8 +266,10 @@ private fun CardToolbar(
         )
 
         IconButton(onClick = onOpenInBrowserClick) {
-            Icon(AppTheme3.Icons.OpenInBrowser,
-                contentDescription = stringResource(R.string.open_article_in_browser))
+            OpenInBrowserIcon(
+                browserApplicationIcon = browserApplicationIcon,
+                contentDescription = stringResource(R.string.open_article_in_browser)
+            )
         }
 
         IconToggleButton(checked = isStarred, onCheckedChange = onStarChanged) {
@@ -311,6 +319,7 @@ private fun PreviewArticleCard() {
                 excerpt = "Excerpt of article".repeat(50),
                 feedNameOrAuthor = "Geekttrss",
                 feedIconUrl = null,
+                browserApplicationIcon = null,
                 isUnread = true,
                 isStarred = card1Starred,
                 onOpenInBrowserClick = {},
@@ -327,6 +336,7 @@ private fun PreviewArticleCard() {
                 excerpt = "Excerpt of article".repeat(50),
                 feedNameOrAuthor = "Geekttrss",
                 feedIconUrl = "",
+                browserApplicationIcon = null,
                 isUnread = false,
                 isStarred = card2Starred,
                 onOpenInBrowserClick = {},

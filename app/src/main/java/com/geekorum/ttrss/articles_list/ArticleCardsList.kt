@@ -20,6 +20,7 @@
  */
 package com.geekorum.ttrss.articles_list
 
+import android.graphics.drawable.Drawable
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
@@ -95,6 +96,7 @@ enum class PagingViewLoadState {
 fun ArticleCardList(
     viewModel: BaseArticlesViewModel,
     listState: LazyListState = rememberLazyListState(),
+    browserApplicationIcon: Drawable?,
     onCardClick: (Int, Article) -> Unit,
     onShareClick: (Article) -> Unit,
     onOpenInBrowserClick: (Article) -> Unit,
@@ -127,6 +129,7 @@ fun ArticleCardList(
         isMultiFeedList = isMultiFeedList,
         isRefreshing = isRefreshing,
         pullRefreshState = pullRefreshState,
+        browserApplicationIcon = browserApplicationIcon,
         onCardClick = onCardClick,
         onShareClick = onShareClick,
         onOpenInBrowserClick = onOpenInBrowserClick,
@@ -145,13 +148,14 @@ fun ArticleCardList(
 
 }
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun ArticleCardList(
     articles: LazyPagingItems<ArticleWithFeed>,
     isMultiFeedList: Boolean,
     isRefreshing: Boolean,
     pullRefreshState: PullRefreshState,
+    browserApplicationIcon: Drawable?,
     onCardClick: (Int, Article) -> Unit,
     onShareClick: (Article) -> Unit,
     onOpenInBrowserClick: (Article) -> Unit,
@@ -186,6 +190,7 @@ private fun ArticleCardList(
                 articles,
                 listState,
                 isMultiFeedList,
+                browserApplicationIcon,
                 lazyListContentPadding,
                 onCardClick,
                 onOpenInBrowserClick,
@@ -212,6 +217,7 @@ private fun ArticlesList(
     articles: LazyPagingItems<ArticleWithFeed>,
     listState: LazyListState,
     isMultiFeedList: Boolean,
+    browserApplicationIcon: Drawable?,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     onCardClick: (Int, Article) -> Unit,
     onOpenInBrowserClick: (Article) -> Unit,
@@ -257,6 +263,7 @@ private fun ArticlesList(
                     SwipeableArticleCard(
                         articleWithFeed = articleWithFeed,
                         displayFeedName = isMultiFeedList,
+                        browserApplicationIcon = browserApplicationIcon,
                         onCardClick = { onCardClick(index, articleWithFeed.article) },
                         onOpenInBrowserClick = onOpenInBrowserClick,
                         onShareClick = onShareClick,
@@ -296,6 +303,7 @@ fun FeedEmptyText(isRefreshing: Boolean) {
 private fun SwipeableArticleCard(
     articleWithFeed: ArticleWithFeed,
     displayFeedName: Boolean,
+    browserApplicationIcon: Drawable?,
     onCardClick: () -> Unit,
     onOpenInBrowserClick: (Article) -> Unit,
     onShareClick: (Article) -> Unit,
@@ -316,6 +324,7 @@ private fun SwipeableArticleCard(
         flavorImageUrl = article.flavorImageUri,
         excerpt = article.contentExcerpt,
         feedNameOrAuthor = feedNameOrAuthor,
+        browserApplicationIcon = browserApplicationIcon,
         feedIconUrl = favIcon?.url,
         isUnread = article.isUnread,
         isStarred = article.isStarred,
@@ -383,6 +392,7 @@ private fun ArticleCardList() {
         articles = pagingItems,
         isMultiFeedList = false,
         isRefreshing = false,
+        browserApplicationIcon = null,
         pullRefreshState = rememberPullRefreshState(refreshing = false, onRefresh = { }),
         onCardClick = { _, _ -> },
         onShareClick = {},

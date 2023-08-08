@@ -22,6 +22,7 @@ package com.geekorum.ttrss.articles_list.magazine
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
@@ -47,6 +48,7 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.core.app.ShareCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
@@ -81,6 +83,7 @@ fun MagazineScreen(
         })
     }
 
+    val browserApplicationIcon by activityViewModel.browserIcon.collectAsStateWithLifecycle()
     Surface(Modifier.fillMaxSize()) {
         val context = LocalContext.current
         val lazyListState = rememberLazyListState()
@@ -91,6 +94,7 @@ fun MagazineScreen(
         ArticlesMagazine(
             viewModel = magazineViewModel,
             listState = lazyListState,
+            browserApplicationIcon = browserApplicationIcon,
             onCardClick = activityViewModel::displayArticle,
             onShareClick = { article ->
                 context.startActivity(createShareIntent(context, article))
@@ -110,6 +114,7 @@ fun MagazineScreen(
 @Composable
 private fun ArticlesMagazine(
     viewModel: MagazineViewModel,
+    browserApplicationIcon: Drawable?,
     onCardClick: (Int, Article) -> Unit,
     onShareClick: (Article) -> Unit,
     onOpenInBrowserClick: (Article) -> Unit,
@@ -158,6 +163,7 @@ private fun ArticlesMagazine(
                 viewModel,
                 pagingItems,
                 listState,
+                browserApplicationIcon,
                 lazyListContentPadding,
                 onCardClick,
                 onOpenInBrowserClick,
@@ -182,6 +188,7 @@ private fun ArticlesList(
     viewModel: MagazineViewModel,
     pagingItems: LazyPagingItems<ArticleWithFeed>,
     listState: LazyListState,
+    browserApplicationIcon: Drawable?,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     onCardClick: (Int, Article) -> Unit,
     onOpenInBrowserClick: (Article) -> Unit,
@@ -224,6 +231,7 @@ private fun ArticlesList(
                     ArticleCard(
                         articleWithFeed = articleWithFeed,
                         viewModel = viewModel,
+                        browserApplicationIcon = browserApplicationIcon,
                         onCardClick = { onCardClick(index, articleWithFeed.article) },
                         onOpenInBrowserClick = onOpenInBrowserClick,
                         onShareClick = onShareClick
@@ -238,6 +246,7 @@ private fun ArticlesList(
 private fun ArticleCard(
     articleWithFeed: ArticleWithFeed,
     viewModel: MagazineViewModel,
+    browserApplicationIcon: Drawable?,
     onCardClick: () -> Unit,
     onOpenInBrowserClick: (Article) -> Unit,
     onShareClick: (Article) -> Unit
@@ -252,6 +261,7 @@ private fun ArticleCard(
         excerpt = article.contentExcerpt,
         feedNameOrAuthor = feedNameOrAuthor,
         feedIconUrl = favIcon?.url,
+        browserApplicationIcon = browserApplicationIcon,
         isUnread = article.isUnread,
         isStarred = article.isStarred,
         onCardClick = onCardClick,
