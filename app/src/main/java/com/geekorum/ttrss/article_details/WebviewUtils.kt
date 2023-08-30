@@ -118,7 +118,7 @@ class ArticleDetailsWebViewClient constructor(
         return delegate.shouldInterceptRequest(view, request)
     }
 
-    override fun onPageFinished(view: WebView?, url: String?) {
+    override fun onPageFinished(view: WebView, url: String?) {
         super.onPageFinished(view, url)
         onPageFinishedCallback(view, url)
     }
