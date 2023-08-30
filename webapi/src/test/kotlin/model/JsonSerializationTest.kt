@@ -21,6 +21,7 @@
 package com.geekorum.ttrss.webapi.model
 
 import com.geekorum.ttrss.webapi.Json
+import com.geekorum.ttrss.webapi.error
 import com.geekorum.ttrss.webapi.model.Error.E_NOT_FOUND
 import com.geekorum.ttrss.webapi.model.Error.NOT_LOGGED_IN
 import com.google.common.truth.Truth.assertThat
@@ -94,7 +95,7 @@ class JsonSerializationTest {
         val result = Json.decodeFromString(serializer, jsonString)
         val expected = LoginResponsePayload(
             status = 1,
-            content = LoginResponsePayload.Content(error = NOT_LOGGED_IN)
+            content = ErrorContent(error = NOT_LOGGED_IN)
         )
         assertThat(result.sequence).isEqualTo(expected.sequence)
         assertThat(result.status).isEqualTo(expected.status)
@@ -153,7 +154,7 @@ class JsonSerializationTest {
         val expected = UpdateArticleResponsePayload(
             sequence = 0,
             status = 1,
-            content = UpdateArticleResponsePayload.Content(error = NOT_LOGGED_IN)
+            content = ErrorContent(error = NOT_LOGGED_IN)
         )
         assertThat(result.sequence).isEqualTo(expected.sequence)
         assertThat(result.status).isEqualTo(expected.status)
@@ -218,7 +219,7 @@ class JsonSerializationTest {
         """.trimIndent()
         val serializer = getSerializer<ListResponsePayload<Feed>>()
         val result = Json.decodeFromString(serializer, jsonString)
-        val expected = ListResponsePayload(
+        val expected = ListResponsePayload<Feed>(
             sequence = 2,
             status = 1,
             content = ListContent(listOf(
@@ -250,7 +251,7 @@ class JsonSerializationTest {
         )
         assertThat(result.sequence).isEqualTo(expected.sequence)
         assertThat(result.status).isEqualTo(expected.status)
-        assertThat(result.content.list).isEqualTo(expected.content.list)
+        assertThat(result.result).isEqualTo(expected.result)
     }
 
     @Test
@@ -267,11 +268,11 @@ class JsonSerializationTest {
         val expected = ListResponsePayload<Feed>(
             sequence = 2,
             status = 1,
-            content = ListContent(error = NOT_LOGGED_IN)
+            content = ErrorContent(error = NOT_LOGGED_IN)
         )
         assertThat(result.sequence).isEqualTo(expected.sequence)
         assertThat(result.status).isEqualTo(expected.status)
-        assertThat(result.content.error).isEqualTo(expected.content.error)
+        assertThat(result.error).isEqualTo(expected.error)
     }
 
 
@@ -314,7 +315,7 @@ class JsonSerializationTest {
         """.trimIndent()
         val serializer = getSerializer<ListResponsePayload<FeedCategory>>()
         val result = Json.decodeFromString(serializer, jsonString)
-        val expected = ListResponsePayload(
+        val expected = ListResponsePayload<FeedCategory>(
             sequence = 2,
             status = 1,
             content = ListContent(listOf(
@@ -324,7 +325,7 @@ class JsonSerializationTest {
         )
         assertThat(result.sequence).isEqualTo(expected.sequence)
         assertThat(result.status).isEqualTo(expected.status)
-        assertThat(result.content.list).isEqualTo(expected.content.list)
+        assertThat(result.result).isEqualTo(expected.result)
     }
 
 
@@ -342,11 +343,11 @@ class JsonSerializationTest {
         val expected = ListResponsePayload<FeedCategory>(
             sequence = 2,
             status = 1,
-            content = ListContent(error = NOT_LOGGED_IN)
+            content = ErrorContent(error = NOT_LOGGED_IN)
         )
         assertThat(result.sequence).isEqualTo(expected.sequence)
         assertThat(result.status).isEqualTo(expected.status)
-        assertThat(result.content.error).isEqualTo(expected.content.error)
+        assertThat(result.error).isEqualTo(expected.error)
     }
 
     @Test
@@ -363,7 +364,7 @@ class JsonSerializationTest {
         val expected = ErrorResponsePayload(
             sequence = 0,
             status = 1,
-            content = ErrorResponsePayload.Content(error = E_NOT_FOUND)
+            content = ErrorContent(error = E_NOT_FOUND)
         )
         assertThat(result.sequence).isEqualTo(expected.sequence)
         assertThat(result.status).isEqualTo(expected.status)

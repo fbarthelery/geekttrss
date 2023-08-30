@@ -85,7 +85,7 @@ class SubscribeToFeedJsonSerializationTest {
         val expected = SubscribeToFeedResponsePayload(
             sequence = 0,
             status = 1,
-            content = SubscribeToFeedResponsePayload.Content(error = Error.NOT_LOGGED_IN)
+            content = ErrorContent(error = Error.NOT_LOGGED_IN)
         )
         Truth.assertThat(result.sequence).isEqualTo(expected.sequence)
         Truth.assertThat(result.status).isEqualTo(expected.status)
@@ -148,7 +148,7 @@ class UnsubscribeFromFeedJsonSerializationTest {
         val expected = UnsubscribeFeedResponsePayload(
             sequence = 0,
             status = 1,
-            content = Content(error = Error.FEED_NOT_FOUND)
+            content = ErrorContent(error = Error.FEED_NOT_FOUND)
         )
         Truth.assertThat(result.sequence).isEqualTo(expected.sequence)
         Truth.assertThat(result.status).isEqualTo(expected.status)

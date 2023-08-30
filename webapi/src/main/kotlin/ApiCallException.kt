@@ -20,9 +20,10 @@
  */
 package com.geekorum.ttrss.webapi
 
+import com.geekorum.ttrss.webapi.model.Error
 import com.geekorum.ttrss.webapi.model.ResponsePayload
 import com.geekorum.ttrss.webapi.model.ResponsePayload.Companion.API_STATUS_OK
-import com.geekorum.ttrss.webapi.model.Error
+import com.geekorum.ttrss.webapi.model.error
 
 /**
  * Exception raised when an Tiny Tiny Rss API call fail.

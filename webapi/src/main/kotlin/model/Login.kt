@@ -18,21 +18,12 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-@file:OptIn(ExperimentalSerializationApi::class)
 package com.geekorum.ttrss.webapi.model
 
 import androidx.annotation.Keep
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Serializer
 import kotlinx.serialization.Transient
-import kotlinx.serialization.builtins.nullable
-import kotlinx.serialization.builtins.serializer
-import kotlinx.serialization.encoding.CompositeDecoder
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
 
 /**
  * Request payload to log the user in.
@@ -53,21 +44,22 @@ data class LoginRequestPayload(
  * The response of a Login request.
  */
 @Keep
-@Serializable(LoginResponsePayload.OwnSerializer::class)
+@Serializable
 data class LoginResponsePayload(
     @SerialName("seq")
     override val sequence: Int? = null,
     override val status: Int = 0,
-    override val content: Content
+    @Serializable(with = ContentSerializer::class)
+    override val content: BaseContent
 ) : ResponsePayload<LoginResponsePayload.Content>() {
 
     @Transient
     val sessionId: String?
-        get() = content.sessionId
+        get() = typedContent?.sessionId
 
     @Transient
     val apiLevel: Int?
-        get() = content.apiLevel
+        get() = typedContent?.apiLevel
 
     @Serializable
     data class Content(
@@ -79,40 +71,8 @@ data class LoginResponsePayload(
 
         val config: GetConfigResponsePayload.Content? = null,
 
-        override var error: Error? = null
+    ) : BaseContent
 
-    ) : BaseContent()
+    object ContentSerializer : BaseContentSerializer(Content.serializer())
 
-    @Serializer(LoginResponsePayload::class)
-    internal object OwnSerializer : KSerializer<LoginResponsePayload> {
-        override fun serialize(encoder: Encoder, value: LoginResponsePayload) {
-            TODO("not implemented")
-        }
-
-        override fun deserialize(decoder: Decoder): LoginResponsePayload {
-            val contentDecoder = decoder.beginStructure(descriptor)
-            lateinit var content: Content
-            var seq: Int? = null
-            var status = 0
-            loop@ while (true) {
-                when (val i = contentDecoder.decodeElementIndex(descriptor)) {
-                    CompositeDecoder.DECODE_DONE -> break@loop
-                    0 -> seq = contentDecoder.decodeNullableSerializableElement(descriptor, i,
-                        Int.serializer().nullable)
-                    1 -> status = contentDecoder.decodeIntElement(descriptor, i)
-                    2 -> {
-                        val contentSerializer = Content.serializer()
-                        content = contentDecoder.decodeSerializableElement(contentSerializer.descriptor, i,
-                            contentSerializer)
-                    }
-                }
-            }
-            contentDecoder.endStructure(descriptor)
-            return LoginResponsePayload(
-                content = content,
-                sequence = seq,
-                status = status
-            )
-        }
-    }
 }
