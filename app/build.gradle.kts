@@ -28,9 +28,7 @@ plugins {
 //    alias(libs.plugins.android.application)
     id("com.android.application")
 //    alias(libs.plugins.kotlin.android)
-//    alias(libs.plugins.kotlin.kapt)
     kotlin("android")
-    kotlin("kapt")
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.com.geekorum.gms.oss.license)
     id("com.geekorum.build.android-tests")
@@ -143,13 +141,6 @@ kotlin {
     }
 }
 
-kapt {
-    arguments {
-        // assisted inject create a module without hilt annotation. will be fixed in 0.5.3
-        arg("dagger.hilt.disableModulesHaveInstallInCheck", true)
-    }
-}
-
 ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
     arg("room.incremental", "true")
@@ -233,16 +224,16 @@ dependencies {
 
 
     implementation(libs.dagger)
-    kapt(libs.dagger.compiler)
-    kaptTest(libs.dagger.compiler)
+    ksp(libs.dagger.compiler)
+    kspTest(libs.dagger.compiler)
     implementation(libs.dagger.hilt.android)
     implementation(libs.androidx.hilt.work)
-    kapt(libs.androidx.hilt.compiler)
-    kapt(libs.dagger.hilt.compiler)
+    ksp(libs.androidx.hilt.compiler)
+    ksp(libs.dagger.hilt.compiler)
     testImplementation(libs.dagger.hilt.android.testing)
-    kaptTest(libs.dagger.hilt.compiler)
+    kspTest(libs.dagger.hilt.compiler)
     androidTestImplementation(libs.dagger.hilt.android.testing)
-    kaptAndroidTest(libs.dagger.hilt.compiler)
+    kspAndroidTest(libs.dagger.hilt.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
 
