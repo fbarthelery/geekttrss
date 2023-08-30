@@ -27,7 +27,6 @@ import com.geekorum.ttrss.webapi.TokenRetriever
 import com.geekorum.ttrss.webapi.model.SubscribeResultCode
 import com.geekorum.ttrss.webapi.model.SubscribeToFeedRequestPayload
 import com.geekorum.ttrss.webapi.model.UnsubscribeFeedRequestPayload
-import com.geekorum.ttrss.webapi.model.UnsubscribeFeedResponsePayload.Content.Status.OK
 import timber.log.Timber
 
 /**
@@ -65,14 +64,11 @@ internal class RetrofitManageFeedService(
         val unsubscribeResult = helper.executeOrFail("Unable to unsubscribe from feed") {
             tinyrssApi.unsubscribeFromFeed(payload)
         }
-        val status = unsubscribeResult.content.status
-        return when (status) {
-            OK -> true
-            else -> {
-                Timber.w("Unable to unsubscribe feed. Error: ${unsubscribeResult.content.error}")
-                false
-            }
+        if (!unsubscribeResult.success) {
+            Timber.w("Unable to unsubscribe feed. Error: ${unsubscribeResult.error}")
+            return false
         }
+        return true
     }
 
     override suspend fun subscribeToFeed(
@@ -82,7 +78,7 @@ internal class RetrofitManageFeedService(
         val subscribeResult = helper.executeOrFail("Unable to subscribe to feed") {
             tinyrssApi.subscribeToFeed(payload)
         }
-        val subscribeResultCode = subscribeResult.content.status?.let { SubscribeResultCode.valueOf(it.resultCode) }
+        val subscribeResultCode = subscribeResult.resultCode
         return when (subscribeResultCode) {
             SubscribeResultCode.FEED_ALREADY_EXIST, SubscribeResultCode.FEED_ADDED -> ResultCode.SUCCESS
             SubscribeResultCode.INVALID_URL -> ResultCode.INVALID_URL
