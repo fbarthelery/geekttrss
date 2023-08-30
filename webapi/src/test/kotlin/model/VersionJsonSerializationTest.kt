@@ -21,6 +21,7 @@
 package com.geekorum.ttrss.webapi.model
 
 import com.geekorum.ttrss.webapi.Json
+import com.geekorum.ttrss.webapi.error
 import com.google.common.truth.Truth.assertThat
 import kotlin.test.Test
 
@@ -64,12 +65,12 @@ class GetVersionJsonSerializationTest {
               "content": {"error":"NOT_LOGGED_IN"}
             }
         """.trimIndent()
-        val serializer = getSerializer<ListResponsePayload<Headline>>()
+        val serializer = getSerializer<GetVersionResponsePayload>()
         val result = Json.decodeFromString(serializer, jsonString)
         val expected = GetVersionResponsePayload(
             sequence = 2,
             status = 1,
-            content = GetVersionResponsePayload.Content(error = Error.NOT_LOGGED_IN)
+            content = ErrorContent(error = Error.NOT_LOGGED_IN)
         )
         assertThat(result.sequence).isEqualTo(expected.sequence)
         assertThat(result.status).isEqualTo(expected.status)
@@ -123,7 +124,7 @@ class GetApiLevelJsonSerializationTest {
         val expected = GetApiLevelResponsePayload(
             sequence = 2,
             status = 1,
-            content = GetApiLevelResponsePayload.Content(error = Error.NOT_LOGGED_IN)
+            content = ErrorContent(error = Error.NOT_LOGGED_IN)
         )
         assertThat(result.sequence).isEqualTo(expected.sequence)
         assertThat(result.status).isEqualTo(expected.status)

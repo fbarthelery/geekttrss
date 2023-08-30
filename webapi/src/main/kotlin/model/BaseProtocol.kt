@@ -22,13 +22,7 @@
 package com.geekorum.ttrss.webapi.model
 
 import androidx.annotation.Keep
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.KSerializer
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.SerializationException
-import kotlinx.serialization.Serializer
-import kotlinx.serialization.Transient
+import kotlinx.serialization.*
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.nullable
 import kotlinx.serialization.builtins.serializer
@@ -37,6 +31,10 @@ import kotlinx.serialization.descriptors.buildClassSerialDescriptor
 import kotlinx.serialization.encoding.CompositeDecoder
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.json.JsonContentPolymorphicSerializer
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.jsonObject
 
 /* Requests */
 
@@ -79,7 +77,11 @@ abstract class ResponsePayload<T : BaseContent> {
 
     abstract val status: Int?
 
-    abstract val content: T
+    abstract val content: BaseContent
+
+    @Suppress("UNCHECKED_CAST")
+    val typedContent: T?
+        get() = content as? T
 
     companion object {
         val API_STATUS_OK = 0
@@ -108,29 +110,23 @@ data class ErrorResponsePayload(
     @SerialName("seq")
     override val sequence: Int? = null,
     override val status: Int = 0,
-    override val content: Content
-) : ResponsePayload<ErrorResponsePayload.Content>() {
-
-    @Serializable
-    data class Content(
-        override var error: Error? = null
-    ) : BaseContent()
-
-}
+    override val content: ErrorContent
+) : ResponsePayload<ErrorContent>()
 
 /**
- * The content of an answer from the Tiny Tiny Rss api.
+ * The content of an answer from the Tiny Tiny Rss api. This is a marker interface
  *
  * The Api answer with a dynamic content element.
- * This content can either an object containing an error or something else depending on the request.
- * The [BaseContent] allows to deal with the error case.
+ * This content can either an object containing an [ErrorContent] or something else depending on the request.
+ * The [BaseContent] and [ErrorContent] allows to deal with the error case.
  * Other classes can extends this one to add the appropriate content.
  */
-abstract class BaseContent {
+interface BaseContent
 
-    abstract var error: Error?
-}
-
+@Serializable
+data class ErrorContent(
+    var error: Error?
+) : BaseContent
 
 /**
  * Represent the content of an Api Response when the content is a list of objects.
@@ -139,50 +135,23 @@ abstract class BaseContent {
  */
 @Serializable(ListContent.OwnSerializer::class)
 data class ListContent<T>(
-    @Transient
     val list: List<T> = emptyList(),
-    override var error: Error? = null
-) : BaseContent() {
+) : BaseContent {
 
     internal class OwnSerializer<E>(
         val contentSerializer: KSerializer<E>
     ) : KSerializer<ListContent<E>> {
 
-        override val descriptor: SerialDescriptor = buildClassSerialDescriptor("ListContentSerializer") {
-            element("error", Error.serializer().descriptor, isOptional = true)
-        }
+        override val descriptor: SerialDescriptor = buildClassSerialDescriptor("ListContentSerializer") {}
 
         override fun serialize(encoder: Encoder, value: ListContent<E>) {
             TODO("not implemented")
         }
 
         override fun deserialize(decoder: Decoder): ListContent<E> {
-            // fallback to error parsing
-            return deserializeList(decoder) ?: deserializeBaseContent(decoder)
-        }
-
-        private fun deserializeBaseContent(input: Decoder): ListContent<E> {
-            val contentDecoder = input.beginStructure(descriptor)
-            var error: Error? = null
-            loop@ while (true) {
-                when (val i = contentDecoder.decodeElementIndex(descriptor)) {
-                    CompositeDecoder.DECODE_DONE -> break@loop
-                    0 -> error = contentDecoder.decodeNullableSerializableElement(descriptor, i,
-                        Error.serializer().nullable)
-                }
-            }
-            contentDecoder.endStructure(descriptor)
-            return ListContent(error = error)
-        }
-
-        private fun deserializeList(input: Decoder): ListContent<E>? {
             val listSerializer = ListSerializer(contentSerializer)
-            return try {
-                val list = listSerializer.deserialize(input)
-                ListContent(list)
-            } catch (e: SerializationException) {
-                null
-            }
+            val list = listSerializer.deserialize(decoder)
+            return ListContent(list)
         }
     }
 
@@ -199,12 +168,12 @@ data class ListResponsePayload<T>(
     @SerialName("seq")
     override val sequence: Int? = null,
     override val status: Int? = null,
-    override val content: ListContent<T>
+    override val content: BaseContent
 ) : ResponsePayload<ListContent<T>>() {
 
     @Transient
     val result: List<T>
-        get() = content.list
+        get() = (content as ListContent<T>).list
 
     internal class OwnSerializer<E>(
         private val contentSerializer: KSerializer<E>
@@ -222,7 +191,7 @@ data class ListResponsePayload<T>(
 
         override fun deserialize(decoder: Decoder): ListResponsePayload<E> {
             val contentDecoder = decoder.beginStructure(descriptor)
-            lateinit var listContent: ListContent<E>
+            lateinit var content: BaseContent
             var seq: Int? = null
             var status = 0
             loop@ while (true) {
@@ -232,18 +201,38 @@ data class ListResponsePayload<T>(
                         Int.serializer().nullable)
                     1 -> status = contentDecoder.decodeIntElement(descriptor, i)
                     2 -> {
-                        val listContentDecoder = ListContent.serializer(contentSerializer)
-                        listContent = contentDecoder.decodeSerializableElement(listContentDecoder.descriptor, i,
-                            listContentDecoder)
+                        val listContentSerializer = ListContent.serializer(contentSerializer)
+                        val baseContentSerializer = BaseContentSerializer(listContentSerializer)
+                        content = baseContentSerializer.deserialize(decoder)
                     }
                 }
             }
             contentDecoder.endStructure(descriptor)
             return ListResponsePayload(
-                content = listContent,
+                content = content,
                 sequence = seq,
                 status = status
             )
         }
     }
 }
+
+/**
+ * Parse [content][BaseContent] as is :
+ *  - if it contains an "error" field parse as an [ErrorContent]
+ *  - else use specific content serializer
+ */
+open class BaseContentSerializer(
+    private val contentSerializer: DeserializationStrategy<BaseContent>
+) : JsonContentPolymorphicSerializer<BaseContent>(BaseContent::class) {
+    override fun selectDeserializer(element: JsonElement): DeserializationStrategy<BaseContent> {
+        return when {
+            element is JsonObject && "error" in element.jsonObject -> ErrorContent.serializer()
+            else -> contentSerializer
+        }
+    }
+}
+
+
+val BaseContent.error: Error?
+    get() = (this as? ErrorContent)?.error

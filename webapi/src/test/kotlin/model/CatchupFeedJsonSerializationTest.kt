@@ -73,7 +73,7 @@ class CatchupFeedJsonSerializationTest {
         val expected = CatchupFeedResponsePayload(
             sequence = 0,
             status = 1,
-            content = CatchupFeedResponsePayload.Content(error = Error.NOT_LOGGED_IN)
+            content = ErrorContent(error = Error.NOT_LOGGED_IN)
         )
         Truth.assertThat(result.sequence).isEqualTo(expected.sequence)
         Truth.assertThat(result.status).isEqualTo(expected.status)

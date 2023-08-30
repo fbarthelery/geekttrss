@@ -23,15 +23,8 @@ package com.geekorum.ttrss.webapi.model
 
 import androidx.annotation.Keep
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Serializer
-import kotlinx.serialization.builtins.nullable
-import kotlinx.serialization.builtins.serializer
-import kotlinx.serialization.encoding.CompositeDecoder
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
 
 /**
  * The payload gor a getHeadlines request.
@@ -119,54 +112,23 @@ data class UpdateArticleRequestPayload(
  * The response of an update article request.
  */
 @Keep
-@Serializable(UpdateArticleResponsePayload.OwnSerializer::class)
+@Serializable
 data class UpdateArticleResponsePayload(
     @SerialName("seq")
     override val sequence: Int? = null,
     override val status: Int = 0,
-    override val content: Content
+    @Serializable(with = ContentSerializer::class)
+    override val content: BaseContent
 ) : ResponsePayload<UpdateArticleResponsePayload.Content>() {
 
-    @Transient
-    val updated: Int = content.updated ?: 0
+    val updated: Int
+        get() = typedContent?.updated ?: 0
 
     @Serializable
     data class Content(
         val status: String? = null,
         val updated: Int? = null,
-        override var error: Error? = null
-    ): BaseContent()
+    ): BaseContent
 
-    @Serializer(UpdateArticleResponsePayload::class)
-    internal object OwnSerializer : KSerializer<UpdateArticleResponsePayload> {
-        override fun serialize(encoder: Encoder, value: UpdateArticleResponsePayload) {
-            TODO("not implemented")
-        }
-
-        override fun deserialize(decoder: Decoder): UpdateArticleResponsePayload {
-            val contentDecoder = decoder.beginStructure(descriptor)
-            lateinit var content: Content
-            var seq: Int? = null
-            var status = 0
-            loop@ while (true) {
-                when(val i = contentDecoder.decodeElementIndex(descriptor)) {
-                    CompositeDecoder.DECODE_DONE -> break@loop
-                    0 -> seq = contentDecoder.decodeNullableSerializableElement(descriptor, i,
-                        Int.serializer().nullable)
-                    1 -> status = contentDecoder.decodeIntElement(descriptor, i)
-                    2 -> {
-                        val contentSerializer = Content.serializer()
-                        content = contentDecoder.decodeSerializableElement(contentSerializer.descriptor, i,
-                            contentSerializer)
-                    }
-                }
-            }
-            contentDecoder.endStructure(descriptor)
-            return UpdateArticleResponsePayload(
-                content = content,
-                sequence = seq,
-                status = status
-            )
-        }
-    }
+    object ContentSerializer : BaseContentSerializer(Content.serializer())
 }

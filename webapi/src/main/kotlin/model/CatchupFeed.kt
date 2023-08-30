@@ -21,12 +21,8 @@
 package com.geekorum.ttrss.webapi.model
 
 import androidx.annotation.Keep
-import kotlinx.serialization.*
-import kotlinx.serialization.builtins.nullable
-import kotlinx.serialization.builtins.serializer
-import kotlinx.serialization.encoding.CompositeDecoder
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 /**
  * Request Payload to catch up (mark as read) a feed
@@ -58,51 +54,19 @@ data class CatchupFeedRequestPayload(
 
 
 @Keep
-@Serializable(CatchupFeedResponsePayload.OwnSerializer::class)
+@Serializable
 data class CatchupFeedResponsePayload(
     @SerialName("seq")
     override val sequence: Int? = null,
     override val status: Int = 0,
-    override val content: Content
+    @Serializable(with = ContentSerializer::class)
+    override val content: BaseContent
 ) : ResponsePayload<CatchupFeedResponsePayload.Content>() {
 
     @Serializable
     data class Content(
         val status: String? = null,
-        override var error: Error? = null
-    ): BaseContent()
+    ): BaseContent
 
-    @OptIn(ExperimentalSerializationApi::class)
-    @Serializer(CatchupFeedResponsePayload::class)
-    internal object OwnSerializer : KSerializer<CatchupFeedResponsePayload> {
-        override fun serialize(encoder: Encoder, value: CatchupFeedResponsePayload) {
-            TODO("not implemented")
-        }
-
-        override fun deserialize(decoder: Decoder): CatchupFeedResponsePayload {
-            val contentDecoder = decoder.beginStructure(descriptor)
-            lateinit var content: Content
-            var seq: Int? = null
-            var status = 0
-            loop@ while (true) {
-                when(val i = contentDecoder.decodeElementIndex(descriptor)) {
-                    CompositeDecoder.DECODE_DONE -> break@loop
-                    0 -> seq = contentDecoder.decodeNullableSerializableElement(descriptor, i,
-                        Int.serializer().nullable)
-                    1 -> status = contentDecoder.decodeIntElement(descriptor, i)
-                    2 -> {
-                        val contentSerializer = Content.serializer()
-                        content = contentDecoder.decodeSerializableElement(contentSerializer.descriptor, i,
-                            contentSerializer)
-                    }
-                }
-            }
-            contentDecoder.endStructure(descriptor)
-            return CatchupFeedResponsePayload(
-                content = content,
-                sequence = seq,
-                status = status
-            )
-        }
-    }
+    object ContentSerializer : BaseContentSerializer(Content.serializer())
 }
