@@ -46,7 +46,7 @@ plugins {
 // try to remove it on next navigation-safe-args plugin release
 buildscript {
     dependencies {
-        classpath("com.android.tools.build:gradle:8.1.0")
+        classpath("com.android.tools.build:gradle:8.1.1")
     }
 }
 
