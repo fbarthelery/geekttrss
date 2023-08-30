@@ -72,7 +72,7 @@ internal class FabPresenter(
             modifier = modifier.size(56.dp),
             targetState = targetState,
             transitionSpec = {
-                scaleIn(tween(300, delayMillis = 100)) with
+                scaleIn(tween(300, delayMillis = 100)) togetherWith
                         scaleOut(tween(300)) using
                         SizeTransform(clip = false) { _, _ ->
                             // delay size transform to make scaleOut happens in place

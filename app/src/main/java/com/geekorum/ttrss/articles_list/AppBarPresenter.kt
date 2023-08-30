@@ -135,7 +135,7 @@ internal class AppBarPresenter(
         val tagsSet = tags?.toSet() ?: emptySet()
         AnimatedContent(targetState = showTagsBar && tagsSet.isNotEmpty(),
             transitionSpec = {
-                fadeIn() + slideInVertically() with
+                fadeIn() + slideInVertically() togetherWith
                         fadeOut() + slideOutVertically() using SizeTransform(clip = false)
             },
             label = "TagBarVisibility"
