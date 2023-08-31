@@ -25,9 +25,12 @@ import androidx.core.provider.FontsContractCompat
 import com.geekorum.ttrss.R
 import dagger.Binds
 import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import timber.log.Timber
 
 @Module
+@InstallIn(SingletonComponent::class)
 abstract class GoogleFontsWebFontProviderModule {
 
     @Binds

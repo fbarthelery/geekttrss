@@ -102,6 +102,7 @@ abstract class FakeSyncWorkersModule {
 }
 
 @Module
+@DisableInstallInCheck
 object FakeNetworkLoginModule {
 
     @Provides
