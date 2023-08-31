@@ -26,12 +26,14 @@ import com.geekorum.ttrss.R
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.webapi.TinyRssApi
 import com.geekorum.ttrss.webapi.model.Error
+import com.geekorum.ttrss.webapi.model.ErrorContent
 import com.geekorum.ttrss.webapi.model.LoginResponsePayload
 import com.geekorum.ttrss.webapi.model.ResponsePayload
 import com.google.common.truth.Truth.assertThat
 import dagger.Component
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.migration.DisableInstallInCheck
 import io.mockk.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -64,7 +66,7 @@ class LoginViewModelTest {
 
     private val failedLoginResponse = LoginResponsePayload(
         status = ResponsePayload.API_STATUS_ERR,
-        content = LoginResponsePayload.Content(error = Error.LOGIN_ERROR))
+        content = ErrorContent(error = Error.LOGIN_ERROR))
 
 
     @Before
@@ -162,6 +164,7 @@ class LoginViewModelTest {
 
 
 @Module
+@DisableInstallInCheck
 class FakeTinyrssApiModule(
     private val tinyRssApi: TinyRssApi
 ) {
