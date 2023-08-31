@@ -125,19 +125,14 @@ android {
     packaging {
         // Fix: https://github.com/Kotlin/kotlinx.coroutines/issues/2023
         resources {
-            excludes += listOf("META-INF/AL2.0",
+            excludes += listOf(
+                "META-INF/AL2.0",
                 "META-INF/LGPL2.1",
+                "META-INF/LICENSE.md",
+                "META-INF/LICENSE-notice.md",
                 "DebugProbesKt.bin"
             )
         }
-    }
-}
-
-kotlin {
-//        this seems to break hilt at the moment
-//        jvmToolchain(11)
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions.jvmTarget = "11"
     }
 }
 

@@ -20,7 +20,9 @@
  */
 import com.android.build.api.dsl.CommonExtension
 import com.geekorum.build.*
+import org.jetbrains.kotlin.gradle.dsl.KotlinTopLevelExtension
 import org.jetbrains.kotlin.gradle.plugin.KaptExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -63,12 +65,15 @@ allprojects {
         }
     }
 
+    plugins.withType<KotlinBasePlugin> {
+        extensions.configure<KotlinTopLevelExtension> {
+            jvmToolchain(17)
+        }
+    }
+
     afterEvaluate {
         extensions.findByType<KaptExtension>()?.arguments {
             arg("dagger.formatGeneratedSource", "enabled")
-        }
-        extensions.findByType(CommonExtension::class.java)?.apply {
-            configureJavaVersion()
         }
     }
 }

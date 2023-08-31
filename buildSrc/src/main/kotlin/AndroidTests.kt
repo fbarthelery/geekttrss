@@ -20,8 +20,8 @@
  */
 package com.geekorum.build
 
-import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.CommonExtension
+import com.android.build.api.dsl.DefaultConfig
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.DependencyConstraint
@@ -33,14 +33,15 @@ import org.gradle.kotlin.dsl.*
 const val espressoVersion = "3.5.1"
 const val androidxTestRunnerVersion = "1.5.2"
 const val androidxTestCoreVersion = "1.5.0"
-const val robolectricVersion = "4.9.2"
+const val robolectricVersion = "4.10.3"
 
+private typealias BaseExtension = CommonExtension<*, *, DefaultConfig, *, *>
 
 /*
  * Configuration for espresso and robolectric usage in an Android project
  */
 internal fun Project.configureTests() {
-    extensions.configure<CommonExtension<*,*,*,*,*>>("android") {
+    extensions.configure<BaseExtension>("android") {
         defaultConfig {
             testInstrumentationRunner = "com.geekorum.ttrss.HiltRunner"
             testInstrumentationRunnerArguments += mapOf(
@@ -84,8 +85,8 @@ internal fun Project.configureTests() {
         dualTestImplementation("androidx.test.ext:truth:1.5.0")
 
         // mock
-        testImplementation("io.mockk:mockk:1.11.0")
-        androidTestImplementation("io.mockk:mockk-android:1.11.0")
+        testImplementation("io.mockk:mockk:1.13.5")
+        androidTestImplementation("io.mockk:mockk-android:1.13.5")
         testImplementation("org.robolectric:robolectric:$robolectricVersion")
 
         constraints {

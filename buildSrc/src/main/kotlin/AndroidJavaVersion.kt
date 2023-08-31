@@ -20,22 +20,8 @@
  */
 package com.geekorum.build
 
-import com.android.build.api.dsl.CommonExtension
-import org.gradle.api.JavaVersion
 import org.gradle.api.Project
-import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.kotlin.dsl.dependencies
-
-/**
- * Configure java version compile options based on minSdkVersion value
- */
-fun CommonExtension<*,*,*,*,*>.configureJavaVersion() {
-    val version = JavaVersion.VERSION_11
-    compileOptions {
-        sourceCompatibility = version
-        targetCompatibility = version
-    }
-}
 
 /**
  * Add missing annotation processor dependencies to build on Java 11
