@@ -28,6 +28,8 @@ import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.security.ProviderInstaller
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import dagger.multibindings.IntoSet
 import timber.log.Timber
 
@@ -53,6 +55,7 @@ private class GmsSecurityProviderInitializer : AppInitializer {
 }
 
 @Module(includes = [AppInitializersModule::class])
+@InstallIn(SingletonComponent::class)
 class GmsSecurityProviderModule {
 
     @Provides

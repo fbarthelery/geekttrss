@@ -37,6 +37,8 @@ import com.google.android.play.core.splitinstall.SplitInstallSessionState
 import com.google.android.play.core.splitinstall.model.SplitInstallSessionStatus
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -117,6 +119,7 @@ private fun SplitInstallSessionState.toInstallSessionState(): InstallSession.Sta
 
 
 @Module
+@InstallIn(SingletonComponent::class)
 class PlayStoreInstallModule {
     @Provides
     fun providesOnDemandModuleManager(application: android.app.Application): OnDemandModuleManager {

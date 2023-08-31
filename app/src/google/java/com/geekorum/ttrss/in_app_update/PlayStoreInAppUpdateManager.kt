@@ -30,6 +30,8 @@ import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.ktx.*
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import timber.log.Timber
@@ -118,6 +120,7 @@ value class PlayInstallStatus(private val value: Int) {
 }
 
 @Module
+@InstallIn(SingletonComponent::class)
 object PlayStoreInAppUpdateModule {
 
     @Provides
