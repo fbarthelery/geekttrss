@@ -26,6 +26,7 @@ import com.geekorum.ttrss.webapi.TokenRetriever
 import dagger.Component
 import dagger.Module
 import dagger.Provides
+import dagger.hilt.migration.DisableInstallInCheck
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
@@ -74,6 +75,7 @@ class ApiServiceTest {
 
 
 @Module
+@DisableInstallInCheck
 internal class ServerModule(val serverUrl: String) {
 
     @Provides
