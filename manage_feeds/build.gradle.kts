@@ -29,7 +29,6 @@ plugins {
     kotlin("kapt")
     id("com.geekorum.build.android-tests")
     id("com.geekorum.build.android-avdl")
-    alias(libs.plugins.androidx.navigation.safeargs.kotlin)
 }
 
 android {
@@ -67,13 +66,14 @@ android {
             proguardFile("proguard-rules.pro")
         }
     }
-}
 
-kotlin {
-//        this seems to break hilt at the moment
-//        jvmToolchain(11)
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions.jvmTarget = "11"
+    packaging {
+        resources {
+            excludes += listOf(
+                "META-INF/LICENSE.md",
+                "META-INF/LICENSE-notice.md"
+            )
+        }
     }
 }
 

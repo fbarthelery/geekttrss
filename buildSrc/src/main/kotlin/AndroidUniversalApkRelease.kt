@@ -20,30 +20,29 @@
  */
 package com.geekorum.build
 
-import com.android.build.api.variant.*
-import com.android.build.gradle.AppPlugin
+import com.android.build.api.variant.ApplicationAndroidComponentsExtension
+import com.android.build.gradle.api.AndroidBasePlugin
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.the
 import org.gradle.kotlin.dsl.withType
+import java.util.Locale
 
-
+@Suppress("UnstableApiUsage")
 internal fun Project.makeAssembleReleaseTaskGeneratesUniversalApk() {
-    val variantsName = mutableListOf<String>()
-    plugins.withType<AppPlugin> {
-        val android = project.extensions.getByType(AndroidComponentsExtension::class.java)
-        android.onVariants(android.selector().withBuildType("release")) {
-            variantsName += it.name
-        }
-    }
-
-    // this needs to run after evaluation so the different tasks have been created
-    afterEvaluate {
+    plugins.withType<AndroidBasePlugin> {
+        val android = the<ApplicationAndroidComponentsExtension>()
         tasks.apply {
-            named("assembleRelease") {
-                for (variant in variantsName) {
-                    val packageTask = named("package${variant.capitalize()}UniversalApk")
-                    dependsOn(packageTask)
+            val release = android.selector().withBuildType("release")
+            android.onVariants(release) {
+                afterEvaluate {
+                    named("assembleRelease") {
+                        dependsOn(named("package${it.name.capitalize()}UniversalApk"))
+                    }
                 }
             }
         }
     }
 }
+
+private fun String.capitalize() =
+    replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
