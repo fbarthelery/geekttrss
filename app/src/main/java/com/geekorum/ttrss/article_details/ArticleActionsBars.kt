@@ -21,80 +21,39 @@
 package com.geekorum.ttrss.article_details
 
 import android.content.res.Configuration
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.LinearOutSlowInEasing
-import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.ui.AppTheme3
+import kotlin.math.roundToInt
 
 
-@Composable
-fun AnimatedArticleBottomAppBar(
-    isVisible: MutableTransitionState<Boolean>,
-    isUnread: Boolean,
-    isStarred: Boolean,
-    modifier: Modifier = Modifier,
-    floatingActionButton: @Composable (() -> Unit)? = null,
-    onToggleUnreadClick: () -> Unit,
-    onStarredChange: (Boolean) -> Unit,
-    onShareClick: () -> Unit,
-) {
-    Box(modifier.fillMaxWidth()) {
-        AnimatedVisibility(isVisible,
-            enter = slideInVertically(tween(225, easing = LinearOutSlowInEasing)) { it },
-            exit = slideOutVertically(tween(175, easing = FastOutLinearInEasing)) { it },
-        ) {
-            ArticleBottomAppBar(
-                isUnread = isUnread,
-                isStarred = isStarred,
-                floatingActionButton = if (isVisible.targetState && isVisible.isIdle)
-                    floatingActionButton else null,
-                onToggleUnreadClick = onToggleUnreadClick,
-                onStarredChange = onStarredChange,
-                onShareClick = onShareClick
-            )
-        }
-
-        if (!isVisible.targetState || !isVisible.isIdle) {
-            Box(
-                Modifier
-                    .padding(end = 16.dp, bottom = 12.dp)
-                    .windowInsetsPadding(WindowInsets.navigationBars)
-                    .align(Alignment.BottomEnd)
-            ) {
-                floatingActionButton?.invoke()
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalAnimationGraphicsApi::class)
+@OptIn(ExperimentalAnimationGraphicsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun ArticleBottomAppBar(
     isUnread: Boolean,
     isStarred: Boolean,
+    modifier: Modifier = Modifier,
+    scrollBehavior: BottomAppBarScrollBehavior? = null,
     floatingActionButton: @Composable (() -> Unit)? = null,
     onToggleUnreadClick: () -> Unit,
     onStarredChange: (Boolean) -> Unit,
@@ -128,37 +87,61 @@ fun ArticleBottomAppBar(
                 Icon(Icons.Default.Share, contentDescription = null)
             }
         },
-        floatingActionButton = floatingActionButton
+        floatingActionButton = floatingActionButton,
+        // don't pass the scrollBehavior as it will only collapse the bottomAppBar content and not the insets padding.
+        // instead we reimplement the collapsing using Modifier.layout
+        // Passing the scrollBehavior allows to drag the bottomBar, but it's not necessary for us.
+        // scrollBehavior = scrollBehavior,
+        modifier = modifier.layout { measurable, constraints ->
+            val placeable = measurable.measure(constraints)
+            // Sets the app bar's height offset to collapse the entire bar's height when content
+            // is scrolled.
+            scrollBehavior?.state?.heightOffsetLimit = -placeable.height.toFloat()
+
+            val height = placeable.height + (scrollBehavior?.state?.heightOffset ?: 0f)
+            layout(placeable.width, height.roundToInt()) {
+                placeable.place(0, 0)
+            }
+        }
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun PreviewAnimatedArticleBottomAppBar() {
+fun PreviewArticleBottomAppBar() {
     AppTheme3 {
-        Surface(Modifier.fillMaxWidth().height(150.dp)) {
-            Box {
-                val isVisible = remember { MutableTransitionState(true) }
-                AnimatedArticleBottomAppBar(
-                    modifier = Modifier.align(Alignment.BottomCenter),
-                    isVisible = isVisible,
-                    isUnread = true,
-                    isStarred = false,
-                    onToggleUnreadClick = { isVisible.targetState = false },
-                    floatingActionButton = {
-                        FloatingActionButton(
-                            onClick = {
-                                isVisible.targetState = true
-                            }) {
-                            Icon(
-                                Icons.Default.OpenInBrowser,
-                                contentDescription = null
-                            )
-                        }
-                    },
-                    onStarredChange = {},
-                    onShareClick = {}
+        val bottomAppBarScrollBehavior = BottomAppBarDefaults.exitAlwaysScrollBehavior()
+        Scaffold(
+            modifier = Modifier.nestedScroll(bottomAppBarScrollBehavior.nestedScrollConnection),
+            bottomBar = {
+                var isUnread by remember { mutableStateOf(true) }
+                var isStarred by remember { mutableStateOf(false) }
+                ArticleBottomAppBar(
+                    isUnread = isUnread,
+                    isStarred = isStarred,
+                    onToggleUnreadClick = { isUnread = !isUnread },
+                    onStarredChange = { isStarred = it},
+                    onShareClick = {},
+                    scrollBehavior = bottomAppBarScrollBehavior
                 )
+            },
+            floatingActionButtonPosition = FabPosition.EndOverlay,
+            floatingActionButton = {
+                FloatingActionButton(
+                    onClick = {}) {
+                    Icon(
+                        Icons.Default.OpenInBrowser,
+                        contentDescription = null
+                    )
+                }
+            }
+        ) {
+            val scrollState = rememberScrollState()
+            Column(Modifier.padding(it).fillMaxWidth().verticalScroll(scrollState)) {
+                repeat(199) {
+                    Text("text $it")
+                }
             }
         }
     }
