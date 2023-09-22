@@ -157,7 +157,7 @@ dependencies {
     implementation(libs.androidx.preferences)
 
     // compose
-    api(enforcedPlatform(libs.androidx.compose.bom))
+    api(platform(libs.androidx.compose.bom))
     api(libs.androidx.compose.ui)
     api(libs.androidx.compose.ui.util)
     api(libs.androidx.compose.foundation)

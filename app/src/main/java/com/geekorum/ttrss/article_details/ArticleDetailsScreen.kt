@@ -24,10 +24,8 @@ import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import androidx.annotation.ColorRes
-import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material3.*
 import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
@@ -327,31 +325,31 @@ fun ArticleDetailsScreen(
     }
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val bottomAppBarScrollBehavior = BottomAppBarDefaults.exitAlwaysScrollBehavior()
+    val context = LocalContext.current
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+            .nestedScroll(bottomAppBarScrollBehavior.nestedScrollConnection),
         topBar = {
             ArticleTopAppBar(scrollBehavior = scrollBehavior, onNavigateUpClick = onNavigateUpClick)
         },
         bottomBar = {
-            val context = LocalContext.current
-            val isVisible = remember { MutableTransitionState(false) }
-            isVisible.targetState = articleDetailsScreenState.bottomAppBarIsVisible
-            AnimatedArticleBottomAppBar(
-                isVisible = isVisible,
-                isUnread = article?.isTransientUnread == true,
+            ArticleBottomAppBar(isUnread = article?.isTransientUnread == true,
                 isStarred = article?.isStarred == true,
-                floatingActionButton = {
-                    FloatingActionButton(onClick = {
-                        article?.let { articleDetailsViewModel.openArticleInBrowser(context, it) }
-                    }) {
-                        OpenInBrowserIcon(browserIcon, contentDescription = stringResource(R.string.open_article_in_browser))
-                    }
-                },
+                floatingActionButton = null,
+                scrollBehavior = bottomAppBarScrollBehavior,
                 onToggleUnreadClick = { articleDetailsViewModel.toggleArticleRead() },
                 onStarredChange = { articleDetailsViewModel.onStarChanged(it) },
-                onShareClick = { articleDetailsViewModel.shareArticle(context) }
-            )
-        }
+                onShareClick = { articleDetailsViewModel.shareArticle(context) } )
+        },
+         floatingActionButton = {
+             FloatingActionButton(onClick = {
+                 article?.let { articleDetailsViewModel.openArticleInBrowser(context, it) }
+             }) {
+                 OpenInBrowserIcon(browserIcon, contentDescription = stringResource(R.string.open_article_in_browser))
+             }
+         },
+        floatingActionButtonPosition = FabPosition.EndOverlay
     ) { padding ->
         article?.let {
             val readMoreArticles by articleDetailsViewModel.additionalArticles.collectAsState()
