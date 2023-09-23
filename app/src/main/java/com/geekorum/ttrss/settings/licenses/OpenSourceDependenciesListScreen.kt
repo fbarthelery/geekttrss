@@ -94,7 +94,7 @@ fun OpenSourceDependenciesListScreen(
                             )
                         }
                     )
-                    Divider(Modifier.padding(horizontal = 16.dp))
+                    HorizontalDivider(Modifier.padding(horizontal = 16.dp))
                 }
             }
         }

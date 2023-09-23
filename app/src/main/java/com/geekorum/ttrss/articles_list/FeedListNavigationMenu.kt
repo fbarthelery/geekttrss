@@ -221,7 +221,8 @@ fun FeedSection(
                 }
             )
 
- 	DropdownMenu(expanded = displayDropdownMenu,
+            DropdownMenu(
+                expanded = displayDropdownMenu,
                 onDismissRequest = { displayDropdownMenu = false },
                 offset = DpOffset(x = 16.dp, y = (-8).dp)
             ) {
@@ -242,7 +243,7 @@ fun FeedSection(
 
 @Composable
 private fun NavigationDivider() {
-    Divider(modifier = Modifier
+    HorizontalDivider(modifier = Modifier
         .padding(horizontal = NavigationItemPadding))
 }
 

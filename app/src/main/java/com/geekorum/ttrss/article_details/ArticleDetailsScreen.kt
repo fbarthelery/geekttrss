@@ -273,7 +273,7 @@ private fun ArticleDetailsHeroContent(
             articleContent()
 
             if (readMoreArticles.isNotEmpty()) {
-                Divider(Modifier
+                HorizontalDivider(Modifier
                     .fillMaxWidth()
                     .padding(vertical = 16.dp))
                 ReadMoreSection(articles = readMoreArticles,
@@ -429,14 +429,14 @@ private fun ArticleDetailsContent(
             title = article.title,
             date = article.getDateString()
         )
-        Divider(Modifier
+        HorizontalDivider(Modifier
             .fillMaxWidth())
         Box(Modifier.fillMaxWidth()) {
             articleContent()
         }
 
         if (readMoreArticles.isNotEmpty()) {
-            Divider(Modifier
+            HorizontalDivider(Modifier
                 .fillMaxWidth()
                 .padding(bottom = 16.dp))
             ReadMoreSection(articles = readMoreArticles,
