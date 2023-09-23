@@ -103,7 +103,7 @@ fun ManageFeaturesScreen(
                         }
                     )
                     if (idx < features.lastIndex) {
-                        Divider()
+                        HorizontalDivider()
                     }
                 }
             }
