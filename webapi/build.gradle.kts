@@ -20,9 +20,7 @@
  */
 
 plugins {
-//    alias(libs.plugins.kotlin.jvm)
-//    alias(libs.plugins.kotlinx.serialization)
-    kotlin("jvm")
+    id("com.geekorum.build.conventions.jvm-library")
     kotlin("plugin.serialization")
 }
 

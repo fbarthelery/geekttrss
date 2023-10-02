@@ -20,26 +20,23 @@
  */
 package com.geekorum.build.conventions
 
-import com.android.build.gradle.BaseExtension
-import com.geekorum.build.configureAnnotationProcessorDeps
-import com.geekorum.build.createComponentsPlatforms
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.findByType
+import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.dsl.KotlinTopLevelExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-fun Project.conventionForAndroidProject() {
-    conventionForKotlinProject()
-
-    dependencies {
-        createComponentsPlatforms()
+fun Project.conventionForKotlinProject() {
+    plugins.withType<KotlinBasePlugin> {
+        extensions.configure<KotlinTopLevelExtension> {
+            jvmToolchain(17)
+        }
     }
-    configureAnnotationProcessorDeps()
 
-
-    extensions.findByType<BaseExtension>()?.apply {
-        setCompileSdkVersion(34)
-        defaultConfig {
-            minSdk = 24
+    tasks.withType<KotlinCompile> {
+        kotlinOptions {
+            freeCompilerArgs = listOf("-Xjvm-default=all")
         }
     }
 }
