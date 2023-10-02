@@ -25,17 +25,11 @@ import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
 import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsPlugin
 
 plugins {
-//    alias(libs.plugins.android.application)
-    id("com.android.application")
-//    alias(libs.plugins.kotlin.android)
-    kotlin("android")
+    id("com.geekorum.build.conventions.android-application")
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.com.geekorum.gms.oss.license)
     id("com.geekorum.build.android-tests")
-    id("com.geekorum.build.android-signing")
     id("com.geekorum.build.android-avdl")
-    id("com.geekorum.build.android-release-universal-apk")
-    id("com.geekorum.build.play-store-publish")
     alias(libs.plugins.androidx.navigation.safeargs.kotlin)
     alias(libs.plugins.dagger.hilt.android)
 }
@@ -56,12 +50,9 @@ androidComponents {
 }
 
 android {
-    val compileSdkInt: Int by rootProject.extra
-    compileSdk = compileSdkInt
     namespace = "com.geekorum.ttrss"
     defaultConfig {
         applicationId = "com.geekorum.ttrss"
-        minSdk = 24
         targetSdk = 33
 
         sourceSets {
