@@ -22,7 +22,7 @@ import com.geekorum.build.dualTestImplementation
 
 plugins {
     id("com.geekorum.build.conventions.android-dynamic-feature")
-    kotlin("kapt")
+    alias(libs.plugins.kotlin.ksp)
     id("com.geekorum.build.android-tests")
     id("com.geekorum.build.android-avdl")
 }
@@ -75,15 +75,15 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
 
     implementation(libs.dagger)
-    kapt(libs.dagger.compiler)
-    kaptTest(libs.dagger.compiler)
+    ksp(libs.dagger.compiler)
+    kspTest(libs.dagger.compiler)
     implementation(libs.androidx.hilt.work)
     testImplementation(libs.dagger.hilt.android.testing)
     androidTestImplementation(libs.dagger.hilt.android.testing)
-    kapt(libs.dagger.hilt.compiler)
-    kapt(libs.androidx.hilt.compiler)
-    kaptTest(libs.dagger.hilt.compiler)
-    kaptAndroidTest(libs.dagger.hilt.compiler)
+    ksp(libs.dagger.hilt.compiler)
+    ksp(libs.androidx.hilt.compiler)
+    kspTest(libs.dagger.hilt.compiler)
+    kspAndroidTest(libs.dagger.hilt.compiler)
 
     //geekdroid
     implementation(libs.geekdroid)
