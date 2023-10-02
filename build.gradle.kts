@@ -18,12 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-import com.android.build.api.dsl.CommonExtension
 import com.geekorum.build.*
-import org.jetbrains.kotlin.gradle.dsl.KotlinTopLevelExtension
-import org.jetbrains.kotlin.gradle.plugin.KaptExtension
-import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
 //    alias(libs.plugins.android.application) apply false
@@ -40,9 +35,6 @@ plugins {
     alias(libs.plugins.google.gms.google.services) apply false
 }
 
-// some extra properties
-extra["compileSdkInt"] = 34
-
 allprojects {
     repositories {
         google().setupGoogleContent()
@@ -52,31 +44,7 @@ allprojects {
             url = uri("https://jitpack.io")
         }
     }
-    dependencies {
-        createComponentsPlatforms()
-    }
-    configureAnnotationProcessorDeps()
-
-    apply<SourceLicenseCheckerPlugin>()
-
-    tasks.withType<KotlinCompile> {
-        kotlinOptions {
-            freeCompilerArgs = listOf("-Xjvm-default=all")
-        }
-    }
-
-    plugins.withType<KotlinBasePlugin> {
-        extensions.configure<KotlinTopLevelExtension> {
-            jvmToolchain(17)
-        }
-    }
-
-    afterEvaluate {
-        extensions.findByType<KaptExtension>()?.arguments {
-            arg("dagger.formatGeneratedSource", "enabled")
-        }
-    }
-}
+ }
 
 tasks.register("clean", Delete::class.java) {
     delete(buildDir)
