@@ -19,8 +19,7 @@
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
 plugins {
-//    alias(libs.plugins.kotlin.jvm)
-    kotlin("jvm")
+    id("com.geekorum.build.conventions.jvm-library")
 }
 
 dependencies {

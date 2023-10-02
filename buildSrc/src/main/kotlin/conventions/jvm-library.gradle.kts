@@ -20,26 +20,9 @@
  */
 package com.geekorum.build.conventions
 
-import com.android.build.gradle.BaseExtension
-import com.geekorum.build.configureAnnotationProcessorDeps
-import com.geekorum.build.createComponentsPlatforms
-import org.gradle.api.Project
-import org.gradle.kotlin.dsl.dependencies
-import org.gradle.kotlin.dsl.findByType
-
-fun Project.conventionForAndroidProject() {
-    conventionForKotlinProject()
-
-    dependencies {
-        createComponentsPlatforms()
-    }
-    configureAnnotationProcessorDeps()
-
-
-    extensions.findByType<BaseExtension>()?.apply {
-        setCompileSdkVersion(34)
-        defaultConfig {
-            minSdk = 24
-        }
-    }
+plugins {
+    kotlin("jvm")
+    id("com.geekorum.build.source-license-checker")
 }
+
+conventionForKotlinProject()
