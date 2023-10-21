@@ -32,6 +32,7 @@ plugins {
     id("com.geekorum.build.android-avdl")
     alias(libs.plugins.androidx.navigation.safeargs.kotlin)
     alias(libs.plugins.dagger.hilt.android)
+    alias(libs.plugins.androidx.room)
 }
 
 // workaround bug https://issuetracker.google.com/issues/275534543
@@ -127,8 +128,11 @@ android {
     }
 }
 
+room {
+    schemaDirectory("$projectDir/schemas/")
+}
+
 ksp {
-    arg("room.schemaLocation", "$projectDir/schemas")
     arg("room.incremental", "true")
     arg("room.generateKotlin", "true")
 }
