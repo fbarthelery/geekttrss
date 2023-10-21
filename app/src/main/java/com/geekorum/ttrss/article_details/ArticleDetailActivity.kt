@@ -20,17 +20,16 @@
  */
 package com.geekorum.ttrss.article_details
 
-import android.annotation.SuppressLint
 import android.app.assist.AssistContent
 import android.content.ContentUris
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.core.net.toUri
-import androidx.core.view.WindowCompat
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.articles_list.ArticleListActivity
 import com.geekorum.ttrss.data.Article
@@ -65,7 +64,7 @@ class ArticleDetailActivity : SessionActivity() {
             onPageFinishedCallback = { _, _ -> }
         )
 
-        setUpEdgeToEdge()
+        enableEdgeToEdge()
         val articleUri = requireNotNull(intent.data)
         articleDetailsViewModel.init(ContentUris.parseId(articleUri))
 
@@ -96,11 +95,6 @@ class ArticleDetailActivity : SessionActivity() {
                 .toUri()
         }
         startActivity(intent)
-    }
-
-    @SuppressLint("RestrictedApi")
-    private fun setUpEdgeToEdge() {
-        WindowCompat.setDecorFitsSystemWindows(window, false)
     }
 
     override fun onProvideAssistContent(outContent: AssistContent) {

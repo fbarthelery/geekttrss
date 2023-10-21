@@ -26,6 +26,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.os.StrictMode
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.browser.customtabs.CustomTabsService
 import androidx.compose.foundation.background
@@ -76,7 +77,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
+        enableEdgeToEdge()
         allowDiskReads()
         setContent {
             AppTheme3 {

@@ -22,6 +22,7 @@ package com.geekorum.ttrss.publish_article
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -56,7 +57,7 @@ class ShareToPublishArticleActivity : BottomSheetDialogActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
+        enableEdgeToEdge()
         val articleId = intent.data?.lastPathSegment?.toLongOrNull()
         if (articleId == null) {
             Timber.e("Trying to publish article without articleId: ${intent.data}")
