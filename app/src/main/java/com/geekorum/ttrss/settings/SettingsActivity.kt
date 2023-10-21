@@ -30,7 +30,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.browser.customtabs.CustomTabsService
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -40,10 +39,8 @@ import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -53,7 +50,6 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.core.net.toUri
-import androidx.core.view.WindowCompat
 import androidx.fragment.app.commit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -66,7 +62,6 @@ import com.geekorum.ttrss.core.BaseActivity
 import com.geekorum.ttrss.databinding.SettingsPreferencesContainerBinding
 import com.geekorum.ttrss.debugtools.withStrictMode
 import com.geekorum.ttrss.ui.AppTheme3
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -81,12 +76,6 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
         allowDiskReads()
         setContent {
             AppTheme3 {
-                val sysUiController = rememberSystemUiController()
-                val useDarkIcons = !isSystemInDarkTheme()
-                DisposableEffect(sysUiController, useDarkIcons) {
-                    sysUiController.setSystemBarsColor(Color.Transparent, darkIcons = useDarkIcons)
-                    onDispose {  }
-                }
                 SettingsScreen(windowSizeClass = calculateWindowSizeClass(activity = this@SettingsActivity),
                     onNavigateUpClick = {
                         onSupportNavigateUp()

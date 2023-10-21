@@ -24,7 +24,6 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,9 +32,11 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
-import androidx.compose.runtime.*
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -48,7 +49,6 @@ import com.geekorum.ttrss.in_app_update.InAppUpdateViewModel
 import com.geekorum.ttrss.on_demand_modules.InstallModuleViewModel
 import com.geekorum.ttrss.session.SessionActivity
 import com.geekorum.ttrss.ui.AppTheme3
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -121,18 +121,8 @@ class ArticleListActivity : SessionActivity() {
             }
 
             AppTheme3 {
-                val systemUiController = rememberSystemUiController()
-                val useDarkIcons = !isSystemInDarkTheme()
-                DisposableEffect(systemUiController, useDarkIcons) {
-                    systemUiController.setSystemBarsColor(
-                        color = Color.Transparent,
-                        darkIcons = useDarkIcons
-                    )
-                    onDispose {}
-                }
-
                 val coroutineScope = rememberCoroutineScope()
-                val drawerState =  rememberDrawerState(DrawerValue.Closed)
+                val drawerState = rememberDrawerState(DrawerValue.Closed)
 
                 val undoUnreadSnackbarHostState = remember { UndoUnreadSnackbarHostState() }
                 val undoUnreadSnackbarMessage by activityViewModel.undoReadSnackBarMessage.collectAsStateWithLifecycle()

@@ -27,16 +27,12 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.ui.graphics.Color
 import androidx.core.content.IntentCompat
 import com.geekorum.geekdroid.accounts.AccountAuthenticatorAppCompatActivity
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.ui.AppTheme3
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -77,12 +73,6 @@ class LoginActivity : AccountAuthenticatorAppCompatActivity() {
         enableEdgeToEdge()
         setContent {
             AppTheme3 {
-                val sysUiController = rememberSystemUiController()
-                val useDarkIcons = !isSystemInDarkTheme()
-                DisposableEffect(sysUiController, useDarkIcons) {
-                    sysUiController.setSystemBarsColor(Color.Transparent, darkIcons = useDarkIcons)
-                    onDispose {  }
-                }
                 LoginScreen(windowSizeClass = calculateWindowSizeClass(this@LoginActivity),
                     viewModel = loginViewModel)
             }

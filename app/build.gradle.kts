@@ -168,7 +168,6 @@ dependencies {
     api(libs.accompanist.insets.ui)
     api(libs.accompanist.drawablepainter)
     api(libs.accompanist.webview)
-    api(libs.accompanist.systemuicontroller)
     api(libs.androidx.compose.ui.tooling)
     api(libs.coil.compose)
 
