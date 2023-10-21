@@ -22,6 +22,7 @@ package com.geekorum.ttrss.articles_list
 
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.padding
@@ -37,7 +38,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -89,7 +89,7 @@ class ArticleListActivity : SessionActivity() {
         //TODO use a preference ?
         feedsViewModel.setOnlyUnread(true)
 
-        setupEdgeToEdge()
+        enableEdgeToEdge()
         setContent()
     }
 
@@ -191,10 +191,6 @@ class ArticleListActivity : SessionActivity() {
                 }
             }
         }
-    }
-
-    private fun setupEdgeToEdge() {
-        WindowCompat.setDecorFitsSystemWindows(window, false)
     }
 
     private fun createAppBarPresenter(navController: NavController): AppBarPresenter {

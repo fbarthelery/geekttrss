@@ -23,6 +23,7 @@ package com.geekorum.ttrss.manage_feeds
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -46,7 +47,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.view.WindowCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -66,7 +66,7 @@ class ManageFeedsActivity : BaseSessionActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setupEdgeToEdge()
+        enableEdgeToEdge()
         setContent {
             AppTheme3 {
                 val systemUiController = rememberSystemUiController()
@@ -87,9 +87,6 @@ class ManageFeedsActivity : BaseSessionActivity() {
         startActivity(intent)
     }
 
-    private fun setupEdgeToEdge() {
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-    }
 }
 
 @Composable

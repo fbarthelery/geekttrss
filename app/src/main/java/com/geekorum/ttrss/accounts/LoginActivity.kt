@@ -25,6 +25,7 @@ import android.accounts.AccountManager
 import android.app.Activity
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
@@ -32,7 +33,6 @@ import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.graphics.Color
 import androidx.core.content.IntentCompat
-import androidx.core.view.WindowCompat
 import com.geekorum.geekdroid.accounts.AccountAuthenticatorAppCompatActivity
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.ui.AppTheme3
@@ -74,7 +74,7 @@ class LoginActivity : AccountAuthenticatorAppCompatActivity() {
             }
         })
 
-        WindowCompat.setDecorFitsSystemWindows(window, false)
+        enableEdgeToEdge()
         setContent {
             AppTheme3 {
                 val sysUiController = rememberSystemUiController()
