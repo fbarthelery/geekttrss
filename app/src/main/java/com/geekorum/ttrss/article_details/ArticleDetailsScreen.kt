@@ -21,11 +21,18 @@
 package com.geekorum.ttrss.article_details
 
 import android.content.res.ColorStateList
+import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.drawable.Drawable
+import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.annotation.ColorRes
-import androidx.compose.foundation.*
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
@@ -51,7 +58,6 @@ import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleContentIndexed
 import com.geekorum.ttrss.ui.AppTheme3
 import com.geekorum.ttrss.ui.components.OpenInBrowserIcon
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.accompanist.web.AccompanistWebViewClient
 import kotlinx.coroutines.delay
 import java.util.Locale
@@ -69,45 +75,8 @@ fun rememberArticleDetailsScreenState(): ArticleDetailsScreenState {
 class ArticleDetailsScreenState(
     val scrollState: ScrollState
 ) {
-    private var _bottomAppBarIsVisible by mutableStateOf(true)
-    val bottomAppBarIsVisible: Boolean
-        @Composable get() {
-            if (scrollState.isScrollingUp()) {
-                _bottomAppBarIsVisible = true
-            } else if (scrollState.isScrollingDown()) {
-                _bottomAppBarIsVisible = false
-            }
-            return _bottomAppBarIsVisible
-        }
-
     val isAtEndOfArticle: Boolean by derivedStateOf {
         scrollState.value == scrollState.maxValue
-    }
-
-    @Composable
-    private fun ScrollState.isScrollingUp(): Boolean {
-        var previousScrollOffset by remember(this) { mutableStateOf(value) }
-        return remember(this) {
-            derivedStateOf {
-                return@derivedStateOf (previousScrollOffset > value)
-                    .also {
-                        previousScrollOffset = value
-                    }
-            }
-        }.value
-    }
-
-    @Composable
-    private fun ScrollState.isScrollingDown(): Boolean {
-        var previousScrollOffset by remember(this) { mutableStateOf(value) }
-        return remember(this) {
-            derivedStateOf {
-                return@derivedStateOf (previousScrollOffset < value)
-                    .also {
-                        previousScrollOffset = value
-                    }
-            }
-        }.value
     }
 }
 
@@ -148,21 +117,20 @@ fun ArticleDetailsScreenHero(
 
     val article by articleDetailsViewModel.article.observeAsState()
     val browserIcon by articleDetailsViewModel.browserIcon.collectAsStateWithLifecycle()
-    val systemUiController = rememberSystemUiController()
-    val useStatusBarDarkIcons = when {
-        // in dark theme
-        isSystemInDarkTheme() && article?.isTransientUnread == true -> true
-        isSystemInDarkTheme() -> false
-        // in light theme
-        article?.isTransientUnread == true -> false
-        else -> true
+    val activity = LocalContext.current as ComponentActivity
+    val statusBarStyle = when {
+        // inverse of dark mode when is unread
+        article?.isTransientUnread == true -> SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT) { resources ->
+            (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) ==
+                    Configuration.UI_MODE_NIGHT_NO
+        }
+        else -> SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT)
     }
-    DisposableEffect(systemUiController, useStatusBarDarkIcons) {
-        systemUiController.setSystemBarsColor(
-            color = androidx.compose.ui.graphics.Color.Transparent,
-            darkIcons = useStatusBarDarkIcons
-        )
-        onDispose {}
+    DisposableEffect(activity, statusBarStyle) {
+        activity.enableEdgeToEdge(statusBarStyle = statusBarStyle)
+        onDispose {
+            activity.enableEdgeToEdge()
+        }
     }
 
     val context = LocalContext.current
@@ -294,35 +262,8 @@ fun ArticleDetailsScreen(
     webViewClient: AccompanistWebViewClient,
 ) {
     val articleDetailsScreenState = rememberArticleDetailsScreenState()
-    val bottomAppBarIsVisible = articleDetailsScreenState.bottomAppBarIsVisible
-
     val article by articleDetailsViewModel.article.observeAsState()
-    val systemUiController = rememberSystemUiController()
-    val useStatusBarDarkIcons = !isSystemInDarkTheme()
     val browserIcon by articleDetailsViewModel.browserIcon.collectAsStateWithLifecycle()
-    DisposableEffect(systemUiController, useStatusBarDarkIcons) {
-        systemUiController.setStatusBarColor(
-            color = androidx.compose.ui.graphics.Color.Transparent,
-            darkIcons = useStatusBarDarkIcons
-        )
-        onDispose {}
-    }
-    val useNavigationBarDarkIcons = when {
-        // in dark theme
-        isSystemInDarkTheme() && article?.isTransientUnread == true && !bottomAppBarIsVisible -> false
-        isSystemInDarkTheme() && article?.isTransientUnread == true -> true
-        isSystemInDarkTheme() -> false
-        // in light theme
-        article?.isTransientUnread == true && bottomAppBarIsVisible -> false
-        else -> true
-    }
-    DisposableEffect(systemUiController, useNavigationBarDarkIcons) {
-        systemUiController.setNavigationBarColor(
-            color = androidx.compose.ui.graphics.Color.Transparent,
-            darkIcons = useNavigationBarDarkIcons,
-        )
-        onDispose {}
-    }
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val bottomAppBarScrollBehavior = BottomAppBarDefaults.exitAlwaysScrollBehavior()

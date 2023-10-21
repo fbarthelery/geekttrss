@@ -25,17 +25,12 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.ui.graphics.Color
-import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.geekorum.ttrss.ui.AppTheme3
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -46,12 +41,6 @@ class OpenSourceLicensesActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContent {
             AppTheme3 {
-                val sysUiController = rememberSystemUiController()
-                val useDarkIcons = !isSystemInDarkTheme()
-                DisposableEffect(sysUiController, useDarkIcons) {
-                    sysUiController.setSystemBarsColor(Color.Transparent, darkIcons = useDarkIcons)
-                    onDispose {  }
-                }
                 DependencyNavHost(
                     navigateUp = {
                         onNavigateUp()

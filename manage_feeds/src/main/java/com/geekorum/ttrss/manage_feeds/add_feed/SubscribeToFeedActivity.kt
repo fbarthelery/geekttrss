@@ -25,15 +25,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -42,7 +39,6 @@ import androidx.navigation.compose.rememberNavController
 import com.geekorum.ttrss.manage_feeds.BaseSessionActivity
 import com.geekorum.ttrss.manage_feeds.R
 import com.geekorum.ttrss.ui.AppTheme3
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 
 class SubscribeToFeedActivity : BaseSessionActivity() {
@@ -54,13 +50,6 @@ class SubscribeToFeedActivity : BaseSessionActivity() {
         enableEdgeToEdge()
         setContent {
             AppTheme3 {
-                val systemUiController = rememberSystemUiController()
-                val useDarkIcons = !isSystemInDarkTheme()
-                DisposableEffect(systemUiController, useDarkIcons) {
-                    systemUiController.setSystemBarsColor(Color.Transparent, useDarkIcons)
-                    onDispose {  }
-                }
-
                 val navController = rememberNavController()
                 val currentBackStackEntry by navController.currentBackStackEntryAsState()
                 val destination = currentBackStackEntry?.destination
