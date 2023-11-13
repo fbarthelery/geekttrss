@@ -147,7 +147,6 @@ dependencies {
 
     // androidx ui
     implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.coordinatorlayout)
     implementation(libs.androidx.preferences)
 
