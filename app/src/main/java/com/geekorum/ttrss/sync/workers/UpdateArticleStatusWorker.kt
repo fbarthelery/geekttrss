@@ -33,11 +33,8 @@ import com.geekorum.ttrss.sync.DatabaseService
 import com.geekorum.ttrss.webapi.ApiCallException
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 /**
@@ -82,6 +79,7 @@ class UpdateArticleStatusWorker @AssistedInject constructor(
         Result.success()
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     @Throws(ApiCallException::class)
     private suspend fun updateArticlesStatus() = coroutineScope {
         Timber.i("Updating old articles status for feed $feedId")

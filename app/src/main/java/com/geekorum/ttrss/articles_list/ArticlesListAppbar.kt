@@ -29,7 +29,11 @@ import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Sort
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
@@ -70,7 +74,7 @@ fun ArticlesListAppBar(
                     onClick = {
                     appBarState.closeSearch()
                 }) {
-                    Icon(Icons.Default.ArrowBack, contentDescription = "back")
+                    Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "back")
                 }
             } else {
                 navigationIcon?.invoke()
@@ -243,7 +247,7 @@ fun SortMenuButton(
             onClick = {
                 expanded = true
             }) {
-            Icon(Icons.Default.Sort, contentDescription = stringResource(R.string.content_desc_btn_sort_menu))
+            Icon(Icons.AutoMirrored.Default.Sort, contentDescription = stringResource(R.string.content_desc_btn_sort_menu))
         }
 
         DropdownMenu(

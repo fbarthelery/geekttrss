@@ -31,8 +31,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Archive
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
@@ -158,7 +158,7 @@ fun ArticleTopAppBar(
         title = {},
         navigationIcon = {
             IconButton(onClick = onNavigateUpClick) {
-                Icon(Icons.Default.ArrowBack, contentDescription = null)
+                Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = null)
             }
         }
     )
@@ -211,7 +211,7 @@ fun ArticleTopActionsBar(
         scrollBehavior = scrollBehavior,
         navigationIcon = {
             IconButton(onClick = onNavigateUpClick) {
-                Icon(Icons.Default.ArrowBack, contentDescription = null)
+                Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = null)
             }
         },
         actions = {

@@ -181,7 +181,7 @@ fun InstallFeatureScreen(
                 LinearProgressIndicator(
                     modifier = Modifier.padding(vertical = 16.dp))
             } else {
-                LinearProgressIndicator(progress = progress/progressMax.toFloat(),
+                LinearProgressIndicator(progress = { progress / progressMax.toFloat() },
                     modifier = Modifier.padding(vertical = 16.dp))
             }
         }
