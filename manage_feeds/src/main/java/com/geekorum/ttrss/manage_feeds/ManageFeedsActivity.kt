@@ -31,7 +31,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlaylistAdd
+import androidx.compose.material.icons.automirrored.filled.PlaylistAdd
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -121,7 +121,7 @@ fun ManageFeedsListScreen(
         },
         floatingActionButton = {
             FloatingActionButton(onClick = onAddFeedClick) {
-                Icon(Icons.Default.PlaylistAdd, contentDescription = null)
+                Icon(Icons.AutoMirrored.Default.PlaylistAdd, contentDescription = null)
             }
         }
     ) { contentPadding ->

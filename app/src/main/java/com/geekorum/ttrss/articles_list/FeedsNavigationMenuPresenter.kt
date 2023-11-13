@@ -92,6 +92,7 @@ class FeedsNavigationMenuPresenter(
         }
 
         FeedListNavigationMenu(
+            modifier = modifier,
             user = account?.name ?: "",
             server = server ?: "",
             feedSection = {
@@ -203,7 +204,7 @@ private fun ManageFeedSection(
                         )
                     } else {
                         LinearProgressIndicator(
-                            progress = progress / progressMax.toFloat(),
+                            progress = { progress / progressMax.toFloat() },
                             color = MaterialTheme.colorScheme.tertiary,
                             modifier = Modifier.padding(top = 8.dp, bottom = 16.dp)
                         )
