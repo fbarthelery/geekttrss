@@ -86,7 +86,9 @@ class FeedsNavigationMenuPresenter(
                 ExtendedFloatingActionButton(
                     text = { Text(stringResource(R.string.btn_refresh)) },
                     icon = { Icon(Icons.Default.Refresh, contentDescription = null) },
-                    onClick = {}
+                    onClick = {
+                        activityViewModel.refresh()
+                    }
                 )
             }
         }
