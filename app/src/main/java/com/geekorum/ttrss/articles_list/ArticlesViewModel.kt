@@ -283,6 +283,7 @@ class ArticlesListViewModel @Inject constructor(
 
 
     override fun refresh() {
+        if (isRefreshing.value) return
         viewModelScope.launch {
             if (Feed.isVirtualFeed(feedId)) {
                 backgroundJobManager.refresh(account)
@@ -321,6 +322,7 @@ class ArticlesListByTagViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     override fun refresh() {
+        if (isRefreshing.value) return
         backgroundJobManager.refresh(account)
     }
 

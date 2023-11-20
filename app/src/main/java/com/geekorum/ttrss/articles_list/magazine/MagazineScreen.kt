@@ -28,20 +28,22 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -110,7 +112,7 @@ fun MagazineScreen(
 }
 
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ArticlesMagazine(
     viewModel: MagazineViewModel,
@@ -124,9 +126,7 @@ private fun ArticlesMagazine(
 ) {
 
     val isRefreshing by viewModel.isRefreshing.observeAsState(false)
-    val pullRefreshState = rememberPullRefreshState(isRefreshing, onRefresh = {
-        viewModel.refreshMagazine()
-    })
+    val pullRefreshState = rememberPullToRefreshState()
     val ltr = LocalLayoutDirection.current
     val pullRefreshBoxContentPadding = PaddingValues(
         start = contentPadding.calculateStartPadding(ltr),
@@ -141,7 +141,38 @@ private fun ArticlesMagazine(
         top = 8.dp
     )
 
-    Box(modifier.padding(pullRefreshBoxContentPadding).pullRefresh(pullRefreshState)) {
+    // trigger refresh and sync pull refresh state
+    if (pullRefreshState.isRefreshing) {
+        LaunchedEffect(isRefreshing) {
+            if (!isRefreshing) { // not making a full refresh
+                viewModel.refreshMagazine()
+                // display loading for a few frames
+                delay(700)
+                pullRefreshState.endRefresh()
+            }
+        }
+    } else if (isRefreshing){
+        LaunchedEffect(Unit) {
+            pullRefreshState.startRefresh()
+        }
+    }
+    if (!isRefreshing) {
+        LaunchedEffect(Unit) {
+            pullRefreshState.endRefresh()
+        }
+    }
+    // workaround vertical offset state not correctly restored
+    // https://issuetracker.google.com/issues/312220305
+    if (pullRefreshState.isRefreshing && pullRefreshState.verticalOffset == 0f) {
+        LaunchedEffect(Unit) {
+            pullRefreshState.startRefresh()
+        }
+    }
+
+    Box(
+        modifier
+            .padding(pullRefreshBoxContentPadding)
+            .nestedScroll(pullRefreshState.nestedScrollConnection)) {
         val pagingItems = viewModel.articles.collectAsLazyPagingItems()
         val loadState by pagingViewStateFor(pagingItems)
         val isEmpty = pagingItems.itemCount == 0
@@ -171,12 +202,10 @@ private fun ArticlesMagazine(
             )
         }
 
-        PullRefreshIndicator(
-            isRefreshing,
+        PullToRefreshContainer(
             pullRefreshState,
-            backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.align(Alignment.TopCenter)
+            modifier = Modifier
+                .align(Alignment.TopCenter)
         )
     }
 
