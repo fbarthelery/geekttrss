@@ -32,15 +32,14 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.PullRefreshState
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.PullToRefreshState
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -91,7 +90,7 @@ enum class PagingViewLoadState {
 }
 
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArticleCardList(
     viewModel: BaseArticlesViewModel,
@@ -104,11 +103,30 @@ fun ArticleCardList(
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
-    val pullRefreshState = rememberPullRefreshState(isRefreshing, onRefresh = {
-        viewModel.refresh()
-    })
+    val pullRefreshState = rememberPullToRefreshState()
     val articles = viewModel.articles.collectAsLazyPagingItems()
     val isMultiFeedList by viewModel.isMultiFeed.collectAsState()
+
+    // trigger refresh and sync pull refresh state
+    if (pullRefreshState.isRefreshing) {
+        LaunchedEffect(Unit) {
+            viewModel.refresh()
+        }
+    } else if (isRefreshing){
+        pullRefreshState.startRefresh()
+    }
+    if (!isRefreshing) {
+        LaunchedEffect(Unit) {
+            pullRefreshState.endRefresh()
+        }
+    }
+    // workaround vertical offset state not correctly restored
+    // https://issuetracker.google.com/issues/312220305
+    if (pullRefreshState.isRefreshing && pullRefreshState.verticalOffset == 0f) {
+        LaunchedEffect(Unit) {
+            pullRefreshState.startRefresh()
+        }
+    }
 
     val loadState by pagingViewStateFor(articles)
     val isEmpty = articles.itemCount == 0
@@ -148,13 +166,13 @@ fun ArticleCardList(
 
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ArticleCardList(
     articles: LazyPagingItems<ArticleWithFeed>,
     isMultiFeedList: Boolean,
     isRefreshing: Boolean,
-    pullRefreshState: PullRefreshState,
+    pullRefreshState: PullToRefreshState,
     browserApplicationIcon: Drawable?,
     onCardClick: (Int, Article) -> Unit,
     onShareClick: (Article) -> Unit,
@@ -180,7 +198,11 @@ private fun ArticleCardList(
         top = 8.dp
     )
 
-    Box(modifier.padding(pullRefreshBoxContentPadding).pullRefresh(pullRefreshState)) {
+    Box(
+        modifier
+            .padding(pullRefreshBoxContentPadding)
+            .nestedScroll(pullRefreshState.nestedScrollConnection)
+    ) {
         val loadState by pagingViewStateFor(articles)
         val isEmpty = articles.itemCount == 0
         if (isEmpty && loadState == PagingViewLoadState.LOADED) {
@@ -201,11 +223,8 @@ private fun ArticleCardList(
             )
         }
 
-        PullRefreshIndicator(
-            isRefreshing,
+        PullToRefreshContainer(
             pullRefreshState,
-            backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.align(Alignment.TopCenter)
         )
     }
@@ -374,7 +393,7 @@ private fun ChangeReadBehindItem(dismissDirection: DismissDirection) {
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ArticleCardList() {
     val articles = List(25) {
@@ -393,7 +412,7 @@ private fun ArticleCardList() {
         isMultiFeedList = false,
         isRefreshing = false,
         browserApplicationIcon = null,
-        pullRefreshState = rememberPullRefreshState(refreshing = false, onRefresh = { }),
+        pullRefreshState = rememberPullToRefreshState(),
         onCardClick = { _, _ -> },
         onShareClick = {},
         onOpenInBrowserClick = {},
