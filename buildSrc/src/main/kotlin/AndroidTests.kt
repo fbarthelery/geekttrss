@@ -33,7 +33,7 @@ import org.gradle.kotlin.dsl.*
 const val espressoVersion = "3.5.1"
 const val androidxTestRunnerVersion = "1.5.2"
 const val androidxTestCoreVersion = "1.5.0"
-const val robolectricVersion = "4.10.3"
+const val robolectricVersion = "4.11.1"
 
 private typealias BaseExtension = CommonExtension<*, *, DefaultConfig, *, *>
 
@@ -85,8 +85,8 @@ internal fun Project.configureTests() {
         dualTestImplementation("androidx.test.ext:truth:1.5.0")
 
         // mock
-        testImplementation("io.mockk:mockk:1.13.5")
-        androidTestImplementation("io.mockk:mockk-android:1.13.5")
+        testImplementation("io.mockk:mockk:1.13.8")
+        androidTestImplementation("io.mockk:mockk-android:1.13.8")
         testImplementation("org.robolectric:robolectric:$robolectricVersion")
 
         constraints {
