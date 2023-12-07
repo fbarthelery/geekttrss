@@ -22,7 +22,10 @@ package com.geekorum.ttrss.articles_list
 
 import android.accounts.Account
 import androidx.core.text.parseAsHtml
-import androidx.lifecycle.*
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asFlow
+import androidx.lifecycle.viewModelScope
 import androidx.paging.*
 import com.geekorum.geekdroid.accounts.SyncInProgressLiveData
 import com.geekorum.ttrss.background_job.BackgroundJobManager
@@ -260,10 +263,10 @@ class ArticlesListViewModel @Inject constructor(
             backgroundJobManager.isRefreshingStatus(state.get<Long>(STATE_FEED_ID)!!).asFlow()
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private fun getArticlesForFeed(feed: Feed): Flow<PagingData<ArticleWithFeed>> {
         val isMostRecentOrderFlow = state.getStateFlow(STATE_ORDER_MOST_RECENT_FIRST, false)
-        val needUnreadFlow = state.getStateFlow(STATE_NEED_UNREAD, false)
+        val needUnreadFlow = if (feed.isStarredFeed) flowOf(false) else
+            state.getStateFlow(STATE_NEED_UNREAD, false)
         return isMostRecentOrderFlow.combine(needUnreadFlow) { mostRecentFirst, needUnread ->
             getArticleAccess(mostRecentFirst, needUnread)
         }.flatMapLatest { access ->
@@ -307,7 +310,7 @@ class ArticlesListByTagViewModel @Inject constructor(
     componentFactory: SessionActivityComponent.Factory
 ) : BaseArticlesViewModel(state, componentFactory) {
 
-    val tag = state.getStateFlow<String>(STATE_TAG, "")
+    val tag = state.getStateFlow(STATE_TAG, "")
     override val isMultiFeed: StateFlow<Boolean> = MutableStateFlow(true)
 
     private val account: Account = component.account
