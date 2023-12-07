@@ -22,10 +22,6 @@ package com.geekorum.ttrss.articles_list
 
 import android.accounts.Account
 import android.content.Context
-import android.content.SharedPreferences
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.core.net.toUri
 import androidx.lifecycle.*
 import com.geekorum.geekdroid.app.lifecycle.Event
@@ -38,11 +34,6 @@ import javax.inject.Inject
 
 private const val STATE_FEED_ID = "feed_id"
 private const val STATE_ACCOUNT = "account"
-private const val STATE_NEED_UNREAD = "need_unread"
-private const val STATE_SORT_ORDER = "sort_order" // most_recent_first, oldest_first
-
-private const val PREF_VIEW_MODE = "view_mode"
-private const val PREF_SORT_ORDER = "sort_order"
 
 /**
  * [ViewModel] for the [ArticleListActivity]
@@ -51,15 +42,8 @@ private const val PREF_SORT_ORDER = "sort_order"
 class ActivityViewModel @Inject constructor(
     private val state: SavedStateHandle,
     private val browserLauncher: TtRssBrowserLauncher,
-    private val prefs: SharedPreferences
+    private val articlesListPreferencesRepository: ArticlesListPreferencesRepository
 ) : ViewModel() {
-
-    private val onSharedPreferenceChangeListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-        when (key) {
-            PREF_VIEW_MODE -> updateNeedUnread()
-            PREF_SORT_ORDER -> updateSortOrder()
-        }
-    }
 
     private val _articleSelectedEvent = MutableLiveData<Event<ArticleSelectedParameters>>()
     val articleSelectedEvent: LiveData<Event<ArticleSelectedParameters>> = _articleSelectedEvent
@@ -70,7 +54,7 @@ class ActivityViewModel @Inject constructor(
     private val _refreshClickedEvent = MutableLiveData<Event<Any>>()
     val refreshClickedEvent: LiveData<Event<Any>> = _refreshClickedEvent
 
-    val mostRecentSortOrder = state.getLiveData<String>(STATE_SORT_ORDER).map {
+    val mostRecentSortOrder = articlesListPreferencesRepository.getSortOrder().map {
         when (it) {
             "most_recent_first" -> true
             "oldest_first" -> false
@@ -78,14 +62,16 @@ class ActivityViewModel @Inject constructor(
         }
     }
 
-    val sortOrder = mostRecentSortOrder.asFlow()
-        .map { mostRecent ->
+    val sortOrder = mostRecentSortOrder.map { mostRecent ->
             if (mostRecent) SortOrder.MOST_RECENT_FIRST else SortOrder.OLDEST_FIRST
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SortOrder.OLDEST_FIRST)
 
-    val onlyUnreadArticles = state.getLiveData(STATE_NEED_UNREAD, true)
-
-    var appBarHeight: Int by mutableStateOf(0)
+    val onlyUnreadArticles = articlesListPreferencesRepository.getViewMode().map {
+        when (it) {
+            "unread", "adaptive" -> true
+            else -> false
+        }
+    }
 
     private val _undoReadSnackBarMessage = MutableStateFlow<UndoReadSnackbarMessage?>(null)
     val undoReadSnackBarMessage = _undoReadSnackBarMessage.asStateFlow()
@@ -97,9 +83,6 @@ class ActivityViewModel @Inject constructor(
 
     init {
         browserLauncher.warmUp()
-        prefs.registerOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener)
-        updateNeedUnread()
-        updateSortOrder()
     }
 
     fun setAccount(account: Account) {
@@ -127,35 +110,19 @@ class ActivityViewModel @Inject constructor(
     }
 
     fun setSortByMostRecentFirst(mostRecentFirst: Boolean) {
-        if (mostRecentFirst) {
-            prefs.edit().putString(PREF_SORT_ORDER, "most_recent_first").apply()
-        } else {
-            prefs.edit().putString(PREF_SORT_ORDER, "oldest_first").apply()
-        }
+        articlesListPreferencesRepository.setSortByMostRecentFirst(mostRecentFirst)
     }
 
     fun setNeedUnread(needUnread: Boolean) {
         if (needUnread) {
-            prefs.edit().putString(PREF_VIEW_MODE, "adaptive").apply()
+            articlesListPreferencesRepository.setViewMode("adaptive")
         } else {
-            prefs.edit().putString(PREF_VIEW_MODE, "all").apply()
+            articlesListPreferencesRepository.setViewMode("all")
         }
-    }
-
-    private fun updateNeedUnread() {
-        state[STATE_NEED_UNREAD] = when (prefs.getString(PREF_VIEW_MODE, "adaptive")) {
-            "unread", "adaptive" -> true
-            else -> false
-        }
-    }
-
-    private fun updateSortOrder() {
-        state[STATE_SORT_ORDER] = prefs.getString(PREF_SORT_ORDER, "most_recent_first")
     }
 
     override fun onCleared() {
         browserLauncher.shutdown()
-        prefs.unregisterOnSharedPreferenceChangeListener(onSharedPreferenceChangeListener)
     }
 
     data class ArticleSelectedParameters(val position: Int, val article: Article)
