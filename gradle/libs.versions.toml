@@ -38,12 +38,12 @@ androidx-lifecycle = "2.6.2"
 androidx-navigation = "2.7.5"
 androidx-paging = "3.2.1"
 androidx-preferences = "1.2.1"
-androidx-room = "2.6.0"
+androidx-room = "2.6.1"
 androidx-startup = "1.1.1"
-androidx-work = "2.8.1"
+androidx-work = "2.9.0"
 android-material = "1.10.0"
 kotlinx-coroutines = "1.7.3"
-kotlinx-datetime = "0.4.0"
+kotlinx-datetime = "0.4.1"
 kotlinx-serialization = "1.6.0"
 dagger = "2.48.1"
 okio = "3.5.0"
@@ -82,7 +82,6 @@ dagger-hilt-android = { id = "dagger.hilt.android.plugin", version.ref = "dagger
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "kotlin-ksp" }
 
 [libraries]
@@ -112,10 +111,10 @@ androidx-compose-animation-graphics = { module = "androidx.compose.animation:ani
 androidx-compose-material-icons-core = { module = "androidx.compose.material:material-icons-core" }
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 # alpha for bottom app bar with FAB overlaid and bottom app bar scroll behavior
-androidx-compose-material3 = { module = "androidx.compose.material3:material3", version = "1.2.0-alpha11" }
+androidx-compose-material3 = { module = "androidx.compose.material3:material3", version = "1.2.0-alpha12" }
 androidx-compose-material3-window-sizes = { module = "androidx.compose.material3:material3-window-size-class" }
 # beta for fix that keeps mutable states working during unit tests
-androidx-compose-runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata", version = "1.6.0-beta01" }
+androidx-compose-runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata", version = "1.6.0-beta02" }
 androidx-compose-ui = { module = "androidx.compose.ui:ui" }
 androidx-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4" }
 androidx-compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest" }

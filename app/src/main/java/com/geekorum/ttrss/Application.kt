@@ -46,9 +46,10 @@ open class Application : AndroidApplication(), Configuration.Provider, ImageLoad
         EntryPointAccessors.fromApplication(this, ApplicationComponentEntryPoint::class.java)
     }
 
-    override fun getWorkManagerConfiguration(): Configuration = workManagerConfig
-
     override fun newImageLoader(): ImageLoader = imageLoader
+
+    override val workManagerConfiguration: Configuration
+        get() = workManagerConfig
 
 }
 
