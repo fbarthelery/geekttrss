@@ -35,7 +35,6 @@ import okhttp3.Response
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Test
 import kotlin.test.BeforeTest
-import kotlin.test.Ignore
 
 private val SIMPLE_MANIFEST = """
 {
@@ -143,7 +142,6 @@ class AppManifestSnooperTest {
         assertThat(result).isEmpty()
     }
 
-    @Ignore("works fine in local but hang up on CI")
     @Test
     fun testHtmlWithInvalidManifestReturnsEmpty() = testScope.runTest {
         mockkStatic("com.geekorum.favikonsnoop.FaviKonSnoopKt")
