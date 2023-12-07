@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+
+    Geekttrss is a RSS feed reader application on the Android Platform.
+
+    Copyright (C) 2017-2023 by Frederic-Charles Barthelery.
+
+    This file is part of Geekttrss.
+
+    Geekttrss is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Geekttrss is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<resources>
+    <string name="ttrss_account">Tiny Tiny RSS</string>
+    <string name="prompt_url">Url du serveur Tiny Tiny Rss</string>
+    <string name="prompt_username">Nom d\'utilisateur</string>
+    <string name="prompt_password">Mot de passe</string>
+    <string name="lbl_use_http_authentication">Utiliser l\'authentification Http</string>
+    <string name="action_sign_in">Se connecter</string>
+    <string name="action_sign_in_short">Se connecter</string>
+    <string name="error_field_required">Ce champ est requis</string>
+    <string name="error_invalid_http_url">Url http(s) invalide</string>
+    <string name="error_http_url_must_end_wish_slash">L\'url doit se terminer par /</string>
+    <string name="error_incorrect_password">Mot de passe incorrect</string>
+    <string name="title_article_list">Articles</string>
+    <string name="sort_order">Tri</string>
+    <string name="content_desc_btn_sort_menu">Tri</string>
+    <string name="sort_order_most_recent_first">Le plus récent</string>
+    <string name="sort_order_oldest_first">Le plus vieux</string>
+    <string name="title_article_search">Recherche</string>
+    <string name="menu_item_mark_feed_as_read">Marquer comme lu</string>
+    <string name="title_article_details">Détails de l\'article</string>
+    <string name="title_feeds_menu">Flux</string>
+    <string name="drawer_open">Ouvrir le menu</string>
+    <string name="drawer_close">Fermer le menu</string>
+    <string name="drawer_btn_settings">Paramètres</string>
+    <string name="star_article">Ajouter aux favoris</string>
+    <string name="lbl_read_more">Pour aller plus loin</string>
+    <string name="activity_settings_title">Paramètres</string>
+    <string name="pref_title_theme">Theme</string>
+    <string name="pref_title_in_app_browser_engine">Moteur web intégré</string>
+    <string name="theme_system_default">Utiliser les paramètres du système</string>
+    <string name="theme_light">Clair</string>
+    <string name="theme_dark">Sombre</string>
+    <string name="pref_category_user_interface">Interface</string>
+    <string name="pref_category_advanced">Avancé</string>
+    <string name="pref_category_about">A propos</string>
+    <string name="pref_title_about_version">Version %1$s</string>
+    <string name="pref_category_development">Dévelopement</string>
+    <string name="pref_title_manage_features">Gestion des fonctionnalités</string>
+    <string name="pref_title_oss_license">Licences open source</string>
+    <string name="pref_summary_oss_license">Détails des licences pour les logiciels open sources</string>
+    <string name="btn_install_feature">Installer</string>
+    <string name="btn_uninstall_feature">Désinstaller</string>
+    <string name="lbl_install_feature_title">Installation du module</string>
+    <string name="lbl_download_in_progress">Téléchargement</string>
+    <string name="lbl_install_in_progress">Installation</string>
+    <string name="lbl_failed_to_install">Échec de l\'installation</string>
+    <string name="lbl_install_complete">Installation terminée</string>
+    <string name="lbl_other">Autre état</string>
+    <string name="title_magazine">Magazine</string>
+    <string name="mark_as_read">Marquer comme lu</string>
+    <string name="mark_as_unread">Marquer comme non lu</string>
+    <string name="feed_icon_content_description">Icone du flux</string>
+    <string name="open_article_in_browser">Ouvrir dans le navigateur web</string>
+    <string name="undo_set_articles_read_btn">Annuler</string>
+    <string name="author_formatted">par %1$s</string>
+    <string name="fragment_articles_list_no_articles_lbl">Pas d\'articles</string>
+    <string name="fragment_articles_list_no_articles_and_sync_lbl">Pas d\'articles\nLa première synchronisation peut prendre longtemps …</string>
+    <string name="btn_refresh">Rafraichir</string>
+    <string name="banner_update_msg">Une mise à jour est disponible</string>
+    <string name="banner_update_btn">Installer</string>
+    <string name="banner_dismiss_btn">Fermer</string>
+    <string name="banner_update_install_msg">Mise à jour prête à l\'installation</string>
+    <string name="banner_install_btn">Redémarrer</string>
+    <string name="activity_add_feed_title">Souscrire à un flux</string>
+    <string name="activity_share_to_publish_toolbar_title">Publication d\'un article</string>
+    <string name="activity_share_to_publish_article_title">Publier l\'article</string>
+    <string name="lbl_publishing_in_progress">Publication en cours</string>
+    <string name="share_article">Partager l\'article</string>
+    <string name="context_selection_toggle_unread">Lu/Non Lu</string>
+    <string name="search">Recherche</string>
+    <string name="error_unknown">Erreur: erreur non prévue</string>
+    <string name="error_http_unauthorized">Erreur Http: 401 unauthorized</string>
+    <string name="error_http_forbidden">Erreur Http: 404 forbidden</string>
+    <string name="error_http_not_found">Erreur Http: 404 not found</string>
+    <string name="error_http_server_error">Erreur Http: 500 server error</string>
+    <string name="error_http_other_error">Erreur: Autre erreur HTTP (voir les logs)</string>
+    <string name="error_ssl_rejected">Erreur: Certificat SSL rejeté</string>
+    <string name="error_parse_error">"Erreur: Echec de l'analyse du JSON "</string>
+    <string name="error_io_error">Erreur: Erreur d\'I/O</string>
+    <string name="error_other_error">Erreur: erreur non prévue (voir les logs)</string>
+    <string name="error_api_disabled">Erreur: Veuillez activer l\'accès par API dans les paramètres de tt-rss - Avancé</string>
+    <string name="error_api_unknown">Erreur: erreur non prévue (voir les logs)</string>
+    <string name="error_api_incorrect_usage">Erreur: Usage incorrect de l\'API</string>
+    <string name="error_login_failed">Erreur: nom d\'utilisateur ou mot de passe incorrect</string>
+    <string name="error_invalid_api_url">Erreur: URL de l\'API invalide</string>
+    <string name="error_ssl_hostname_rejected">Erreur: nom d\'hote SSL non vérifié</string>
+    <string name="error_api_unknown_method">Erreur: méthode d\'API inconnue</string>
+    <string name="error_network_unavailable">Erreur: réseau non disponible</string>
+    <string name="error_cleartext_traffic_not_allowed">Erreur: traffic réseau en clair (http) non autorisé sur cette version d\'Android</string>
+    <string name="title_manage_feeds">Gestion des flux</string>
+    <string name="content_desc_btn_clear">Effacer</string>
+    <string name="placeholder_textfield_search">Rechercher …</string>
+</resources>
