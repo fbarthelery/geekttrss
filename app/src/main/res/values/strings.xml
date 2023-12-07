@@ -22,10 +22,10 @@
 
 -->
 <resources>
-    <string name="app_name">Geekttrss</string>
+    <string name="app_name" translatable="false">Geekttrss</string>
 
-    <string name="path_star_mask_filled">M0,24 L24,24 L24,0 L0,0 Z</string>
-    <string name="path_star_mask_empty">M0,24 L24,24 L24,24 L0,24 Z</string>
+    <string name="path_star_mask_filled" translatable="false">M0,24 L24,24 L24,0 L0,0 Z</string>
+    <string name="path_star_mask_empty" translatable="false">M0,24 L24,24 L24,24 L0,24 Z</string>
     <string name="ttrss_account">Tiny Tiny RSS</string>
     <!-- Login activity -->
     <string name="prompt_url">Tiny Tiny RSS server url</string>
@@ -45,8 +45,8 @@
     <string name="sort_order_most_recent_first">Most recent first</string>
     <string name="sort_order_oldest_first">Oldest first</string>
     <string name="title_article_search">Search</string>
-    <string name="label_feed_name">{feed_name}</string>
-    <string name="label_tag">#{tag}</string>
+    <string name="label_feed_name" translatable="false">{feed_name}</string>
+    <string name="label_tag" translatable="false">#{tag}</string>
     <string name="menu_item_mark_feed_as_read">Mark as read</string>
 
     <!-- activity article details -->
@@ -71,7 +71,7 @@
     <string name="pref_category_advanced">Advanced</string>
     <string name="pref_category_about">About</string>
     <string name="pref_title_about_version">Version %1$s</string>
-    <string name="pref_summary_about_version">%1$s-%2$s</string>
+    <string name="pref_summary_about_version" translatable="false">%1$s-%2$s</string>
     <string name="pref_category_development">Development</string>
     <string name="pref_title_manage_features">Manage features</string>
     <string name="pref_title_oss_license">Open source licenses</string>

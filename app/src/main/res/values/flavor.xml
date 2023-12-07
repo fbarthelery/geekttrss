@@ -23,10 +23,10 @@
 -->
 <resources>
     <!-- Must be kept in sync with packageId and other flavor dependent variable -->
-    <string name="package_name">com.geekorum.ttrss</string>
-    <string name="sync_adapter_content_authority">com.geekorum.ttrss.providers.articles</string>
+    <string name="package_name" translatable="false">com.geekorum.ttrss</string>
+    <string name="sync_adapter_content_authority" translatable="false">com.geekorum.ttrss.providers.articles</string>
     <color name="app_icon_flavor_background">@color/material_grey_300</color>
 
     <bool name="dev_show_manage_features">false</bool>
-    <string name="article_details_data_pattern">content://com.geekorum.ttrss.providers.articles/{article_id}</string>
+    <string name="article_details_data_pattern" translatable="false">content://com.geekorum.ttrss.providers.articles/{article_id}</string>
 </resources>

@@ -23,9 +23,9 @@
 -->
 <resources>
     <!-- Must be kept in sync with packageId in build.gradle.kts -->
-    <string name="package_name">com.geekorum.ttrss.free</string>
-    <string name="sync_adapter_content_authority">com.geekorum.ttrss.free.providers.articles</string>
+    <string name="package_name" translatable="false">com.geekorum.ttrss.free</string>
+    <string name="sync_adapter_content_authority" translatable="false">com.geekorum.ttrss.free.providers.articles</string>
     <color name="app_icon_flavor_background">@color/material_light_green_200</color>
 
-    <string name="article_details_data_pattern">content://com.geekorum.ttrss.free.providers.articles/{article_id}</string>
+    <string name="article_details_data_pattern" translatable="false">content://com.geekorum.ttrss.free.providers.articles/{article_id}</string>
 </resources>
