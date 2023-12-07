@@ -38,7 +38,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.data.Article
-import com.geekorum.ttrss.share.createShareArticleIntent
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 
 @Composable
@@ -80,13 +81,13 @@ private fun BaseArticlesListScreen(
             articlesListViewModel.refresh()
         })
 
-        activityViewModel.mostRecentSortOrder.observe(viewLifecycleOwner) {
+        activityViewModel.mostRecentSortOrder.onEach {
             articlesListViewModel.setSortByMostRecentFirst(it)
-        }
+        }.launchIn(this)
 
-        activityViewModel.onlyUnreadArticles.observe(viewLifecycleOwner) {
+        activityViewModel.onlyUnreadArticles.onEach {
             articlesListViewModel.setNeedUnread(it)
-        }
+        }.launchIn(this)
     }
 
     val lazyListState = rememberLazyListState()
