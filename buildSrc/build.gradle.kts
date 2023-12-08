@@ -32,10 +32,10 @@ repositories {
 dependencies {
     // play-publisher depends on AGP original not api. So we need to include it here
     // in order to be in the correct classpath
-    implementation("com.android.tools.build:gradle:8.1.4")
+    implementation("com.android.tools.build:gradle:8.2.0")
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.21")
 
-    implementation("com.android.tools.build:gradle-api:8.1.1")
+    implementation("com.android.tools.build:gradle-api:8.2.0")
     implementation("gradle.plugin.com.hierynomus.gradle.plugins:license-gradle-plugin:0.16.1")
     implementation("com.github.triplet.gradle:play-publisher:3.8.4")
     implementation("com.geekorum.gradle.avdl:flydroid:0.0.4")
