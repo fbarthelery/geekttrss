@@ -364,9 +364,9 @@ private fun SwipeableArticleCard(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ChangeReadBehindItem(dismissDirection: DismissDirection) {
+private fun ChangeReadBehindItem(dismissDirection: SwipeToDismissValue) {
     val horizontalArrangement = when (dismissDirection) {
-        DismissDirection.StartToEnd -> Arrangement.Start
+        SwipeToDismissValue.StartToEnd -> Arrangement.Start
         else -> Arrangement.End
     }
     Row(modifier = Modifier
@@ -376,7 +376,7 @@ private fun ChangeReadBehindItem(dismissDirection: DismissDirection) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         val text = stringResource(id = R.string.mark_as_read)
-        if (dismissDirection == DismissDirection.StartToEnd) {
+        if (dismissDirection == SwipeToDismissValue.StartToEnd) {
             Icon(painter = painterResource(R.drawable.ic_archive), contentDescription = text,
                 modifier = Modifier.padding(end = 8.dp),
                 tint = MaterialTheme.colorScheme.secondary
@@ -384,7 +384,7 @@ private fun ChangeReadBehindItem(dismissDirection: DismissDirection) {
         }
         Text(text,
             style = MaterialTheme.typography.bodySmall)
-        if (dismissDirection == DismissDirection.EndToStart) {
+        if (dismissDirection == SwipeToDismissValue.EndToStart) {
             Icon(painter = painterResource(R.drawable.ic_archive), contentDescription = text,
                 modifier = Modifier.padding(start = 8.dp),
                 tint = MaterialTheme.colorScheme.secondary

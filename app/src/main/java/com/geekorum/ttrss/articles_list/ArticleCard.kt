@@ -73,29 +73,29 @@ fun SwipeableArticleCard(
     onToggleUnreadClick: () -> Unit,
     onSwiped: () -> Unit,
     modifier: Modifier = Modifier,
-    behindCardContent: @Composable (DismissDirection?) -> Unit = { }
+    behindCardContent: @Composable (SwipeToDismissValue?) -> Unit = { }
 ) {
-    val dismissState = rememberDismissState()
+    val dismissState = rememberSwipeToDismissState()
     var isInit by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
         // state is restored because it user rememberSaveable
         // so reset it if needed
-        dismissState.snapTo(DismissValue.Default)
+        dismissState.snapTo(SwipeToDismissValue.Settled)
         isInit = true
     }
     LaunchedEffect(isInit, dismissState.currentValue) {
-        if (isInit && dismissState.currentValue != DismissValue.Default) {
+        if (isInit && dismissState.currentValue != SwipeToDismissValue.Settled) {
             onSwiped()
         }
     }
 
-    SwipeToDismiss(
+    SwipeToDismissBox(
         state = dismissState,
         modifier = modifier,
-        background = {
+        backgroundContent = {
             behindCardContent(dismissState.dismissDirection)
         },
-        dismissContent = {
+        content = {
             ArticleCard(
                 title = title,
                 flavorImageUrl = flavorImageUrl,
