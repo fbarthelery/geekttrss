@@ -41,13 +41,13 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.ShareCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import com.geekorum.ttrss.articles_list.ActivityViewModel
 import com.geekorum.ttrss.articles_list.ArticleCard
-import com.geekorum.ttrss.articles_list.PagingViewLoadState
-import com.geekorum.ttrss.articles_list.pagingViewStateFor
+import com.geekorum.ttrss.articles_list.debouncedPagingViewStateFor
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleWithFeed
 import kotlinx.coroutines.delay
@@ -68,9 +68,9 @@ fun SearchResultCardList(
 
     val listState = rememberLazyListState()
     var animateItemAppearance by remember { mutableStateOf(true) }
-    val loadState by pagingViewStateFor(pagingItems)
+    val loadState by debouncedPagingViewStateFor(pagingItems)
     LaunchedEffect(loadState, pagingItems.itemCount) {
-        if (loadState == PagingViewLoadState.LOADING) {
+        if (loadState is LoadState.NotLoading) {
             Timber.i("loading item reset animate item appearance")
             animateItemAppearance = true
         }

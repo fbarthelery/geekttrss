@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.app.ShareCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
@@ -171,11 +172,11 @@ private fun ArticlesMagazine(
             .padding(pullRefreshBoxContentPadding)
             .nestedScroll(pullRefreshState.nestedScrollConnection)) {
         val pagingItems = viewModel.articles.collectAsLazyPagingItems()
-        val loadState by pagingViewStateFor(pagingItems)
+        val loadState by debouncedPagingViewStateFor(pagingItems)
         val isEmpty = pagingItems.itemCount == 0
         var refreshIfEmpty = remember { true }
         LaunchedEffect(loadState, isEmpty) {
-            if (loadState == PagingViewLoadState.LOADED) {
+            if (loadState is LoadState.NotLoading) {
                 if (isEmpty && refreshIfEmpty) {
                     viewModel.refreshFeeds()
                 }
@@ -184,7 +185,7 @@ private fun ArticlesMagazine(
             }
         }
 
-        if (isEmpty && loadState == PagingViewLoadState.LOADED) {
+        if (isEmpty && loadState is LoadState.NotLoading) {
             FeedEmptyText(isRefreshing)
         } else {
             ArticlesList(

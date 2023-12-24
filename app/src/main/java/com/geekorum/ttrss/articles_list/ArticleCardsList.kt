@@ -56,38 +56,29 @@ import androidx.paging.compose.itemKey
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.*
 import com.geekorum.ttrss.ui.AppTheme3
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flowOf
 
 
 /**
- * Get [PagingViewLoadState] for [pagingItems].
- * This allows to make the disctinction between the initial [LoadState] of [LoadState.NotLoading]
- * and the final [LoadState.NotLoading] at the end of the operation
+ * Get a debounced paging [LoadState] for [pagingItems].
+ * As we make lots of write while loading data, this allows to not
+ * go between loading/not loading in quick successions.
  */
+@OptIn(FlowPreview::class)
 @Composable
-fun pagingViewStateFor(pagingItems: LazyPagingItems<ArticleWithFeed>) =
-    produceState(initialValue = PagingViewLoadState.INITIAL, key1 = pagingItems) {
+fun debouncedPagingViewStateFor(pagingItems: LazyPagingItems<ArticleWithFeed>) =
+    produceState(initialValue = pagingItems.loadState.refresh, key1 = pagingItems) {
         snapshotFlow { pagingItems.loadState.refresh }
-            .drop(1) // the initial one is always LoadState.NotLoading, drop it
             .distinctUntilChanged()
+            .debounce(500)
             .collect {
-                value = when (it) {
-                    is LoadState.NotLoading -> PagingViewLoadState.LOADED
-                    is LoadState.Loading -> PagingViewLoadState.LOADING
-                    is LoadState.Error -> PagingViewLoadState.ERROR
-                }
+                value = it
             }
     }
-
-enum class PagingViewLoadState {
-    INITIAL,
-    LOADING,
-    LOADED,
-    ERROR
-}
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -128,11 +119,11 @@ fun ArticleCardList(
         }
     }
 
-    val loadState by pagingViewStateFor(articles)
+    val loadState by debouncedPagingViewStateFor(articles)
     val isEmpty = articles.itemCount == 0
     var refreshIfEmpty by remember { mutableStateOf(true) }
     LaunchedEffect(loadState, isEmpty) {
-        if (loadState == PagingViewLoadState.LOADED) {
+        if (loadState is LoadState.NotLoading) {
             if (isEmpty && refreshIfEmpty) {
                 viewModel.refresh()
             }
@@ -203,9 +194,9 @@ private fun ArticleCardList(
             .padding(pullRefreshBoxContentPadding)
             .nestedScroll(pullRefreshState.nestedScrollConnection)
     ) {
-        val loadState by pagingViewStateFor(articles)
+        val loadState by debouncedPagingViewStateFor(articles)
         val isEmpty = articles.itemCount == 0
-        if (isEmpty && loadState == PagingViewLoadState.LOADED) {
+        if (isEmpty && loadState is LoadState.NotLoading) {
             FeedEmptyText(isRefreshing)
         } else {
             ArticlesList(
