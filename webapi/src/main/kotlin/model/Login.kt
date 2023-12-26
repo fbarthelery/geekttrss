@@ -53,11 +53,9 @@ data class LoginResponsePayload(
     override val content: BaseContent
 ) : ResponsePayload<LoginResponsePayload.Content>() {
 
-    @Transient
     val sessionId: String?
         get() = typedContent?.sessionId
 
-    @Transient
     val apiLevel: Int?
         get() = typedContent?.apiLevel
 
