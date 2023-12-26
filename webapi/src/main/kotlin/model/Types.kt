@@ -134,8 +134,9 @@ data class Headline(
 
     // unuseful for now
     val labels: List<@Serializable(LabelInfo.LabelInfoAsListSerializer::class) LabelInfo> = emptyList(),
-    val lang: String? = ""
-
+    val lang: String? = "",
+    @SerialName("site_url")
+    val siteUrl: String? = ""
 ) {
 
     @delegate:Transient

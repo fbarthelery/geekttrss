@@ -124,7 +124,8 @@ class GetArticlesJsonSerializationTest {
               "author": "bondamanjak",
               "score": 0,
               "note": null,
-              "lang": ""
+              "lang": "fr",
+              "site_url": "http:\/\/www.bondamanjak.com"
             },
             {
               "id": 560198,
@@ -253,7 +254,8 @@ class GetArticlesJsonSerializationTest {
                     nbComments = 0,
                     commentsLink = "http://www.bondamanjak.com/images-jour-31-10-18-martinique-philippot/#respond",
                     alwaysDisplayAttachment = true, author = "bondamanjak",
-                    score = 0, note = null, lang = ""),
+                    score = 0, note = null, lang = "fr",
+                    siteUrl = "http://www.bondamanjak.com"),
                 Headline(id = 560198, unread = false, marked = false, published = false, lastUpdatedTimestamp = 1541039212,
                     isUpdated = false, title = "Some article from apiLevel 14 and tt-rss version 19.8",
                     link = "https://discourse.tt-rss.org/t/blacklisted-by-feedburner-ever-happened-to-anyone/2677/9",
