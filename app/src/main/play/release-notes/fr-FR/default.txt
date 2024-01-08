@@ -1,3 +1,6 @@
-Un appui long sur un feed permet de marquer tous ses articles comme lus
-Il est possible d'ajouter un article au flux Articles publiés de TinyTinyRss en utilisant le dialogue de partage
+Mise à jour du thème vers Material 3
+Affichage de l'icone  de l'application navigateur web
+Correction du bug ou la snackbar et le button fab apparaissent sous la barre de navigation du systeme en mode 3 boutons
+Affichage de tous les articles favoris et pas seulement les non lus
+Ajout de la traduction francaise
 Diverses corrections de bugs et améliorations
