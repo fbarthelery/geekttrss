@@ -80,7 +80,7 @@ fun SelectFeedScreen(
                         )
                     },
                     colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth().menuAnchor()
                 )
 
                 // Use DropDownMenu instead of exposed, to workaround bug
