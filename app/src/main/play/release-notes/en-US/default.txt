@@ -1,3 +1,6 @@
-By long pressing the feed in the drawer, you can mark all its articles as read
-Allow to add an article to TinyTinyRss published articles feed when using the share dialog
+Update theme to Material 3
+Use browser application icon
+Fix issue with snackbar and fab button displaying under the system navigation bar in 3 button mode
+Display all starred articles not only unread one
+Add French translation
 Various bug fixes and improvements
