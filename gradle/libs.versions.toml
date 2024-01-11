@@ -18,7 +18,7 @@
 # along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
 #
 [versions]
-android-gradle-plugin = "8.1.4"
+android-gradle-plugin = "8.2.1"
 accompanist = "0.32.0"
 androidx-annotation = "1.7.1"
 androidx-core = "1.12.0"
@@ -42,12 +42,15 @@ androidx-room = "2.6.1"
 androidx-startup = "1.1.1"
 androidx-work = "2.9.0"
 android-material = "1.11.0"
+avdl = "0.0.4"
 kotlinx-coroutines = "1.7.3"
 kotlinx-datetime = "0.4.1"
 kotlinx-serialization = "1.6.2"
 dagger = "2.50"
+license-gradle-plugin = "0.16.1"
 okio = "3.7.0"
 okhttp = "4.10.0"
+play-publisher = "3.8.6"
 timber = "5.0.1"
 truth = "1.2.0"
 mockk = "1.13.8"
@@ -76,6 +79,7 @@ google-gms-google-services = { id = "com.google.gms.google-services", version = 
 # Waiting for feedback on https://github.com/google/play-services-plugins/pull/268
 # google-gms-oss-license = { id = "com.google.android.gms.oss-licenses-plugin", version = "0.10.6.1" }
 com-geekorum-gms-oss-license = { id = "com.geekorum.gms.oss-licenses-plugin", version = "0.10.6" }
+com-geekorum-avdl-flydroid = { id = "com.geekorum.gradle.avdl.providers.flydroid", version.ref = "avdl" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version = "2.9.9" }
 androidx-navigation-safeargs-kotlin = { id = "androidx.navigation.safeargs.kotlin", version.ref = "androidx-navigation" }
 dagger-hilt-android = { id = "dagger.hilt.android.plugin", version.ref = "dagger" }
@@ -83,8 +87,15 @@ kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", vers
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "kotlin-ksp" }
+license-gradle-plugin = { id = "com.github.hierynomus.license", version.ref = "license-gradle-plugin" }
+gradle-play-publisher = { id = "com.github.triplet.play", version.ref = "play-publisher"}
 
 [libraries]
+# build plugins dependencies
+android-gradle-plugin = { module = "com.android.tools.build:gradle", version.ref = "android-gradle-plugin" }
+android-gradle-plugin-api = { module = "com.android.tools.build:gradle", version.ref = "android-gradle-plugin" }
+
+# app dependencies
 accompanist-drawablepainter = { module = "com.google.accompanist:accompanist-drawablepainter", version.ref = "accompanist" }
 accompanist-webview = { module = "com.google.accompanist:accompanist-webview", version.ref = "accompanist" }
 
