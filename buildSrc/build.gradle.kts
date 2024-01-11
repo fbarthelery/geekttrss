@@ -29,16 +29,24 @@ repositories {
     google()
 }
 
+// see https://github.com/gradle/gradle/issues/17963
+fun Provider<PluginDependency>.gav(): String {
+    val t = get()
+    val id = t.pluginId
+    val version = t.version
+    return "$id:$id.gradle.plugin:$version"
+}
+
 dependencies {
     // play-publisher depends on AGP original not api. So we need to include it here
     // in order to be in the correct classpath
-    implementation("com.android.tools.build:gradle:8.2.1")
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22")
+    implementation(libs.android.gradle.plugin)
+    implementation(libs.plugins.kotlin.android.gav())
 
-    implementation("com.android.tools.build:gradle-api:8.2.1")
-    implementation("gradle.plugin.com.hierynomus.gradle.plugins:license-gradle-plugin:0.16.1")
-    implementation("com.github.triplet.gradle:play-publisher:3.8.4")
-    implementation("com.geekorum.gradle.avdl:flydroid:0.0.4")
+    implementation(libs.android.gradle.plugin.api)
+    implementation(libs.plugins.license.gradle.plugin.gav())
+    implementation(libs.plugins.gradle.play.publisher.gav())
+    implementation(libs.plugins.com.geekorum.avdl.flydroid.gav())
 
     // fix https://github.com/google/dagger/issues/3068
     implementation("com.squareup:javapoet:1.13.0")
