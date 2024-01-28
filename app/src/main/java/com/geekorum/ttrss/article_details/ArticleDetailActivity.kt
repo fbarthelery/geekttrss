@@ -77,7 +77,14 @@ class ArticleDetailActivity : SessionActivity() {
                     heightSizeClass = heightSizeClass,
                     webViewClient = webViewClient,
                     onNavigateUpClick = {
-                        onSupportNavigateUp()
+                        // if we are on application backstack we can just call onBackPressed or finish the activity
+                        // onSupportNavigateUp() will recreate the previous activity which we want to avoid
+                        val upIntent = supportParentActivityIntent
+                        if (upIntent != null && supportShouldUpRecreateTask(upIntent)) {
+                            onSupportNavigateUp()
+                        } else {
+                            onBackPressedDispatcher.onBackPressed()
+                        }
                     },
                     onArticleClick = {
                         showArticle(it)
