@@ -89,9 +89,12 @@ fun SwipeableArticleCard(
         }
     }
 
+    // we want the dismiss box to take full width so the card is completely
+    // out of screen when dismissed
     SwipeToDismissBox(
         state = dismissState,
-        modifier = modifier,
+        modifier = modifier
+            .fillMaxWidth(),
         backgroundContent = {
             behindCardContent(dismissState.dismissDirection)
         },
@@ -110,13 +113,16 @@ fun SwipeableArticleCard(
                 onStarChanged = onStarChanged,
                 onShareClick = onShareClick,
                 onToggleUnreadClick = onToggleUnreadClick,
+                // center the card
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentWidth()
             )
         }
     )
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ArticleCard(
     title: String,
