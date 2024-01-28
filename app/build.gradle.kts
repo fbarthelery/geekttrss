@@ -239,6 +239,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.kotlinx.coroutines.jdk8)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.turbine)
     androidTestImplementation(libs.kotlinx.coroutines.test)
 
     implementation(enforcedPlatform(libs.firebase.bom))

@@ -109,6 +109,10 @@ class MockedSession(id: Int) : InstallSession(id) {
         emit(state)
         delay(500)
 
+        state = State(State.Status.DOWNLOADING, 0, 0)
+        emit(state)
+        delay(500)
+
         state = State(State.Status.DOWNLOADING, 0, 1000)
         emit(state)
         delay(500)

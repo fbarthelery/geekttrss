@@ -98,7 +98,7 @@ class InstallModuleViewModel @Inject constructor(
         }
         val max = 100
         val percent = when (state.status) {
-            DOWNLOADING -> ((state.bytesDownloaded.toFloat() / state.totalBytesDownloaded) * max).roundToInt()
+            DOWNLOADING -> ((state.bytesDownloaded.toFloat() / state.totalBytesDownloaded) * max).takeIf { it.isFinite() }?.roundToInt() ?: 0
             INSTALLED -> 100
             else -> 0
         }
