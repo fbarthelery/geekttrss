@@ -320,6 +320,7 @@ private fun SwipeableArticleCard(
     onToggleUnreadClick: (Article) -> Unit,
     onStarChanged: (Article, Boolean) -> Unit,
     onSwiped: (Article) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val (article, feedWithFavIcon) = articleWithFeed
     val (feed, favIcon) = feedWithFavIcon
@@ -349,6 +350,7 @@ private fun SwipeableArticleCard(
             }
         },
         onSwiped = { onSwiped(article) },
+        modifier = modifier
     )
 }
 
@@ -362,6 +364,9 @@ private fun ChangeReadBehindItem(dismissDirection: SwipeToDismissBoxValue) {
     }
     Row(modifier = Modifier
         .fillMaxSize()
+        // center it horizontally then take max width of a card (384.dp)
+        .wrapContentWidth()
+        .width(384.dp)
         .padding(horizontal = 16.dp),
         horizontalArrangement = horizontalArrangement,
         verticalAlignment = Alignment.CenterVertically
