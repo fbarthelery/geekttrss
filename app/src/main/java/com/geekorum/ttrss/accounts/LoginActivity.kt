@@ -30,7 +30,7 @@ import androidx.activity.viewModels
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.core.content.IntentCompat
-import com.geekorum.geekdroid.accounts.AccountAuthenticatorAppCompatActivity
+import com.geekorum.geekdroid.accounts.AccountAuthenticatorComponentActivity
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.ui.AppTheme3
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,7 +40,7 @@ import javax.inject.Inject
  * A Login screen to a Tinytinyrss server.
  */
 @AndroidEntryPoint
-class LoginActivity : AccountAuthenticatorAppCompatActivity() {
+class LoginActivity : AccountAuthenticatorComponentActivity () {
 
     companion object {
         const val ACTION_ADD_ACCOUNT = "add_account"
