@@ -52,8 +52,10 @@ class TtrssAccountViewModel @Inject constructor(
 ): AccountsListViewModel(accountManager, accountSelector, AccountAuthenticator.TTRSS_ACCOUNT_TYPE) {
 
     val selectedAccountHost = selectedAccount.map { account ->
-        val url = accountManager.getUserData(account, AccountAuthenticator.USERDATA_URL)
-        Uri.parse(url).host ?: ""
+        if (account != null) {
+            val url = accountManager.getUserData(account, AccountAuthenticator.USERDATA_URL)
+            Uri.parse(url).host ?: ""
+        } else ""
     }
     private val noAccountSelectedEventSource = MutableLiveData<EmptyEvent>()
     val noAccountSelectedEvent:LiveData<EmptyEvent> = noAccountSelectedEventSource
