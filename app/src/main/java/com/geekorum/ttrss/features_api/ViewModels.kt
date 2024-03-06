@@ -21,16 +21,22 @@
 package com.geekorum.ttrss.features_api
 
 import android.app.Application
-import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.*
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.createSavedStateHandle
+import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.navigation.NavBackStackEntry
-import androidx.savedstate.SavedStateRegistryOwner
 import dagger.BindsInstance
 import dagger.Module
 import dagger.Subcomponent
+import dagger.hilt.android.ViewModelLifecycle
+import dagger.hilt.android.internal.lifecycle.HiltViewModelAssistedMap
+import dagger.hilt.android.internal.lifecycle.HiltViewModelFactory.CREATION_CALLBACK_KEY
 import dagger.hilt.android.internal.lifecycle.HiltViewModelMap
+import dagger.hilt.android.internal.lifecycle.RetainedLifecycleImpl
 import dagger.hilt.android.scopes.ViewModelScoped
 import dagger.hilt.migration.DisableInstallInCheck
 import dagger.multibindings.Multibinds
@@ -57,38 +63,30 @@ object DefaultViewModelFactories {
     class InternalFactoryFactory @Inject constructor(
         private val application: Application,
         @param:HiltViewModelMap.KeySet
-        private val keySet: Set<String>,
+        private val keySet: Map<Class<*>, Boolean>,
         private val viewModelComponentBuilder: ViewModelComponent.Builder,
     ) {
 
-        fun fromActivity(activity: ComponentActivity, delegateFactory: ViewModelProvider.Factory): ViewModelProvider.Factory {
-            return getHiltViewModelFactory(activity,
-                activity.intent?.extras,
-                delegateFactory)
+        fun fromActivity(activity: ComponentActivity, delegateFactory: ViewModelProvider.Factory?): ViewModelProvider.Factory {
+            return getHiltViewModelFactory(delegateFactory)
         }
 
-        fun fromFragment(fragment: Fragment, delegateFactory: ViewModelProvider.Factory): ViewModelProvider.Factory {
-            return getHiltViewModelFactory(fragment, fragment.arguments, delegateFactory)
+        fun fromFragment(fragment: Fragment, delegateFactory: ViewModelProvider.Factory?): ViewModelProvider.Factory {
+            return getHiltViewModelFactory( delegateFactory)
         }
 
         /**
          * Added to get a factory from a [NavBackStackEntry]
          */
         fun fromNavBackStackEntry(navBackStackEntry: NavBackStackEntry, delegateFactory: ViewModelProvider.Factory): ViewModelProvider.Factory {
-            return getHiltViewModelFactory(navBackStackEntry,
-                navBackStackEntry.arguments,
-                delegateFactory)
+            return getHiltViewModelFactory(delegateFactory)
         }
 
         private fun getHiltViewModelFactory(
-            owner: SavedStateRegistryOwner,
-            defaultArgs: Bundle?,
             extensionDelegate: ViewModelProvider.Factory?
         ): ViewModelProvider.Factory {
-            val delegate = extensionDelegate
-                ?: SavedStateViewModelFactory(application, owner, defaultArgs)
-            return HiltViewModelFactory(
-                owner, defaultArgs, keySet, delegate, viewModelComponentBuilder)
+            val delegate = checkNotNull(extensionDelegate)
+            return HiltViewModelFactory(keySet, delegate, viewModelComponentBuilder)
         }
 
     }
@@ -113,33 +111,99 @@ object DefaultViewModelFactories {
  * default factory by activities and fragments annotated with [ ].
  */
 private class HiltViewModelFactory(
-    owner: SavedStateRegistryOwner,
-    defaultArgs: Bundle?,
-    private val hiltViewModelKeys: Set<String>,
+    private val hiltViewModelKeys: Map<Class<*>, Boolean>,
     private val delegateFactory: ViewModelProvider.Factory,
     viewModelComponentBuilder: ViewModelComponent.Builder
 ) : ViewModelProvider.Factory {
 
-    private val hiltViewModelFactory: AbstractSavedStateViewModelFactory =
-        object : AbstractSavedStateViewModelFactory(owner, defaultArgs) {
-            override fun <T : ViewModel> create(
-                key: String, modelClass: Class<T>, handle: SavedStateHandle
-            ): T {
-                val component = viewModelComponentBuilder.savedStateHandle(handle).build()
+    private val hiltViewModelFactory: ViewModelProvider.Factory =
+        object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
+                val lifecycle = RetainedLifecycleImpl()
 
-                val provider = component.hiltViewModelMap[modelClass.name]
-                    ?: throw IllegalStateException(
-                        "Expected the @HiltViewModel-annotated class '${modelClass.name}' to be available in the multi-binding of @HiltViewModelMap but none was found.")
-                @Suppress("UNCHECKED_CAST")
-                return provider.get() as T
+                val handle = extras.createSavedStateHandle()
+                val component = viewModelComponentBuilder
+                    .savedStateHandle(handle)
+                    .viewModelLifecycle(lifecycle)
+                    .build()
+
+                val viewModel = createViewModel(component, modelClass, extras)
+                viewModel.addCloseable(lifecycle::dispatchOnCleared)
+                return viewModel
             }
         }
 
+    private fun <T : ViewModel?> createViewModel(
+        component: ViewModelComponent,
+        modelClass: Class<T>,
+        extras: CreationExtras
+    ): T {
+        val provider = component
+                .hiltViewModelMap[modelClass]
+        val creationCallback =
+            extras.get<Function1<Any, ViewModel>>(CREATION_CALLBACK_KEY)
+
+        val assistedFactory = component
+                .hiltViewModelAssistedMap[modelClass]
+
+        if (assistedFactory == null) {
+            if (creationCallback == null) {
+                if (provider == null) {
+                    throw java.lang.IllegalStateException(
+                        "Expected the @HiltViewModel-annotated class "
+                                + modelClass.name
+                                + " to be available in the multi-binding of "
+                                + "@HiltViewModelMap"
+                                + " but none was found."
+                    )
+                } else {
+                    return provider.get() as T
+                }
+            } else {
+                // Provider could be null or non-null.
+                throw java.lang.IllegalStateException(
+                    ("Found creation callback but class "
+                            + modelClass.name
+                            + " does not have an assisted factory specified in @HiltViewModel.")
+                )
+            }
+        } else {
+            if (provider == null) {
+                if (creationCallback == null) {
+                    throw java.lang.IllegalStateException(
+                        ("Found @HiltViewModel-annotated class "
+                                + modelClass.name
+                                + " using @AssistedInject but no creation callback"
+                                + " was provided in CreationExtras.")
+                    )
+                } else {
+                    return creationCallback.invoke(assistedFactory) as T
+                }
+            } else {
+                // Creation callback could be null or non-null.
+                throw AssertionError(
+                    ("Found the @HiltViewModel-annotated class "
+                            + modelClass.name
+                            + " in both the multi-bindings of "
+                            + "@HiltViewModelMap and @HiltViewModelAssistedMap.")
+                )
+            }
+        }
+    }
+
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return if (hiltViewModelKeys.contains(modelClass.name)) {
+        return if (hiltViewModelKeys.containsKey(modelClass)) {
             hiltViewModelFactory.create(modelClass)
         } else {
             delegateFactory.create(modelClass)
+        }
+    }
+
+    override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
+        return if (hiltViewModelKeys.containsKey(modelClass)) {
+            hiltViewModelFactory.create(modelClass, extras)
+        } else {
+            delegateFactory.create(modelClass, extras)
         }
     }
 }
@@ -150,15 +214,34 @@ private class HiltViewModelFactory(
 @DisableInstallInCheck
 object DynamicFeatureViewModelModule
 
-@Subcomponent
+@Subcomponent(modules = [ViewModelModule::class])
 @ViewModelScoped
 interface ViewModelComponent {
     @get:HiltViewModelMap
-    val hiltViewModelMap: Map<String, Provider<ViewModel>>
+    val hiltViewModelMap: Map<Class<*>, Provider<ViewModel>>
+
+    @get:HiltViewModelAssistedMap
+    val hiltViewModelAssistedMap: Map<Class<*>, Any>
 
     @Subcomponent.Builder
     interface Builder {
         fun savedStateHandle(@BindsInstance savedStateHandle: SavedStateHandle): Builder
+        fun viewModelLifecycle(@BindsInstance viewModelLifecycle: ViewModelLifecycle): Builder
         fun build(): ViewModelComponent
     }
+
 }
+
+
+@Module
+@DisableInstallInCheck
+interface ViewModelModule{
+    @Multibinds
+    @HiltViewModelMap
+    fun hiltViewModelMap(): Map<String?, ViewModel?>?
+
+    @Multibinds
+    @HiltViewModelAssistedMap
+    fun hiltViewModelAssistedMap(): Map<Class<*>?, Any?>?
+}
+
