@@ -24,7 +24,6 @@ import android.accounts.Account
 import android.content.Intent
 import android.os.Bundle
 import android.os.StrictMode
-import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.animation.animateContentSize
@@ -39,7 +38,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.geekorum.geekdroid.app.BottomSheetDialogActivity
+import com.geekorum.geekdroid.app.ModalBottomSheetActivity
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.WithNightModePreferencesTheme
 import com.geekorum.ttrss.applicationComponent
@@ -57,9 +56,7 @@ import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
  * 'org.apache.james:apache-mime4j-dome:0.8.1'
  * who doesn't have much dependencies and are used by k9mail
  */
-class AddFeedActivity :
-    BottomSheetDialogActivity()
-//ModalBottomSheetActivity()
+class AddFeedActivity : ModalBottomSheetActivity()
 {
     private lateinit var activityComponent: ActivityComponent
 
@@ -77,12 +74,10 @@ class AddFeedActivity :
         viewModel.init(url)
 
         viewModel.complete.observe(this, EventObserver {
-            finish()
-//            dismiss()
+            dismiss()
         })
 
-//        setSheetContent {
-        setContent {
+        setSheetContent {
             WithNightModePreferencesTheme {
                 AddFeedContent(viewModel)
             }
@@ -362,7 +357,7 @@ private fun PreviewAddFeedContent() {
             selectedFeed = selectedFeed,
             accounts = accounts,
             selectedAccount = selectedAccount,
-            onFeedSelectionChange = {selectedFeed = it},
+            onFeedSelectionChange = { selectedFeed = it},
             onAccountSelectionChange = { selectedAccount = it},
             onCancelClick = {},
             onSubscribeClick = {}

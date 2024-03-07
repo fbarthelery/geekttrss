@@ -23,22 +23,6 @@
 -->
 <resources>
     <style name="AppTheme.ManageFeedsActivity" parent="AppTheme.NoActionBar"/>
-
-    <style name="AppTheme.AddFeedActivity" parent="@style/Theme.MaterialComponents.DayNight.BottomSheetDialog">
-        <!-- use the material Blue Grey palette -->
-        <item name="colorPrimary">@color/material_blue_grey_500</item>
-        <item name="colorPrimaryDark">@color/material_blue_grey_500_darker</item>
-        <item name="colorPrimaryVariant">@color/material_blue_grey_500_darker</item>
-        <item name="colorSecondary">@color/material_green_a700</item>
-        <item name="colorSecondaryVariant">@color/material_green_a700_darker</item>
-        <item name="colorOnPrimary">@android:color/white</item>
-        <item name="colorOnSecondary">@android:color/white</item>
-
-        <!-- needed for a BottomDialogActivity -->
-        <item name="windowNoTitle">true</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:windowTranslucentStatus">false</item>
-        <item name="android:windowTranslucentNavigation">true</item>
-
-    </style>
+py
+    <style name="AppTheme.AddFeedActivity" parent="Theme.Geekdroid.ModalBottomSheetDialogActivity"/>
 </resources>
