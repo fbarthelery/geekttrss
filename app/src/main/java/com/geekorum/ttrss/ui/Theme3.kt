@@ -124,6 +124,10 @@ object AppTheme3 {
         onSurfaceVariant = Color(0xFFc0c8cd),
     )
 
+    object Colors {
+        val MaterialGreenA700 = Color(0xFF00C853)
+    }
+
     val Icons = Default
 
     val Shapes = Shapes(

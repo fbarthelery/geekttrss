@@ -44,6 +44,7 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.tooling.preview.Preview
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.ui.AppTheme3
+import com.materialkolor.ktx.harmonizeWithPrimary
 import kotlin.math.roundToInt
 
 
@@ -69,18 +70,16 @@ fun ArticleBottomAppBar(
             IconButton(onClick = onToggleUnreadClick) {
                 Icon(Icons.Default.Archive, contentDescription = null)
             }
-            IconToggleButton(isStarred, onCheckedChange = onStarredChange) {
+            IconToggleButton(isStarred, onCheckedChange = onStarredChange,
+                colors = IconButtonDefaults.iconToggleButtonColors(
+                    checkedContentColor = MaterialTheme.colorScheme.harmonizeWithPrimary(AppTheme3.Colors.MaterialGreenA700)
+                )
+            ) {
                 val image =
                     AnimatedImageVector.animatedVectorResource(id = R.drawable.avd_ic_star_filled)
-                val starColor = if (isStarred) {
-                    Color.Unspecified
-                } else {
-                    LocalContentColor.current
-                }
                 Icon(
                     painter = rememberAnimatedVectorPainter(image, atEnd = isStarred),
                     contentDescription = null,
-                    tint = starColor,
                 )
             }
             IconButton(onClick = onShareClick) {

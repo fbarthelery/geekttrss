@@ -53,6 +53,7 @@ import coil.request.ImageRequest
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.ui.AppTheme3
 import com.geekorum.ttrss.ui.components.OpenInBrowserIcon
+import com.materialkolor.ktx.harmonizeWithPrimary
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -278,12 +279,15 @@ private fun CardToolbar(
             )
         }
 
-        IconToggleButton(checked = isStarred, onCheckedChange = onStarChanged) {
+        IconToggleButton(checked = isStarred, onCheckedChange = onStarChanged,
+            colors = IconButtonDefaults.iconToggleButtonColors(
+                checkedContentColor = MaterialTheme.colorScheme.harmonizeWithPrimary(AppTheme3.Colors.MaterialGreenA700)
+            )
+        ) {
             val image = AnimatedImageVector.animatedVectorResource(id = R.drawable.avd_ic_star_filled)
             Icon(
                 painter = rememberAnimatedVectorPainter(image, atEnd = isStarred),
                 contentDescription = null,
-                tint = Color.Unspecified,
             )
         }
         IconButton(onClick = onShareClick) {
