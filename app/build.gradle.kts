@@ -168,6 +168,7 @@ dependencies {
     api(libs.accompanist.webview)
     api(libs.androidx.compose.ui.tooling)
     api(libs.coil.compose)
+    implementation(libs.materialKolor)
 
 
     // for layout inspector
