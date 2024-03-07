@@ -38,11 +38,7 @@
         <item name="windowNoTitle">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:windowTranslucentStatus">false</item>
-    </style>
+        <item name="android:windowTranslucentNavigation">true</item>
 
-    <!-- Theme overlays -->
-
-    <style name="ThemeOverlay.AppTheme.AddFeedActivity.AccountsPanel" parent="ThemeOverlay.AppTheme.DayNight">
-        <item name="android:colorBackground">@color/background_add_feed_accounts_spinner</item>
     </style>
 </resources>
