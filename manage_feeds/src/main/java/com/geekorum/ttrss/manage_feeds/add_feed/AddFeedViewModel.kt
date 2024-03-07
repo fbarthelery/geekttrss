@@ -23,6 +23,9 @@ package com.geekorum.ttrss.manage_feeds.add_feed
 import android.accounts.Account
 import android.accounts.AccountManager
 import androidx.annotation.VisibleForTesting
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.databinding.ObservableBoolean
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -63,20 +66,14 @@ class AddFeedViewModel @Inject constructor(
     val accounts = AccountsLiveData(accountManager, AccountAuthenticator.TTRSS_ACCOUNT_TYPE)
     private val _completeEvent = MutableLiveData<EmptyEvent>()
     val complete: LiveData<EmptyEvent> = _completeEvent
-    val canSubscribe = ObservableBoolean(false)
+    var canSubscribe by mutableStateOf(false)
+        private set
 
-    internal var selectedFeed: FeedResult? = null
-        set(value) {
-            field = value
-            canSubscribe.set(value != null  && selectedAccount != null)
-        }
+    var selectedFeed: FeedResult? by mutableStateOf(null)
+        private set
 
-    internal var selectedAccount: Account? = null
-        set(value) {
-            field = value
-            canSubscribe.set(value != null  && selectedFeed != null)
-        }
-
+    var selectedAccount: Account? by mutableStateOf(null)
+        private set
 
     private val accountObserver = Observer<Array<Account>> {
         val accounts = checkNotNull(it)
@@ -108,6 +105,9 @@ class AddFeedViewModel @Inject constructor(
             }
 
             _availableFeeds.value = feeds
+            if (feeds.isNotEmpty()) {
+                setSelectedFeed(feeds.first())
+            }
         } catch (exception: IOException) {
             _availableFeeds.value = emptyList()
         }
@@ -126,10 +126,12 @@ class AddFeedViewModel @Inject constructor(
 
     fun setSelectedFeed(feed: Any) {
         selectedFeed = feed as FeedResult
+        canSubscribe = (selectedFeed != null  && selectedAccount != null)
     }
 
     fun setSelectedAccount(account: Any) {
         selectedAccount = account as Account
+        canSubscribe = (selectedAccount != null  && selectedFeed != null)
     }
 
     private fun subscribeToFeed(
