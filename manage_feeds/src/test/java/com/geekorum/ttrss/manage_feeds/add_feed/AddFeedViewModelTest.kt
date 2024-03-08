@@ -84,35 +84,28 @@ class AddFeedViewModelTest {
             FeedResult(HTML, "https://apple.com", "type2", "title2"))
         coEvery { feedsFinder.findFeeds(any()) }.returns( feeds)
 
-        val result = async {
-            target.availableFeeds.asFlow()
-                    .first()
-        }
         target.initWithUrl("https://some.google.com/".toHttpUrl())
+        val result = target.availableFeeds.value
 
         val expected = feeds
-        assertThat(result.await()).isEqualTo(expected)
+        assertThat(result).isEqualTo(expected)
     }
 
 
     @Test
     fun testThatInitUrlWithExceptionReturnsEmptyFeeds() = runTest {
         coEvery { feedsFinder.findFeeds(any()) } throws IOException("No network")
-
-        val result = async {
-            target.availableFeeds.asFlow()
-                    .first()
-        }
         target.initWithUrl("https://some.google.com/".toHttpUrl())
 
-        assertThat(result.await()).isEmpty()
+        val result = target.availableFeeds.value
+        assertThat(result).isEmpty()
     }
 
     @Test
     fun testThatSubscribeFeedEnqueueAWorkRequest() {
         val account: Account = mockk()
-        target.selectedFeed = FeedResult(HTML,"https://google.com", "type", "title")
-        target.selectedAccount = account
+        target.setSelectedFeed(FeedResult(HTML,"https://google.com", "type", "title"))
+        target.setSelectedAccount(account)
 
         target.subscribeToFeed()
 
@@ -121,19 +114,19 @@ class AddFeedViewModelTest {
 
     @Test
     fun testThatCanSubscribeOnceSelectionIsDone() {
-        assertThat(target.canSubscribe.get()).isFalse()
+        assertThat(target.canSubscribe).isFalse()
 
-        target.selectedAccount = mockk()
-        target.selectedFeed = mockk()
+        target.setSelectedAccount(mockk<Account>())
+        target.setSelectedFeed(mockk<FeedResult>())
 
-        assertThat(target.canSubscribe.get()).isTrue()
+        assertThat(target.canSubscribe).isTrue()
     }
 
 
     @Test
     fun testThatSubscribeEmitCompleteEvent() = runTest {
-        target.selectedFeed = FeedResult(HTML,"https://google.com", "type", "title")
-        target.selectedAccount = mockk()
+        target.setSelectedFeed(FeedResult(HTML,"https://google.com", "type", "title"))
+        target.setSelectedAccount(mockk<Account>())
 
         val completeEvent = async {
             target.complete.asFlow()
