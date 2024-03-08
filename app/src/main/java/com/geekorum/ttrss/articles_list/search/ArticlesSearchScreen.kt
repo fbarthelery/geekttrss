@@ -21,7 +21,6 @@
 package com.geekorum.ttrss.articles_list.search
 
 import android.content.Context
-import android.content.Intent
 import android.graphics.drawable.Drawable
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
@@ -38,7 +37,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.core.app.ShareCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
@@ -50,6 +48,7 @@ import com.geekorum.ttrss.articles_list.ArticleCard
 import com.geekorum.ttrss.articles_list.debouncedPagingViewStateFor
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleWithFeed
+import com.geekorum.ttrss.share.createShareArticleIntent
 import kotlinx.coroutines.delay
 import timber.log.Timber
 
@@ -197,14 +196,5 @@ fun ArticlesSearchScreen(
 
 
 private fun onShareClicked(context: Context, article: Article) {
-    context.startActivity(createShareIntent(context, article))
-}
-
-private fun createShareIntent(context: Context, article: Article): Intent {
-    val shareIntent = ShareCompat.IntentBuilder(context)
-    shareIntent.setSubject(article.title)
-        .setHtmlText(article.content)
-        .setText(article.link)
-        .setType("text/plain")
-    return shareIntent.createChooserIntent()
+    context.startActivity(createShareArticleIntent(context, article))
 }

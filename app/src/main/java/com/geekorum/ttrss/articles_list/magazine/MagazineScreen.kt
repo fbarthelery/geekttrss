@@ -20,8 +20,6 @@
  */
 package com.geekorum.ttrss.articles_list.magazine
 
-import android.content.Context
-import android.content.Intent
 import android.graphics.drawable.Drawable
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
@@ -45,7 +43,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
-import androidx.core.app.ShareCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
@@ -57,17 +54,8 @@ import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.articles_list.*
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleWithFeed
+import com.geekorum.ttrss.share.createShareArticleIntent
 import kotlinx.coroutines.delay
-
-
-private fun createShareIntent(context: Context, article: Article): Intent {
-    val shareIntent = ShareCompat.IntentBuilder(context)
-    shareIntent.setSubject(article.title)
-        .setHtmlText(article.content)
-        .setText(article.link)
-        .setType("text/plain")
-    return shareIntent.createChooserIntent()
-}
 
 
 @Composable
@@ -97,7 +85,7 @@ fun MagazineScreen(
             browserApplicationIcon = browserApplicationIcon,
             onCardClick = activityViewModel::displayArticle,
             onShareClick = { article ->
-                context.startActivity(createShareIntent(context, article))
+                context.startActivity(createShareArticleIntent(context, article))
             },
             onOpenInBrowserClick = {
                 activityViewModel.displayArticleInBrowser(context, it)
