@@ -21,7 +21,6 @@
 package com.geekorum.ttrss.publish_article
 
 import android.os.Bundle
-import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,12 +31,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.geekorum.geekdroid.app.BottomSheetDialogActivity
+import com.geekorum.geekdroid.app.ModalBottomSheetActivity
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.session.SessionActivityComponent
 import com.geekorum.ttrss.ui.AppTheme3
@@ -51,7 +49,7 @@ import javax.inject.Inject
 private const val DISPLAY_TIMEOUT_MD: Long = 1500
 
 @AndroidEntryPoint
-class ShareToPublishArticleActivity : BottomSheetDialogActivity() {
+class ShareToPublishArticleActivity : ModalBottomSheetActivity() {
 
     lateinit var viewModel: SharingToPublishViewModel
 
@@ -64,7 +62,7 @@ class ShareToPublishArticleActivity : BottomSheetDialogActivity() {
             finish()
             return
         }
-        setContent {
+        setSheetContent {
             AppTheme3 {
                 SharingToPublishScreen(
                     articleId = articleId,

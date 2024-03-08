@@ -89,12 +89,7 @@
         <item name="android:windowLightStatusBar">true</item>
     </style>
 
-    <style name="AppTheme.ShareToPublishArticleActivity" parent="@style/Theme.MaterialComponents.DayNight.BottomSheetDialog">
-        <!-- needed for a BottomDialogActivity -->
-        <item name="windowNoTitle">true</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:windowTranslucentStatus">false</item>
-    </style>
+    <style name="AppTheme.ShareToPublishArticleActivity" parent="Theme.Geekdroid.ModalBottomSheetDialogActivity" />
 
 
     <!-- Theme overlays -->
