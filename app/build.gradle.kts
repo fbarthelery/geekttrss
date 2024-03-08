@@ -39,7 +39,7 @@ plugins {
 // try to remove it on next navigation-safe-args plugin release
 buildscript {
     dependencies {
-        classpath("com.android.tools.build:gradle:8.2.0")
+        classpath(libs.android.gradle.plugin)
     }
 }
 
@@ -185,7 +185,11 @@ dependencies {
 
     //geekdroid
     implementation(libs.geekdroid)
-    add("googleImplementation", libs.geekdroid.firebase)
+    "googleImplementation"(libs.geekdroid.firebase) {
+        // exclude firestore as it is not used in this project and put j2objc-annotation in compileOnly
+        // and it is not supported
+        exclude(group = "com.google.firebase", module = "firebase-firestore-ktx")
+    }
     implementation(libs.aboutoss.core)
 
     implementation(project(":htmlparsers"))
