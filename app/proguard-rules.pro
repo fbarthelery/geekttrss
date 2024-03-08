@@ -98,3 +98,4 @@
 -dontwarn com.google.auto.service.AutoService
 -dontwarn javax.lang.model.**
 -dontwarn javax.tools.Diagnostic$Kind
+-dontwarn com.google.j2objc.annotations.RetainedWith
