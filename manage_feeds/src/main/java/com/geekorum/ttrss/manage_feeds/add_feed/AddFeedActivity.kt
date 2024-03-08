@@ -38,6 +38,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.geekorum.geekdroid.app.ModalBottomSheetActivity
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.WithNightModePreferencesTheme
@@ -106,7 +107,7 @@ class AddFeedActivity : ModalBottomSheetActivity()
 @Composable
 private fun AddFeedContent(vm: AddFeedViewModel) {
     AppTheme3 {
-        val feeds by vm.availableFeeds.observeAsState()
+        val feeds by vm.availableFeeds.collectAsStateWithLifecycle()
         val accounts by vm.accounts.observeAsState(emptyArray())
         AddFeedContent(
             isLoading = feeds == null,

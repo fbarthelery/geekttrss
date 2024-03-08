@@ -43,6 +43,8 @@ import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.manage_feeds.add_feed.FeedsFinder.FeedResult
 import com.geekorum.ttrss.manage_feeds.workers.SubscribeWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
@@ -61,8 +63,8 @@ class AddFeedViewModel @Inject constructor(
     accountManager: AccountManager
 ) : ViewModel() {
 
-    private val _availableFeeds = MutableLiveData<Collection<FeedResult>>()
-    val availableFeeds: LiveData<Collection<FeedResult>> = _availableFeeds
+    private val _availableFeeds = MutableStateFlow<Collection<FeedResult>?>(null)
+    val availableFeeds = _availableFeeds.asStateFlow()
     val accounts = AccountsLiveData(accountManager, AccountAuthenticator.TTRSS_ACCOUNT_TYPE)
     private val _completeEvent = MutableLiveData<EmptyEvent>()
     val complete: LiveData<EmptyEvent> = _completeEvent
