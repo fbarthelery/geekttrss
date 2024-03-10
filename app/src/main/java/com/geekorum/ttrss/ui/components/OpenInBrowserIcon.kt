@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.geekorum.ttrss.ui.AppTheme3.Icons
@@ -46,7 +47,9 @@ fun OpenInBrowserIcon(browserApplicationIcon: Drawable?,
                 rememberDrawablePainter(browserApplicationIcon.monochrome!!)
             Icon(
                 monochromePainter, contentDescription = contentDescription,
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier.size(24.dp)
+                    .scale(2f)
+
             )
         }
 
