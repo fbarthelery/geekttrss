@@ -128,6 +128,7 @@ dependencies {
     dualTestImplementation(libs.androidx.arch.core.testing)
     androidTestImplementation(platform(libs.okhttp.bom))
     androidTestImplementation(libs.okhttp.mockwebserver)
+    androidTestImplementation(libs.androidx.test.uiautomator)
 
     debugImplementation(libs.androidx.fragment.testing.manifest)
     androidTestImplementation(libs.androidx.fragment.testing)
