@@ -87,6 +87,7 @@ fun ArticleCardList(
     viewModel: BaseArticlesViewModel,
     listState: LazyListState = rememberLazyListState(),
     browserApplicationIcon: Drawable?,
+    displayCompactItems: Boolean,
     onCardClick: (Int, Article) -> Unit,
     onShareClick: (Article) -> Unit,
     onOpenInBrowserClick: (Article) -> Unit,
@@ -139,6 +140,7 @@ fun ArticleCardList(
         isRefreshing = isRefreshing,
         pullRefreshState = pullRefreshState,
         browserApplicationIcon = browserApplicationIcon,
+        displayCompactItems = displayCompactItems,
         onCardClick = onCardClick,
         onShareClick = onShareClick,
         onOpenInBrowserClick = onOpenInBrowserClick,
@@ -165,6 +167,7 @@ private fun ArticleCardList(
     isRefreshing: Boolean,
     pullRefreshState: PullToRefreshState,
     browserApplicationIcon: Drawable?,
+    displayCompactItems: Boolean,
     onCardClick: (Int, Article) -> Unit,
     onShareClick: (Article) -> Unit,
     onOpenInBrowserClick: (Article) -> Unit,
@@ -182,11 +185,12 @@ private fun ArticleCardList(
         top = contentPadding.calculateTopPadding()
     )
 
+    val additionalPadding = if (displayCompactItems) 0.dp else 8.dp
     val lazyListContentPadding = PaddingValues(
-        start = contentPadding.calculateStartPadding(ltr) + 8.dp,
-        end = contentPadding.calculateEndPadding(ltr) + 8.dp,
-        bottom = contentPadding.calculateBottomPadding() + 8.dp,
-        top = 8.dp
+        start = contentPadding.calculateStartPadding(ltr) + additionalPadding,
+        end = contentPadding.calculateEndPadding(ltr) + additionalPadding,
+        bottom = contentPadding.calculateBottomPadding() + additionalPadding,
+        top = additionalPadding
     )
 
     Box(
@@ -205,6 +209,7 @@ private fun ArticleCardList(
                 isMultiFeedList,
                 browserApplicationIcon,
                 lazyListContentPadding,
+                displayCompactItems,
                 onCardClick,
                 onOpenInBrowserClick,
                 onShareClick,
@@ -229,6 +234,7 @@ private fun ArticlesList(
     isMultiFeedList: Boolean,
     browserApplicationIcon: Drawable?,
     contentPadding: PaddingValues = PaddingValues(0.dp),
+    displayCompactItems: Boolean = false,
     onCardClick: (Int, Article) -> Unit,
     onOpenInBrowserClick: (Article) -> Unit,
     onShareClick: (Article) -> Unit,
@@ -237,9 +243,10 @@ private fun ArticlesList(
     onSwiped: (Article) -> Unit
 ) {
     var animateItemAppearance by remember { mutableStateOf(true) }
+    val verticalArrangement = if (displayCompactItems) Arrangement.Top else Arrangement.spacedBy(16.dp)
     LazyColumn(
         state = listState,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = verticalArrangement,
         horizontalAlignment = Alignment.CenterHorizontally,
         contentPadding = contentPadding,
         modifier = Modifier.fillMaxSize()
@@ -270,17 +277,36 @@ private fun ArticlesList(
                 modifier = Modifier.animateItemPlacement()
             ) {
                 if (articleWithFeed != null) {
-                    SwipeableArticleCard(
-                        articleWithFeed = articleWithFeed,
-                        displayFeedName = isMultiFeedList,
-                        browserApplicationIcon = browserApplicationIcon,
-                        onCardClick = { onCardClick(index, articleWithFeed.article) },
-                        onOpenInBrowserClick = onOpenInBrowserClick,
-                        onShareClick = onShareClick,
-                        onStarChanged = onStarChanged,
-                        onToggleUnreadClick = onToggleUnreadClick,
-                        onSwiped = onSwiped
-                    )
+                    if (displayCompactItems) {
+                        Column {
+                            SwipeableArticleItem(
+                                articleWithFeed = articleWithFeed,
+                                displayFeedName = isMultiFeedList,
+                                browserApplicationIcon = browserApplicationIcon,
+                                displayCompactItem = displayCompactItems,
+                                onItemClick = { onCardClick(index, articleWithFeed.article) },
+                                onOpenInBrowserClick = onOpenInBrowserClick,
+                                onShareClick = onShareClick,
+                                onStarChanged = onStarChanged,
+                                onToggleUnreadClick = onToggleUnreadClick,
+                                onSwiped = onSwiped
+                            )
+                            HorizontalDivider()
+                        }
+                    } else {
+                        SwipeableArticleItem(
+                            articleWithFeed = articleWithFeed,
+                            displayFeedName = isMultiFeedList,
+                            browserApplicationIcon = browserApplicationIcon,
+                            displayCompactItem = displayCompactItems,
+                            onItemClick = { onCardClick(index, articleWithFeed.article) },
+                            onOpenInBrowserClick = onOpenInBrowserClick,
+                            onShareClick = onShareClick,
+                            onStarChanged = onStarChanged,
+                            onToggleUnreadClick = onToggleUnreadClick,
+                            onSwiped = onSwiped
+                        )
+                    }
                 }
             }
         }
@@ -292,9 +318,10 @@ fun FeedEmptyText(isRefreshing: Boolean) {
     val emptyText = if (isRefreshing) {
         stringResource(R.string.fragment_articles_list_no_articles_and_sync_lbl)
     } else stringResource(R.string.fragment_articles_list_no_articles_lbl)
-    Box(Modifier
-        .fillMaxSize()
-        .verticalScroll(rememberScrollState()),
+    Box(
+        Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState()),
         contentAlignment = Alignment.TopCenter
     ) {
         Text(emptyText,
@@ -310,11 +337,12 @@ fun FeedEmptyText(isRefreshing: Boolean) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SwipeableArticleCard(
+private fun SwipeableArticleItem(
     articleWithFeed: ArticleWithFeed,
     displayFeedName: Boolean,
     browserApplicationIcon: Drawable?,
-    onCardClick: () -> Unit,
+    displayCompactItem: Boolean,
+    onItemClick: () -> Unit,
     onOpenInBrowserClick: (Article) -> Unit,
     onShareClick: (Article) -> Unit,
     onToggleUnreadClick: (Article) -> Unit,
@@ -330,28 +358,52 @@ private fun SwipeableArticleCard(
         stringResource(R.string.author_formatted, article.author)
     }
 
-    SwipeableArticleCard(
-        title = article.title,
-        flavorImageUrl = article.flavorImageUri,
-        excerpt = article.contentExcerpt,
-        feedNameOrAuthor = feedNameOrAuthor,
-        browserApplicationIcon = browserApplicationIcon,
-        feedIconUrl = favIcon?.url,
-        isUnread = article.isUnread,
-        isStarred = article.isStarred,
-        onCardClick = onCardClick,
-        onOpenInBrowserClick = { onOpenInBrowserClick(article) },
-        onStarChanged = { onStarChanged(article, it) },
-        onShareClick = { onShareClick(article) },
-        onToggleUnreadClick = { onToggleUnreadClick(article) },
-        behindCardContent = { direction ->
-            if (direction != null) {
-                ChangeReadBehindItem(direction)
-            }
-        },
-        onSwiped = { onSwiped(article) },
-        modifier = modifier
-    )
+    if (displayCompactItem) {
+        SwipeableCompactArticleListItem(
+            title = article.title,
+            flavorImageUrl = article.flavorImageUri,
+            feedNameOrAuthor = feedNameOrAuthor,
+            browserApplicationIcon = browserApplicationIcon,
+            feedIconUrl = favIcon?.url,
+            isUnread = article.isUnread,
+            isStarred = article.isStarred,
+            onItemClick = onItemClick,
+            onOpenInBrowserClick = { onOpenInBrowserClick(article) },
+            onStarChanged = { onStarChanged(article, it) },
+            onShareClick = { onShareClick(article) },
+            onToggleUnreadClick = { onToggleUnreadClick(article) },
+            behindCardContent = { direction ->
+                if (direction != null) {
+                    ChangeReadBehindItem(direction)
+                }
+            },
+            onSwiped = { onSwiped(article) },
+            modifier = modifier
+        )
+    } else {
+        SwipeableArticleCard(
+            title = article.title,
+            flavorImageUrl = article.flavorImageUri,
+            excerpt = article.contentExcerpt,
+            feedNameOrAuthor = feedNameOrAuthor,
+            browserApplicationIcon = browserApplicationIcon,
+            feedIconUrl = favIcon?.url,
+            isUnread = article.isUnread,
+            isStarred = article.isStarred,
+            onCardClick = onItemClick,
+            onOpenInBrowserClick = { onOpenInBrowserClick(article) },
+            onStarChanged = { onStarChanged(article, it) },
+            onShareClick = { onShareClick(article) },
+            onToggleUnreadClick = { onToggleUnreadClick(article) },
+            behindCardContent = { direction ->
+                if (direction != null) {
+                    ChangeReadBehindItem(direction)
+                }
+            },
+            onSwiped = { onSwiped(article) },
+            modifier = modifier
+        )
+    }
 }
 
 
@@ -408,6 +460,7 @@ private fun ArticleCardList() {
         isMultiFeedList = false,
         isRefreshing = false,
         browserApplicationIcon = null,
+        displayCompactItems = false,
         pullRefreshState = rememberPullToRefreshState(),
         onCardClick = { _, _ -> },
         onShareClick = {},

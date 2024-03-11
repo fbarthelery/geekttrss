@@ -177,7 +177,7 @@ class ArticleListActivity : SessionActivity() {
                     },
                     drawerGesturesEnabled = drawerLayoutPresenter.drawerGesturesEnabled
                 ) { contentPadding ->
-                    ArticlesListNavHost(activityViewModel, navController, contentPadding)
+                    ArticlesListNavHost(windowSizeClass, activityViewModel, navController, contentPadding)
                 }
             }
         }

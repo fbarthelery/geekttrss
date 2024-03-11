@@ -25,6 +25,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -77,13 +78,15 @@ class ArticlesListScreenArgs(
 
 @Composable
 fun ArticlesListNavHost(
+    windowSizeClass: WindowSizeClass,
     activityViewModel: ActivityViewModel = hiltViewModel(),
     navController: NavHostController = rememberNavController(),
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     NavHost(navController = navController, startDestination = "magazine") {
         composable(NavRoutes.Magazine) {
-            MagazineScreen(activityViewModel = activityViewModel, contentPadding = contentPadding)
+            MagazineScreen(activityViewModel = activityViewModel, windowSizeClass = windowSizeClass,
+                contentPadding = contentPadding)
         }
         composable(NavRoutes.ArticlesList, arguments = listOf(
             navArgument("feed_id") {
@@ -94,15 +97,18 @@ fun ArticlesListNavHost(
                 defaultValue = "All Articles"
             }
         )) {
-            ArticlesListScreen(activityViewModel = activityViewModel, contentPadding = contentPadding)
+            ArticlesListScreen(activityViewModel = activityViewModel, windowSizeClass = windowSizeClass,
+                contentPadding = contentPadding)
         }
 
         composable(NavRoutes.ArticlesListByTag) {
-            ArticlesListByTagScreen(activityViewModel = activityViewModel, contentPadding = contentPadding)
+            ArticlesListByTagScreen(activityViewModel = activityViewModel,
+                windowSizeClass = windowSizeClass, contentPadding = contentPadding)
         }
 
         composable(NavRoutes.Search) {
-            ArticlesSearchScreen(activityViewModel = activityViewModel, contentPadding = contentPadding)
+            ArticlesSearchScreen(activityViewModel = activityViewModel, windowSizeClass = windowSizeClass,
+                contentPadding = contentPadding)
         }
     }
 }

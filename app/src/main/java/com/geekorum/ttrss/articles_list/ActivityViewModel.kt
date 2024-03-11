@@ -73,6 +73,9 @@ class ActivityViewModel @Inject constructor(
         }
     }
 
+    val displayCompactItems = articlesListPreferencesRepository.getDisplayCompactArticles()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+
     private val _undoReadSnackBarMessage = MutableStateFlow<UndoReadSnackbarMessage?>(null)
     val undoReadSnackBarMessage = _undoReadSnackBarMessage.asStateFlow()
 

@@ -31,9 +31,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
+import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -60,6 +64,7 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun MagazineScreen(
+    windowSizeClass: WindowSizeClass,
     activityViewModel: ActivityViewModel,
     magazineViewModel: MagazineViewModel = hiltViewModel(),
     contentPadding: PaddingValues = PaddingValues(0.dp)
@@ -79,10 +84,17 @@ fun MagazineScreen(
         LaunchedEffect(activityViewModel, isScrollingUp) {
             activityViewModel.setIsScrollingUp(isScrollingUp)
         }
+
+        val compactItemsInSmallScreens by activityViewModel.displayCompactItems.collectAsStateWithLifecycle()
+        val displayCompactItems = compactItemsInSmallScreens
+                && (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact ||
+                        windowSizeClass.heightSizeClass == WindowHeightSizeClass.Compact)
+
         ArticlesMagazine(
             viewModel = magazineViewModel,
             listState = lazyListState,
             browserApplicationIcon = browserApplicationIcon,
+            displayCompactItems = displayCompactItems,
             onCardClick = activityViewModel::displayArticle,
             onShareClick = { article ->
                 context.startActivity(createShareArticleIntent(context, article))
@@ -103,6 +115,7 @@ fun MagazineScreen(
 private fun ArticlesMagazine(
     viewModel: MagazineViewModel,
     browserApplicationIcon: Drawable?,
+    displayCompactItems: Boolean,
     onCardClick: (Int, Article) -> Unit,
     onShareClick: (Article) -> Unit,
     onOpenInBrowserClick: (Article) -> Unit,
@@ -120,11 +133,12 @@ private fun ArticlesMagazine(
         top = contentPadding.calculateTopPadding()
     )
 
+    val additionalPadding = if (displayCompactItems) 0.dp else 8.dp
     val lazyListContentPadding = PaddingValues(
-        start = contentPadding.calculateStartPadding(ltr) + 8.dp,
-        end = contentPadding.calculateEndPadding(ltr) + 8.dp,
-        bottom = contentPadding.calculateBottomPadding() + 8.dp,
-        top = 8.dp
+        start = contentPadding.calculateStartPadding(ltr) + additionalPadding,
+        end = contentPadding.calculateEndPadding(ltr) + additionalPadding,
+        bottom = contentPadding.calculateBottomPadding() + additionalPadding,
+        top = additionalPadding
     )
 
     // trigger refresh and sync pull refresh state
@@ -181,10 +195,11 @@ private fun ArticlesMagazine(
                 pagingItems,
                 listState,
                 browserApplicationIcon,
+                displayCompactItems,
                 lazyListContentPadding,
                 onCardClick,
                 onOpenInBrowserClick,
-                onShareClick
+                onShareClick,
             )
         }
 
@@ -204,15 +219,17 @@ private fun ArticlesList(
     pagingItems: LazyPagingItems<ArticleWithFeed>,
     listState: LazyListState,
     browserApplicationIcon: Drawable?,
+    displayCompactItems: Boolean = false,
     contentPadding: PaddingValues = PaddingValues(0.dp),
     onCardClick: (Int, Article) -> Unit,
     onOpenInBrowserClick: (Article) -> Unit,
-    onShareClick: (Article) -> Unit
+    onShareClick: (Article) -> Unit,
 ) {
     var animateItemAppearance by remember { mutableStateOf(true) }
+    val verticalArrangement = if (displayCompactItems) Arrangement.Top else Arrangement.spacedBy(16.dp)
     LazyColumn(
         state = listState,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = verticalArrangement,
         horizontalAlignment = Alignment.CenterHorizontally,
         contentPadding = contentPadding,
         modifier = Modifier.fillMaxSize()
@@ -243,14 +260,30 @@ private fun ArticlesList(
                 modifier = Modifier.animateItemPlacement()
             ) {
                 if (articleWithFeed != null) {
-                    ArticleCard(
-                        articleWithFeed = articleWithFeed,
-                        viewModel = viewModel,
-                        browserApplicationIcon = browserApplicationIcon,
-                        onCardClick = { onCardClick(index, articleWithFeed.article) },
-                        onOpenInBrowserClick = onOpenInBrowserClick,
-                        onShareClick = onShareClick
-                    )
+                    if (displayCompactItems) {
+                        Column {
+                            ArticleItem(
+                                articleWithFeed = articleWithFeed,
+                                viewModel = viewModel,
+                                browserApplicationIcon = browserApplicationIcon,
+                                onCardClick = { onCardClick(index, articleWithFeed.article) },
+                                onOpenInBrowserClick = onOpenInBrowserClick,
+                                onShareClick = onShareClick,
+                                displayCompactItem = displayCompactItems
+                            )
+                            HorizontalDivider()
+                        }
+                    } else {
+                        ArticleItem(
+                            articleWithFeed = articleWithFeed,
+                            viewModel = viewModel,
+                            browserApplicationIcon = browserApplicationIcon,
+                            onCardClick = { onCardClick(index, articleWithFeed.article) },
+                            onOpenInBrowserClick = onOpenInBrowserClick,
+                            onShareClick = onShareClick,
+                            displayCompactItem = displayCompactItems
+                        )
+                    }
                 }
             }
         }
@@ -258,33 +291,53 @@ private fun ArticlesList(
 }
 
 @Composable
-private fun ArticleCard(
+private fun ArticleItem(
     articleWithFeed: ArticleWithFeed,
     viewModel: MagazineViewModel,
     browserApplicationIcon: Drawable?,
     onCardClick: () -> Unit,
     onOpenInBrowserClick: (Article) -> Unit,
-    onShareClick: (Article) -> Unit
+    onShareClick: (Article) -> Unit,
+    displayCompactItem: Boolean,
 ) {
     val (article, feedWithFavIcon) = articleWithFeed
     val (feed, favIcon) = feedWithFavIcon
     val feedNameOrAuthor = feed.displayTitle.takeIf { it.isNotBlank() } ?: feed.title
 
-    ArticleCard(
-        title = article.title,
-        flavorImageUrl = article.flavorImageUri,
-        excerpt = article.contentExcerpt,
-        feedNameOrAuthor = feedNameOrAuthor,
-        feedIconUrl = favIcon?.url,
-        browserApplicationIcon = browserApplicationIcon,
-        isUnread = article.isUnread,
-        isStarred = article.isStarred,
-        onCardClick = onCardClick,
-        onOpenInBrowserClick = { onOpenInBrowserClick(article) },
-        onStarChanged = { viewModel.setArticleStarred(article.id, it) },
-        onShareClick = { onShareClick(article) },
-        onToggleUnreadClick = {
-            viewModel.setArticleUnread(article.id, !article.isTransientUnread)
-        }
-    )
+    if (displayCompactItem) {
+        CompactArticleListItem(
+            title = article.title,
+            flavorImageUrl = article.flavorImageUri,
+            feedNameOrAuthor = feedNameOrAuthor,
+            feedIconUrl = favIcon?.url,
+            browserApplicationIcon = browserApplicationIcon,
+            isUnread = article.isUnread,
+            isStarred = article.isStarred,
+            onItemClick = onCardClick,
+            onOpenInBrowserClick = { onOpenInBrowserClick(article) },
+            onStarChanged = { viewModel.setArticleStarred(article.id, it) },
+            onShareClick = { onShareClick(article) },
+            onToggleUnreadClick = {
+                viewModel.setArticleUnread(article.id, !article.isTransientUnread)
+            }
+        )
+    } else {
+        ArticleCard(
+            title = article.title,
+            flavorImageUrl = article.flavorImageUri,
+            excerpt = article.contentExcerpt,
+            feedNameOrAuthor = feedNameOrAuthor,
+            feedIconUrl = favIcon?.url,
+            browserApplicationIcon = browserApplicationIcon,
+            isUnread = article.isUnread,
+            isStarred = article.isStarred,
+            onCardClick = onCardClick,
+            onOpenInBrowserClick = { onOpenInBrowserClick(article) },
+            onStarChanged = { viewModel.setArticleStarred(article.id, it) },
+            onShareClick = { onShareClick(article) },
+            onToggleUnreadClick = {
+                viewModel.setArticleUnread(article.id, !article.isTransientUnread)
+            }
+        )
+    }
 }
