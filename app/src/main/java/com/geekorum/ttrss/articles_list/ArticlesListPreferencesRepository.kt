@@ -29,6 +29,7 @@ import javax.inject.Inject
 
 private const val PREF_VIEW_MODE = "view_mode"
 private const val PREF_SORT_ORDER = "sort_order"
+private const val PREF_ARTICLES_COMPACT_LIST_ITEMS = "articles_compact_list_item"
 
 //TODO migrate to datastore
 class ArticlesListPreferencesRepository @Inject constructor(
@@ -64,6 +65,20 @@ class ArticlesListPreferencesRepository @Inject constructor(
             awaitClose {
                 prefs.unregisterOnSharedPreferenceChangeListener(listener)
             }
+        }
+    }
+
+    fun getDisplayCompactArticles() = callbackFlow {
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            if (key == PREF_ARTICLES_COMPACT_LIST_ITEMS) {
+                trySendBlocking(prefs.getBoolean(PREF_ARTICLES_COMPACT_LIST_ITEMS, false))
+            }
+        }
+        prefs.registerOnSharedPreferenceChangeListener(listener)
+        val initial = prefs.getBoolean(PREF_ARTICLES_COMPACT_LIST_ITEMS, false)
+        send(initial)
+        awaitClose {
+            prefs.unregisterOnSharedPreferenceChangeListener(listener)
         }
     }
 
