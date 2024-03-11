@@ -57,6 +57,7 @@ import com.geekorum.ttrss.R
 import com.geekorum.ttrss.ui.AppTheme3
 import com.geekorum.ttrss.ui.components.MultiLineHeadlineListItem
 import com.geekorum.ttrss.ui.components.OpenInBrowserIcon
+import com.geekorum.ttrss.ui.components.forwardingPainter
 import com.materialkolor.ktx.harmonizeWithPrimary
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -158,7 +159,11 @@ fun CompactArticleListItem(
             val imageReq = ImageRequest.Builder(LocalContext.current)
                 .data(finalImageUrl)
                 .build()
-            val fallback = rememberVectorPainter(image = Icons.Outlined.Panorama)
+            val contentColor = LocalContentColor.current
+            val fallback = forwardingPainter(
+                painter = rememberVectorPainter(image = Icons.Outlined.Panorama),
+                colorFilter = if (contentColor == Color.Unspecified) null else ColorFilter.tint(contentColor)
+            )
             AsyncImage(
                 model = imageReq,
                 contentDescription = null,
