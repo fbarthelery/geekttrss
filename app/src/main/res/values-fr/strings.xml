@@ -49,6 +49,8 @@
     <string name="lbl_read_more">Pour aller plus loin</string>
     <string name="activity_settings_title">Paramètres</string>
     <string name="pref_title_theme">Theme</string>
+    <string name="pref_title_articles_compact_list_items">Liste compacte</string>
+    <string name="pref_summary_articles_compact_list_items">Affiche la liste des articles sous forme compacte sur les petits écrans</string>
     <string name="pref_title_in_app_browser_engine">Moteur web intégré</string>
     <string name="theme_system_default">Utiliser les paramètres du système</string>
     <string name="theme_light">Clair</string>
