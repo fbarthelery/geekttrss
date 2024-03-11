@@ -25,6 +25,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Surface
+import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -43,26 +46,41 @@ import kotlinx.coroutines.flow.onEach
 
 @Composable
 fun ArticlesListScreen(
+    windowSizeClass: WindowSizeClass,
     activityViewModel: ActivityViewModel,
     articlesListViewModel: ArticlesListViewModel = hiltViewModel(),
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
-    BaseArticlesListScreen(activityViewModel = activityViewModel, articlesListViewModel, contentPadding)
+    val compactItemsInSmallScreens by activityViewModel.displayCompactItems.collectAsStateWithLifecycle()
+    val displayCompactItems = compactItemsInSmallScreens
+            && (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact ||
+            windowSizeClass.heightSizeClass == WindowHeightSizeClass.Compact)
+
+    BaseArticlesListScreen(activityViewModel = activityViewModel, articlesListViewModel,
+        displayCompactItems, contentPadding)
 }
 
 @Composable
 fun ArticlesListByTagScreen(
+    windowSizeClass: WindowSizeClass,
     activityViewModel: ActivityViewModel,
     articlesListByTagViewModel: ArticlesListByTagViewModel = hiltViewModel(),
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
-    BaseArticlesListScreen(activityViewModel = activityViewModel, articlesListByTagViewModel, contentPadding)
+    val compactItemsInSmallScreens by activityViewModel.displayCompactItems.collectAsStateWithLifecycle()
+    val displayCompactItems = compactItemsInSmallScreens
+            && (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact ||
+            windowSizeClass.heightSizeClass == WindowHeightSizeClass.Compact)
+
+    BaseArticlesListScreen(activityViewModel = activityViewModel, articlesListByTagViewModel,
+        displayCompactItems, contentPadding)
 }
 
 @Composable
 private fun BaseArticlesListScreen(
     activityViewModel: ActivityViewModel,
     articlesListViewModel: BaseArticlesViewModel,
+    displayContactItems: Boolean,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     val viewLifecycleOwner = LocalLifecycleOwner.current
@@ -104,6 +122,7 @@ private fun BaseArticlesListScreen(
             viewModel = articlesListViewModel,
             listState = lazyListState,
             browserApplicationIcon = browserIcon,
+            displayCompactItems = displayContactItems,
             onCardClick = activityViewModel::displayArticle,
             onShareClick = {
                 onShareClicked(context, it)

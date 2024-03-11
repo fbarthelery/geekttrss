@@ -30,7 +30,11 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Surface
+import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,9 +47,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
-import com.geekorum.ttrss.articles_list.ActivityViewModel
-import com.geekorum.ttrss.articles_list.ArticleCard
-import com.geekorum.ttrss.articles_list.debouncedPagingViewStateFor
+import com.geekorum.ttrss.articles_list.*
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleWithFeed
 import com.geekorum.ttrss.share.createShareArticleIntent
@@ -57,6 +59,7 @@ import timber.log.Timber
 fun SearchResultCardList(
     viewModel: SearchViewModel,
     browserApplicationIcon: Drawable?,
+    displayCompactItems: Boolean,
     onCardClick: (Int, Article) -> Unit,
     onShareClick: (Article) -> Unit,
     onOpenInBrowserClick: (Article) -> Unit,
@@ -76,16 +79,18 @@ fun SearchResultCardList(
     }
 
     val ltr = LocalLayoutDirection.current
+    val additionalPadding = if (displayCompactItems) 0.dp else 8.dp
     val lazyListContentPadding = PaddingValues(
-        start = contentPadding.calculateStartPadding(ltr) + 8.dp,
-        end = contentPadding.calculateEndPadding(ltr) + 8.dp,
-        bottom = contentPadding.calculateBottomPadding() + 8.dp,
-        top = contentPadding.calculateTopPadding() + 8.dp
+        start = contentPadding.calculateStartPadding(ltr) + additionalPadding,
+        end = contentPadding.calculateEndPadding(ltr) + additionalPadding,
+        bottom = contentPadding.calculateBottomPadding() + additionalPadding,
+        top = additionalPadding
     )
 
+    val verticalArrangement = if (displayCompactItems) Arrangement.Top else Arrangement.spacedBy(16.dp)
     LazyColumn(
         state = listState,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = verticalArrangement,
         horizontalAlignment = Alignment.CenterHorizontally,
         contentPadding = lazyListContentPadding,
         modifier = modifier.fillMaxSize()
@@ -116,13 +121,30 @@ fun SearchResultCardList(
                 modifier = Modifier.animateItemPlacement(),
             ) {
                 if (articleWithFeed != null) {
-                    ArticleCard(
-                        articleWithFeed = articleWithFeed,
-                        viewModel = viewModel,
-                        browserApplicationIcon = browserApplicationIcon,
-                        onCardClick = { onCardClick(index, articleWithFeed.article) },
-                        onOpenInBrowserClick = onOpenInBrowserClick,
-                        onShareClick = onShareClick)
+                    if (displayCompactItems) {
+                        Column {
+                            ArticleItem(
+                                articleWithFeed = articleWithFeed,
+                                viewModel = viewModel,
+                                browserApplicationIcon = browserApplicationIcon,
+                                displayCompactItem = displayCompactItems,
+                                onItemClick = { onCardClick(index, articleWithFeed.article) },
+                                onOpenInBrowserClick = onOpenInBrowserClick,
+                                onShareClick = onShareClick
+                            )
+                            HorizontalDivider()
+                        }
+                    } else {
+                        ArticleItem(
+                            articleWithFeed = articleWithFeed,
+                            viewModel = viewModel,
+                            browserApplicationIcon = browserApplicationIcon,
+                            displayCompactItem = displayCompactItems,
+                            onItemClick = { onCardClick(index, articleWithFeed.article) },
+                            onOpenInBrowserClick = onOpenInBrowserClick,
+                            onShareClick = onShareClick
+                        )
+                    }
                 }
             }
         }
@@ -130,11 +152,12 @@ fun SearchResultCardList(
 }
 
 @Composable
-private fun ArticleCard(
+private fun ArticleItem(
     articleWithFeed: ArticleWithFeed,
     viewModel: SearchViewModel,
     browserApplicationIcon: Drawable?,
-    onCardClick: () -> Unit,
+    displayCompactItem: Boolean,
+    onItemClick: () -> Unit,
     onOpenInBrowserClick: (Article) -> Unit,
     onShareClick: (Article) -> Unit
 ) {
@@ -142,28 +165,49 @@ private fun ArticleCard(
     val (feed, favIcon) = feedWithFavIcon
     val feedNameOrAuthor = feed.displayTitle.takeIf { it.isNotBlank() } ?: feed.title
 
-    ArticleCard(
-        title = article.title,
-        flavorImageUrl = article.flavorImageUri,
-        excerpt = article.contentExcerpt,
-        feedNameOrAuthor = feedNameOrAuthor,
-        feedIconUrl = favIcon?.url,
-        browserApplicationIcon = browserApplicationIcon,
-        isUnread = article.isUnread,
-        isStarred = article.isStarred,
-        onCardClick = onCardClick,
-        onOpenInBrowserClick = { onOpenInBrowserClick(article) },
-        onStarChanged = { viewModel.setArticleStarred(article.id, it) },
-        onShareClick = { onShareClick(article) },
-        onToggleUnreadClick = {
-            viewModel.setArticleUnread(article.id, !article.isTransientUnread)
-        }
-    )
+    if (displayCompactItem) {
+        CompactArticleListItem(
+            title = article.title,
+            flavorImageUrl = article.flavorImageUri,
+            feedNameOrAuthor = feedNameOrAuthor,
+            feedIconUrl = favIcon?.url,
+            browserApplicationIcon = browserApplicationIcon,
+            isUnread = article.isUnread,
+            isStarred = article.isStarred,
+            onItemClick = onItemClick,
+            onOpenInBrowserClick = { onOpenInBrowserClick(article) },
+            onStarChanged = { viewModel.setArticleStarred(article.id, it) },
+            onShareClick = { onShareClick(article) },
+            onToggleUnreadClick = {
+                viewModel.setArticleUnread(article.id, !article.isTransientUnread)
+            }
+        )
+
+    } else {
+        ArticleCard(
+            title = article.title,
+            flavorImageUrl = article.flavorImageUri,
+            excerpt = article.contentExcerpt,
+            feedNameOrAuthor = feedNameOrAuthor,
+            feedIconUrl = favIcon?.url,
+            browserApplicationIcon = browserApplicationIcon,
+            isUnread = article.isUnread,
+            isStarred = article.isStarred,
+            onCardClick = onItemClick,
+            onOpenInBrowserClick = { onOpenInBrowserClick(article) },
+            onStarChanged = { viewModel.setArticleStarred(article.id, it) },
+            onShareClick = { onShareClick(article) },
+            onToggleUnreadClick = {
+                viewModel.setArticleUnread(article.id, !article.isTransientUnread)
+            }
+        )
+    }
 }
 
 
 @Composable
 fun ArticlesSearchScreen(
+    windowSizeClass: WindowSizeClass,
     activityViewModel: ActivityViewModel,
     searchViewModel: SearchViewModel = hiltViewModel(),
     contentPadding: PaddingValues = PaddingValues(0.dp)
@@ -174,6 +218,11 @@ fun ArticlesSearchScreen(
         }
     }
 
+    val compactItemsInSmallScreens by activityViewModel.displayCompactItems.collectAsStateWithLifecycle()
+    val displayCompactItems = compactItemsInSmallScreens
+            && (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact ||
+            windowSizeClass.heightSizeClass == WindowHeightSizeClass.Compact)
+
     val browserApplicationIcon by activityViewModel.browserIcon.collectAsStateWithLifecycle()
     Surface(Modifier.fillMaxSize()) {
         val context = LocalContext.current
@@ -181,6 +230,7 @@ fun ArticlesSearchScreen(
             viewModel = searchViewModel,
             onCardClick = activityViewModel::displayArticle,
             browserApplicationIcon = browserApplicationIcon,
+            displayCompactItems = displayCompactItems,
             onShareClick = {
                 onShareClicked(context, it)
             },
