@@ -70,6 +70,7 @@ geekdroid = "master-SNAPSHOT"
 aboutoss = "0.1.0"
 kotlin = "1.9.22"
 kotlin-ksp = "1.9.22-1.0.16"
+uiautomator = "2.3.0"
 
 [plugins]
 # these cannot be used for now because it will use multiple classpath and will make play-publisher-plugin fail
@@ -163,6 +164,7 @@ androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "
 
 androidx-startup = { module = "androidx.startup:startup-runtime", version.ref = "androidx-startup" }
 
+androidx-test-uiautomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "uiautomator" }
 androidx-work-runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "androidx-work"}
 androidx-work-testing = { module = "androidx.work:work-testing", version.ref = "androidx-work"}
 
