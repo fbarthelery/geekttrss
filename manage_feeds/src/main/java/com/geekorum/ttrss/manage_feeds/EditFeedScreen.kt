@@ -22,19 +22,28 @@ package com.geekorum.ttrss.manage_feeds
 
 import android.accounts.Account
 import android.app.Application
+import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.automirrored.filled.AddToHomeScreen
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.pm.ShortcutInfoCompat
+import androidx.core.content.pm.ShortcutManagerCompat
+import androidx.core.graphics.drawable.IconCompat
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -44,6 +53,10 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import coil.compose.rememberAsyncImagePainter
+import coil.imageLoader
+import coil.request.ImageRequest
+import com.geekorum.ttrss.articles_list.ArticleListActivity
+import com.geekorum.ttrss.articles_list.createFeedDeepLink
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.data.ManageFeedsDao
 import com.geekorum.ttrss.manage_feeds.workers.UnsubscribeWorker
@@ -52,6 +65,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 import com.geekorum.ttrss.R as appR
 
@@ -68,6 +82,8 @@ class EditFeedViewModel @Inject constructor(
     private val feedsDao: ManageFeedsDao
 ): ViewModel() {
 
+    private val canCreatePinShortcut = ShortcutManagerCompat.isRequestPinShortcutSupported(application)
+
     @OptIn(ExperimentalCoroutinesApi::class)
     private val feed = savedStateHandle.getStateFlow<Long?>(ARG_FEED_ID, null)
         .filterNotNull()
@@ -76,7 +92,8 @@ class EditFeedViewModel @Inject constructor(
     }
 
     val uiState = feed.map {
-        EditFeedUiState(feed = it?.feed, faviconUrl = it?.favIcon?.url )
+        EditFeedUiState(feed = it?.feed, faviconUrl = it?.favIcon?.url,
+            canCreatePinShortcut = canCreatePinShortcut)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), EditFeedUiState())
 
     fun unsubscribeFeed() {
@@ -99,12 +116,57 @@ class EditFeedViewModel @Inject constructor(
             .build()
         workManager.enqueue(request)
     }
+
+    fun createShortcut(context: Context) = viewModelScope.launch {
+        val feed = checkNotNull(uiState.value.feed)
+        val feedIconUrl = uiState.value.faviconUrl
+
+        val shortcutTitle = feed.displayTitle.takeIf { it.isNotBlank() } ?: feed.title
+        val intent = Intent(context, ArticleListActivity::class.java).apply {
+            data = createFeedDeepLink(feed)
+            action = Intent.ACTION_VIEW
+        }
+
+        val feedIconBitmap = try {
+            getFeedIconBitmap(context, feedIconUrl)
+        } catch (e: Exception) {
+            Timber.w(e, "Unable to get favicon bitmap")
+            null
+        }
+
+        val shortcutIcon = feedIconBitmap?.let { IconCompat.createWithBitmap(it) }
+            ?: IconCompat.createWithResource(context, appR.mipmap.ic_launcher)
+
+        val shortcutInfo = ShortcutInfoCompat.Builder(context, getShortcutId(feed.id))
+            .setShortLabel(shortcutTitle)
+            .setLongLabel(feed.displayTitle.takeIf { it.isNotBlank() } ?: feed.title)
+            .setIcon(shortcutIcon)
+            .setIntent(intent)
+            .build()
+        ShortcutManagerCompat.requestPinShortcut(context, shortcutInfo, null)
+    }
+
+    private suspend fun getFeedIconBitmap(
+        context: Context,
+        feedIconUrl: String?
+    ): Bitmap? {
+        val imageLoader = context.imageLoader
+        val request = ImageRequest.Builder(context)
+            .data(feedIconUrl)
+            .build()
+        val drawable = imageLoader.execute(request).drawable
+        val bitmap = (drawable as? BitmapDrawable)?.bitmap
+        return bitmap
+    }
+
+    private fun getShortcutId(feedId: Long) = "FEED_$feedId"
 }
 
 
 data class EditFeedUiState(
     val feed: Feed? = null,
-    val faviconUrl: String? = null
+    val faviconUrl: String? = null,
+    val canCreatePinShortcut: Boolean = false,
 ) {
     val title: String = feed?.title ?: ""
     val url: String = feed?.url ?: ""
@@ -120,13 +182,20 @@ fun EditFeedScreen(viewModel: EditFeedViewModel = dfmHiltViewModel(), navigateBa
             navigateBack()
         }
     }
-    EditFeedScreen(uiState = uiState, onUnsubscribeFeed = viewModel::unsubscribeFeed)
+    val context = LocalContext.current
+    EditFeedScreen(uiState = uiState,
+        onUnsubscribeFeed = viewModel::unsubscribeFeed,
+        onCreateShortcutToFeed = {
+            viewModel.createShortcut(context)
+        })
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditFeedScreen(
-    uiState: EditFeedUiState, onUnsubscribeFeed: () -> Unit
+    uiState: EditFeedUiState,
+    onUnsubscribeFeed: () -> Unit,
+    onCreateShortcutToFeed: () -> Unit
 ) {
     Scaffold(topBar = {
         LargeTopAppBar(
@@ -164,11 +233,20 @@ fun EditFeedScreen(
                 .padding(16.dp)
                 .fillMaxWidth()
         ) {
-            Text(stringResource(R.string.lbl_feed_url), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.lbl_feed_url),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold)
             Text(uiState.url)
 
+            if (uiState.canCreatePinShortcut) {
+                CreateShortcutButton(onClick = onCreateShortcutToFeed,
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .padding(top = 16.dp))
+            }
+
             TextButton(modifier = Modifier
-                .padding(top = 32.dp)
+                .padding(top = 16.dp)
                 .align(Alignment.End),
                 onClick = { showUnsubscribeDialog = true }) {
                 Text(stringResource(R.string.btn_unsubscribe))
@@ -181,6 +259,24 @@ fun EditFeedScreen(
                 onDismissRequest = { showUnsubscribeDialog = false },
                 onConfirmClick = onUnsubscribeFeed
             )
+        }
+    }
+}
+
+@Composable
+private fun CreateShortcutButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
+    OutlinedButton(
+        modifier = modifier,
+        contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
+        onClick = onClick) {
+        Row {
+            Icon(
+                AppTheme3.IconsAutoMirrored.AddToHomeScreen,
+                contentDescription = null,
+                modifier = Modifier.size(ButtonDefaults.IconSize)
+            )
+            Spacer(Modifier.width(ButtonDefaults.IconSpacing))
+            Text(stringResource(R.string.btn_create_shortcut))
         }
     }
 }
@@ -243,9 +339,10 @@ private fun PreviewEditFeedScreen() {
                 title = "Android developers",
                 url = "https://medium.com/feed/androiddevelopers"
             ),
-            faviconUrl = null
+            faviconUrl = null,
+            canCreatePinShortcut = true
         )
 
-        EditFeedScreen(uiState, onUnsubscribeFeed = {})
+        EditFeedScreen(uiState, onUnsubscribeFeed = {}, onCreateShortcutToFeed = {})
     }
 }
