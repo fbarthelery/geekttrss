@@ -24,6 +24,7 @@ import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons.Default
+import androidx.compose.material.icons.Icons.AutoMirrored
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -129,6 +130,7 @@ object AppTheme3 {
     }
 
     val Icons = Default
+    val IconsAutoMirrored = AutoMirrored.Filled
 
     val Shapes = Shapes(
         extraSmall = RoundedCornerShape(topEnd = 4.dp, bottomStart = 4.dp),
