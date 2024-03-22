@@ -23,6 +23,7 @@ package com.geekorum.ttrss.articles_list
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
@@ -30,18 +31,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
+import androidx.navigation.*
 import androidx.navigation.NavGraph.Companion.findStartDestination
-import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.article_details.ArticleDetailActivity
 import com.geekorum.ttrss.articles_list.magazine.MagazineScreen
 import com.geekorum.ttrss.articles_list.search.ArticlesSearchScreen
+import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.settings.SettingsActivity
 
 object NavRoutes {
@@ -88,15 +87,19 @@ fun ArticlesListNavHost(
             MagazineScreen(activityViewModel = activityViewModel, windowSizeClass = windowSizeClass,
                 contentPadding = contentPadding)
         }
-        composable(NavRoutes.ArticlesList, arguments = listOf(
-            navArgument("feed_id") {
-                type = NavType.LongType
-                defaultValue = -4L
-            },
-            navArgument("feed_name") {
-                defaultValue = "All Articles"
-            }
-        )) {
+        composable(NavRoutes.ArticlesList,
+            arguments = listOf(
+                navArgument("feed_id") {
+                    type = NavType.LongType
+                    defaultValue = -4L
+                },
+                navArgument("feed_name") {
+                    defaultValue = "All Articles"
+                }
+            ),
+            deepLinks = listOf(
+                navDeepLink { uriPattern = "app://feeds/{feed_id}?feed_name={feed_name}" }
+            )) {
             ArticlesListScreen(activityViewModel = activityViewModel, windowSizeClass = windowSizeClass,
                 contentPadding = contentPadding)
         }
@@ -167,4 +170,9 @@ fun NavController.navigateToManageFeeds() {
         component = ComponentName(context, "com.geekorum.ttrss.manage_feeds.ManageFeedsActivity")
     }
     context.startActivity(intent)
+}
+
+fun createFeedDeepLink(feed: Feed): Uri {
+    val shortcutTitle = feed.displayTitle.takeIf { it.isNotBlank() } ?: feed.title
+    return "app://feeds/${feed.id}?feed_name=${shortcutTitle}".toUri()
 }
