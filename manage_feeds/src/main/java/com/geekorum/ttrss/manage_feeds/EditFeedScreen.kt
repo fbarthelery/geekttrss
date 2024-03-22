@@ -185,6 +185,55 @@ fun EditFeedScreen(
     }
 }
 
+
+@Composable
+fun ConfirmUnsubscribeDialog(
+    feed: Feed,
+    onDismissRequest: () -> Unit,
+    onConfirmClick: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        confirmButton = {
+            TextButton(onClick = onConfirmClick) {
+                Text(stringResource(R.string.btn_confirm))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismissRequest) {
+                Text(stringResource(R.string.btn_cancel))
+            }
+        },
+        title = {
+            Text(stringResource(R.string.fragment_confirmation_title),
+                style = MaterialTheme.typography.titleLarge)
+        },
+        text = {
+            Column {
+                Text(stringResource(R.string.lbl_unsubscribe_msg), style = MaterialTheme.typography.bodyLarge)
+                Text(feed.title, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(top = 24.dp))
+                Text(feed.url)
+            }
+        })
+}
+
+@Preview
+@Composable
+private fun PreviewConfirmUnsubscribeDialog() {
+    AppTheme3 {
+        val feed = Feed(
+            id = 4,
+            title = "LinuxFr",
+            url = "https://linuxfr.org/feed",
+            unreadCount = 8,
+        )
+        ConfirmUnsubscribeDialog(feed,
+            onDismissRequest = {},
+            onConfirmClick = {})
+    }
+}
+
 @Preview
 @Composable
 private fun PreviewEditFeedScreen() {
