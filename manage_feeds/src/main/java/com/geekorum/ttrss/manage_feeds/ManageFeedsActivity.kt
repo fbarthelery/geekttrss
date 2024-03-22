@@ -26,8 +26,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -40,11 +38,15 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
@@ -65,7 +67,7 @@ class ManageFeedsActivity : BaseSessionActivity() {
         enableEdgeToEdge()
         setContent {
             AppTheme3 {
-                ManageFeedsListScreen(navigateToSubscribeToFeed = {
+                ManageFeedNavHost(navigateToSubscribeToFeed = {
                     startSubscribeToFeed()
                 })
             }
@@ -81,24 +83,17 @@ class ManageFeedsActivity : BaseSessionActivity() {
 
 @Composable
 fun ManageFeedsListScreen(
-    viewModel: ManageFeedViewModel = viewModel(),
+    viewModel: ManageFeedViewModel = dfmHiltViewModel(),
     navigateToSubscribeToFeed: () -> Unit,
+    navigateToEditFeed: (Long) -> Unit
 ) {
     ManageFeedsListScreen(
         feedsData = viewModel.feeds,
         onFeedClick = {
-            viewModel.feedToUnsubscribe = it.feed
+            navigateToEditFeed(it.feed.id)
         },
         onAddFeedClick = navigateToSubscribeToFeed
     )
-
-    viewModel.feedToUnsubscribe?.let {
-        ConfirmUnsubscribeDialog(feed = it,
-            onDismissRequest = { viewModel.feedToUnsubscribe = null },
-            onConfirmClick = {
-                viewModel.unsubscribeFeed()
-            })
-    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -205,49 +200,36 @@ private fun PreviewManageFeedsListScreen() {
 
 
 @Composable
-fun ConfirmUnsubscribeDialog(
-    feed: Feed,
-    onDismissRequest: () -> Unit,
-    onConfirmClick: () -> Unit
+fun ManageFeedNavHost(
+    navigateToSubscribeToFeed: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
-        confirmButton = {
-            TextButton(onClick = onConfirmClick) {
-                Text(stringResource(R.string.btn_confirm))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismissRequest) {
-                Text(stringResource(R.string.btn_cancel))
-            }
-        },
-        title = {
-            Text(stringResource(R.string.fragment_confirmation_title),
-                style = MaterialTheme.typography.titleLarge)
-        },
-        text = {
-            Column {
-                Text(stringResource(R.string.lbl_unsubscribe_msg), style = MaterialTheme.typography.bodyLarge)
-                Text(feed.title, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(top = 24.dp))
-                Text(feed.url)
-            }
-        })
-}
+    val navController = rememberNavController()
+    NavHost(
+        navController = navController,
+        startDestination = "feeds_list",
+        modifier = modifier
+    ) {
+        composable("feeds_list") {
+            ManageFeedsListScreen(
+                navigateToSubscribeToFeed = navigateToSubscribeToFeed,
+                navigateToEditFeed = {
+                    navController.navigateToEditFeed(it)
+                })
+        }
 
-@Preview
-@Composable
-private fun PreviewConfirmUnsubscribeDialog() {
-    AppTheme3 {
-        val feed = Feed(
-            id = 4,
-            title = "LinuxFr",
-            url = "https://linuxfr.org/feed",
-            unreadCount = 8,
-        )
-        ConfirmUnsubscribeDialog(feed,
-            onDismissRequest = {},
-            onConfirmClick = {})
+        composable("edit_feed/{feedId}",
+            arguments = listOf(
+                navArgument("feedId") {
+                    type = NavType.LongType
+                }
+            )
+        ) {
+            EditFeedScreen(navigateBack = {
+                navController.popBackStack()
+            })
+        }
     }
 }
+
+private fun NavController.navigateToEditFeed(feedId: Long) = navigate("edit_feed/$feedId")

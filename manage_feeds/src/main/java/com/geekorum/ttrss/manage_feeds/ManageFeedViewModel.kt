@@ -20,30 +20,14 @@
  */
 package com.geekorum.ttrss.manage_feeds
 
-import android.accounts.Account
-import android.app.Application
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import androidx.work.Constraints
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import com.geekorum.geekdroid.app.lifecycle.Event
-import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.data.FeedWithFavIcon
 import com.geekorum.ttrss.data.ManageFeedsDao
-import com.geekorum.ttrss.manage_feeds.workers.UnsubscribeWorker
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -51,12 +35,8 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class ManageFeedViewModel @Inject constructor(
-    private val application: Application,
-    private val account: Account,
     private val feedsDao: ManageFeedsDao
 ): ViewModel() {
-
-    var feedToUnsubscribe by mutableStateOf<Feed?>(null)
 
     val feeds: Flow<PagingData<FeedWithFavIcon>> by lazy {
         Pager(PagingConfig(40)) {
@@ -64,25 +44,5 @@ class ManageFeedViewModel @Inject constructor(
         }.flow
     }
 
-    fun unsubscribeFeed() {
-        val feed = checkNotNull(feedToUnsubscribe)
-        unsubscribeFeed(feed.id)
-        feedToUnsubscribe = null
-    }
-
-    private fun unsubscribeFeed(feedId: Long) {
-        viewModelScope.launch {
-            feedsDao.updateIsSubscribedFeed(feedId, false)
-        }
-        val workManager = WorkManager.getInstance(application)
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-        val request = OneTimeWorkRequestBuilder<UnsubscribeWorker>()
-            .setConstraints(constraints)
-            .setInputData(UnsubscribeWorker.getInputData(account, feedId))
-            .build()
-        workManager.enqueue(request)
-    }
 }
 
