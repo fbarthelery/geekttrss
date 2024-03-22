@@ -84,7 +84,7 @@ fun SearchResultCardList(
         start = contentPadding.calculateStartPadding(ltr) + additionalPadding,
         end = contentPadding.calculateEndPadding(ltr) + additionalPadding,
         bottom = contentPadding.calculateBottomPadding() + additionalPadding,
-        top = additionalPadding
+        top = contentPadding.calculateTopPadding() + additionalPadding
     )
 
     val verticalArrangement = if (displayCompactItems) Arrangement.Top else Arrangement.spacedBy(16.dp)
