@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+
+    Geekttrss is a RSS feed reader application on the Android Platform.
+
+    Copyright (C) 2017-2019 by Frederic-Charles Barthelery.
+
+    This file is part of Geekttrss.
+
+    Geekttrss is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Geekttrss is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
+
+-->
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="activity_manage_feed_title">Mes flux</string>
+    <string name="fragment_confirmation_title">Se désabonner ?</string>
+    <string name="btn_confirm">Se désabonner</string>
+    <string name="btn_cancel">Annuler</string>
+    <string name="lbl_unsubscribe_msg">Vous ne recevrez plus de mise à jour de</string>
+    <string name="activity_add_feed_title">S\'abonner à un flux</string>
+    <string name="activity_add_feed_no_feeds_available">Pas de flux disponibles</string>
+    <string name="activity_add_feed_looking_for_feed">Recherche de flux</string>
+    <string name="activity_add_feed_account_subtitle">Compte</string>
+    <string name="activity_add_feed_btn_subscribe">S\'abonner</string>
+    <string name="activity_subscribe_feed_btn_subscribe">S\'abonner</string>
+    <string name="activity_subscribe_feed_btn_cancel">Annuler</string>
+    <string name="activity_subscribe_feed_btn_back">Retour</string>
+    <string name="activity_subscribe_feed_btn_close">Fermer</string>
+    <string name="fragment_enter_feed_url_label">Entrer l\'url du flux ou du site web</string>
+    <string name="fragment_enter_feed_url_field_label">Url</string>
+    <string name="fragment_display_error_no_feeds_found">Nous n\'avons pas trouver de flux sur ce site web. Vérifiez l\'url</string>
+    <string name="fragment_display_error_io_error">Un problème est survenu. Verifiez votre connection internet</string>
+    <string name="lbl_feed_url">Url</string>
+    <string name="btn_unsubscribe">Se désabonner</string>
+    <string name="btn_create_shortcut">Créer un raccourci</string>
+    <plurals name="fragment_select_feed_label">
+        <item quantity="one" tools:ignore="ImpliedQuantity">Nous avons trouvé ce flux sur ce site web. Voulez-vous vous abonner ?</item>
+        <item quantity="other">Nous avons trouvé %d flux sur ce site web. Selectionner celui auquel vous voulez vous abonner.</item>
+    </plurals>
+</resources>
