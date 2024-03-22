@@ -22,6 +22,19 @@ package com.geekorum.ttrss.manage_feeds
 
 import android.app.Activity
 import android.app.Application
+import android.content.Context
+import android.content.ContextWrapper
+import androidx.activity.ComponentActivity
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.HasDefaultViewModelProviderFactory
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.viewmodel.CreationExtras
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavBackStackEntry
 import androidx.work.WorkManager
 import androidx.work.WorkerFactory
 import com.geekorum.ttrss.ForceNightModeViewModel_HiltModules
@@ -36,11 +49,7 @@ import com.geekorum.ttrss.manage_feeds.add_feed.AddFeedModule
 import com.geekorum.ttrss.manage_feeds.workers.WorkerComponent
 import com.geekorum.ttrss.manage_feeds.workers.WorkersModule
 import com.geekorum.ttrss.session.SessionAccountModule
-import dagger.BindsInstance
-import dagger.Component
-import dagger.Module
-import dagger.Provides
-import dagger.Subcomponent
+import dagger.*
 import dagger.hilt.migration.DisableInstallInCheck
 
 @Component(dependencies = [ManageFeedsDependencies::class],
@@ -102,3 +111,69 @@ object WorkManagerModule {
     fun provideWorkManager(application: Application): WorkManager = WorkManager.getInstance(application)
 }
 
+
+
+
+/* inject hilt view model from manage_feed module */
+
+@Composable
+internal inline fun <reified VM : ViewModel> dfmHiltViewModel(
+    viewModelStoreOwner: ViewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current) {
+        "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
+    },
+    key: String? = null,
+    factory: ViewModelProvider.Factory? = null,
+    extras: CreationExtras = if (viewModelStoreOwner is HasDefaultViewModelProviderFactory) {
+        viewModelStoreOwner.defaultViewModelCreationExtras
+    } else {
+        CreationExtras.Empty
+    }
+): VM {
+    val actualFactory = factory ?: createHiltViewModelFactory(viewModelStoreOwner)
+    return viewModel(viewModelStoreOwner, key = key, factory = actualFactory, extras = extras)
+}
+
+@Composable
+@PublishedApi
+internal fun createHiltViewModelFactory(
+    viewModelStoreOwner: ViewModelStoreOwner
+): ViewModelProvider.Factory? = if (viewModelStoreOwner is NavBackStackEntry) {
+    HiltViewModelFactory(
+        context = LocalContext.current,
+        navBackStackEntry = viewModelStoreOwner
+    )
+} else {
+    // Use the default factory provided by the ViewModelStoreOwner
+    // and assume it is an @AndroidEntryPoint annotated fragment or activity
+    null
+}
+
+@JvmName("create")
+private fun HiltViewModelFactory(
+    context: Context,
+    navBackStackEntry: NavBackStackEntry
+): ViewModelProvider.Factory {
+    val activity = context.let {
+        var ctx = it
+        while (ctx is ContextWrapper) {
+            // Hilt can only be used with ComponentActivity
+            if (ctx is ComponentActivity) {
+                return@let ctx
+            }
+            ctx = ctx.baseContext
+        }
+        throw IllegalStateException(
+            "Expected an activity context for creating a HiltViewModelFactory " +
+                    "but instead found: $ctx"
+        )
+    }
+    if (activity is BaseSessionActivity) {
+        return activity.activityComponent.hiltViewModelFactoryFactory.fromNavBackStackEntry(
+            navBackStackEntry, navBackStackEntry.defaultViewModelProviderFactory
+        )
+    }
+    return dagger.hilt.android.internal.lifecycle.HiltViewModelFactory.createInternal(
+        activity,
+        navBackStackEntry.defaultViewModelProviderFactory,
+    )
+}
