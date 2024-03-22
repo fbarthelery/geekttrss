@@ -25,7 +25,7 @@ import com.geekorum.ttrss.applicationComponent
 import com.geekorum.ttrss.session.SessionActivity
 
 open class BaseSessionActivity : SessionActivity() {
-    private lateinit var activityComponent: ActivityComponent
+    internal lateinit var activityComponent: ActivityComponent
 
     override fun inject() {
         val manageFeedComponent = DaggerManageFeedComponent.builder()
