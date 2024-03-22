@@ -99,7 +99,9 @@ interface ActivityComponent {
 
 @Module(includes = [
     ManageFeedViewModel_HiltModules.BindsModule::class,
-    ManageFeedViewModel_HiltModules.KeyModule::class
+    ManageFeedViewModel_HiltModules.KeyModule::class,
+    EditFeedViewModel_HiltModules.BindsModule::class,
+    EditFeedViewModel_HiltModules.KeyModule::class,
 ])
 @DisableInstallInCheck
 internal class ManageFeedModule

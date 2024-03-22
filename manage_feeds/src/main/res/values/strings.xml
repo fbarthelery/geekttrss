@@ -57,4 +57,9 @@
     <string name="fragment_display_error_no_feeds_found">We did not find any feeds on this website. Check the url</string>
     <string name="fragment_display_error_io_error">Something went wrong. Check your internet connectivity</string>
 
+    <!-- EditFeedScreen   -->
+    <string name="lbl_feed_url">Url</string>
+    <string name="btn_unsubscribe">Unsubscribe</string>
+
+
 </resources>
