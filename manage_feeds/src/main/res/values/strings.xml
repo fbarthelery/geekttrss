@@ -60,6 +60,7 @@
     <!-- EditFeedScreen   -->
     <string name="lbl_feed_url">Url</string>
     <string name="btn_unsubscribe">Unsubscribe</string>
+    <string name="btn_create_shortcut">Create shortcut</string>
 
 
 </resources>
