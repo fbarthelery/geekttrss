@@ -156,5 +156,5 @@
 
     <!-- ArticlesListAppBar   -->
     <string name="content_desc_btn_clear">Clear</string>
-    <string name="placeholder_textfield_search">Search…</string>
+    <string name="placeholder_textfield_search">Search articles</string>
 </resources>
