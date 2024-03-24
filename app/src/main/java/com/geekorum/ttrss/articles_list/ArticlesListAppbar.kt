@@ -20,14 +20,9 @@
  */
 package com.geekorum.ttrss.articles_list
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Sort
@@ -40,12 +35,8 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.mapSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.geekorum.ttrss.R
@@ -64,47 +55,23 @@ fun ArticlesListAppBar(
     colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
     navigationIcon: @Composable (() -> Unit)? = null,
 ) {
-    val isSearchVisibleAndOpen = displaySearchButton && appBarState.searchOpen
     TopAppBar(
         modifier = modifier,
         colors = colors,
         navigationIcon = {
-            if (isSearchVisibleAndOpen) {
-                IconButton(
-                    onClick = {
-                    appBarState.closeSearch()
-                }) {
-                    Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = "back")
-                }
-            } else {
                 navigationIcon?.invoke()
-            }
         },
-        title = {
-            if (displaySearchButton && appBarState.searchOpen) {
-                SearchTextField(
-                    value = appBarState.searchText ,
-                    onValueChange = { appBarState.searchText = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                )
-            } else {
-                title()
-            }
-        },
+        title = title,
         actions = {
-            if (!isSearchVisibleAndOpen) {
-                if (displaySearchButton) {
-                    IconButton(onClick = {
-                        appBarState.openSearch()
-                    }) {
-                        Icon(Icons.Default.Search, contentDescription = "search")
-                    }
+            if (displaySearchButton) {
+                IconButton(onClick = {
+                    appBarState.openSearch()
+                }) {
+                    Icon(Icons.Default.Search, contentDescription = "search")
                 }
-
-                if (displaySortMenuButton) {
-                    SortMenuButton(sortOrder, onSortOrderChange)
-                }
+            }
+            if (displaySortMenuButton) {
+                SortMenuButton(sortOrder, onSortOrderChange)
             }
         }
     )
@@ -126,6 +93,9 @@ class ArticlesListAppbarState(
         private set
     private var _searchText by mutableStateOf(initialSearchText)
 
+    var isSearchTransitioning by mutableStateOf(false)
+        internal set
+    
     var searchText: String
         get() = _searchText
         set(value) {
@@ -189,50 +159,6 @@ fun rememberArticlesListAppBarState(
     }
 }
 
-@Composable
-private fun SearchTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val focusRequester = remember {
-        FocusRequester()
-    }
-
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
-    }
-
-    TextField(
-        modifier = modifier.focusRequester(focusRequester),
-        value = value,
-        onValueChange = onValueChange,
-        placeholder = {
-            Text(stringResource(R.string.placeholder_textfield_search), style = MaterialTheme.typography.titleLarge)
-        },
-        trailingIcon = {
-            if (value.isNotEmpty()) {
-                IconButton(onClick = { onValueChange("") }) {
-                    Icon(Icons.Default.Clear, contentDescription = stringResource(R.string.content_desc_btn_clear))
-                }
-            }
-        },
-        singleLine = true,
-        maxLines = 1,
-        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-        keyboardActions = KeyboardActions(onSearch = {
-            onValueChange(value)
-        }),
-        colors = TextFieldDefaults.colors(
-            focusedContainerColor = Color.Transparent,
-            unfocusedContainerColor = Color.Transparent,
-            disabledContainerColor = Color.Transparent,
-            focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent
-
-        )
-    )
-}
 
 @Composable
 fun SortMenuButton(
@@ -306,10 +232,65 @@ private fun SortMenuRadioGroup(
     }
 }
 
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+fun ArticlesSearchBar(
+    active: Boolean,
+    onActiveChange: (Boolean) -> Unit,
+    query: String,
+    onQueryChange: (String) -> Unit,
+    onSearch: (String) -> Unit,
+    onUpClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    SearchBar(
+        query = query,
+        onQueryChange = onQueryChange,
+        onSearch = {
+            onSearch(it)
+            onActiveChange(false)
+        },
+        active = active,
+        onActiveChange = {
+            // query is empty or we haven't made any search yet
+//                    if (!it && query.isEmpty()) navigateBack()
+            onActiveChange(it)
+        },
+        placeholder = {
+            Text(
+                stringResource(R.string.placeholder_textfield_search),
+            )
+        },
+        leadingIcon = {
+            IconButton(onClick = onUpClick) {
+                Icon(
+                    imageVector = AppTheme3.IconsAutoMirrored.ArrowBack,
+                    contentDescription = null
+                )
+            }
+        },
+        trailingIcon = {
+            if (query.isNotEmpty()) {
+                IconButton(onClick = { onQueryChange("") }) {
+                    Icon(
+                        Icons.Default.Clear,
+                        contentDescription = stringResource(R.string.content_desc_btn_clear)
+                    )
+                }
+            }
+        },
+        modifier = modifier,
+    ) {
+        // suggestions
+    }
+}
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun PreviewArticlesListAppBar() {
+private fun PreviewArticlesListAppBar() {
     AppTheme3 {
         var sortOrder by remember {
             mutableStateOf(SortOrder.MOST_RECENT_FIRST)
@@ -331,6 +312,46 @@ fun PreviewArticlesListAppBar() {
             }
         ) {
             Text("content", Modifier.padding(it))
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewArticlesSearch() {
+    AppTheme3 {
+        var active by remember {
+            mutableStateOf(false)
+        }
+        var query by remember {
+            mutableStateOf("")
+        }
+        var content by remember {
+            mutableStateOf("content")
+        }
+        Scaffold(
+            topBar = {
+                ArticlesSearchBar(
+                    active = active,
+                    onActiveChange = {
+                        active = it
+                    },
+                    query = query,
+                    onQueryChange = { query = it },
+                    onUpClick = {
+                        active = false
+                        query = ""
+                    },
+                    onSearch = {
+                               content = "Search results for $it"
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentWidth()
+                )
+            }
+        ) {
+            Text(content, Modifier.padding(it))
         }
     }
 }
