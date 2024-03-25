@@ -246,7 +246,9 @@ internal class AppBarPresenter(
         onSearchClick: () -> Unit,
         modifier: Modifier = Modifier,
     ) {
-        val hasSortMenu = destinationHasSortButton(currentDestination?.destination)
+        var hasSortMenu by remember {
+            mutableStateOf(destinationHasSortButton(currentDestination?.destination))
+        }
         val sortOrder by activityViewModel.sortOrder.collectAsStateWithLifecycle()
 
         val navigationIcon: @Composable () -> Unit = {
@@ -267,10 +269,18 @@ internal class AppBarPresenter(
                 if (currentDestination?.destination != null && currentDestination.destination.label == null) {
                     setDestinationLabelPerRoute(context, currentDestination.destination)
                 }
-                toolbarTitle = currentDestination?.destination?.fillInLabel(
+                // change title only if there is a new one otherwise keep previous
+                currentDestination?.destination?.fillInLabel(
                     context,
                     currentDestination.arguments
-                ) ?: ""
+                )?.let {
+                    toolbarTitle =  it
+                }
+
+                // change sortMenu if not going to search
+                if (currentDestination?.destination?.route != NavRoutes.Search) {
+                    hasSortMenu = destinationHasSortButton(currentDestination?.destination)
+                }
             }
         }
 

@@ -51,13 +51,13 @@ object NavRoutes {
 
     fun getLabelForRoute(context: Context, route: String?) = when(route) {
         Magazine -> context.getString(R.string.title_magazine)
-        Search -> context.getString(R.string.title_article_search)
         ArticlesList -> "{feed_name}"
         ArticlesListByTag -> "#{tag}"
         else -> null
     }
 
     fun isTopLevelDestination(route: String?) = when (route) {
+        Search,
         Magazine,
         ArticlesList,
         ArticlesListByTag -> true
