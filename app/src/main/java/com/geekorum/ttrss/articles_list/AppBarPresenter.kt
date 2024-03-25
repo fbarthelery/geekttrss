@@ -116,6 +116,7 @@ internal class AppBarPresenter(
                     }
                 }
 
+                val suggestions by activityViewModel.articlesSearchHistory.collectAsStateWithLifecycle()
                 ArticlesSearchBar(
                     active = active,
                     onActiveChange = {
@@ -126,8 +127,10 @@ internal class AppBarPresenter(
                     onQueryChange = {
                         query = it
                     },
+                    suggestions = suggestions,
                     onSearch = {
                         activityViewModel.setSearchQuery(it)
+                        activityViewModel.recordSearchQueryInHistory(it)
                         hasSearched = true
                     },
                     onUpClick = { navController.popBackStack() },
