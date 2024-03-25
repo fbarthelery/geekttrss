@@ -20,13 +20,17 @@
  */
 package com.geekorum.ttrss.articles_list
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
@@ -162,6 +166,7 @@ fun ArticlesSearchBar(
     onSearch: (String) -> Unit,
     onUpClick: () -> Unit,
     modifier: Modifier = Modifier,
+    suggestions: List<String> = emptyList(),
 ) {
     SearchBar(
         query = query,
@@ -199,7 +204,23 @@ fun ArticlesSearchBar(
         },
         modifier = modifier,
     ) {
-        // TODO suggestions
+        LazyColumn {
+            items(suggestions, key = { it }) { suggestion ->
+                ListItem(
+                    headlineContent = {
+                        Text(suggestion)
+                    },
+                    leadingContent = {
+                        Icon(AppTheme3.Icons.History, null)
+                    },
+                    modifier = Modifier.clickable {
+                        onQueryChange(suggestion)
+                        onSearch(suggestion)
+                        onActiveChange(false)
+                    }
+                )
+            }
+        }
     }
 }
 

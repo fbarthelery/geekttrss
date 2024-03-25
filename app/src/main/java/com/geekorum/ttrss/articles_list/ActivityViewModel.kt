@@ -26,10 +26,13 @@ import androidx.core.net.toUri
 import androidx.lifecycle.*
 import com.geekorum.geekdroid.app.lifecycle.Event
 import com.geekorum.ttrss.data.Article
+import com.geekorum.ttrss.data.ArticlesSearchHistoryRepository
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.network.TtRssBrowserLauncher
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 private const val STATE_FEED_ID = "feed_id"
@@ -42,7 +45,8 @@ private const val STATE_ACCOUNT = "account"
 class ActivityViewModel @Inject constructor(
     private val state: SavedStateHandle,
     private val browserLauncher: TtRssBrowserLauncher,
-    private val articlesListPreferencesRepository: ArticlesListPreferencesRepository
+    private val articlesListPreferencesRepository: ArticlesListPreferencesRepository,
+    private val articlesSearchHistoryRepository: ArticlesSearchHistoryRepository,
 ) : ViewModel() {
 
     private val _articleSelectedEvent = MutableLiveData<Event<ArticleSelectedParameters>>()
@@ -53,6 +57,17 @@ class ActivityViewModel @Inject constructor(
 
     private val _refreshClickedEvent = MutableLiveData<Event<Any>>()
     val refreshClickedEvent: LiveData<Event<Any>> = _refreshClickedEvent
+
+    // we need to delay history update until the search screen results are displayed
+    // otherwise the suggestions list will update during the transition
+    private var delayHistoryUpdate = false
+    val articlesSearchHistory = articlesSearchHistoryRepository.searchHistory
+        .onEach {
+            if (delayHistoryUpdate) {
+                delay(1000)
+            }
+        }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     val mostRecentSortOrder = articlesListPreferencesRepository.getSortOrder().map {
         when (it) {
@@ -110,6 +125,15 @@ class ActivityViewModel @Inject constructor(
 
     fun setSearchQuery(query: String) {
         _searchQuery.value = query
+    }
+
+    fun recordSearchQueryInHistory(query: String) = viewModelScope.launch {
+        try {
+            delayHistoryUpdate = true
+            articlesSearchHistoryRepository.recordSearchQuery(query)
+        } finally {
+            delayHistoryUpdate = false
+        }
     }
 
     fun setSortByMostRecentFirst(mostRecentFirst: Boolean) {
