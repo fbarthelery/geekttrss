@@ -31,10 +31,9 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.Saver
-import androidx.compose.runtime.saveable.mapSaver
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
@@ -46,10 +45,10 @@ import com.geekorum.ttrss.ui.AppTheme3
 @Composable
 fun ArticlesListAppBar(
     title: @Composable () -> Unit,
+    onSearchClick: () -> Unit,
     sortOrder: SortOrder,
     onSortOrderChange: (SortOrder) -> Unit,
     modifier: Modifier = Modifier,
-    appBarState: ArticlesListAppbarState = rememberArticlesListAppBarState(),
     displaySortMenuButton: Boolean = true,
     displaySearchButton: Boolean = true,
     colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
@@ -64,9 +63,7 @@ fun ArticlesListAppBar(
         title = title,
         actions = {
             if (displaySearchButton) {
-                IconButton(onClick = {
-                    appBarState.openSearch()
-                }) {
+                IconButton(onClick = onSearchClick) {
                     Icon(Icons.Default.Search, contentDescription = "search")
                 }
             }
@@ -81,84 +78,6 @@ fun ArticlesListAppBar(
 fun AppBarTitleText(title: String) {
     Text(title, overflow = TextOverflow.Ellipsis, maxLines = 1)
 }
-
-@Stable
-class ArticlesListAppbarState(
-    initialSearchText: String = "",
-    initialSearchIsOpen: Boolean = false,
-    private val onSearchTextChange: (String) -> Unit,
-    private val onSearchOpenChange: (Boolean) -> Unit,
-) {
-    var searchOpen by  mutableStateOf(initialSearchIsOpen)
-        private set
-    private var _searchText by mutableStateOf(initialSearchText)
-
-    var isSearchTransitioning by mutableStateOf(false)
-        internal set
-    
-    var searchText: String
-        get() = _searchText
-        set(value) {
-            _searchText = value
-            if (searchOpen) {
-                onSearchTextChange(value)
-            }
-        }
-
-
-    fun openSearch() {
-        searchOpen = true
-        onSearchOpenChange(searchOpen)
-    }
-
-    fun closeSearch() {
-        searchText = ""
-        searchOpen = false
-        onSearchOpenChange(searchOpen)
-    }
-
-    companion object {
-        fun Saver(
-            onSearchTextChange: (String) -> Unit,
-            onSearchOpenChange: (Boolean) -> Unit,
-        ): Saver<ArticlesListAppbarState, Any> =
-            mapSaver(
-                save = {
-                    mapOf(
-                        "searchOpen" to it.searchOpen,
-                        "searchText" to it.searchText
-                    )
-                },
-                restore = {
-                    val text = it["searchText"] as String
-                    val isOpen = it["searchOpen"] as Boolean
-                    ArticlesListAppbarState(initialSearchText = text,
-                        initialSearchIsOpen = isOpen,
-                        onSearchTextChange = onSearchTextChange,
-                        onSearchOpenChange = onSearchOpenChange
-                        )
-                }
-            )
-    }
-}
-
-@Composable
-fun rememberArticlesListAppBarState(
-    onSearchTextChange: (String) -> Unit = {},
-    onSearchOpenChange: (Boolean) -> Unit = {}
-): ArticlesListAppbarState {
-    return rememberSaveable(
-        saver = ArticlesListAppbarState.Saver(
-            onSearchTextChange = onSearchTextChange,
-            onSearchOpenChange = onSearchOpenChange
-        )
-    ) {
-        ArticlesListAppbarState(
-            onSearchTextChange = onSearchTextChange,
-            onSearchOpenChange = onSearchOpenChange)
-    }
-}
-
 
 @Composable
 fun SortMenuButton(
@@ -244,6 +163,13 @@ fun ArticlesSearchBar(
     onUpClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val focusRequester = remember {
+        FocusRequester()
+    }
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+
     SearchBar(
         query = query,
         onQueryChange = onQueryChange,
@@ -280,9 +206,9 @@ fun ArticlesSearchBar(
                 }
             }
         },
-        modifier = modifier,
+        modifier = modifier.focusRequester(focusRequester),
     ) {
-        // suggestions
+        // TODO suggestions
     }
 }
 
@@ -307,7 +233,8 @@ private fun PreviewArticlesListAppBar() {
                         }
                     },
                     sortOrder = sortOrder,
-                    onSortOrderChange = { sortOrder = it }
+                    onSortOrderChange = { sortOrder = it },
+                    onSearchClick = {}
                 )
             }
         ) {

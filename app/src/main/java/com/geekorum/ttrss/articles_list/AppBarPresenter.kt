@@ -23,10 +23,10 @@ package com.geekorum.ttrss.articles_list
 import android.app.Activity
 import android.content.Context
 import androidx.compose.animation.*
-import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
@@ -35,12 +35,15 @@ import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.traversalIndex
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -63,6 +66,12 @@ internal class AppBarPresenter(
     private val navController: NavController,
 ) {
 
+    /**
+     * Are we in a transition to/from ArticleSearchBar
+     */
+    var isSearchTransitioning: Boolean = false
+        private set
+
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class, ExperimentalMaterial3Api::class)
     @Composable
     fun ToolbarContent(modifier: Modifier = Modifier, scrollBehavior: TopAppBarScrollBehavior? = null, onNavigationMenuClick: () -> Unit) {
@@ -70,14 +79,83 @@ internal class AppBarPresenter(
         val hasFixedDrawer = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded
 
         val currentDestination by navController.currentBackStackEntryFlow.collectAsStateWithLifecycle(
-            null
+            navController.currentBackStackEntry
         )
 
+        val isSearchOpen = currentDestination != null && currentDestination?.destination?.route == NavRoutes.Search
+        val isNotOnSearchDestination = currentDestination != null && currentDestination?.destination?.route != NavRoutes.Search
+        if (isNotOnSearchDestination) {
+            LaunchedEffect(Unit) {
+                activityViewModel.setSearchQuery("")
+            }
+        }
+
+        val searchScreenTransition = updateTransition(targetState = isSearchOpen, label = "show search")
+        SideEffect {
+            isSearchTransitioning = searchScreenTransition.currentState != searchScreenTransition.targetState
+        }
+
+        searchScreenTransition.AnimatedContent(
+            transitionSpec = {
+                //TODO tweak transition
+                fadeIn(animationSpec = tween(220 , delayMillis = 90 ))
+                    .togetherWith(fadeOut(animationSpec = tween(90)))
+            },
+            modifier = modifier
+        ) { showSearch ->
+            if (showSearch) {
+                var active by rememberSaveable { mutableStateOf(true) }
+                var query by rememberSaveable { mutableStateOf("") }
+
+                ArticlesSearchBar(
+                    active = active,
+                    onActiveChange = {
+                        // query is empty or we haven't made any search yet
+//                    if (!it && query.isEmpty()) navigateBack()
+                        active = it
+                    },
+                    query = query,
+                    onQueryChange = {
+                        query = it
+                    },
+                    onSearch = {
+                        activityViewModel.setSearchQuery(it)
+                    },
+                    onUpClick = { navController.popBackStack() },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentWidth()
+                        .semantics { traversalIndex = -1f })
+
+            } else {
+                TopAppBar(
+                    hasFixedDrawer = hasFixedDrawer,
+                    currentDestination = currentDestination,
+                    onNavigationMenuClick = onNavigationMenuClick,
+                    onSearchClick = { navController.navigateToSearch() },
+                    scrollBehavior = scrollBehavior
+                )
+            }
+        }
+    }
+
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    private fun TopAppBar(
+        hasFixedDrawer: Boolean,
+        currentDestination: NavBackStackEntry?,
+        onNavigationMenuClick: () -> Unit,
+        onSearchClick: () -> Unit,
+        modifier: Modifier = Modifier,
+        scrollBehavior: TopAppBarScrollBehavior? = null
+    ) {
         val colors = TopAppBarDefaults.toolbarAppBarColors()
 
         // Sets the app bar's height offset to collapse the entire bar's height when content is
         // scrolled
         val heightOffsetLimit =
+            // -64dp without TagsList + 48.dp with list
+            // TODO change base on tags
             with(LocalDensity.current) { ((-64).dp).toPx() }
         SideEffect {
             if (scrollBehavior?.state?.heightOffsetLimit != heightOffsetLimit) {
@@ -103,6 +181,7 @@ internal class AppBarPresenter(
                     hasFixedDrawer,
                     currentDestination,
                     onNavigationMenuClick,
+                    onSearchClick,
                     Modifier.zIndex(1f)
                 )
                 AnimatedTagsList(currentDestination)
@@ -110,7 +189,6 @@ internal class AppBarPresenter(
         }
     }
 
-    @OptIn(ExperimentalAnimationApi::class)
     @Composable
     private fun AnimatedTagsList(currentDestination: NavBackStackEntry?) {
         val currentTag = if (currentDestination?.destination?.route == NavRoutes.ArticlesListByTag) {
@@ -165,6 +243,7 @@ internal class AppBarPresenter(
         hasFixedDrawer: Boolean,
         currentDestination: NavBackStackEntry?,
         onNavigationMenuClick: () -> Unit,
+        onSearchClick: () -> Unit,
         modifier: Modifier = Modifier,
     ) {
         val hasSortMenu = destinationHasSortButton(currentDestination?.destination)
@@ -178,27 +257,6 @@ internal class AppBarPresenter(
                 IconButton(onClick = onNavigationMenuClick) {
                     Icon(Icons.Default.Menu, contentDescription = stringResource(R.string.drawer_open))
                 }
-            }
-        }
-
-        val appbarState = rememberArticlesListAppBarState(
-            onSearchTextChange = {
-                activityViewModel.setSearchQuery(it)
-            },
-            onSearchOpenChange = { searchOpen ->
-                if (searchOpen) {
-                    navController.navigateToSearch()
-                } else {
-                    if (navController.currentDestination?.route == NavRoutes.Search) {
-                        navController.popBackStack()
-                    }
-                }
-            }
-        )
-
-        if (currentDestination != null && currentDestination.destination.route != NavRoutes.Search) {
-            LaunchedEffect(currentDestination) {
-                appbarState.closeSearch()
             }
         }
 
@@ -217,12 +275,12 @@ internal class AppBarPresenter(
         }
 
         ArticlesListAppBar(
-            appBarState = appbarState,
             // transparent container colors, the surface colors will be handled by parent
             colors = TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent, scrolledContainerColor = Color.Transparent),
             title = {
                 AppBarTitleText(toolbarTitle)
             },
+            onSearchClick = onSearchClick,
             sortOrder = sortOrder,
             onSortOrderChange = {
                 val mostRecentFirst = when (it) {
