@@ -110,8 +110,7 @@ fun ArticlesListNavHost(
         }
 
         composable(NavRoutes.Search) {
-            ArticlesSearchScreen(activityViewModel = activityViewModel, windowSizeClass = windowSizeClass,
-                contentPadding = contentPadding)
+            ArticlesSearchScreen(activityViewModel = activityViewModel, windowSizeClass = windowSizeClass)
         }
     }
 }

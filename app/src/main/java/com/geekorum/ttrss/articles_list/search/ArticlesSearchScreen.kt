@@ -39,7 +39,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -47,10 +46,14 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
-import com.geekorum.ttrss.articles_list.*
+import com.geekorum.ttrss.articles_list.ActivityViewModel
+import com.geekorum.ttrss.articles_list.ArticleCard
+import com.geekorum.ttrss.articles_list.CompactArticleListItem
+import com.geekorum.ttrss.articles_list.debouncedPagingViewStateFor
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleWithFeed
 import com.geekorum.ttrss.share.createShareArticleIntent
+import com.geekorum.ttrss.ui.components.plus
 import kotlinx.coroutines.delay
 import timber.log.Timber
 
@@ -78,21 +81,12 @@ fun SearchResultCardList(
         }
     }
 
-    val ltr = LocalLayoutDirection.current
-    val additionalPadding = if (displayCompactItems) 0.dp else 8.dp
-    val lazyListContentPadding = PaddingValues(
-        start = contentPadding.calculateStartPadding(ltr) + additionalPadding,
-        end = contentPadding.calculateEndPadding(ltr) + additionalPadding,
-        bottom = contentPadding.calculateBottomPadding() + additionalPadding,
-        top = contentPadding.calculateTopPadding() + additionalPadding
-    )
-
     val verticalArrangement = if (displayCompactItems) Arrangement.Top else Arrangement.spacedBy(16.dp)
     LazyColumn(
         state = listState,
         verticalArrangement = verticalArrangement,
         horizontalAlignment = Alignment.CenterHorizontally,
-        contentPadding = lazyListContentPadding,
+        contentPadding = contentPadding,
         modifier = modifier.fillMaxSize()
     ) {
         items(
@@ -205,12 +199,13 @@ private fun ArticleItem(
 }
 
 
+// don't pass content padding value.
+// we always layout like we take fullscreen and there is a search bar on top of screen
 @Composable
 fun ArticlesSearchScreen(
     windowSizeClass: WindowSizeClass,
     activityViewModel: ActivityViewModel,
     searchViewModel: SearchViewModel = hiltViewModel(),
-    contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     LaunchedEffect(activityViewModel, searchViewModel) {
         activityViewModel.searchQuery.collect {
@@ -237,7 +232,9 @@ fun ArticlesSearchScreen(
             onOpenInBrowserClick = {
                 activityViewModel.displayArticleInBrowser(context, it)
             },
-            contentPadding = contentPadding,
+            // 72dp = SearchBar + searchbar vertical padding
+            // add 16.dp of top padding between first item and bar
+            contentPadding = PaddingValues(top = 88.dp) + WindowInsets.statusBars.asPaddingValues(),
             modifier = Modifier
                 .fillMaxSize()
         )
