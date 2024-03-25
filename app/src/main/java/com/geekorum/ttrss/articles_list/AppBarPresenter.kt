@@ -37,6 +37,8 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.platform.LocalContext
@@ -106,12 +108,18 @@ internal class AppBarPresenter(
             if (showSearch) {
                 var active by rememberSaveable { mutableStateOf(true) }
                 var query by rememberSaveable { mutableStateOf("") }
+                var hasSearched by rememberSaveable { mutableStateOf(false) }
+                val focusRequester = remember { FocusRequester() }
+                LaunchedEffect(Unit) {
+                    if (active) {
+                        focusRequester.requestFocus()
+                    }
+                }
 
                 ArticlesSearchBar(
                     active = active,
                     onActiveChange = {
-                        // query is empty or we haven't made any search yet
-//                    if (!it && query.isEmpty()) navigateBack()
+                        if (!it && !hasSearched) navController.popBackStack()
                         active = it
                     },
                     query = query,
@@ -120,9 +128,11 @@ internal class AppBarPresenter(
                     },
                     onSearch = {
                         activityViewModel.setSearchQuery(it)
+                        hasSearched = true
                     },
                     onUpClick = { navController.popBackStack() },
                     modifier = Modifier
+                        .focusRequester(focusRequester)
                         .fillMaxWidth()
                         .wrapContentWidth()
                         .semantics { traversalIndex = -1f })

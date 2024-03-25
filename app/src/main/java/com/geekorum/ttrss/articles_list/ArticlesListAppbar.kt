@@ -163,13 +163,6 @@ fun ArticlesSearchBar(
     onUpClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val focusRequester = remember {
-        FocusRequester()
-    }
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
-    }
-
     SearchBar(
         query = query,
         onQueryChange = onQueryChange,
@@ -179,8 +172,6 @@ fun ArticlesSearchBar(
         },
         active = active,
         onActiveChange = {
-            // query is empty or we haven't made any search yet
-//                    if (!it && query.isEmpty()) navigateBack()
             onActiveChange(it)
         },
         placeholder = {
@@ -206,7 +197,7 @@ fun ArticlesSearchBar(
                 }
             }
         },
-        modifier = modifier.focusRequester(focusRequester),
+        modifier = modifier,
     ) {
         // TODO suggestions
     }
