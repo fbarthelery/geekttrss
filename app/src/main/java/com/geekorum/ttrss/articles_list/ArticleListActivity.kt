@@ -32,10 +32,7 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -177,7 +174,17 @@ class ArticleListActivity : SessionActivity() {
                     },
                     drawerGesturesEnabled = drawerLayoutPresenter.drawerGesturesEnabled
                 ) { contentPadding ->
-                    ArticlesListNavHost(windowSizeClass, activityViewModel, navController, contentPadding)
+                    // if transitioning to/from ArticleSearchBar use previous padding
+                    // and ignore new one coming during transition
+                    var lastPaddingExceptSearch by remember {
+                        mutableStateOf(contentPadding)
+                    }
+                    SideEffect {
+                        if (!appBarPresenter.isSearchTransitioning) {
+                            lastPaddingExceptSearch = contentPadding
+                        }
+                    }
+                    ArticlesListNavHost(windowSizeClass, activityViewModel, navController, lastPaddingExceptSearch)
                 }
             }
         }
