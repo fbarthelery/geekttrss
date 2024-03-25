@@ -31,6 +31,7 @@ androidx-constraintlayout = "2.1.4"
 androidx-coordinatorlayout = "1.2.0"
 androidx-compose-bom = "2024.03.00"
 androidx-compose-compiler = "1.5.11"
+androidx-datastore = "1.0.0"
 androidx-hilt-compiler = "1.2.0"
 androidx-hilt-navigation-compose = "1.2.0"
 androidx-hilt-work = "1.2.0"
@@ -52,6 +53,7 @@ materialKolor = "1.4.3"
 okio = "3.7.0"
 okhttp = "4.10.0"
 play-publisher = "3.8.6"
+protobuf = "4.26.0"
 timber = "5.0.1"
 truth = "1.2.0"
 turbine = "1.0.0"
@@ -92,6 +94,7 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "kotlin-ksp" }
 license-gradle-plugin = { id = "com.github.hierynomus.license", version.ref = "license-gradle-plugin" }
 gradle-play-publisher = { id = "com.github.triplet.play", version.ref = "play-publisher"}
+google-protobuf = { id = "com.google.protobuf", version = "0.9.4" }
 
 [libraries]
 # build plugins dependencies
@@ -109,6 +112,7 @@ androidx-annotation = { module = "androidx.annotation:annotation", version.ref =
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "androidx-appcompat" }
 androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "androidx-activity" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
+androidx-datastore = { module = "androidx.datastore:datastore", version.ref = "androidx-datastore"}
 androidx-fragment = { module = "androidx.fragment:fragment-ktx", version.ref = "androidx-fragment" }
 androidx-fragment-testing = { module = "androidx.fragment:fragment-testing", version.ref = "androidx-fragment" }
 androidx-fragment-testing-manifest = { module = "androidx.fragment:fragment-testing-manifest", version.ref = "androidx-fragment" }
@@ -208,6 +212,8 @@ okhttp = { module = "com.squareup.okhttp3:okhttp" }
 okhttp-logging-interceptor = { module = "com.squareup.okhttp3:logging-interceptor" }
 okhttp-mockwebserver = { module = "com.squareup.okhttp3:mockwebserver" }
 
+protobuf-kotlin-lite = { module = "com.google.protobuf:protobuf-kotlin-lite", version.ref = "protobuf" }
+protobuf-protoc = { module = "com.google.protobuf:protoc", version.ref = "protobuf" }
 retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit-kotlinx-serialization-converter = { module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version.ref = "retrofit-kotlinx-serialization-converter" }
 

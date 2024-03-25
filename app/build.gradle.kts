@@ -23,6 +23,9 @@ import com.geekorum.build.configureVersionChangeset
 import com.geekorum.build.dualTestImplementation
 import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
 import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsPlugin
+import com.google.protobuf.gradle.GenerateProtoTask
+import com.google.protobuf.gradle.id
+import org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompileTool
 
 plugins {
     id("com.geekorum.build.conventions.android-application")
@@ -33,6 +36,7 @@ plugins {
     alias(libs.plugins.androidx.navigation.safeargs.kotlin)
     alias(libs.plugins.dagger.hilt.android)
     alias(libs.plugins.androidx.room)
+    alias(libs.plugins.google.protobuf)
 }
 
 // workaround bug https://issuetracker.google.com/issues/275534543
@@ -137,6 +141,39 @@ ksp {
     arg("room.generateKotlin", "true")
 }
 
+protobuf {
+    protoc {
+        artifact = libs.protobuf.protoc.get().toString()
+    }
+
+    generateProtoTasks {
+        all().forEach { task ->
+            task.builtins {
+                id("java") {
+                    option("lite")
+                }
+                id("kotlin") {
+                    option("lite")
+                }
+            }
+        }
+    }
+}
+
+// TODO remove when fixed. Fix ksp/protobuf dependendencies
+// https://github.com/google/ksp/issues/1590
+androidComponents {
+    onVariants(selector().all()) { variant ->
+        afterEvaluate {
+            val protoTask =
+                project.tasks.named<GenerateProtoTask>("generate" + variant.name.replaceFirstChar { it.uppercaseChar() } + "Proto")
+
+            project.tasks.named<AbstractKotlinCompileTool<*>>("ksp" + variant.name.replaceFirstChar { it.uppercaseChar() } + "Kotlin") {
+                setSource(protoTask)
+            }
+        }
+    }
+}
 
 dependencies {
 
@@ -204,6 +241,8 @@ dependencies {
     implementation(libs.coil)
 
     implementation(libs.jsoup)
+    implementation(libs.androidx.datastore)
+    implementation(libs.protobuf.kotlin.lite)
 
     implementation(libs.androidx.lifecycle.livedata.core)
     implementation(libs.androidx.lifecycle.livedata)
