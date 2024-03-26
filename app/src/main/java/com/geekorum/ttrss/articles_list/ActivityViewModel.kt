@@ -52,9 +52,6 @@ class ActivityViewModel @Inject constructor(
     private val _articleSelectedEvent = MutableLiveData<Event<ArticleSelectedParameters>>()
     val articleSelectedEvent: LiveData<Event<ArticleSelectedParameters>> = _articleSelectedEvent
 
-    private val _searchQuery = MutableStateFlow("")
-    val searchQuery = _searchQuery.asStateFlow()
-
     private val _refreshClickedEvent = MutableLiveData<Event<Any>>()
     val refreshClickedEvent: LiveData<Event<Any>> = _refreshClickedEvent
 
@@ -121,10 +118,6 @@ class ActivityViewModel @Inject constructor(
 
     fun displayArticleInBrowser(context: Context, article: Article) {
         browserLauncher.launchUrl(context, article.link.toUri())
-    }
-
-    fun setSearchQuery(query: String) {
-        _searchQuery.value = query
     }
 
     fun recordSearchQueryInHistory(query: String) = viewModelScope.launch {

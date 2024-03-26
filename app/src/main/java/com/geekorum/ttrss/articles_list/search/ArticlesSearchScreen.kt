@@ -207,12 +207,6 @@ fun ArticlesSearchScreen(
     activityViewModel: ActivityViewModel,
     searchViewModel: SearchViewModel = hiltViewModel(),
 ) {
-    LaunchedEffect(activityViewModel, searchViewModel) {
-        activityViewModel.searchQuery.collect {
-            searchViewModel.setSearchQuery(it)
-        }
-    }
-
     val compactItemsInSmallScreens by activityViewModel.displayCompactItems.collectAsStateWithLifecycle()
     val displayCompactItems = compactItemsInSmallScreens
             && (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact ||
