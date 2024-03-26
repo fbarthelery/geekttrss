@@ -85,12 +85,6 @@ internal class AppBarPresenter(
         )
 
         val isSearchOpen = currentDestination != null && currentDestination?.destination?.route == NavRoutes.Search
-        val isNotOnSearchDestination = currentDestination != null && currentDestination?.destination?.route != NavRoutes.Search
-        if (isNotOnSearchDestination) {
-            LaunchedEffect(Unit) {
-                activityViewModel.setSearchQuery("")
-            }
-        }
 
         val searchScreenTransition = updateTransition(targetState = isSearchOpen, label = "show search")
         SideEffect {
@@ -129,9 +123,9 @@ internal class AppBarPresenter(
                     },
                     suggestions = suggestions,
                     onSearch = {
-                        activityViewModel.setSearchQuery(it)
                         activityViewModel.recordSearchQueryInHistory(it)
                         hasSearched = true
+                        navController.navigateToSearch(it)
                     },
                     onUpClick = { navController.popBackStack() },
                     modifier = Modifier

@@ -20,25 +20,25 @@
  */
 package com.geekorum.ttrss.articles_list.search
 
-import androidx.annotation.MainThread
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.geekorum.ttrss.articles_list.ArticlesRepository
 import com.geekorum.ttrss.data.ArticleWithFeed
 import com.geekorum.ttrss.session.SessionActivityComponent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.flatMapLatest
 import javax.inject.Inject
 
-@OptIn(ExperimentalCoroutinesApi::class)
+private val ARG_QUERY = "query"
+
 @HiltViewModel
 class SearchViewModel @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     componentFactory: SessionActivityComponent.Factory
 ) : ViewModel() {
 
@@ -46,18 +46,11 @@ class SearchViewModel @Inject constructor(
     private val articlesRepository: ArticlesRepository = sessionActivityComponent.articleRepository
     private val setFieldActionFactory = sessionActivityComponent.setArticleFieldActionFactory
 
-    private val searchQuery = MutableStateFlow("")
-
-    val articles: Flow<PagingData<ArticleWithFeed>> = searchQuery.flatMapLatest {
-        Pager(PagingConfig(pageSize = 50)) {
-            articlesRepository.searchArticles(it)
-        }.flow
-    }
-
-    @MainThread
-    fun setSearchQuery(keyword: String) {
-        searchQuery.value = keyword
-    }
+    val articles: Flow<PagingData<ArticleWithFeed>> = Pager(PagingConfig(pageSize = 50)) {
+        val searchQuery = savedStateHandle.get<String>(ARG_QUERY)!!
+        articlesRepository.searchArticles(searchQuery)
+    }.flow
+        .cachedIn(viewModelScope)
 
     fun setArticleStarred(articleId: Long, newValue: Boolean) {
         val action = setFieldActionFactory.createSetStarredAction(viewModelScope, articleId, newValue)

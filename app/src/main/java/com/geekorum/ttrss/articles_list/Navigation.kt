@@ -47,7 +47,7 @@ object NavRoutes {
     const val Magazine = "magazine"
     const val ArticlesList = "feeds/{feed_id}?feed_name={feed_name}"
     const val ArticlesListByTag = "tags/{tag}"
-    const val Search = "search"
+    const val Search = "search?query={query}"
 
     fun getLabelForRoute(context: Context, route: String?) = when(route) {
         Magazine -> context.getString(R.string.title_magazine)
@@ -109,7 +109,12 @@ fun ArticlesListNavHost(
                 windowSizeClass = windowSizeClass, contentPadding = contentPadding)
         }
 
-        composable(NavRoutes.Search) {
+        composable(NavRoutes.Search,
+            arguments = listOf(navArgument("query") {
+                nullable = false
+                defaultValue = ""
+            })
+        ) {
             ArticlesSearchScreen(activityViewModel = activityViewModel, windowSizeClass = windowSizeClass)
         }
     }
@@ -159,9 +164,12 @@ fun NavController.navigateToArticle(articleId: Long) {
     context.startActivity(intent)
 }
 
-
-fun NavController.navigateToSearch() {
-    navigate(NavRoutes.Search)
+fun NavController.navigateToSearch(query: String = "") {
+    navigate("search?query=$query", navOptions = navOptions {
+        popUpTo(NavRoutes.Search) {
+            inclusive = true
+        }
+    })
 }
 
 fun NavController.navigateToManageFeeds() {
