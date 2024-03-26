@@ -180,7 +180,7 @@ class ArticleListActivity : SessionActivity() {
                         mutableStateOf(contentPadding)
                     }
                     SideEffect {
-                        if (!appBarPresenter.isSearchTransitioning) {
+                        if (!appBarPresenter.isSearchTransitioning && navController.currentDestination?.route != NavRoutes.Search) {
                             lastPaddingExceptSearch = contentPadding
                         }
                     }
