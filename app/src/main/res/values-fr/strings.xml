@@ -40,6 +40,7 @@
     <string name="sort_order_oldest_first">Le plus vieux</string>
     <string name="title_article_search">Recherche</string>
     <string name="menu_item_mark_feed_as_read">Marquer comme lu</string>
+    <string name="label_articles_search_no_results">Pas d\'articles trouvés pour \"%1$s\"</string>
     <string name="title_article_details">Détails de l\'article</string>
     <string name="title_feeds_menu">Flux</string>
     <string name="drawer_open">Ouvrir le menu</string>
@@ -115,4 +116,5 @@
     <string name="title_manage_feeds">Gestion des flux</string>
     <string name="content_desc_btn_clear">Effacer</string>
     <string name="placeholder_textfield_search">Rechercher des articles</string>
+    <string name="label_articles_search_no_results_instructions">Vérifiez l\'orthographe ou essayez un autre terme de recherche</string>
 </resources>

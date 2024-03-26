@@ -46,9 +46,10 @@ class SearchViewModel @Inject constructor(
     private val articlesRepository: ArticlesRepository = sessionActivityComponent.articleRepository
     private val setFieldActionFactory = sessionActivityComponent.setArticleFieldActionFactory
 
+    val query = savedStateHandle.get<String>(ARG_QUERY)!!
+
     val articles: Flow<PagingData<ArticleWithFeed>> = Pager(PagingConfig(pageSize = 50)) {
-        val searchQuery = savedStateHandle.get<String>(ARG_QUERY)!!
-        articlesRepository.searchArticles(searchQuery)
+        articlesRepository.searchArticles(query)
     }.flow
         .cachedIn(viewModelScope)
 

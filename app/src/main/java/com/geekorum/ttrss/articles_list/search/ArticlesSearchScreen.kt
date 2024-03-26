@@ -31,7 +31,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
@@ -39,6 +41,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -46,6 +52,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
+import com.geekorum.ttrss.R
 import com.geekorum.ttrss.articles_list.ActivityViewModel
 import com.geekorum.ttrss.articles_list.ArticleCard
 import com.geekorum.ttrss.articles_list.CompactArticleListItem
@@ -70,10 +77,16 @@ fun SearchResultCardList(
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     val pagingItems = viewModel.articles.collectAsLazyPagingItems()
+    val loadState by debouncedPagingViewStateFor(pagingItems)
+
+    val isEmpty = pagingItems.itemCount == 0
+    if (isEmpty && (loadState is LoadState.NotLoading || loadState is LoadState.Error)) {
+        NoResultsForQuery(viewModel.query, modifier = Modifier.padding(contentPadding))
+        return
+    }
 
     val listState = rememberLazyListState()
     var animateItemAppearance by remember { mutableStateOf(true) }
-    val loadState by debouncedPagingViewStateFor(pagingItems)
     LaunchedEffect(loadState, pagingItems.itemCount) {
         if (loadState is LoadState.NotLoading) {
             Timber.i("loading item reset animate item appearance")
@@ -235,6 +248,28 @@ fun ArticlesSearchScreen(
     }
 }
 
+
+@Composable
+private fun NoResultsForQuery(query: String, modifier: Modifier = Modifier) {
+    Column(modifier.padding(horizontal = 16.dp)) {
+        Text(buildNoArticlesText(query), style = MaterialTheme.typography.titleLarge)
+        Text(
+            stringResource(R.string.label_articles_search_no_results_instructions),
+            Modifier.padding(top = 16.dp))
+    }
+}
+
+@Composable
+private fun buildNoArticlesText(query: String): AnnotatedString {
+    val text = stringResource(R.string.label_articles_search_no_results, query)
+    return buildAnnotatedString {
+        append(text)
+        val startIndex = text.indexOf('"')
+        val endIndex = text.lastIndexOf('"')
+        val queryStyle = SpanStyle(color = MaterialTheme.colorScheme.primary)
+        addStyle(queryStyle, startIndex, endIndex)
+    }
+}
 
 private fun onShareClicked(context: Context, article: Article) {
     context.startActivity(createShareArticleIntent(context, article))
