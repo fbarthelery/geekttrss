@@ -21,6 +21,7 @@
 package com.geekorum.ttrss.manage_feeds
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -28,6 +29,8 @@ import com.geekorum.ttrss.data.FeedWithFavIcon
 import com.geekorum.ttrss.data.ManageFeedsDao
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
 /**
@@ -43,6 +46,10 @@ class ManageFeedViewModel @Inject constructor(
             feedsDao.getAllSubscribedFeeds()
         }.flow
     }
+
+    val subscribedFeedsByCategories = feedsDao
+        .getSubscribedFeedsByCategories()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyMap())
 
 }
 

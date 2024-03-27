@@ -38,4 +38,9 @@ interface ManageFeedsDao {
 
     @Query("SELECT * FROM feeds WHERE _id=:id")
     abstract fun getFeedById(id: Long): Flow<FeedWithFavIcon?>
+
+    @Transaction
+    @Query("SELECT * FROM categories JOIN feeds on categories._id = feeds.cat_id WHERE feeds.is_subscribed == 1 ORDER BY categories.title, feeds.title")
+    fun getSubscribedFeedsByCategories(): Flow<Map<Category, List<FeedWithFavIcon>>>
+
 }
