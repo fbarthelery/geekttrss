@@ -178,8 +178,18 @@ fun FeedSection(
         Box {
             var displayDropdownMenu by remember { mutableStateOf(false) }
             val feed = feedWithFavIcon.feed
+            val label = run {
+                val titleRes = when (feed.id) {
+                    Feed.FEED_ID_FRESH -> R.string.label_fresh_feeds_title
+                    Feed.FEED_ID_STARRED -> R.string.label_starred_feeds_title
+                    Feed.FEED_ID_ALL_ARTICLES -> R.string.label_all_articles_feeds_title
+                    else -> null
+                }
+                titleRes?.let { stringResource(it) }
+                    ?:feed.displayTitle.takeIf { it.isNotBlank() } ?: feed.title
+            }
             NavigationItem(
-                feed.displayTitle.takeIf { it.isNotBlank() } ?: feed.title,
+                label,
                 selected = feed == selectedFeed,
                 selectedForAction = displayDropdownMenu,
                 onClick = {
