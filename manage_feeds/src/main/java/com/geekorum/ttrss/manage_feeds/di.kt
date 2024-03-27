@@ -102,8 +102,8 @@ interface ActivityComponent {
     ManageFeedViewModel_HiltModules.KeyModule::class,
     EditFeedViewModel_HiltModules.BindsModule::class,
     EditFeedViewModel_HiltModules.KeyModule::class,
-    DisplaySpecialFeedViewModel_HiltModules.BindsModule::class,
-    DisplaySpecialFeedViewModel_HiltModules.KeyModule::class,
+    EditSpecialFeedViewModel_HiltModules.BindsModule::class,
+    EditSpecialFeedViewModel_HiltModules.KeyModule::class,
 ])
 @DisableInstallInCheck
 internal class ManageFeedModule
