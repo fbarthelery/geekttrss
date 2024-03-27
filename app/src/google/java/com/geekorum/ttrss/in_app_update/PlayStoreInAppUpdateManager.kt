@@ -23,6 +23,7 @@ package com.geekorum.ttrss.in_app_update
 import android.app.Application
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
+import com.google.android.play.core.appupdate.AppUpdateOptions
 import com.google.android.play.core.install.InstallState
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallErrorCode
@@ -44,7 +45,12 @@ class PlayStoreInAppUpdateManager(
     private val appUpdateManager: AppUpdateManager
 ) : InAppUpdateManager {
     override suspend fun getUpdateAvailability(): UpdateAvailability {
-        val updateInfo = appUpdateManager.requestAppUpdateInfo()
+        val updateInfo = try {
+            appUpdateManager.requestAppUpdateInfo()
+        } catch (e: Exception) {
+            Timber.e(e, "Unable to get app update availability")
+            return UpdateAvailability.NO_UPDATE
+        }
         return when (updateInfo.updateAvailability()) {
             PlayUpdateAvailability.UPDATE_AVAILABLE,
             PlayUpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS
@@ -55,7 +61,12 @@ class PlayStoreInAppUpdateManager(
     }
 
     override suspend fun getUpdateState(): UpdateState {
-        val updateInfo = appUpdateManager.requestAppUpdateInfo()
+        val updateInfo = try {
+            appUpdateManager.requestAppUpdateInfo()
+        } catch (e: Exception) {
+            Timber.e(e, "Unable to get app update info")
+            return UpdateState(UpdateState.Status.UNKNOWN)
+        }
         val status = PlayInstallStatus(updateInfo.installStatus).toUpdateStateStatus()
         return UpdateState(status)
     }
@@ -65,8 +76,9 @@ class PlayStoreInAppUpdateManager(
         val playIntentSenderForResultStarter = PlayIntentSenderForResultStarter { intent, finalRequestCode, fillInIntent, flagsMask, flagsValues, extraFlags, options ->
             intentSenderForResultStarter.startIntentSenderForResult(intent, finalRequestCode, fillInIntent, flagsMask, flagsValues, extraFlags, options)
         }
-        appUpdateManager.startUpdateFlowForResult(updateInfo, AppUpdateType.FLEXIBLE,
-            playIntentSenderForResultStarter, requestCode)
+        val appUpdateOptions = AppUpdateOptions.defaultOptions(AppUpdateType.FLEXIBLE)
+        appUpdateManager.startUpdateFlowForResult(updateInfo,
+            playIntentSenderForResultStarter, appUpdateOptions, requestCode)
         return appUpdateManager.requestUpdateFlow()
             .map {
                 it.toUpdateState().also {state ->
@@ -80,8 +92,9 @@ class PlayStoreInAppUpdateManager(
         val playIntentSenderForResultStarter = PlayIntentSenderForResultStarter { intent, finalRequestCode, fillInIntent, flagsMask, flagsValues, extraFlags, options ->
             intentSenderForResultStarter.startIntentSenderForResult(intent, finalRequestCode, fillInIntent, flagsMask, flagsValues, extraFlags, options)
         }
-        appUpdateManager.startUpdateFlowForResult(updateInfo, AppUpdateType.IMMEDIATE,
-            playIntentSenderForResultStarter, requestCode)
+        val appUpdateOptions = AppUpdateOptions.defaultOptions(AppUpdateType.IMMEDIATE)
+        appUpdateManager.startUpdateFlowForResult(updateInfo,
+            playIntentSenderForResultStarter, appUpdateOptions, requestCode)
     }
 
     override fun completeUpdate() {
