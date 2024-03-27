@@ -110,6 +110,9 @@
     <string name="fragment_articles_list_no_articles_lbl">No articles</string>
     <string name="fragment_articles_list_no_articles_and_sync_lbl">No articles.\nFirst synchronization may take a while…</string>
     <string name="btn_refresh">Refresh</string>
+    <string name="label_fresh_feeds_title">Fresh articles</string>
+    <string name="label_starred_feeds_title">Starred articles</string>
+    <string name="label_all_articles_feeds_title">All articles</string>
 
     <!-- banners -->
     <string name="banner_update_msg">A new update is available</string>

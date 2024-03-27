@@ -137,7 +137,19 @@ class FeedsNavigationMenuPresenter(
 
     private fun navigateToFeed(feed: Feed) {
         activityViewModel.setSelectedFeed(feed)
-        navController.navigateToFeed(feed.id, feed.title)
+        val feedTitle = run {
+            val titleRes = when (feed.id) {
+                Feed.FEED_ID_FRESH -> R.string.label_fresh_feeds_title
+                Feed.FEED_ID_STARRED -> R.string.label_starred_feeds_title
+                Feed.FEED_ID_ALL_ARTICLES -> R.string.label_all_articles_feeds_title
+                else -> null
+            }
+            titleRes?.let { activity.getString(it) }
+                ?: feed.displayTitle.takeIf { it.isNotBlank() }
+                ?: feed.title
+        }
+
+        navController.navigateToFeed(feed.id, feedTitle)
     }
 
 }

@@ -179,7 +179,6 @@ fun NavController.navigateToManageFeeds() {
     context.startActivity(intent)
 }
 
-fun createFeedDeepLink(feed: Feed): Uri {
-    val shortcutTitle = feed.displayTitle.takeIf { it.isNotBlank() } ?: feed.title
-    return "app://feeds/${feed.id}?feed_name=${shortcutTitle}".toUri()
+fun createFeedDeepLink(feed: Feed, title: String): Uri {
+    return "app://feeds/${feed.id}?feed_name=${title}".toUri()
 }

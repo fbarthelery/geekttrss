@@ -117,4 +117,7 @@
     <string name="content_desc_btn_clear">Effacer</string>
     <string name="placeholder_textfield_search">Rechercher des articles</string>
     <string name="label_articles_search_no_results_instructions">Vérifiez l\'orthographe ou essayez un autre terme de recherche</string>
+    <string name="label_fresh_feeds_title">Articles récents</string>
+    <string name="label_starred_feeds_title">Articles favoris</string>
+    <string name="label_all_articles_feeds_title">Tous les articles</string>
 </resources>
