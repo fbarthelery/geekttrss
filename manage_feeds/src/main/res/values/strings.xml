@@ -61,6 +61,9 @@
     <string name="lbl_feed_url">Url</string>
     <string name="btn_unsubscribe">Unsubscribe</string>
     <string name="btn_create_shortcut">Create shortcut</string>
+    <string name="lbl_all_articles_feed_description">This is a virtual feed that contains all articles</string>
+    <string name="lbl_fresh_articles_feed_description">This is a virtual feed that contains recent articles</string>
+    <string name="lbl_starred_articles_feed_description">This is a virtual feed that contains articles that you have starred</string>
 
 
 </resources>
