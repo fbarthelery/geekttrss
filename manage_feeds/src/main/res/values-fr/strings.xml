@@ -47,4 +47,7 @@
         <item quantity="one" tools:ignore="ImpliedQuantity">Nous avons trouvé ce flux sur ce site web. Voulez-vous vous abonner ?</item>
         <item quantity="other">Nous avons trouvé %d flux sur ce site web. Selectionner celui auquel vous voulez vous abonner.</item>
     </plurals>
+    <string name="lbl_all_articles_feed_description">C\'est un flux virtuel qui contient tous les articles</string>
+    <string name="lbl_fresh_articles_feed_description">C\'est un flux virtuel qui contient les articles récents</string>
+    <string name="lbl_starred_articles_feed_description">C\'est un flux virtuel qui contient les articles que vous avez marqué d\'une étoile</string>
 </resources>

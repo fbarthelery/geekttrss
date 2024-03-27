@@ -83,7 +83,8 @@ fun ManageFeedNavHost(
                 }
             )
         ) {
-            EditFeedScreen(navigateBack = {
+            val feedId = it.arguments!!.getLong("feedId")
+            EditFeedScreen(feedId, navigateBack = {
                 navController.popBackStack()
             })
         }

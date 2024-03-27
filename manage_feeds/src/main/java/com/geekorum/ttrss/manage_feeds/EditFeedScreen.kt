@@ -29,6 +29,7 @@ import android.graphics.drawable.BitmapDrawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.automirrored.filled.AddToHomeScreen
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -162,6 +163,49 @@ class EditFeedViewModel @Inject constructor(
     private fun getShortcutId(feedId: Long) = "FEED_$feedId"
 }
 
+@HiltViewModel
+class DisplaySpecialFeedViewModel @Inject constructor(
+    private val application: Application,
+    private val savedStateHandle: SavedStateHandle,
+): ViewModel() {
+
+    private val canCreatePinShortcut = ShortcutManagerCompat.isRequestPinShortcutSupported(application)
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val feed = savedStateHandle.getStateFlow<Long?>(ARG_FEED_ID, null)
+        .filterNotNull()
+        .mapLatest {
+            Feed.createVirtualFeedForId(it)
+        }
+
+    val uiState = feed.map {
+        EditFeedUiState(feed = it, canCreatePinShortcut = canCreatePinShortcut)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), EditFeedUiState())
+
+    fun createShortcut(context: Context) = viewModelScope.launch {
+        val feed = checkNotNull(uiState.value.feed)
+
+        val shortcutTitle = feed.displayTitle.takeIf { it.isNotBlank() } ?: feed.title
+        val intent = Intent(context, ArticleListActivity::class.java).apply {
+            data = createFeedDeepLink(feed)
+            action = Intent.ACTION_VIEW
+        }
+
+        val shortcutIcon = IconCompat.createWithResource(context, appR.mipmap.ic_launcher)
+
+        val shortcutInfo = ShortcutInfoCompat.Builder(context, getShortcutId(feed.id))
+            .setShortLabel(shortcutTitle)
+            .setLongLabel(feed.displayTitle.takeIf { it.isNotBlank() } ?: feed.title)
+            .setIcon(shortcutIcon)
+            .setIntent(intent)
+            .build()
+        ShortcutManagerCompat.requestPinShortcut(context, shortcutInfo, null)
+    }
+
+    private fun getShortcutId(feedId: Long) = "FEED_$feedId"
+}
+
+
 
 data class EditFeedUiState(
     val feed: Feed? = null,
@@ -173,6 +217,15 @@ data class EditFeedUiState(
     val isSubscribed: Boolean = feed?.isSubscribed ?: true
 }
 
+
+@Composable
+fun EditFeedScreen(feedId: Long, navigateBack: () -> Unit) {
+    if (Feed.isVirtualFeed(feedId)) {
+        EditSpecialFeedScreen()
+    } else {
+        EditFeedScreen(navigateBack = navigateBack)
+    }
+}
 
 @Composable
 fun EditFeedScreen(viewModel: EditFeedViewModel = dfmHiltViewModel(), navigateBack: () -> Unit) {
@@ -264,6 +317,84 @@ fun EditFeedScreen(
 }
 
 @Composable
+fun EditSpecialFeedScreen(viewModel: DisplaySpecialFeedViewModel = dfmHiltViewModel()) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    EditSpecialFeedScreen(uiState = uiState,
+        onCreateShortcutToFeed = {
+            viewModel.createShortcut(context)
+        })
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EditSpecialFeedScreen(
+    uiState: EditFeedUiState,
+    onCreateShortcutToFeed: () -> Unit
+) {
+    Scaffold(topBar = {
+        LargeTopAppBar(
+            title = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    val feed = uiState.feed
+                    if (feed != null) {
+                        val iconVector = when {
+                            feed.isArchivedFeed -> AppTheme3.Icons.Inventory2
+                            feed.isStarredFeed -> AppTheme3.Icons.Star
+                            feed.isPublishedFeed -> AppTheme3.Icons.CheckBox
+                            feed.isFreshFeed -> AppTheme3.Icons.LocalCafe
+                            feed.isAllArticlesFeed -> AppTheme3.Icons.FolderOpen
+                            else -> null
+                        }
+                        if (iconVector != null) {
+                            Icon(iconVector, contentDescription = null,
+                                modifier = Modifier
+                                    .padding(end = 16.dp)
+                                    .size(48.dp))
+                        }
+                    }
+
+                    Text(uiState.title,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 2,
+                    )
+                }
+            },
+            colors = TopAppBarDefaults.largeTopAppBarColors(
+                containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+            ))
+    }) {
+        Column(
+            Modifier
+                .padding(it)
+                .padding(16.dp)
+                .fillMaxWidth()
+        ) {
+            if (uiState.feed != null) {
+                val feed = uiState.feed!!
+                val specialFeedDescriptionId = when {
+                    feed.isStarredFeed -> R.string.lbl_starred_articles_feed_description
+                    feed.isFreshFeed -> R.string.lbl_fresh_articles_feed_description
+                    feed.isAllArticlesFeed -> R.string.lbl_all_articles_feed_description
+                    else -> null
+                }
+                val description = specialFeedDescriptionId?.let { stringResource(it) } ?: ""
+                Text(description)
+
+                if (uiState.canCreatePinShortcut) {
+                    CreateShortcutButton(
+                        onClick = onCreateShortcutToFeed,
+                        modifier = Modifier
+                            .align(Alignment.End)
+                            .padding(top = 16.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun CreateShortcutButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
     OutlinedButton(
         modifier = modifier,
@@ -344,5 +475,23 @@ private fun PreviewEditFeedScreen() {
         )
 
         EditFeedScreen(uiState, onUnsubscribeFeed = {}, onCreateShortcutToFeed = {})
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewEditSpecialFeedScreen() {
+    AppTheme3 {
+        val uiState = EditFeedUiState(
+            feed = Feed(
+                id = Feed.FEED_ID_FRESH,
+                title = "Fresh articles",
+                url = "https://medium.com/feed/androiddevelopers"
+            ),
+            faviconUrl = null,
+            canCreatePinShortcut = true
+        )
+
+        EditSpecialFeedScreen(uiState, onCreateShortcutToFeed = {})
     }
 }
