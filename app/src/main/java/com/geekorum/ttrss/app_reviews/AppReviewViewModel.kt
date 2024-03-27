@@ -23,8 +23,8 @@ package com.geekorum.ttrss.app_reviews
 import android.app.Activity
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.datetime.Clock
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -42,11 +42,13 @@ class AppReviewViewModel @Inject constructor(
 
     fun launchReview(activity: Activity) {
         val lastReviewRequestTimeStamp = appReviewStateManager.lastReviewRequestTimestamp
+        Timber.i("Last app review requested on $lastReviewRequestTimeStamp")
         if (appReviewStateManager.canAskForReview && lastReviewRequestTimeStamp == null) { // first time asking, wait a week
             appReviewStateManager.lastReviewRequestTimestamp = Clock.System.now()
             return
         }
         if (appReviewStateManager.canAskForReview) {
+            Timber.i("Launch in-app review dialog")
             appReviewStateManager.lastReviewRequestTimestamp = Clock.System.now()
             reviewManager.launchReview(activity)
         }
