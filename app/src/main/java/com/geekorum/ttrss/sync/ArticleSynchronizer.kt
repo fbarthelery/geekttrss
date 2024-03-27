@@ -27,31 +27,20 @@ import android.os.Bundle
 import android.os.RemoteException
 import android.util.Log
 import androidx.lifecycle.asFlow
-import androidx.work.Constraints
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.await
-import androidx.work.workDataOf
+import androidx.work.*
 import com.geekorum.geekdroid.accounts.CancellableSyncAdapter
+import com.geekorum.ttrss.data.Feed
+import com.geekorum.ttrss.data.feedsettings.FeedSettingsRepository
 import com.geekorum.ttrss.network.ApiService
-import com.geekorum.ttrss.sync.SyncContract.EXTRA_FEED_ID
-import com.geekorum.ttrss.sync.SyncContract.EXTRA_NUMBER_OF_LATEST_ARTICLES_TO_REFRESH
-import com.geekorum.ttrss.sync.SyncContract.EXTRA_UPDATE_FEED_ICONS
-import com.geekorum.ttrss.sync.workers.CollectNewArticlesWorker
-import com.geekorum.ttrss.sync.workers.SendTransactionsWorker
-import com.geekorum.ttrss.sync.workers.SyncFeedsIconWorker
-import com.geekorum.ttrss.sync.workers.SyncFeedsWorker
-import com.geekorum.ttrss.sync.workers.SyncWorkerFactory
-import com.geekorum.ttrss.sync.workers.UpdateAccountInfoWorker
-import com.geekorum.ttrss.sync.workers.UpdateArticleStatusWorker
+import com.geekorum.ttrss.sync.SyncContract.*
+import com.geekorum.ttrss.sync.workers.*
 import com.geekorum.ttrss.webapi.ApiCallException
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.takeWhile
 import timber.log.Timber
 import java.util.UUID
@@ -59,12 +48,12 @@ import java.util.UUID
 /**
  * Synchronize Articles from the network.
  */
-@OptIn(ExperimentalCoroutinesApi::class)
 class ArticleSynchronizer @AssistedInject constructor(
     application: Application,
     @Assisted params: Bundle,
     private val account: Account,
-    private val databaseService: DatabaseService
+    private val databaseService: DatabaseService,
+    private val feedSettingsRepository: FeedSettingsRepository
 ) : CancellableSyncAdapter.CancellableSync() {
 
     @AssistedFactory
@@ -152,15 +141,21 @@ class ArticleSynchronizer @AssistedInject constructor(
 
         val tag = UUID.randomUUID().toString()
         val jobRequests = databaseService.getFeeds()
+            .filter {
+                if (!isFeedSyncable(it)) {
+                    Timber.i("Feed ${it.id} - ${it.title} is not syncable. don't collect new articles")
+                    false
+                } else true
+            }
             .shuffled()
             .map { feed ->
-            val inputData = CollectNewArticlesWorker.getInputData(account, feed.id)
-            OneTimeWorkRequestBuilder<CollectNewArticlesWorker>()
+                val inputData = CollectNewArticlesWorker.getInputData(account, feed.id)
+                OneTimeWorkRequestBuilder<CollectNewArticlesWorker>()
                     .setConstraints(constraints)
                     .setInputData(inputData)
                     .addTag(tag)
                     .build()
-        }
+            }
         collectNewArticlesJobsTag = tag
 
         workManager.enqueue(jobRequests).await()
@@ -172,6 +167,12 @@ class ArticleSynchronizer @AssistedInject constructor(
                 .collect()
     }
 
+    private suspend fun isFeedSyncable(feed: Feed): Boolean {
+        val feedSettings = feedSettingsRepository.getFeedSettings(feed.id)
+            .firstOrNull() ?: return true
+        return feedSettings.syncPeriodically
+    }
+
     private suspend fun updateArticlesStatus() {
         val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -181,8 +182,12 @@ class ArticleSynchronizer @AssistedInject constructor(
         val jobRequests = databaseService.getFeeds()
             .filter {
                 it.id == feedId || feedId == ApiService.ALL_ARTICLES_FEED_ID
-            }
-            .shuffled()
+            }.filter {
+                if (!isFeedSyncable(it)) {
+                    Timber.i("Feed ${it.id} - ${it.title} is not syncable. don't update article status")
+                    false
+                } else true
+            }.shuffled()
             .map { feed ->
                 val inputData = UpdateArticleStatusWorker.getInputData(
                     account, feed.id, numberOfLatestArticlesToRefresh)
