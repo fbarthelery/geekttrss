@@ -53,6 +53,7 @@ import com.geekorum.ttrss.data.FeedWithFavIcon
 import com.geekorum.ttrss.ui.AppTheme3
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import com.geekorum.ttrss.R as appR
 
 private const val CategoryContentType = "Category"
 private const val FeedContentType = "Feed"
@@ -167,7 +168,9 @@ fun ManageFeedsListScreen(
             contentPadding = contentPadding
         ) {
             item(contentType = CategoryContentType) {
-                CategoryListItem(category = "SpecialFeeds", isExpanded = isSpecialFeedsExpanded,
+                CategoryListItem(
+                    stringResource(R.string.lbl_special_feeds_category),
+                    isExpanded = isSpecialFeedsExpanded,
                     modifier = Modifier.clickable {
                         isSpecialFeedsExpanded = !isSpecialFeedsExpanded
                     }
@@ -220,9 +223,9 @@ private fun FeedListItem(
         leadingContent = {
             val feedIconPainter = rememberAsyncImagePainter(
                 model = feedItem?.favIcon?.url,
-                placeholder = painterResource(com.geekorum.ttrss.R.drawable.ic_rss_feed_orange),
-                fallback = painterResource(com.geekorum.ttrss.R.drawable.ic_rss_feed_orange),
-                error = painterResource(com.geekorum.ttrss.R.drawable.ic_rss_feed_orange),
+                placeholder = painterResource(appR.drawable.ic_rss_feed_orange),
+                fallback = painterResource(appR.drawable.ic_rss_feed_orange),
+                error = painterResource(appR.drawable.ic_rss_feed_orange),
             )
             Image(
                 painter = feedIconPainter,
@@ -263,9 +266,18 @@ private fun SpecialFeedListItem(
             }
         },
         headlineContent = {
-            //TODO use resources
+            val label = run {
+                val titleRes = when (feedItem.feed.id) {
+                    Feed.FEED_ID_FRESH -> appR.string.label_fresh_feeds_title
+                    Feed.FEED_ID_STARRED -> appR.string.label_starred_feeds_title
+                    Feed.FEED_ID_ALL_ARTICLES -> appR.string.label_all_articles_feeds_title
+                    else -> null
+                }
+                titleRes?.let { stringResource(it) }
+                    ?:feedItem.feed.displayTitle.takeIf { it.isNotBlank() } ?: feedItem.feed.title
+            }
             Text(
-                feedItem.feed.title,
+                label,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1
             )

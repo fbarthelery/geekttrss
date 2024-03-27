@@ -49,5 +49,6 @@
     </plurals>
     <string name="lbl_all_articles_feed_description">C\'est un flux virtuel qui contient tous les articles</string>
     <string name="lbl_fresh_articles_feed_description">C\'est un flux virtuel qui contient les articles récents</string>
-    <string name="lbl_starred_articles_feed_description">C\'est un flux virtuel qui contient les articles que vous avez marqué d\'une étoile</string>
+    <string name="lbl_starred_articles_feed_description">C\'est un flux virtuel qui contient vos articles favoris</string>
+    <string name="lbl_special_feeds_category">Flux spéciaux</string>
 </resources>

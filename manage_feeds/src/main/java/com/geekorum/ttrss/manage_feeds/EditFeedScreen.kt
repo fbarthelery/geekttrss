@@ -124,7 +124,7 @@ class EditFeedViewModel @Inject constructor(
 
         val shortcutTitle = feed.displayTitle.takeIf { it.isNotBlank() } ?: feed.title
         val intent = Intent(context, ArticleListActivity::class.java).apply {
-            data = createFeedDeepLink(feed)
+            data = createFeedDeepLink(feed, shortcutTitle)
             action = Intent.ACTION_VIEW
         }
 
@@ -164,7 +164,7 @@ class EditFeedViewModel @Inject constructor(
 }
 
 @HiltViewModel
-class DisplaySpecialFeedViewModel @Inject constructor(
+class EditSpecialFeedViewModel @Inject constructor(
     private val application: Application,
     private val savedStateHandle: SavedStateHandle,
 ): ViewModel() {
@@ -182,20 +182,19 @@ class DisplaySpecialFeedViewModel @Inject constructor(
         EditFeedUiState(feed = it, canCreatePinShortcut = canCreatePinShortcut)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), EditFeedUiState())
 
-    fun createShortcut(context: Context) = viewModelScope.launch {
+    fun createShortcut(context: Context, title: String) = viewModelScope.launch {
         val feed = checkNotNull(uiState.value.feed)
 
-        val shortcutTitle = feed.displayTitle.takeIf { it.isNotBlank() } ?: feed.title
         val intent = Intent(context, ArticleListActivity::class.java).apply {
-            data = createFeedDeepLink(feed)
+            data = createFeedDeepLink(feed, title)
             action = Intent.ACTION_VIEW
         }
 
         val shortcutIcon = IconCompat.createWithResource(context, appR.mipmap.ic_launcher)
 
         val shortcutInfo = ShortcutInfoCompat.Builder(context, getShortcutId(feed.id))
-            .setShortLabel(shortcutTitle)
-            .setLongLabel(feed.displayTitle.takeIf { it.isNotBlank() } ?: feed.title)
+            .setShortLabel(title)
+            .setLongLabel(title)
             .setIcon(shortcutIcon)
             .setIntent(intent)
             .build()
@@ -317,12 +316,12 @@ fun EditFeedScreen(
 }
 
 @Composable
-fun EditSpecialFeedScreen(viewModel: DisplaySpecialFeedViewModel = dfmHiltViewModel()) {
+fun EditSpecialFeedScreen(viewModel: EditSpecialFeedViewModel = dfmHiltViewModel()) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     EditSpecialFeedScreen(uiState = uiState,
         onCreateShortcutToFeed = {
-            viewModel.createShortcut(context)
+            viewModel.createShortcut(context, it)
         })
 }
 
@@ -330,8 +329,20 @@ fun EditSpecialFeedScreen(viewModel: DisplaySpecialFeedViewModel = dfmHiltViewMo
 @Composable
 fun EditSpecialFeedScreen(
     uiState: EditFeedUiState,
-    onCreateShortcutToFeed: () -> Unit
+    onCreateShortcutToFeed: (String) -> Unit
 ) {
+    val feedTitle = run {
+        val titleRes = when (uiState.feed?.id) {
+            Feed.FEED_ID_FRESH -> appR.string.label_fresh_feeds_title
+            Feed.FEED_ID_STARRED -> appR.string.label_starred_feeds_title
+            Feed.FEED_ID_ALL_ARTICLES -> appR.string.label_all_articles_feeds_title
+            else -> null
+        }
+        titleRes?.let { stringResource(it) }
+            ?: uiState.feed?.displayTitle?.takeIf { it.isNotBlank() }
+            ?: uiState.feed?.title ?: ""
+    }
+
     Scaffold(topBar = {
         LargeTopAppBar(
             title = {
@@ -354,7 +365,7 @@ fun EditSpecialFeedScreen(
                         }
                     }
 
-                    Text(uiState.title,
+                    Text(feedTitle,
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 2,
                     )
@@ -371,7 +382,7 @@ fun EditSpecialFeedScreen(
                 .fillMaxWidth()
         ) {
             if (uiState.feed != null) {
-                val feed = uiState.feed!!
+                val feed = uiState.feed
                 val specialFeedDescriptionId = when {
                     feed.isStarredFeed -> R.string.lbl_starred_articles_feed_description
                     feed.isFreshFeed -> R.string.lbl_fresh_articles_feed_description
@@ -383,7 +394,7 @@ fun EditSpecialFeedScreen(
 
                 if (uiState.canCreatePinShortcut) {
                     CreateShortcutButton(
-                        onClick = onCreateShortcutToFeed,
+                        onClick = { onCreateShortcutToFeed(feedTitle) },
                         modifier = Modifier
                             .align(Alignment.End)
                             .padding(top = 16.dp)

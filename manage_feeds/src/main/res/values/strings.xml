@@ -63,7 +63,7 @@
     <string name="btn_create_shortcut">Create shortcut</string>
     <string name="lbl_all_articles_feed_description">This is a virtual feed that contains all articles</string>
     <string name="lbl_fresh_articles_feed_description">This is a virtual feed that contains recent articles</string>
-    <string name="lbl_starred_articles_feed_description">This is a virtual feed that contains articles that you have starred</string>
-
+    <string name="lbl_starred_articles_feed_description">This is a virtual feed that contains your favorite articles</string>
+    <string name="lbl_special_feeds_category">Special feeds</string>
 
 </resources>
