@@ -81,8 +81,9 @@ fun ManageFeedsListScreen(
     navigateToSubscribeToFeed: () -> Unit,
     navigateToEditFeed: (Long) -> Unit
 ) {
+    val feedsData by viewModel.subscribedFeedsByCategories.collectAsStateWithLifecycle()
     ManageFeedsListScreen(
-        feedsData = viewModel.feeds,
+        feedsData = feedsData,
         onFeedClick = {
             navigateToEditFeed(it.feed.id)
         },
