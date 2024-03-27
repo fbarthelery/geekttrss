@@ -22,12 +22,16 @@ package com.geekorum.ttrss.manage_feeds
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.PlaylistAdd
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
@@ -37,16 +41,39 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import coil.compose.rememberAsyncImagePainter
+import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.data.FeedWithFavIcon
 import com.geekorum.ttrss.ui.AppTheme3
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+
+private const val CategoryContentType = "Category"
+private const val FeedContentType = "Feed"
+private const val SpecialFeedContentType = "SpecialFeed"
+
+private val SpecialFeeds = createSpecialFeeds()
+private fun createSpecialFeeds(): List<FeedWithFavIcon> {
+    val allArticles = FeedWithFavIcon(
+        feed = Feed.createVirtualFeedForId(Feed.FEED_ID_ALL_ARTICLES),
+        favIcon = null)
+
+    val freshArticles = FeedWithFavIcon(
+        feed = Feed.createVirtualFeedForId(Feed.FEED_ID_FRESH),
+        favIcon = null)
+    val starredArticles = FeedWithFavIcon(
+        feed = Feed.createVirtualFeedForId(Feed.FEED_ID_STARRED),
+        favIcon = null)
+
+    return listOf(allArticles, freshArticles, starredArticles)
+}
+
 
 @Composable
 fun ManageFeedsListScreen(
@@ -96,38 +123,198 @@ fun ManageFeedsListScreen(
         ) {
             items(feedsPagingItem.itemCount,
                 key = feedsPagingItem.itemKey { it.feed.id },
-                contentType = feedsPagingItem.itemContentType { "Feed" }) { idx ->
+                contentType = feedsPagingItem.itemContentType { FeedContentType }) { idx ->
                 val feedItem = feedsPagingItem[idx]
-                ListItem(
-                    modifier = Modifier.clickable {
-                        if (feedItem != null)
-                            onFeedClick(feedItem)
-                    },
-                    leadingContent = {
-                        val feedIconPainter = rememberAsyncImagePainter(
-                            model = feedItem?.favIcon?.url,
-                            placeholder = painterResource(com.geekorum.ttrss.R.drawable.ic_rss_feed_orange),
-                            fallback = painterResource(com.geekorum.ttrss.R.drawable.ic_rss_feed_orange),
-                            error = painterResource(com.geekorum.ttrss.R.drawable.ic_rss_feed_orange),
-                        )
-                        Image(
-                            painter = feedIconPainter,
-                            contentDescription = null,
-                            contentScale = ContentScale.FillBounds,
-                            modifier = Modifier.size(40.dp)
-                        )
-                    },
-                    headlineContent = {
-                        Text(
-                            feedItem?.feed?.title ?: "",
-                            overflow = TextOverflow.Ellipsis,
-                            maxLines = 1
-                        )
-                    })
+                FeedListItem(feedItem, onFeedClick)
             }
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ManageFeedsListScreen(
+    feedsData: Map<Category, List<FeedWithFavIcon>>,
+    onFeedClick: (FeedWithFavIcon) -> Unit,
+    onAddFeedClick: () -> Unit,
+) {
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    Scaffold(
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            LargeTopAppBar(
+                colors = TopAppBarDefaults.largeTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
+                ),
+                title = { Text(stringResource(id = R.string.activity_manage_feed_title)) },
+                scrollBehavior = scrollBehavior
+            )
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = onAddFeedClick) {
+                Icon(Icons.AutoMirrored.Default.PlaylistAdd, contentDescription = null)
+            }
+        }
+    ) { contentPadding ->
+        val nestedScrollInterop = rememberNestedScrollInteropConnection()
+        val expandedCategoriesId = rememberSaveable(
+            saver = MutableStateListSaver
+        ) { mutableStateListOf() }
+        var isSpecialFeedsExpanded by rememberSaveable { mutableStateOf(true) }
+        LazyColumn(
+            modifier = Modifier.nestedScroll(nestedScrollInterop),
+            contentPadding = contentPadding
+        ) {
+            item(contentType = CategoryContentType) {
+                CategoryListItem(category = "SpecialFeeds", isExpanded = isSpecialFeedsExpanded,
+                    modifier = Modifier.clickable {
+                        isSpecialFeedsExpanded = !isSpecialFeedsExpanded
+                    }
+                )
+            }
+            if (isSpecialFeedsExpanded) {
+                items(
+                    SpecialFeeds.size,
+                    contentType = { SpecialFeedContentType }) { idx ->
+                    val feedItem = SpecialFeeds[idx]
+                    SpecialFeedListItem(feedItem, onFeedClick)
+                }
+            }
+
+            for (category in feedsData.keys) {
+                val isExpanded = category.id in expandedCategoriesId
+                item(contentType = CategoryContentType) {
+                    CategoryListItem(category = category.title, isExpanded = isExpanded,
+                        modifier = Modifier.clickable {
+                            if (isExpanded)
+                                expandedCategoriesId.remove(category.id)
+                            else
+                                expandedCategoriesId.add(category.id)
+                        }
+                    )
+                }
+                if (isExpanded) {
+                    val feeds = feedsData[category]!!
+                    items(feeds.size,
+                        contentType = { FeedContentType }) { idx ->
+                        val feedItem = feeds[idx]
+                        FeedListItem(feedItem, onFeedClick)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun FeedListItem(
+    feedItem: FeedWithFavIcon?,
+    onFeedClick: (FeedWithFavIcon) -> Unit
+) {
+    ListItem(
+        modifier = Modifier.clickable {
+            if (feedItem != null)
+                onFeedClick(feedItem)
+        },
+        leadingContent = {
+            val feedIconPainter = rememberAsyncImagePainter(
+                model = feedItem?.favIcon?.url,
+                placeholder = painterResource(com.geekorum.ttrss.R.drawable.ic_rss_feed_orange),
+                fallback = painterResource(com.geekorum.ttrss.R.drawable.ic_rss_feed_orange),
+                error = painterResource(com.geekorum.ttrss.R.drawable.ic_rss_feed_orange),
+            )
+            Image(
+                painter = feedIconPainter,
+                contentDescription = null,
+                contentScale = ContentScale.FillBounds,
+                modifier = Modifier.size(40.dp)
+            )
+        },
+        headlineContent = {
+            Text(
+                feedItem?.feed?.title ?: "",
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1
+            )
+        })
+}
+
+@Composable
+private fun SpecialFeedListItem(
+    feedItem: FeedWithFavIcon,
+    onFeedClick: (FeedWithFavIcon) -> Unit
+) {
+    ListItem(
+        modifier = Modifier.clickable {
+            onFeedClick(feedItem)
+        },
+        leadingContent = {
+            val iconVector = when {
+                feedItem.feed.isArchivedFeed -> AppTheme3.Icons.Inventory2
+                feedItem.feed.isStarredFeed -> AppTheme3.Icons.Star
+                feedItem.feed.isPublishedFeed -> AppTheme3.Icons.CheckBox
+                feedItem.feed.isFreshFeed -> AppTheme3.Icons.LocalCafe
+                feedItem.feed.isAllArticlesFeed -> AppTheme3.Icons.FolderOpen
+                else -> null
+            }
+            if (iconVector != null) {
+                Icon(iconVector, contentDescription = null)
+            }
+        },
+        headlineContent = {
+            //TODO use resources
+            Text(
+                feedItem.feed.title,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1
+            )
+        })
+}
+
+
+
+@Composable
+fun CategoryListItem(category: String, isExpanded: Boolean, modifier: Modifier = Modifier) {
+    Column(modifier) {
+        ListItem(
+            leadingContent = {
+                Icon(AppTheme3.Icons.Category, null,
+                    tint = if (isExpanded) MaterialTheme.colorScheme.primary else LocalContentColor.current)
+            },
+            trailingContent = {
+                if (isExpanded) {
+                    Icon(AppTheme3.Icons.ExpandLess, null)
+                } else {
+                    Icon(AppTheme3.Icons.ExpandMore, null)
+                }
+            },
+            headlineContent = {
+                Text(category,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                    style = MaterialTheme.typography.titleMedium
+                )
+            })
+        HorizontalDivider()
+    }
+}
+
+private val MutableStateListSaver = listSaver(
+    save = { it },
+    restore = { values ->
+        mutableStateListOf<Long>().apply { addAll(values) }
+    }
+)
+
+@Preview
+@Composable
+private fun PreviewCategoryListItem() {
+    var isExpanded by remember { mutableStateOf(false) }
+    CategoryListItem("Special feeds", isExpanded = isExpanded, modifier = Modifier.clickable {
+        isExpanded = !isExpanded
+    })
+}
+
 
 @Preview
 @Composable
