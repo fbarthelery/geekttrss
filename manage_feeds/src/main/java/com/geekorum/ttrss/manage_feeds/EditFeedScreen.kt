@@ -27,6 +27,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.automirrored.filled.AddToHomeScreen
 import androidx.compose.material.icons.filled.*
@@ -60,6 +61,9 @@ import com.geekorum.ttrss.articles_list.ArticleListActivity
 import com.geekorum.ttrss.articles_list.createFeedDeepLink
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.data.ManageFeedsDao
+import com.geekorum.ttrss.data.feedsettings.FeedSettings
+import com.geekorum.ttrss.data.feedsettings.FeedSettingsRepository
+import com.geekorum.ttrss.data.feedsettings.copy
 import com.geekorum.ttrss.manage_feeds.workers.UnsubscribeWorker
 import com.geekorum.ttrss.ui.AppTheme3
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -75,26 +79,36 @@ private const val ARG_FEED_ID = "feedId"
 /**
  * ViewModel to edit preferences for a feed
  */
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class EditFeedViewModel @Inject constructor(
     private val application: Application,
     private val savedStateHandle: SavedStateHandle,
     private val account: Account,
-    private val feedsDao: ManageFeedsDao
+    private val feedsDao: ManageFeedsDao,
+    private val feedSettingsRepository: FeedSettingsRepository,
 ): ViewModel() {
 
     private val canCreatePinShortcut = ShortcutManagerCompat.isRequestPinShortcutSupported(application)
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     private val feed = savedStateHandle.getStateFlow<Long?>(ARG_FEED_ID, null)
         .filterNotNull()
         .flatMapLatest {
         feedsDao.getFeedById(it)
     }
 
-    val uiState = feed.map {
-        EditFeedUiState(feed = it?.feed, faviconUrl = it?.favIcon?.url,
-            canCreatePinShortcut = canCreatePinShortcut)
+    private val feedSettings = savedStateHandle.getStateFlow<Long?>(ARG_FEED_ID, null)
+        .filterNotNull()
+        .flatMapLatest {
+            feedSettingsRepository.getFeedSettings(it)
+        }
+
+    val uiState = feed.combine(feedSettings) { feedInfo, settings ->
+        EditFeedUiState(feed = feedInfo?.feed,
+            faviconUrl = feedInfo?.favIcon?.url,
+            canCreatePinShortcut = canCreatePinShortcut,
+            isSyncingAutomatically = settings?.syncPeriodically ?: true
+        )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), EditFeedUiState())
 
     fun unsubscribeFeed() {
@@ -145,6 +159,13 @@ class EditFeedViewModel @Inject constructor(
             .setIntent(intent)
             .build()
         ShortcutManagerCompat.requestPinShortcut(context, shortcutInfo, null)
+    }
+
+    fun setSyncAutomatically(value: Boolean) = viewModelScope.launch {
+        val feedId: Long = savedStateHandle[ARG_FEED_ID]!!
+        val feedSettings = feedSettingsRepository.getFeedSettings(feedId).firstOrNull() ?: FeedSettings.getDefaultInstance()
+        val update = feedSettings.copy { syncPeriodically = value }
+        feedSettingsRepository.updateFeedSettings(feedId, update)
     }
 
     private suspend fun getFeedIconBitmap(
@@ -210,6 +231,7 @@ data class EditFeedUiState(
     val feed: Feed? = null,
     val faviconUrl: String? = null,
     val canCreatePinShortcut: Boolean = false,
+    val isSyncingAutomatically: Boolean = true,
 ) {
     val title: String = feed?.title ?: ""
     val url: String = feed?.url ?: ""
@@ -239,6 +261,9 @@ fun EditFeedScreen(viewModel: EditFeedViewModel = dfmHiltViewModel(), navigateBa
         onUnsubscribeFeed = viewModel::unsubscribeFeed,
         onCreateShortcutToFeed = {
             viewModel.createShortcut(context)
+        },
+        onSyncAutomaticallyChange = {
+            viewModel.setSyncAutomatically(it)
         })
 }
 
@@ -247,7 +272,8 @@ fun EditFeedScreen(viewModel: EditFeedViewModel = dfmHiltViewModel(), navigateBa
 fun EditFeedScreen(
     uiState: EditFeedUiState,
     onUnsubscribeFeed: () -> Unit,
-    onCreateShortcutToFeed: () -> Unit
+    onCreateShortcutToFeed: () -> Unit,
+    onSyncAutomaticallyChange: (Boolean) -> Unit,
 ) {
     Scaffold(topBar = {
         LargeTopAppBar(
@@ -282,26 +308,35 @@ fun EditFeedScreen(
         Column(
             Modifier
                 .padding(it)
-                .padding(16.dp)
                 .fillMaxWidth()
         ) {
-            Text(stringResource(R.string.lbl_feed_url),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold)
-            Text(uiState.url)
-
-            if (uiState.canCreatePinShortcut) {
-                CreateShortcutButton(onClick = onCreateShortcutToFeed,
-                    modifier = Modifier
-                        .align(Alignment.End)
-                        .padding(top = 16.dp))
+            Column(Modifier.padding(16.dp)) {
+                Text(stringResource(R.string.lbl_feed_url),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold)
+                Text(uiState.url)
             }
 
-            TextButton(modifier = Modifier
-                .padding(top = 16.dp)
-                .align(Alignment.End),
-                onClick = { showUnsubscribeDialog = true }) {
-                Text(stringResource(R.string.btn_unsubscribe))
+            FeedsSettings(syncAutomatically = uiState.isSyncingAutomatically,
+                onSyncAutomaticallyChange = onSyncAutomaticallyChange,
+                modifier = Modifier.padding(bottom = 16.dp))
+
+            Column(
+                Modifier
+                    .padding(horizontal = 16.dp)
+                    .align(Alignment.End)
+            ) {
+                if (uiState.canCreatePinShortcut) {
+                    CreateShortcutButton(onClick = onCreateShortcutToFeed,
+                        modifier = Modifier.align(Alignment.End))
+                }
+
+                TextButton(modifier = Modifier
+                    .padding(top = 16.dp)
+                    .align(Alignment.End),
+                    onClick = { showUnsubscribeDialog = true }) {
+                    Text(stringResource(R.string.btn_unsubscribe))
+                }
             }
         }
 
@@ -314,6 +349,44 @@ fun EditFeedScreen(
         }
     }
 }
+
+@Composable
+private fun FeedsSettings(
+    syncAutomatically: Boolean,
+    onSyncAutomaticallyChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier) {
+        SwitchPreference(
+            headlineContent = {
+                Text("Sync automatically")
+            },
+            checked = syncAutomatically,
+            onCheckedChange = onSyncAutomaticallyChange
+        )
+    }
+}
+
+@Composable
+private fun SwitchPreference(
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    headlineContent: @Composable () -> Unit,
+    modifier: Modifier = Modifier,
+    supportingContent: @Composable (() -> Unit)? = null,
+) {
+    ListItem(
+        headlineContent = headlineContent,
+        supportingContent = supportingContent,
+        trailingContent = {
+            Switch(checked = checked, onCheckedChange = onCheckedChange)
+        },
+        modifier = modifier.clickable {
+            onCheckedChange(!checked)
+        }
+    )
+}
+
 
 @Composable
 fun EditSpecialFeedScreen(viewModel: EditSpecialFeedViewModel = dfmHiltViewModel()) {
@@ -485,7 +558,7 @@ private fun PreviewEditFeedScreen() {
             canCreatePinShortcut = true
         )
 
-        EditFeedScreen(uiState, onUnsubscribeFeed = {}, onCreateShortcutToFeed = {})
+        EditFeedScreen(uiState, onUnsubscribeFeed = {}, onCreateShortcutToFeed = {}, onSyncAutomaticallyChange = {})
     }
 }
 
