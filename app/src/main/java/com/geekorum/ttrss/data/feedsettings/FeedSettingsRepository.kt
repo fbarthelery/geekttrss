@@ -18,7 +18,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.geekorum.ttrss.data
+package com.geekorum.ttrss.data.feedsettings
 
 import android.content.Context
 import androidx.datastore.core.CorruptionException
@@ -37,63 +37,51 @@ import java.io.OutputStream
 import javax.inject.Inject
 import javax.inject.Singleton
 
-class ArticlesSearchHistoryRepository @Inject constructor(
-    private val dataStore: ArticlesSearchHistoryDataStore
+class FeedSettingsRepository @Inject constructor(
+    private val datastore: DataStore<FeedsSettings>
 ) {
 
-    val searchHistory = dataStore.data.map {
-        it.queriesList
+    fun getFeedSettings(feedId: Long) = datastore.data.map {
+        it.settingsMap[feedId]
     }
 
-    suspend fun recordSearchQuery(query: String) {
-        dataStore.updateData { data ->
-            data.copy {
-                val newQueries = queries.toMutableList()
-                    .apply {
-                        remove(query)
-                        add(0, query)
-                    }
-                    .filter { it.isNotBlank() }
-                    .take(10)
-
-                queries.clear()
-                queries.addAll(newQueries)
+    suspend fun updateFeedSettings(feedId: Long, feedSettings: FeedSettings) {
+        datastore.updateData {
+            it.copy {
+                settings[feedId] = feedSettings
             }
         }
     }
 }
 
-typealias ArticlesSearchHistoryDataStore = DataStore<ArticlesSearchHistory>
+private object FeedsSettingsSerializer : Serializer<FeedsSettings> {
+    override val defaultValue: FeedsSettings = FeedsSettings.getDefaultInstance()
 
-val Context.articlesSearchHistoryDatastore by dataStore(
-    fileName = "articles_search_history.pb",
-    serializer = ArticlesSearchHistorySerializer
-)
-
-private object ArticlesSearchHistorySerializer : Serializer<ArticlesSearchHistory> {
-    override val defaultValue: ArticlesSearchHistory = ArticlesSearchHistory.getDefaultInstance()
-
-    override suspend fun readFrom(input: InputStream): ArticlesSearchHistory {
+    override suspend fun readFrom(input: InputStream): FeedsSettings {
         try {
-            return ArticlesSearchHistory.parseFrom(input)
+            return FeedsSettings.parseFrom(input)
         } catch (e: InvalidProtocolBufferException) {
             throw CorruptionException("Can't read proto file", e)
-        }
-    }
+        }    }
 
-    override suspend fun writeTo(t: ArticlesSearchHistory, output: OutputStream) {
+    override suspend fun writeTo(t: FeedsSettings, output: OutputStream) {
         t.writeTo(output)
     }
 }
 
 
+val Context.feedsSettingsDatastore by dataStore(
+    fileName = "feeds_settings.pb",
+    serializer = FeedsSettingsSerializer
+)
+
 @Module
 @InstallIn(SingletonComponent::class)
-object ArticlesSearchHistoryModule {
+object FeedsSettingsModule {
 
     @Provides
     @Singleton
-    fun providesArticlesSearchHistoryDatastore(@ApplicationContext context: Context): ArticlesSearchHistoryDataStore {
-        return context.articlesSearchHistoryDatastore
+    fun providesFeedsSettingsDatastore(@ApplicationContext context: Context): DataStore<FeedsSettings> {
+        return context.feedsSettingsDatastore
     }
 }

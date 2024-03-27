@@ -242,7 +242,7 @@ dependencies {
 
     implementation(libs.jsoup)
     implementation(libs.androidx.datastore)
-    implementation(libs.protobuf.kotlin.lite)
+    api(libs.protobuf.kotlin.lite)
 
     implementation(libs.androidx.lifecycle.livedata.core)
     implementation(libs.androidx.lifecycle.livedata)
