@@ -80,7 +80,7 @@ class InAppUpdatePresenter(
             showBanner = isUpdateAvailable || isUpdateReadyToInstall
         }
 
-        var sheetHeigth by remember { mutableStateOf(0) }
+        var sheetHeigth by remember { mutableIntStateOf(0) }
         AnimatedVisibility(showBanner,
             enter = slideInVertically(initialOffsetY = { it }),
             exit = slideOutVertically(targetOffsetY = { it}),

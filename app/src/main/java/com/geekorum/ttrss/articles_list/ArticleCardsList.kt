@@ -32,6 +32,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material3.*
 import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
 import androidx.compose.material3.pulltorefresh.PullToRefreshState
@@ -425,7 +426,7 @@ private fun ChangeReadBehindItem(dismissDirection: SwipeToDismissBoxValue) {
     ) {
         val text = stringResource(id = R.string.mark_as_read)
         if (dismissDirection == SwipeToDismissBoxValue.StartToEnd) {
-            Icon(painter = painterResource(R.drawable.ic_archive), contentDescription = text,
+            Icon(AppTheme3.Icons.Archive, contentDescription = text,
                 modifier = Modifier.padding(end = 8.dp),
                 tint = MaterialTheme.colorScheme.secondary
             )
@@ -433,7 +434,7 @@ private fun ChangeReadBehindItem(dismissDirection: SwipeToDismissBoxValue) {
         Text(text,
             style = MaterialTheme.typography.bodySmall)
         if (dismissDirection == SwipeToDismissBoxValue.EndToStart) {
-            Icon(painter = painterResource(R.drawable.ic_archive), contentDescription = text,
+            Icon(AppTheme3.Icons.Archive, contentDescription = text,
                 modifier = Modifier.padding(start = 8.dp),
                 tint = MaterialTheme.colorScheme.secondary
             )
@@ -478,8 +479,8 @@ private fun ArticleCardList() {
  */
 @Composable
 fun LazyListState.isScrollingUp(): Boolean {
-    var previousIndex by remember(this) { mutableStateOf(firstVisibleItemIndex) }
-    var previousScrollOffset by remember(this) { mutableStateOf(firstVisibleItemScrollOffset) }
+    var previousIndex by remember(this) { mutableIntStateOf(firstVisibleItemIndex) }
+    var previousScrollOffset by remember(this) { mutableIntStateOf(firstVisibleItemScrollOffset) }
     return remember(this) {
         derivedStateOf {
             if (previousIndex != firstVisibleItemIndex) {

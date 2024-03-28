@@ -101,7 +101,6 @@ class BackgroundJobManager @Inject constructor(
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.N)
 private class BackgroundJobManagerNougatImpl(
     context: Context
 ) : BackgroundJobManagerImpl(context){
