@@ -24,14 +24,18 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.*
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.LiveData
@@ -79,7 +83,8 @@ fun EnterFeedUrlScreen(
     EnterFeedUrlScreen(
         url = viewModel.urlTyped,
         errorMessage = stringResource(appR.string.error_invalid_http_url).takeIf { invalidUrl != null },
-        onUrlChange = { viewModel.urlTyped = it }
+        onUrlChange = { viewModel.urlTyped = it.filterNot { it == '\n' } },
+        onImeNext = { viewModel.submitUrl(viewModel.urlTyped) }
     )
 }
 
@@ -100,6 +105,7 @@ fun EnterFeedUrlScreen(
     url: String,
     errorMessage: String? = null,
     onUrlChange: (String) -> Unit,
+    onImeNext: () -> Unit
 ) {
     Column(
         Modifier
@@ -116,6 +122,8 @@ fun EnterFeedUrlScreen(
                     Icon(Icons.Default.Error, contentDescription = null)
                 }
             },
+            keyboardActions = KeyboardActions(onNext = { onImeNext() }),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Next),
             modifier = Modifier
                 .padding(top = 16.dp)
                 .fillMaxWidth()
@@ -139,7 +147,7 @@ private fun PreviewEnterFeedUrlScreen() {
                     } else null
                 }
             }
-            EnterFeedUrlScreen(url, errorMessage = errorMessage, onUrlChange = { url = it })
+            EnterFeedUrlScreen(url, errorMessage = errorMessage, onUrlChange = { url = it }, onImeNext = {})
         }
     }
 }

@@ -65,6 +65,7 @@ class SubscribeToFeedActivity : BaseSessionActivity() {
                             else -> R.string.activity_subscribe_feed_btn_subscribe
                         }
                         BottomButtonBar(
+                            modifier = Modifier.imePadding(),
                             nextTxtId = nextTxtId,
                             cancelTxtId = cancelTxtId, onCancelClick = {
                                 if (!navController.popBackStack()) {
@@ -111,8 +112,10 @@ class SubscribeToFeedActivity : BaseSessionActivity() {
 private fun BottomButtonBar(
     @StringRes cancelTxtId: Int,
     @StringRes nextTxtId: Int,
-    onCancelClick: () -> Unit, onNextClick: () -> Unit) {
-    Row(Modifier.padding(8.dp)) {
+    onCancelClick: () -> Unit, onNextClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(modifier.padding(8.dp)) {
         TextButton(onClick = onCancelClick) {
             Text(stringResource(cancelTxtId))
         }
