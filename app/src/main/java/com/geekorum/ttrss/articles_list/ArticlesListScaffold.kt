@@ -356,7 +356,7 @@ fun PreviewArticlesListScaffoldPhone() {
                         showBanner = !showBanner
                     }) {
                         Icon(
-                            painter = painterResource(R.drawable.ic_refresh),
+                            AppTheme3.Icons.Refresh,
                             contentDescription = "refresh"
                         )
                     }
@@ -427,7 +427,7 @@ fun PreviewArticlesListScaffoldTablet() {
                         showBanner = !showBanner
                     }) {
                         Icon(
-                            painter = painterResource(R.drawable.ic_refresh),
+                            AppTheme3.Icons.Refresh,
                             contentDescription = "refresh"
                         )
                     }

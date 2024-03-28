@@ -137,7 +137,7 @@ fun InstallFeatureScreen(
         // we could use rememberInfiniteTransition but we wanted the animation to stop gracefully
         val logoAnimation = remember { Animatable(0f) }
 
-        var currentAnimationVelocity by  remember { mutableStateOf(0f) }
+        var currentAnimationVelocity by  remember { mutableFloatStateOf(0f) }
         LaunchedEffect(animate) {
             if (!animate) {
                 logoAnimation.animateTo(

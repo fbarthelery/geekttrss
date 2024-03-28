@@ -169,7 +169,7 @@ fun FeedSection(
 ) {
     SectionLabel(stringResource(R.string.title_feeds_menu))
     NavigationItem(stringResource(R.string.title_magazine),
-        icon = { Icon(painterResource(R.drawable.ic_newspaper_24), contentDescription = null) },
+        icon = { Icon(AppTheme3.Icons.Newspaper, contentDescription = null) },
         selected = isMagazineSelected,
         selectedForAction = false,
         onLongClick = null,
