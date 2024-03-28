@@ -24,7 +24,5 @@
 <resources>
     <drawable name="ic_launcher_round">@mipmap/ic_launcher_round</drawable>
     <!-- just a small alias to replace all the ttrss share icon -->
-    <drawable name="ic_share">@drawable/ic_share_24dp</drawable>
     <integer name="star_fill_time">@android:integer/config_mediumAnimTime</integer>
-    <drawable name="ic_dots_vert">@drawable/ic_dots_vertical_dark</drawable>
 </resources>
