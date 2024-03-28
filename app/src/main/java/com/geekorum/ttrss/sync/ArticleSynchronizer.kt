@@ -181,12 +181,13 @@ class ArticleSynchronizer @AssistedInject constructor(
         val tag = UUID.randomUUID().toString()
         val jobRequests = databaseService.getFeeds()
             .filter {
-                it.id == feedId || feedId == ApiService.ALL_ARTICLES_FEED_ID
-            }.filter {
-                if (!isFeedSyncable(it)) {
-                    Timber.i("Feed ${it.id} - ${it.title} is not syncable. don't update article status")
-                    false
-                } else true
+                if (feedId == ApiService.ALL_ARTICLES_FEED_ID) {
+                    if (!isFeedSyncable(it)) {
+                        Timber.i("Feed ${it.id} - ${it.title} is not syncable. don't update article status")
+                        return@filter false
+                    } else return@filter true
+                }
+                it.id == feedId
             }.shuffled()
             .map { feed ->
                 val inputData = UpdateArticleStatusWorker.getInputData(
