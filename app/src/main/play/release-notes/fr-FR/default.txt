@@ -1,6 +1,6 @@
-Mise à jour du thème vers Material 3
-Affichage de l'icone  de l'application navigateur web
-Correction du bug ou la snackbar et le button fab apparaissent sous la barre de navigation du systeme en mode 3 boutons
-Affichage de tous les articles favoris et pas seulement les non lus
-Ajout de la traduction francaise
+Ajout d'une option pour afficher les articles dans une liste compacte sur de petits écrans
+Affichage des catégories de flux dans la gestion des flux
+Il est possible de créer des raccourcis pour ouvrir l'application sur un flux spécifique
+Il est possible de désactiver la synchronisation automatique d'un flux
+Refonte de l'interface utilisateur de recherche
 Diverses corrections de bugs et améliorations

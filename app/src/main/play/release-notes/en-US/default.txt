@@ -1,6 +1,6 @@
-Update theme to Material 3
-Use browser application icon
-Fix issue with snackbar and fab button displaying under the system navigation bar in 3 button mode
-Display all starred articles not only unread one
-Add French translation
+Add option to display articles in a compact list on small screens
+Display feeds categories in manage feeds
+Allow to create shortcuts to open the application on a specific feed
+Allow to disable automatic synchronization of a feed
+Rework search user interface
 Various bug fixes and improvements
