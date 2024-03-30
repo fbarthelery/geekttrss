@@ -39,7 +39,7 @@ fun Project.conventionForAndroidProject() {
     extensions.findByType<BaseExtension>()?.apply {
         setCompileSdkVersion(34)
         defaultConfig {
-            minSdk = 24
+            minSdk = 26
         }
     }
 }
