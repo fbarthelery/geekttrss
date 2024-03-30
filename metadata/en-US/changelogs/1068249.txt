@@ -1,0 +1,6 @@
+Add option to display articles in a compact list on small screens
+Display feeds categories in manage feeds
+Allow to create shortcuts to open the application on a specific feed
+Allow to disable automatic synchronization of a feed
+Rework search user interface
+Various bug fixes and improvements
