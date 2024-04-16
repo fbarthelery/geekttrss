@@ -257,7 +257,7 @@ private fun ArticlesList(
             AnimatedVisibility(
                 visibilityState,
                 enter = fadeIn() + slideInVertically { it / 3 },
-                modifier = Modifier.animateItemPlacement()
+                modifier = Modifier.animateItem(fadeInSpec = null)
             ) {
                 if (articleWithFeed != null) {
                     if (displayCompactItems) {

@@ -123,7 +123,8 @@ androidx-constraintlayout = { module = "androidx.constraintlayout:constraintlayo
 androidx-coordinatorlayout = { module = "androidx.coordinatorlayout:coordinatorlayout", version.ref = "androidx-coordinatorlayout" }
 
 androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "androidx-compose-bom" }
-androidx-compose-foundation = { module = "androidx.compose.foundation:foundation" }
+# alpha for Modifier.animateItem()
+androidx-compose-foundation = { module = "androidx.compose.foundation:foundation", version = "1.7.0-alpha06" }
 androidx-compose-animation-graphics = { module = "androidx.compose.animation:animation-graphics" }
 androidx-compose-material-icons-core = { module = "androidx.compose.material:material-icons-core" }
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
