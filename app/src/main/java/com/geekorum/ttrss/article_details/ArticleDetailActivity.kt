@@ -37,7 +37,7 @@ import com.geekorum.ttrss.session.SessionActivity
 import com.geekorum.ttrss.ui.AppTheme3
 import com.geekorum.ttrss.ui.component1
 import com.geekorum.ttrss.ui.component2
-import com.google.accompanist.web.AccompanistWebViewClient
+import com.geekorum.ttrss.ui.components.web.AccompanistWebViewClient
 import dagger.hilt.android.AndroidEntryPoint
 import okhttp3.OkHttpClient
 import javax.inject.Inject
@@ -109,4 +109,3 @@ class ArticleDetailActivity : SessionActivity() {
         outContent.webUri = articleDetailsViewModel.article.value?.link?.toUri()
     }
 }
-

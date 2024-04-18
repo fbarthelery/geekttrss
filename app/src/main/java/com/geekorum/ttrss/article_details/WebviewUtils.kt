@@ -37,7 +37,7 @@ import androidx.annotation.ColorInt
 import androidx.core.content.res.ResourcesCompat
 import com.geekorum.geekdroid.network.OkHttpWebViewClient
 import com.geekorum.ttrss.R
-import com.google.accompanist.web.AccompanistWebViewClient
+import com.geekorum.ttrss.ui.components.web.AccompanistWebViewClient
 import okhttp3.OkHttpClient
 import timber.log.Timber
 

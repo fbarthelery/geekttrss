@@ -23,9 +23,9 @@ package com.geekorum.ttrss.article_details
 import android.webkit.WebSettings
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.google.accompanist.web.AccompanistWebViewClient
-import com.google.accompanist.web.WebView
-import com.google.accompanist.web.rememberWebViewStateWithHTMLData
+import com.geekorum.ttrss.ui.components.web.AccompanistWebViewClient
+import com.geekorum.ttrss.ui.components.web.WebView
+import com.geekorum.ttrss.ui.components.web.rememberWebViewStateWithHTMLData
 
 @Composable
 fun ArticleContentWebView(
@@ -53,4 +53,3 @@ fun ArticleContentWebView(
         }
     )
 }
-

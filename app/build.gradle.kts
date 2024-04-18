@@ -202,7 +202,6 @@ dependencies {
     api(libs.androidx.compose.animation.graphics)
     api(libs.androidx.paging.compose)
     api(libs.accompanist.drawablepainter)
-    api(libs.accompanist.webview)
     api(libs.androidx.compose.ui.tooling)
     api(libs.coil.compose)
     implementation(libs.materialKolor)

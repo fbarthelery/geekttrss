@@ -58,7 +58,7 @@ import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleContentIndexed
 import com.geekorum.ttrss.ui.AppTheme3
 import com.geekorum.ttrss.ui.components.OpenInBrowserIcon
-import com.google.accompanist.web.AccompanistWebViewClient
+import com.geekorum.ttrss.ui.components.web.AccompanistWebViewClient
 import kotlinx.coroutines.delay
 import java.util.Locale
 
@@ -112,7 +112,8 @@ fun ArticleDetailsScreenHero(
     articleDetailsViewModel: ArticleDetailsViewModel,
     onNavigateUpClick: () -> Unit,
     onArticleClick: (Article) -> Unit,
-    webViewClient: AccompanistWebViewClient) {
+    webViewClient: AccompanistWebViewClient
+) {
     val articleDetailsScreenState = rememberArticleDetailsScreenState()
 
     val article by articleDetailsViewModel.article.observeAsState()
