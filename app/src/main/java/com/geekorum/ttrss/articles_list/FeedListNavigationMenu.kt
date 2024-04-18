@@ -134,7 +134,7 @@ private fun Modifier.withVerticalScrollBar(
         topLeft = Offset(x = scrollBarX, y = scrollBarY),
         size = Size(width = scrollBarWidth, height = scrollBarHeight),
         cornerRadius = CornerRadius(4.dp.toPx()),
-        alpha = alpha,
+        alpha = alpha.coerceIn(0f, 1f),
     )
 }
 
