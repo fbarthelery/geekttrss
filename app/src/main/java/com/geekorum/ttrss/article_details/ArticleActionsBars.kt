@@ -21,13 +21,13 @@
 package com.geekorum.ttrss.article_details
 
 import android.content.res.Configuration
+import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -39,9 +39,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.layout
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.ui.AppTheme3
 import com.materialkolor.ktx.harmonizeWithPrimary
@@ -166,9 +169,63 @@ fun ArticleTopAppBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL)
 @Composable
-fun PreviewM3ArticleTopAppBar() {
+fun PreviewArticleTopAppBar() {
     AppTheme3 {
         ArticleTopAppBar(onNavigateUpClick = {})
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ArticleFloatingTopAppBar(
+    onNavigateUpClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    scrollBehavior: TopAppBarScrollBehavior? = null,
+    windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
+) {
+    // Sets the app bar's height offset to collapse the entire bar's height when content is
+    // scrolled.
+    val heightOffsetLimit =
+        with(LocalDensity.current) { ((-64).dp).toPx() }
+    SideEffect {
+        if (scrollBehavior?.state?.heightOffsetLimit != heightOffsetLimit) {
+            scrollBehavior?.state?.heightOffsetLimit = heightOffsetLimit
+        }
+    }
+    val colorTransitionFraction = scrollBehavior?.state?.overlappedFraction ?: 0f
+    val iconButtonColors = IconButtonDefaults.filledTonalIconButtonColors(
+        containerColor = lerp(
+            MaterialTheme.colorScheme.surface,
+            MaterialTheme.colorScheme.secondaryContainer,
+            FastOutLinearInEasing.transform(colorTransitionFraction)
+        )
+    )
+    val statusBarColor = lerp(
+        MaterialTheme.colorScheme.surface,
+        MaterialTheme.colorScheme.surfaceContainer,
+        FastOutLinearInEasing.transform(colorTransitionFraction)
+    )
+
+    Column(modifier) {
+        Box(modifier = Modifier
+            .windowInsetsTopHeight(windowInsets)
+            .fillMaxWidth()
+            .background(color = statusBarColor))
+
+        FilledTonalIconButton(onClick = onNavigateUpClick, colors = iconButtonColors,
+            modifier = Modifier.padding(start = 4.dp)
+        ) {
+            Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = null)
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview
+@Composable
+fun PreviewArticleFloatingTopAppBar() {
+    AppTheme3 {
+        ArticleFloatingTopAppBar(onNavigateUpClick = {})
     }
 }
 
