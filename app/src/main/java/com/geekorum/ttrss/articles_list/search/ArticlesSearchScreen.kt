@@ -64,7 +64,6 @@ import com.geekorum.ttrss.ui.components.plus
 import kotlinx.coroutines.delay
 import timber.log.Timber
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SearchResultCardList(
     viewModel: SearchViewModel,
@@ -241,7 +240,7 @@ fun ArticlesSearchScreen(
             },
             // 72dp = SearchBar + searchbar vertical padding
             // add 16.dp of top padding between first item and bar
-            contentPadding = PaddingValues(top = 88.dp) + WindowInsets.statusBars.asPaddingValues(),
+            contentPadding = PaddingValues(top = 88.dp) + WindowInsets.safeDrawing.asPaddingValues(),
             modifier = Modifier
                 .fillMaxSize()
         )
