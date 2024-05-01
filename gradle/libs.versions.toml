@@ -18,7 +18,7 @@
 # along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
 #
 [versions]
-android-gradle-plugin = "8.3.2"
+android-gradle-plugin = "8.4.0"
 accompanist = "0.34.0"
 androidx-annotation = "1.7.1"
 androidx-core = "1.13.0"
