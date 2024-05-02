@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.*
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -42,26 +43,43 @@ import com.geekorum.ttrss.articles_list.magazine.MagazineScreen
 import com.geekorum.ttrss.articles_list.search.ArticlesSearchScreen
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.settings.SettingsActivity
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 object NavRoutes {
-    const val Magazine = "magazine"
-    const val ArticlesList = "feeds/{feed_id}?feed_name={feed_name}"
-    const val ArticlesListByTag = "tags/{tag}"
-    const val Search = "search?query={query}"
+    @Serializable
+    object Magazine
 
-    fun getLabelForRoute(context: Context, route: String?) = when(route) {
-        Magazine -> context.getString(R.string.title_magazine)
-        ArticlesList -> "{feed_name}"
-        ArticlesListByTag -> "#{tag}"
+    @Serializable
+    data class ArticlesList(
+        @SerialName("feed_id")
+        val feedId: Long = -4L,
+        @SerialName("feed_name")
+        val feedName: String? = "All Articles"
+    )
+
+    @Serializable
+    data class ArticlesListByTag(
+        val tag: String
+    )
+
+    @Serializable
+    data class Search(
+        val query: String = ""
+    )
+
+    fun getLabelForDestination(context: Context, destination: NavDestination) = when {
+        destination.hasRoute<Magazine>() -> context.getString(R.string.title_magazine)
+        destination.hasRoute<ArticlesList>() -> "{feed_name}"
+        destination.hasRoute<ArticlesListByTag>() -> "#{tag}"
         else -> null
     }
 
-    fun isTopLevelDestination(route: String?) = when (route) {
-        Search,
-        Magazine,
-        ArticlesList,
-        ArticlesListByTag -> true
-
+    fun isTopLevelDestination(destination: NavDestination) = when {
+        destination.hasRoute<Search>() -> true
+        destination.hasRoute<Magazine>() -> true
+        destination.hasRoute<ArticlesList>() -> true
+        destination.hasRoute<ArticlesListByTag>() -> true
         else -> false
     }
 }
@@ -82,21 +100,12 @@ fun ArticlesListNavHost(
     navController: NavHostController = rememberNavController(),
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
-    NavHost(navController = navController, startDestination = "magazine") {
-        composable(NavRoutes.Magazine) {
+    NavHost(navController = navController, startDestination = NavRoutes.Magazine) {
+        composable<NavRoutes.Magazine> {
             MagazineScreen(activityViewModel = activityViewModel, windowSizeClass = windowSizeClass,
                 contentPadding = contentPadding)
         }
-        composable(NavRoutes.ArticlesList,
-            arguments = listOf(
-                navArgument("feed_id") {
-                    type = NavType.LongType
-                    defaultValue = -4L
-                },
-                navArgument("feed_name") {
-                    defaultValue = "All Articles"
-                }
-            ),
+        composable<NavRoutes.ArticlesList>(
             deepLinks = listOf(
                 navDeepLink { uriPattern = "app://feeds/{feed_id}?feed_name={feed_name}" }
             )) {
@@ -104,17 +113,12 @@ fun ArticlesListNavHost(
                 contentPadding = contentPadding)
         }
 
-        composable(NavRoutes.ArticlesListByTag) {
+        composable<NavRoutes.ArticlesListByTag> {
             ArticlesListByTagScreen(activityViewModel = activityViewModel,
                 windowSizeClass = windowSizeClass, contentPadding = contentPadding)
         }
 
-        composable(NavRoutes.Search,
-            arguments = listOf(navArgument("query") {
-                nullable = false
-                defaultValue = ""
-            })
-        ) {
+        composable<NavRoutes.Search> {
             ArticlesSearchScreen(activityViewModel = activityViewModel, windowSizeClass = windowSizeClass)
         }
     }
@@ -122,12 +126,7 @@ fun ArticlesListNavHost(
 
  fun NavController.navigateToFeed(feedId: Long = -4L, feedTitle: String? = null) {
      // we change navigation stack but don't restore state
-     val route = buildString {
-         append("feeds/$feedId")
-         if (feedTitle != null) {
-             append("?feed_name=$feedTitle")
-         }
-     }
+     val route = NavRoutes.ArticlesList(feedId, feedTitle)
      navigate(route) {
          popUpTo(graph.findStartDestination().route!!) {
              saveState = true
@@ -137,8 +136,9 @@ fun ArticlesListNavHost(
  }
 
 fun NavController.navigateToTag(tag: String) {
-    navigate("tags/$tag") {
-        popUpTo(NavRoutes.ArticlesListByTag) {
+    val destination = NavRoutes.ArticlesListByTag(tag)
+    navigate(destination) {
+        popUpTo<NavRoutes.ArticlesListByTag> {
             inclusive = true
         }
         launchSingleTop = true
@@ -165,8 +165,9 @@ fun NavController.navigateToArticle(articleId: Long) {
 }
 
 fun NavController.navigateToSearch(query: String = "") {
-    navigate("search?query=$query", navOptions = navOptions {
-        popUpTo(NavRoutes.Search) {
+    val destination = NavRoutes.Search(query)
+    navigate(destination, navOptions = navOptions {
+        popUpTo<NavRoutes.Search> {
             inclusive = true
         }
     })
@@ -181,4 +182,13 @@ fun NavController.navigateToManageFeeds() {
 
 fun createFeedDeepLink(feed: Feed, title: String): Uri {
     return "app://feeds/${feed.id}?feed_name=${title}".toUri()
+}
+
+/**
+ * Check if we are on destination T before returning the route.
+ */
+inline fun <reified T: Any> NavBackStackEntry.toRouteOrNull(): T? {
+    return if (destination.hasRoute<T>()) {
+        toRoute<T>()
+    } else null
 }

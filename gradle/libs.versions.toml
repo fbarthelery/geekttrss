@@ -36,7 +36,8 @@ androidx-hilt-compiler = "1.2.0"
 androidx-hilt-navigation-compose = "1.2.0"
 androidx-hilt-work = "1.2.0"
 androidx-lifecycle = "2.7.0"
-androidx-navigation = "2.7.7"
+#alpha for type safe navigation dsl
+androidx-navigation = "2.8.0-alpha08"
 androidx-paging = "3.2.1"
 androidx-preferences = "1.2.1"
 androidx-room = "2.6.1"
@@ -194,6 +195,7 @@ kotlinx-coroutines-jdk8 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-j
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test" }
 
 kotlinx-serialization-bom = { module = "org.jetbrains.kotlinx:kotlinx-serialization-bom", version.ref="kotlinx-serialization" }
+kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json" }
 kotlinx-serialization-json-okio = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json-okio", version.ref = "kotlinx-serialization" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }

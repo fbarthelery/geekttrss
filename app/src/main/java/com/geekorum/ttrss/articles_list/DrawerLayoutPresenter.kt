@@ -23,6 +23,7 @@ package com.geekorum.ttrss.articles_list
 import androidx.compose.runtime.*
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination.Companion.hasRoute
 
 /**
  * Controls the behavior of the NavigationDrawer
@@ -43,7 +44,7 @@ internal fun rememberDrawerLayoutPresenter(navController: NavController): Drawer
     val navBackStackEntry by navController.currentBackStackEntryFlow.collectAsStateWithLifecycle(null)
     LaunchedEffect(navBackStackEntry) {
         presenter.drawerGesturesEnabled = when {
-            navBackStackEntry?.destination?.route == NavRoutes.Search -> false
+            navBackStackEntry?.destination?.hasRoute<NavRoutes.Search>() == true -> false
             else -> true
         }
     }

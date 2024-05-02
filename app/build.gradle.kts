@@ -37,6 +37,7 @@ plugins {
     alias(libs.plugins.dagger.hilt.android)
     alias(libs.plugins.androidx.room)
     alias(libs.plugins.google.protobuf)
+    alias(libs.plugins.kotlinx.serialization)
 }
 
 // workaround bug https://issuetracker.google.com/issues/275534543

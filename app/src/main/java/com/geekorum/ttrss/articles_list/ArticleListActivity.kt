@@ -38,6 +38,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.rememberNavController
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.app_reviews.AppReviewViewModel
@@ -111,7 +112,7 @@ class ArticleListActivity : SessionActivity() {
             }
 
             val navBackStackEntry by navController.currentBackStackEntryFlow.collectAsStateWithLifecycle(null)
-            if (navBackStackEntry?.destination?.route == NavRoutes.Magazine) {
+            if (navBackStackEntry?.destination?.hasRoute<NavRoutes.Magazine>() == true) {
                 LaunchedEffect(Unit) {
                     appReviewViewModel.launchReview(this@ArticleListActivity)
                 }
@@ -180,7 +181,7 @@ class ArticleListActivity : SessionActivity() {
                         mutableStateOf(contentPadding)
                     }
                     SideEffect {
-                        if (!appBarPresenter.isSearchTransitioning && navController.currentDestination?.route != NavRoutes.Search) {
+                        if (!appBarPresenter.isSearchTransitioning && navController.currentDestination?.hasRoute<NavRoutes.Search>() != true) {
                             lastPaddingExceptSearch = contentPadding
                         }
                     }

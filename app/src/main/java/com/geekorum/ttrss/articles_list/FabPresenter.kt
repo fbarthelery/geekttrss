@@ -36,6 +36,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
+import androidx.navigation.NavDestination.Companion.hasRoute
 import com.geekorum.ttrss.R
 
 /**
@@ -51,14 +52,14 @@ internal class FabPresenter(
         //TODO deal with module install
         val navBackStackEntry by navController.currentBackStackEntryFlow.collectAsStateWithLifecycle(null)
         val fabVisibleInDestination = when {
-            navBackStackEntry?.destination?.route == NavRoutes.Search -> false
+            navBackStackEntry?.destination?.hasRoute<NavRoutes.Search>() == true -> false
             navBackStackEntry == null -> false
             else -> true
         }
 
         val fabVisible = fabVisibleInDestination && isScrollingUpOrRest
         val targetState = if (fabVisible) {
-            val feedId = if (navBackStackEntry?.destination?.route == NavRoutes.ArticlesList) {
+            val feedId = if (navBackStackEntry?.destination?.hasRoute<NavRoutes.ArticlesList>() == true) {
                 navBackStackEntry?.arguments?.getLong("feed_id")
             } else null
             DestinationWithFeedId(

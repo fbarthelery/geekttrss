@@ -20,7 +20,6 @@
  */
 package com.geekorum.ttrss.settings.licenses
 
-import android.net.Uri
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -30,8 +29,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
 import com.geekorum.ttrss.ui.AppTheme3
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.serialization.Serializable
 
 @AndroidEntryPoint
 class OpenSourceLicensesActivity : AppCompatActivity() {
@@ -51,6 +52,13 @@ class OpenSourceLicensesActivity : AppCompatActivity() {
     }
 }
 
+@Serializable
+private object DependenciesListDestination
+
+@Serializable
+private data class DependenciesLicenseDestination(
+    val dependency: String
+)
 
 @Composable
 fun DependencyNavHost(
@@ -58,18 +66,19 @@ fun DependencyNavHost(
     navigateUp: () -> Unit
 ) {
     val navController = rememberNavController()
-    NavHost(navController, startDestination = "dependencies") {
-        composable("dependencies") {
+    NavHost(navController, startDestination = DependenciesListDestination) {
+        composable<DependenciesListDestination> {
             OpenSourceDependenciesListScreen(
                 viewModel = openSourceLicensesViewModel,
                 onDependencyClick = {
-                    navController.navigate("dependency_license/${Uri.encode(it)}")
+                    val route = DependenciesLicenseDestination(it)
+                    navController.navigate(route)
                 },
                 onUpClick = navigateUp
             )
         }
-        composable("dependency_license/{dependency}") {
-            val dependency = requireNotNull(it.arguments?.getString("dependency"))
+        composable<DependenciesLicenseDestination> {
+            val dependency = it.toRoute<DependenciesLicenseDestination>().dependency
             OpenSourceLicenseScreen(
                 viewModel = openSourceLicensesViewModel,
                 dependency = dependency,
@@ -80,4 +89,3 @@ fun DependencyNavHost(
         }
     }
 }
-

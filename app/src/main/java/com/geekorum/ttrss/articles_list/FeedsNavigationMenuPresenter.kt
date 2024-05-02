@@ -41,6 +41,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.navigation.toRoute
 import com.geekorum.ttrss.Features
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Feed
@@ -67,16 +69,16 @@ class FeedsNavigationMenuPresenter(
     fun Content(hasFab: Boolean, onNavigation: () -> Unit, modifier: Modifier = Modifier) {
         val navBackStackEntry by navController.currentBackStackEntryFlow.collectAsStateWithLifecycle(null)
         val currentFeedId = run {
-            if (navBackStackEntry?.destination?.route == NavRoutes.ArticlesList) {
+            if (navBackStackEntry?.destination?.hasRoute<NavRoutes.ArticlesList>() == true) {
                 navBackStackEntry?.arguments?.getLong("feed_id")
-            } else if (navBackStackEntry?.destination?.route == NavRoutes.ArticlesListByTag) {
-                val listEntry = navController.getBackStackEntry(NavRoutes.ArticlesList)
-                listEntry.arguments?.getLong("feed_id")
+            } else if (navBackStackEntry?.destination?.hasRoute<NavRoutes.ArticlesListByTag>() == true) {
+                val listEntry = navController.getBackStackEntry<NavRoutes.ArticlesList>()
+                listEntry.toRoute<NavRoutes.ArticlesList>().feedId
             } else {
                 null
             }
         }
-        val isMagazineFeed = navBackStackEntry?.destination?.route == NavRoutes.Magazine
+        val isMagazineFeed = navBackStackEntry?.destination?.hasRoute<NavRoutes.Magazine>() == true
 
         val account by accountViewModel.selectedAccount.observeAsState()
         val server by accountViewModel.selectedAccountHost.observeAsState()

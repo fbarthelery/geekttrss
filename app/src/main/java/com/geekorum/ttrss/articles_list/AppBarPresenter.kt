@@ -50,10 +50,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.FloatingWindow
-import androidx.navigation.NavBackStackEntry
-import androidx.navigation.NavController
-import androidx.navigation.NavDestination
+import androidx.navigation.*
+import androidx.navigation.NavDestination.Companion.hasRoute
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Feed.Companion.FEED_ID_ALL_ARTICLES
 
@@ -84,7 +82,7 @@ internal class AppBarPresenter(
             navController.currentBackStackEntry
         )
 
-        val isSearchOpen = currentDestination != null && currentDestination?.destination?.route == NavRoutes.Search
+        val isSearchOpen = currentDestination?.destination?.hasRoute<NavRoutes.Search>() == true
 
         val searchScreenTransition = updateTransition(targetState = isSearchOpen, label = "show search")
         SideEffect {
@@ -198,20 +196,17 @@ internal class AppBarPresenter(
 
     @Composable
     private fun AnimatedTagsList(currentDestination: NavBackStackEntry?) {
-        val currentTag = if (currentDestination?.destination?.route == NavRoutes.ArticlesListByTag) {
-            currentDestination.arguments?.getString("tag")
-        } else {
-            null
-        }
+        val tagsDestination = currentDestination?.toRouteOrNull<NavRoutes.ArticlesListByTag>()
+        val currentTag = tagsDestination?.tag
 
         val showTagsBar = run {
-            when (currentDestination?.destination?.route) {
-                NavRoutes.ArticlesList -> {
-                    val feedId = currentDestination.arguments?.let { ArticlesListScreenArgs(it) }?.feedId
-                        ?: FEED_ID_ALL_ARTICLES
+            when {
+                currentDestination == null -> false
+                currentDestination.destination.hasRoute<NavRoutes.ArticlesList>() -> {
+                    val feedId = currentDestination.toRoute<NavRoutes.ArticlesList>().feedId
                     feedId == FEED_ID_ALL_ARTICLES
                 }
-                NavRoutes.ArticlesListByTag -> true
+                currentDestination.destination.hasRoute<NavRoutes.ArticlesListByTag>() -> true
 
                 else -> false
             }
@@ -232,7 +227,7 @@ internal class AppBarPresenter(
                     selectedTag = currentTag,
                     selectedTagChange = { tag ->
                         if (tag == null) {
-                            if (navController.currentDestination?.route == NavRoutes.ArticlesListByTag) {
+                            if (currentDestination?.destination?.hasRoute<NavRoutes.ArticlesListByTag>() == true) {
                                 navController.popBackStack()
                             }
                         } else {
@@ -285,7 +280,7 @@ internal class AppBarPresenter(
                 }
 
                 // change sortMenu if not going to search
-                if (currentDestination?.destination?.route != NavRoutes.Search) {
+                if (currentDestination?.destination?.hasRoute<NavRoutes.Search>() != true) {
                     hasSortMenu = destinationHasSortButton(currentDestination?.destination)
                 }
             }
@@ -314,15 +309,16 @@ internal class AppBarPresenter(
     }
 
     private fun setDestinationLabelPerRoute(context: Context, destination: NavDestination) {
-        destination.label = NavRoutes.getLabelForRoute(context, destination.route)
+        destination.label = NavRoutes.getLabelForDestination(context, destination)
     }
 
     private fun isTopLevelDestinationRoute(destination: NavDestination): Boolean =
-        NavRoutes.isTopLevelDestination(destination.route)
+        NavRoutes.isTopLevelDestination(destination)
 
-    private fun destinationHasSortButton(destination: NavDestination?) = when (destination?.route) {
-        NavRoutes.ArticlesList,
-        NavRoutes.ArticlesListByTag -> true
+    private fun destinationHasSortButton(destination: NavDestination?) = when  {
+        destination == null -> false
+        destination.hasRoute<NavRoutes.ArticlesList>() -> true
+        destination.hasRoute<NavRoutes.ArticlesListByTag>() -> true
 
         else -> false
     }
