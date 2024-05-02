@@ -25,6 +25,7 @@ plugins {
     alias(libs.plugins.kotlin.ksp)
     id("com.geekorum.build.android-tests")
     id("com.geekorum.build.android-avdl")
+    alias(libs.plugins.kotlinx.serialization)
 }
 
 android {
@@ -91,6 +92,9 @@ dependencies {
     implementation(platform(libs.kotlinx.coroutines.bom))
     implementation(libs.kotlinx.coroutines.core)
     testImplementation(libs.kotlinx.coroutines.test)
+
+    implementation(platform(libs.kotlinx.serialization.bom))
+    implementation(libs.kotlinx.serialization.core)
 
     implementation(libs.androidx.activity)
 

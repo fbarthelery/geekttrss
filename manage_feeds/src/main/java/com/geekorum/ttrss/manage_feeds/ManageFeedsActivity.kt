@@ -34,6 +34,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.geekorum.ttrss.manage_feeds.add_feed.SubscribeToFeedActivity
 import com.geekorum.ttrss.ui.AppTheme3
+import kotlinx.serialization.Serializable
 
 class ManageFeedsActivity : BaseSessionActivity() {
 
@@ -56,6 +57,13 @@ class ManageFeedsActivity : BaseSessionActivity() {
 
 }
 
+@Serializable
+private object FeedsListDestination
+
+@Serializable
+private data class EditFeedDestination(
+    val feedId: Long
+)
 
 @Composable
 fun ManageFeedNavHost(
@@ -65,10 +73,10 @@ fun ManageFeedNavHost(
     val navController = rememberNavController()
     NavHost(
         navController = navController,
-        startDestination = "feeds_list",
+        startDestination = FeedsListDestination,
         modifier = modifier
     ) {
-        composable("feeds_list") {
+        composable<FeedsListDestination> {
             ManageFeedsListScreen(
                 navigateToSubscribeToFeed = navigateToSubscribeToFeed,
                 navigateToEditFeed = {
@@ -76,13 +84,7 @@ fun ManageFeedNavHost(
                 })
         }
 
-        composable("edit_feed/{feedId}",
-            arguments = listOf(
-                navArgument("feedId") {
-                    type = NavType.LongType
-                }
-            )
-        ) {
+        composable<EditFeedDestination>{
             val feedId = it.arguments!!.getLong("feedId")
             EditFeedScreen(feedId, navigateBack = {
                 navController.popBackStack()
@@ -91,4 +93,4 @@ fun ManageFeedNavHost(
     }
 }
 
-private fun NavController.navigateToEditFeed(feedId: Long) = navigate("edit_feed/$feedId")
+private fun NavController.navigateToEditFeed(feedId: Long) = navigate(EditFeedDestination(feedId))

@@ -35,18 +35,23 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.geekorum.ttrss.manage_feeds.R
+import kotlinx.serialization.Serializable
 import kotlin.math.sign
 
-val ROUTE_ENTER_FEED_URL = "enter_feed_url"
-val ROUTE_SELECT_FEED = "select_feed"
-val ROUTE_DISPLAY_ERROR = "display_error?errorMsgId={errorMsgId}"
+@Serializable
+internal object EnterFeedUrlDestination
+
+@Serializable
+internal object SelectFeedDestination
+
+@Serializable
+internal data class DisplayErrorDestination(val errorMsgId: Int = R.string.fragment_display_error_no_feeds_found)
 
 @Composable
 fun SubscribeToFeedNavHost(
@@ -58,21 +63,22 @@ fun SubscribeToFeedNavHost(
     val slideOffsetPx = with(LocalDensity.current) {
         30.dp.roundToPx()
     }
-    NavHost(modifier = modifier, navController = navController, startDestination = ROUTE_ENTER_FEED_URL,
+    NavHost(modifier = modifier, navController = navController,
+        startDestination = EnterFeedUrlDestination,
         contentAlignment = Alignment.TopStart,
         enterTransition = { sharedAxisXEnterTransition(SlideDirection.Start, slideOffsetPx) },
         exitTransition = { sharedAxisXExitTransition(SlideDirection.Start, slideOffsetPx) },
         popEnterTransition = { sharedAxisXEnterTransition(SlideDirection.End, slideOffsetPx) },
         popExitTransition = { sharedAxisXExitTransition(SlideDirection.End, slideOffsetPx) },
     ) {
-        composable(ROUTE_ENTER_FEED_URL,
+        composable<EnterFeedUrlDestination>(
             enterTransition = {
-                if (initialState.destination.route == ROUTE_DISPLAY_ERROR) {
+                if (initialState.destination.hasRoute<DisplayErrorDestination>()) {
                     fadeIn(animationSpec = tween(700))
                 } else null
             },
             exitTransition = {
-                if (targetState.destination.route == ROUTE_DISPLAY_ERROR) {
+                if (targetState.destination.hasRoute<DisplayErrorDestination>()) {
                     fadeOut(animationSpec = tween(700))
                 } else null
             }
@@ -86,18 +92,12 @@ fun SubscribeToFeedNavHost(
                 },
                 finishActivity = finishActivity)
         }
-        composable(ROUTE_SELECT_FEED) {
+        composable<SelectFeedDestination> {
             SelectFeedScreen(viewModel)
         }
-        composable(ROUTE_DISPLAY_ERROR,
+        composable<DisplayErrorDestination>(
             enterTransition = { fadeIn(animationSpec = tween(700)) },
             exitTransition = { fadeOut(animationSpec = tween(700)) },
-            arguments = listOf(
-                navArgument("errorMsgId") {
-                    type = NavType.IntType
-                    defaultValue = R.string.fragment_display_error_no_feeds_found
-                }
-            )
         ) {
             val errorMsgId = it.arguments!!.getInt("errorMsgId")
             DisplayErrorScreen(errorMsgId = errorMsgId)
@@ -137,16 +137,11 @@ private fun <S> AnimatedContentTransitionScope<S>.sharedAxisXExitTransition(
                 0f at 0 using CubicBezierEasing(0.4f, 0.0f, 0.2f, 1.0f)
             })
 
-private fun NavController.navigateToDisplayError(errorMsgId: Int?) {
-    val route = buildString {
-        append("display_error")
-        if (errorMsgId != null) {
-            append("?errorMsgId=${errorMsgId}")
-        }
-    }
+private fun NavController.navigateToDisplayError(errorMsgId: Int) {
+    val route = DisplayErrorDestination(errorMsgId)
     navigate(route)
 }
 
 private fun NavController.navigateToSelectFeed() {
-    navigate(ROUTE_SELECT_FEED)
+    navigate(SelectFeedDestination)
 }

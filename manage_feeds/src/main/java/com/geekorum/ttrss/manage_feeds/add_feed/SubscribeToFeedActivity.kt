@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.geekorum.ttrss.manage_feeds.BaseSessionActivity
@@ -56,12 +57,12 @@ class SubscribeToFeedActivity : BaseSessionActivity() {
 
                 SubscribeToFeedScaffold(
                     bottomBar = {
-                        val cancelTxtId = when (destination?.route) {
-                            ROUTE_ENTER_FEED_URL -> R.string.activity_subscribe_feed_btn_cancel
+                        val cancelTxtId = when  {
+                            destination?.hasRoute<EnterFeedUrlDestination>() == true -> R.string.activity_subscribe_feed_btn_cancel
                             else -> R.string.activity_subscribe_feed_btn_back
                         }
-                        val nextTxtId = when (destination?.route) {
-                            ROUTE_DISPLAY_ERROR -> R.string.activity_subscribe_feed_btn_close
+                        val nextTxtId = when  {
+                            destination?.hasRoute<DisplayErrorDestination>() == true -> R.string.activity_subscribe_feed_btn_close
                             else -> R.string.activity_subscribe_feed_btn_subscribe
                         }
                         BottomButtonBar(
@@ -73,17 +74,17 @@ class SubscribeToFeedActivity : BaseSessionActivity() {
                                 }
                             },
                             onNextClick = {
-                                when (destination?.route) {
-                                    ROUTE_ENTER_FEED_URL -> {
+                                when {
+                                    destination?.hasRoute<EnterFeedUrlDestination>() == true -> {
                                         viewModel.submitUrl(viewModel.urlTyped)
                                     }
-                                    ROUTE_SELECT_FEED -> {
+                                    destination?.hasRoute<SelectFeedDestination>() == true -> {
                                         if (viewModel.selectedFeed != null) {
                                             viewModel.subscribeToFeed(viewModel.selectedFeed!!.toFeedInformation())
                                             finish()
                                         }
                                     }
-                                    ROUTE_DISPLAY_ERROR -> finish()
+                                    destination?.hasRoute<DisplayErrorDestination>() == true -> finish()
                                     else -> Unit
                                 }
                             })
@@ -97,7 +98,7 @@ class SubscribeToFeedActivity : BaseSessionActivity() {
                         }
                     )
                     SideEffect {
-                        if (destination?.route == ROUTE_ENTER_FEED_URL) {
+                        if (destination?.hasRoute<EnterFeedUrlDestination>() == true) {
                             viewModel.resetAvailableFeeds()
                         }
                     }
