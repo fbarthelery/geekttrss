@@ -32,16 +32,18 @@
 
     <!-- activity add feed -->
     <string name="activity_add_feed_title">Subscribe to feed</string>
-    <string name="activity_add_feed_no_feeds_available">No feeds available</string>
     <string name="activity_add_feed_looking_for_feed">Looking for feed</string>
     <string name="activity_add_feed_account_subtitle">Account</string>
     <string name="activity_add_feed_btn_subscribe">Subscribe</string>
+    <string name="activity_add_feed_no_feeds_found">We did not find any feeds on this website</string>
+
 
     <!-- activity subscribe to feed -->
     <string name="activity_subscribe_feed_btn_subscribe">Subscribe</string>
     <string name="activity_subscribe_feed_btn_cancel">Cancel</string>
     <string name="activity_subscribe_feed_btn_back">Back</string>
     <string name="activity_subscribe_feed_btn_close">Close</string>
+    <string name="activity_subscribe_feed_no_feeds_available">No feeds available</string>
 
     <!-- fragment enter feed url -->
     <string name="fragment_enter_feed_url_label">Enter feed or website url</string>

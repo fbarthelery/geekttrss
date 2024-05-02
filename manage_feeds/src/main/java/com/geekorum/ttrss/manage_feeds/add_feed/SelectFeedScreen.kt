@@ -103,7 +103,7 @@ fun SelectFeedScreen(
                 }
             }
         } else {
-            val text = feeds.firstOrNull()?.title ?: stringResource(R.string.activity_add_feed_no_feeds_available)
+            val text = feeds.firstOrNull()?.title ?: stringResource(R.string.activity_subscribe_feed_no_feeds_available)
             Text(text, style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(top = 24.dp))
         }
     }

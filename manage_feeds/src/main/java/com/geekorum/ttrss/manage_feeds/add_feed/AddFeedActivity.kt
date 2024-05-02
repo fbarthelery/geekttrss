@@ -48,6 +48,7 @@ import com.geekorum.ttrss.manage_feeds.ActivityComponent
 import com.geekorum.ttrss.manage_feeds.DaggerManageFeedComponent
 import com.geekorum.ttrss.manage_feeds.R
 import com.geekorum.ttrss.ui.AppTheme3
+import kotlinx.coroutines.delay
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 
 /**
@@ -146,11 +147,22 @@ private fun AddFeedContent(
                 if (isLoading) {
                     LoadingFeedProgress()
                 } else {
-                    FeedSelector(
-                        feeds,
-                        selectedFeed,
-                        onSelectionChange = onFeedSelectionChange,
-                        modifier = Modifier.fillMaxWidth())
+                    if (feeds.isNotEmpty()) {
+                        FeedSelector(
+                            feeds,
+                            selectedFeed,
+                            onSelectionChange = onFeedSelectionChange,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    } else {
+                        Text(stringResource(R.string.activity_add_feed_no_feeds_found),
+                            modifier = Modifier.padding(16.dp))
+
+                        LaunchedEffect(Unit){
+                            delay(3000)
+                            onCancelClick()
+                        }
+                    }
                     if (accounts.size > 1) {
                         Surface(color = MaterialTheme.colorScheme.primaryContainer,
                             modifier = Modifier.padding(top = 16.dp)) {
@@ -158,7 +170,6 @@ private fun AddFeedContent(
                                 selectedAccount = selectedAccount,
                                 onSelectionChange = onAccountSelectionChange,
                                 modifier = Modifier.padding(vertical = 16.dp))
-
                         }
                     }
                 }
@@ -350,7 +361,7 @@ private fun PreviewAddFeedContent() {
         )
         val accounts = listOf(Account("first", "wtv"), Account("second", "wet") ).toTypedArray()
         var selectedAccount by remember { mutableStateOf(accounts.first()) }
-        var selectedFeed by remember { mutableStateOf(feeds.first()) }
+        var selectedFeed by remember { mutableStateOf(feeds.firstOrNull()) }
 
         AddFeedContent(isLoading = false,
             isSubscribeEnabled = false,
@@ -372,6 +383,3 @@ private fun PreviewAddFeedContent() {
  * The AddFeedInstallerActivity takes care of the logic.
  */
 class CompleteInstallFragment : Fragment()
-
-
-

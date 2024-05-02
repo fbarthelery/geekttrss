@@ -28,7 +28,7 @@
     <string name="btn_cancel">Annuler</string>
     <string name="lbl_unsubscribe_msg">Vous ne recevrez plus de mise à jour de</string>
     <string name="activity_add_feed_title">S\'abonner à un flux</string>
-    <string name="activity_add_feed_no_feeds_available">Pas de flux disponibles</string>
+    <string name="activity_subscribe_feed_no_feeds_available">Pas de flux disponibles</string>
     <string name="activity_add_feed_looking_for_feed">Recherche de flux</string>
     <string name="activity_add_feed_account_subtitle">Compte</string>
     <string name="activity_add_feed_btn_subscribe">S\'abonner</string>
@@ -51,4 +51,5 @@
     <string name="lbl_fresh_articles_feed_description">C\'est un flux virtuel qui contient les articles récents</string>
     <string name="lbl_starred_articles_feed_description">C\'est un flux virtuel qui contient vos articles favoris</string>
     <string name="lbl_special_feeds_category">Flux spéciaux</string>
+    <string name="activity_add_feed_no_feeds_found">Nous n\'avons pas trouver de flux sur ce site web</string>
 </resources>
