@@ -273,7 +273,7 @@ fun ArticleDetailsScreen(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
             .nestedScroll(bottomAppBarScrollBehavior.nestedScrollConnection),
         topBar = {
-            ArticleTopAppBar(scrollBehavior = scrollBehavior, onNavigateUpClick = onNavigateUpClick)
+            ArticleFloatingTopAppBar(scrollBehavior = scrollBehavior, onNavigateUpClick = onNavigateUpClick)
         },
         bottomBar = {
             ArticleBottomAppBar(isUnread = article?.isTransientUnread == true,
@@ -299,7 +299,7 @@ fun ArticleDetailsScreen(
                 readMoreArticles = readMoreArticles,
                 onArticleClick = onArticleClick,
                 webViewClient = webViewClient,
-                modifier = Modifier.padding(top = padding.calculateTopPadding()),
+                contentPadding = padding,
                 scrollState = articleDetailsScreenState.scrollState)
 
             LaunchedEffect(articleDetailsScreenState.isAtEndOfArticle) {
@@ -335,9 +335,10 @@ private fun ArticleDetailsContent(
     onArticleClick: (Article) -> Unit,
     modifier: Modifier = Modifier,
     webViewClient: AccompanistWebViewClient,
-    scrollState: ScrollState = rememberScrollState()
+    scrollState: ScrollState = rememberScrollState(),
+    contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
-    ArticleDetailsContent(article, readMoreArticles, onArticleClick , modifier, scrollState) {
+    ArticleDetailsContent(article, readMoreArticles, onArticleClick , modifier, scrollState, contentPadding) {
         val baseUrl = article.link.toUri().let { "${it.scheme}://${it.host}/" }
         val colorScheme = MaterialTheme.colorScheme
         val content = remember(colorScheme, article) {
@@ -362,18 +363,21 @@ private fun ArticleDetailsContent(
     onArticleClick: (Article) -> Unit,
     modifier: Modifier = Modifier,
     scrollState: ScrollState = rememberScrollState(),
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     articleContent: @Composable () -> Unit) {
     Column(modifier
         .padding(horizontal = 16.dp)
         .verticalScroll(scrollState)
     ) {
+        Spacer(Modifier.height(contentPadding.calculateTopPadding()))
+
         ArticleHeaderWithoutImage(
             title = article.title,
             date = article.getDateString()
         )
         HorizontalDivider(Modifier
             .fillMaxWidth())
-        Box(Modifier.fillMaxWidth()) {
+        Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
             articleContent()
         }
 
@@ -387,6 +391,8 @@ private fun ArticleDetailsContent(
         } else {
             Spacer(Modifier.height(72.dp))
         }
+
+        Spacer(Modifier.height(contentPadding.calculateBottomPadding()))
     }
 }
 
