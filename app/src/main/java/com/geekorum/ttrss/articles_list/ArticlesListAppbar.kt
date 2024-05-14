@@ -42,6 +42,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.ui.AppTheme3
 
@@ -202,6 +203,7 @@ fun ArticlesSearchBar(
                 }
             }
         },
+        shadowElevation = 3.dp,
         modifier = modifier,
     ) {
         LazyColumn {
