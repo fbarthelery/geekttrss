@@ -33,6 +33,7 @@ plugins {
     alias(libs.plugins.com.geekorum.gms.oss.license)
     id("com.geekorum.build.android-tests")
     id("com.geekorum.build.android-avdl")
+    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.androidx.navigation.safeargs.kotlin)
     alias(libs.plugins.dagger.hilt.android)
     alias(libs.plugins.androidx.room)
@@ -91,10 +92,6 @@ android {
         dataBinding = true
         compose = true
         buildConfig = true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.androidx.compose.compiler.get()
     }
 
     flavorDimensions += "distribution"

@@ -26,6 +26,7 @@ plugins {
     id("com.geekorum.build.android-tests")
     id("com.geekorum.build.android-avdl")
     alias(libs.plugins.kotlinx.serialization)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -35,11 +36,6 @@ android {
         dataBinding = true
         compose = true
     }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.androidx.compose.compiler.get()
-    }
-
 
     flavorDimensions += "distribution"
     productFlavors {
