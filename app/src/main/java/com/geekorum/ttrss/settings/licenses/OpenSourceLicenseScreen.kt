@@ -20,8 +20,6 @@
  */
 package com.geekorum.ttrss.settings.licenses
 
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -33,7 +31,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.*
 import androidx.compose.ui.text.style.TextDecoration
@@ -64,7 +61,7 @@ fun OpenSourceLicenseScreen(
     )
 }
 
-@OptIn(ExperimentalLayoutApi::class, ExperimentalTextApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OpenSourceLicenseScreen(
     dependency: String,
@@ -73,10 +70,17 @@ fun OpenSourceLicenseScreen(
     onUrlClick: (String) -> Unit,
     onUrlsFound: (List<String>) -> Unit,
 ) {
-    val linkifiedLicense = linkifyText(text = license)
+    val linkifiedLicense = linkifyText(text = license, urlLinkInteractionListener = {
+        if (it is LinkAnnotation.Url) {
+            onUrlClick(it.url)
+        }
+    })
     LaunchedEffect(linkifiedLicense) {
         val uris =
-            linkifiedLicense.getUrlAnnotations(0, linkifiedLicense.length).map { it.item.url }
+            linkifiedLicense.getLinkAnnotations(0, linkifiedLicense.length)
+                .mapNotNull {
+                    (it.item as? LinkAnnotation.Url)?.url
+                }
         onUrlsFound(uris)
     }
 
@@ -97,31 +101,13 @@ fun OpenSourceLicenseScreen(
             },
         )
     }) { paddingValues ->
-        val layoutResult = remember { mutableStateOf<TextLayoutResult?>(null) }
-        val pressIndicator = Modifier.pointerInput(layoutResult, linkifiedLicense) {
-            detectTapGestures { pos ->
-                layoutResult.value?.let { layoutResult ->
-                    val posWithScroll = pos.copy(y = pos.y + scrollState.value)
-                    val offset = layoutResult.getOffsetForPosition(posWithScroll)
-                    linkifiedLicense.getUrlAnnotations(start = offset, end = offset)
-                        .firstOrNull()?.let { annotation ->
-                            onUrlClick(annotation.item.url)
-                        }
-                }
-            }
-        }
-
         Text(linkifiedLicense,
             modifier = Modifier
                 .padding(horizontal = 16.dp)
                 .fillMaxSize()
-                .then(pressIndicator)
                 .verticalScroll(scrollState)
                 .padding(paddingValues)
                 .consumeWindowInsets(paddingValues),
-            onTextLayout = {
-                layoutResult.value = it
-            }
         )
     }
 }
@@ -131,9 +117,8 @@ fun OpenSourceLicenseScreen(
  */
 private val UrlRegexp = """https?://(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,4}\b([-a-zA-Z0-9@:%_+.~#?&/=]*)""".toRegex()
 
-@OptIn(ExperimentalTextApi::class)
 @Composable
-private fun linkifyText(text: String): AnnotatedString {
+private fun linkifyText(text: String, urlLinkInteractionListener: LinkInteractionListener? = null): AnnotatedString {
     val style = SpanStyle(
         color = MaterialTheme.colorScheme.primary,
         textDecoration = TextDecoration.Underline
@@ -146,7 +131,7 @@ private fun linkifyText(text: String): AnnotatedString {
                     append(text.substring(currentIdx, match.range.first))
                 }
                 val url = text.substring(match.range)
-                withAnnotation(UrlAnnotation(url)) {
+                withLink(LinkAnnotation.Url(url, linkInteractionListener =  urlLinkInteractionListener)) {
                     withStyle(style) {
                         append(url)
                     }
