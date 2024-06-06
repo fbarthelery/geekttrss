@@ -29,6 +29,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.compose.runtime.remember
 import androidx.core.net.toUri
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.articles_list.ArticleListActivity
@@ -37,10 +38,11 @@ import com.geekorum.ttrss.session.SessionActivity
 import com.geekorum.ttrss.ui.AppTheme3
 import com.geekorum.ttrss.ui.component1
 import com.geekorum.ttrss.ui.component2
-import com.geekorum.ttrss.ui.components.web.AccompanistWebViewClient
+import dagger.hilt.EntryPoint
+import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
-import okhttp3.OkHttpClient
-import javax.inject.Inject
+import dagger.hilt.android.EntryPointAccessors
+import dagger.hilt.android.components.ActivityComponent
 
 /**
  * An activity representing a single Article detail screen. This
@@ -52,17 +54,10 @@ import javax.inject.Inject
 class ArticleDetailActivity : SessionActivity() {
 
     private val articleDetailsViewModel: ArticleDetailsViewModel by viewModels()
-    private lateinit var webViewClient: AccompanistWebViewClient
-    @Inject lateinit var okHttpClient: OkHttpClient
-    @Inject lateinit var webFontProvider: WebFontProvider
 
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        webViewClient = ArticleDetailsWebViewClient(okHttpClient, webFontProvider,
-            openUrlInBrowser = articleDetailsViewModel::openUrlInBrowser,
-            onPageFinishedCallback = { _, _ -> }
-        )
 
         enableEdgeToEdge()
         val articleUri = requireNotNull(intent.data)
@@ -72,6 +67,14 @@ class ArticleDetailActivity : SessionActivity() {
             AppTheme3 {
                 val (widthSizeClass, heightSizeClass) = calculateWindowSizeClass(this)
 
+                val webViewClientFactory =  remember {
+                    EntryPointAccessors.fromActivity<ArticleDetailsEntryPoint>(this)
+                        .articleDetailsWebViewClientFactory
+                }
+                val webViewClient = remember(articleDetailsViewModel) {
+                    webViewClientFactory.create(openUrlInBrowser = articleDetailsViewModel::openUrlInBrowser,
+                        onPageFinishedCallback = { _, _ ->})
+                }
                 ArticleDetailsScreen(articleDetailsViewModel,
                     widthSizeClass = widthSizeClass,
                     heightSizeClass = heightSizeClass,
@@ -108,4 +111,10 @@ class ArticleDetailActivity : SessionActivity() {
         super.onProvideAssistContent(outContent)
         outContent.webUri = articleDetailsViewModel.article.value?.link?.toUri()
     }
+}
+
+@EntryPoint
+@InstallIn(ActivityComponent::class)
+interface ArticleDetailsEntryPoint {
+    val articleDetailsWebViewClientFactory: ArticleDetailsWebViewClientFactory
 }

@@ -40,13 +40,14 @@ import com.geekorum.ttrss.R
 import com.geekorum.ttrss.ui.components.web.AccompanistWebViewClient
 import okhttp3.OkHttpClient
 import timber.log.Timber
+import javax.inject.Inject
 
 /**
  * WebViewClient for ArticleDetails webview.
  * It favors opening link in their default application and fallback to a browser if none.
  * It also use  WebFontProvider to load fonts
  */
-class ArticleDetailsWebViewClient constructor(
+class ArticleDetailsWebViewClient(
     okHttpClient: OkHttpClient,
     private val webFontProvider: WebFontProvider,
     private val openUrlInBrowser: (Context, Uri) -> Unit,
@@ -187,5 +188,21 @@ data class WebViewColors(
             }
         }
 
+    }
+}
+
+class ArticleDetailsWebViewClientFactory @Inject constructor(
+    private val okHttpClient: OkHttpClient,
+    private val webFontProvider: WebFontProvider,
+) {
+    fun create(openUrlInBrowser: (Context, Uri) -> Unit,
+            onPageFinishedCallback: (WebView?, String?) -> Unit
+    ): ArticleDetailsWebViewClient {
+        return ArticleDetailsWebViewClient(
+            okHttpClient = okHttpClient,
+            webFontProvider = webFontProvider,
+            openUrlInBrowser = openUrlInBrowser,
+            onPageFinishedCallback = onPageFinishedCallback
+        )
     }
 }
