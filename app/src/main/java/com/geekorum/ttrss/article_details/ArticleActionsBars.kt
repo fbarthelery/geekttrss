@@ -21,12 +21,14 @@
 package com.geekorum.ttrss.article_details
 
 import android.content.res.Configuration
+import android.graphics.drawable.Drawable
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -37,16 +39,19 @@ import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.ui.AppTheme3
+import com.geekorum.ttrss.ui.components.OpenInBrowserIcon
 import com.materialkolor.ktx.harmonizeWithPrimary
 import kotlin.math.roundToInt
 
@@ -294,6 +299,71 @@ fun ArticleTopActionsBar(
     )
 }
 
+
+@OptIn(ExperimentalAnimationGraphicsApi::class, ExperimentalMaterial3Api::class)
+@Composable
+fun FloatingActionsBar(
+    browserApplicationIcon: Drawable?,
+    isUnread: Boolean,
+    isStarred: Boolean,
+    onToggleUnreadClick: () -> Unit,
+    onStarredChange: (Boolean) -> Unit,
+    onShareClick: () -> Unit,
+    onOpenInBrowserClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val containerColor = if (isUnread)
+        MaterialTheme.colorScheme.primary
+    else
+        MaterialTheme.colorScheme.surface
+    val contentColor = if (isUnread)
+        MaterialTheme.colorScheme.onPrimary
+    else
+        MaterialTheme.colorScheme.onSurface
+    
+    val colors = CardDefaults.elevatedCardColors(
+        containerColor = containerColor,
+        contentColor = contentColor
+    )
+    ElevatedCard(
+        shape = MaterialTheme.shapes.small,
+        colors = colors,
+        modifier = modifier,
+    ) {
+        Column {
+            IconButton(onClick = onToggleUnreadClick) {
+                Icon(Icons.Default.Archive, contentDescription = null)
+            }
+            IconToggleButton(isStarred, onCheckedChange = onStarredChange) {
+                val image = AnimatedImageVector.animatedVectorResource(id = R.drawable.avd_ic_star_filled)
+                val starColor = if (isStarred) {
+                    Color.Unspecified
+                } else {
+                    LocalContentColor.current
+                }
+                Icon(
+                    painter = rememberAnimatedVectorPainter(image, atEnd = isStarred),
+                    contentDescription = null,
+                    tint = starColor,
+                )
+            }
+            IconButton(onClick = onShareClick) {
+                Icon(Icons.Default.Share, contentDescription = null)
+            }
+            Box(modifier = Modifier
+                .size(48.dp)
+                .clickable(onClick = onOpenInBrowserClick),
+                contentAlignment = Alignment.Center
+            ) {
+                OpenInBrowserIcon(browserApplicationIcon = browserApplicationIcon,
+                    contentDescription = stringResource(R.string.open_article_in_browser)
+                )
+            }
+        }
+    }
+}
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
@@ -308,5 +378,28 @@ fun PreviewM3ArticleTopActionsBar() {
             onStarredChange = { },
             onShareClick = { }
         )
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewFloatingActionsBar() {
+    AppTheme3 {
+        Box(Modifier.height(400.dp)
+            .width(100.dp)
+            .background(MaterialTheme.colorScheme.surface)
+        ) {
+            FloatingActionsBar(
+                browserApplicationIcon = null,
+                isUnread = true,
+                isStarred = false,
+                onToggleUnreadClick = { },
+                onStarredChange = { },
+                onShareClick = { },
+                onOpenInBrowserClick = {},
+                modifier = Modifier.align(Alignment.CenterEnd)
+                    .padding(end = 16.dp)
+            )
+        }
     }
 }
