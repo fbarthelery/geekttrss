@@ -20,6 +20,7 @@
  */
 package com.geekorum.ttrss.article_details
 
+import android.app.Activity
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.Color
@@ -40,6 +41,7 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
@@ -50,6 +52,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.net.toUri
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -59,6 +62,7 @@ import com.geekorum.ttrss.data.ArticleContentIndexed
 import com.geekorum.ttrss.ui.AppTheme3
 import com.geekorum.ttrss.ui.components.OpenInBrowserIcon
 import com.geekorum.ttrss.ui.components.web.AccompanistWebViewClient
+import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.delay
 import java.util.Locale
 
@@ -556,7 +560,7 @@ private fun prepareArticleContent(
 @Preview
 @Composable
 fun PreviewArticleDetailsContent() {
-    MaterialTheme {
+    AppTheme3 {
         val article = Article(contentData = ArticleContentIndexed(
             title = "My simple but hilariously and excessively long headline",
             content = "<b>Hello world</b>"
@@ -575,7 +579,7 @@ fun PreviewArticleDetailsContent() {
 @Preview(device = "spec:shape=Normal,width=1920,height=1080,unit=dp,dpi=480")
 @Composable
 fun PreviewArticleDetailsHeroContent() {
-    MaterialTheme {
+    AppTheme3 {
         val article = Article(contentData = ArticleContentIndexed(
             title = "My simple but hilariously and excessively long headline",
             content = "<b>Hello world</b>"
@@ -594,7 +598,6 @@ fun PreviewArticleDetailsHeroContent() {
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReadMoreSection(
     articles: List<ArticleWithTag>,
@@ -647,5 +650,347 @@ fun PreviewReadMoreSection() {
             ),
             onArticleClick = {}
         )
+    }
+}
+
+
+@Composable
+fun ArticleDetailsPane(
+    articleId: Long,
+    isSinglePane: Boolean,
+    onNavigateUpClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    articleDetailsViewModel: ArticleDetailsViewModel = hiltViewModel(),
+    dualPanePadding: PaddingValues = PaddingValues(0.dp)
+) {
+    ArticleDetailsPaneLayout(
+        isSinglePane = isSinglePane,
+        dualPanePadding = dualPanePadding,
+        modifier = modifier
+    ) {
+        LaunchedEffect(articleId) {
+            articleDetailsViewModel.init(articleId)
+        }
+
+        val activity = LocalContext.current as Activity
+        val webViewClientFactory =  remember(activity) {
+            EntryPointAccessors.fromActivity<ArticleDetailsEntryPoint>(activity)
+                .articleDetailsWebViewClientFactory
+        }
+        val webViewClient = remember(articleDetailsViewModel) {
+            webViewClientFactory.create(openUrlInBrowser = articleDetailsViewModel::openUrlInBrowser,
+                onPageFinishedCallback = { _, _ ->})
+        }
+
+        MaterialTheme(colorScheme = MaterialTheme.colorScheme.copy(
+            surface = if (isSinglePane) MaterialTheme.colorScheme.surface else
+                MaterialTheme.colorScheme.surfaceContainerHigh
+        )) {
+            if (isSinglePane) {
+                ArticleDetailsForSinglePane(
+                    articleDetailsViewModel = articleDetailsViewModel,
+                    onNavigateUpClick = onNavigateUpClick,
+                    onArticleClick = {},
+                    webViewClient = webViewClient
+                )
+            } else {
+                ArticleDetailsForDualPanes(
+                    articleDetailsViewModel = articleDetailsViewModel,
+                    onArticleClick = {},
+                    webViewClient = webViewClient
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ArticleDetailsPaneLayout(
+    isSinglePane: Boolean,
+    modifier: Modifier = Modifier,
+    dualPanePadding: PaddingValues = PaddingValues(0.dp),
+    content: @Composable () -> Unit
+) {
+    val cardShape = if (isSinglePane) RectangleShape else MaterialTheme.shapes.large
+    val cardColors = if (isSinglePane) CardDefaults.cardColors(
+        containerColor = MaterialTheme.colorScheme.surface
+    ) else CardDefaults.cardColors(
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+    )
+    val paddingModifier = if (!isSinglePane) Modifier
+        .padding(dualPanePadding)
+        .consumeWindowInsets(dualPanePadding)
+        .safeContentPadding()
+    else Modifier
+    Card(
+        shape = cardShape,
+        colors = cardColors,
+        modifier = modifier.then(paddingModifier)
+    ) {
+       content()
+    }
+}
+
+@Composable
+fun ArticleDetailsForSinglePane(
+    articleDetailsViewModel: ArticleDetailsViewModel,
+    onNavigateUpClick: () -> Unit,
+    onArticleClick: (Article) -> Unit,
+    webViewClient: AccompanistWebViewClient
+) {
+    val article by articleDetailsViewModel.article.observeAsState()
+    val readMoreArticles by articleDetailsViewModel.additionalArticles.collectAsState()
+    val browserIcon by articleDetailsViewModel.browserIcon.collectAsStateWithLifecycle()
+
+    val context = LocalContext.current
+    val articleDetailsScreenState = rememberArticleDetailsScreenState()
+
+    ArticleDetailsForSinglePane(
+        article = article,
+        browserIcon = browserIcon,
+        onNavigateUpClick = onNavigateUpClick,
+        onEndOfArticleReached = { articleDetailsViewModel.setArticleUnread(false) },
+        onToggleUnreadClick = { articleDetailsViewModel.toggleArticleRead() },
+        onStarredChange = { articleDetailsViewModel.onStarChanged(it) },
+        onShareClick = { articleDetailsViewModel.shareArticle(context) },
+        onOpenInBrowserClick = {
+            article?.let { articleDetailsViewModel.openArticleInBrowser(context, it) }
+        },
+        articleDetailsScreenState = articleDetailsScreenState,
+    ) { article, contentPadding ->
+        ArticleDetailsContent(article,
+            readMoreArticles = readMoreArticles,
+            onArticleClick = onArticleClick,
+            webViewClient = webViewClient,
+            contentPadding = contentPadding,
+            scrollState = articleDetailsScreenState.scrollState)
+
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ArticleDetailsForSinglePane(
+    article: Article?,
+    browserIcon: Drawable?,
+    onNavigateUpClick: () -> Unit,
+    onEndOfArticleReached: () -> Unit,
+    onToggleUnreadClick: () -> Unit,
+    onStarredChange: (Boolean) -> Unit,
+    onShareClick: () -> Unit,
+    onOpenInBrowserClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    articleDetailsScreenState: ArticleDetailsScreenState = rememberArticleDetailsScreenState(),
+    articleContent: @Composable (article: Article, contentPadding: PaddingValues) -> Unit
+) {
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val bottomAppBarScrollBehavior = BottomAppBarDefaults.exitAlwaysScrollBehavior()
+
+    Scaffold(
+        modifier = modifier
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
+//         TODO cause issues in pane or in articles list activity
+            .nestedScroll(bottomAppBarScrollBehavior.nestedScrollConnection),
+        topBar = {
+            ArticleFloatingTopAppBar(scrollBehavior = scrollBehavior,
+                onNavigateUpClick = onNavigateUpClick)
+        },
+        bottomBar = {
+            ArticleBottomAppBar(isUnread = article?.isTransientUnread == true,
+                isStarred = article?.isStarred == true,
+                floatingActionButton = null,
+                scrollBehavior = bottomAppBarScrollBehavior,
+                onToggleUnreadClick = onToggleUnreadClick,
+                onStarredChange = onStarredChange,
+                onShareClick = onShareClick )
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = onOpenInBrowserClick) {
+                OpenInBrowserIcon(browserIcon, contentDescription = stringResource(R.string.open_article_in_browser))
+            }
+        },
+        floatingActionButtonPosition = FabPosition.EndOverlay
+    ) { contentPadding ->
+        article?.let { article ->
+            articleContent(article, contentPadding)
+
+            LaunchedEffect(articleDetailsScreenState.isAtEndOfArticle) {
+                if (articleDetailsScreenState.isAtEndOfArticle) {
+                    if (articleDetailsScreenState.scrollState.value == 0) {
+                        delay(2000)
+                    }
+                    onEndOfArticleReached()
+                }
+            }
+        }
+    }
+}
+
+
+
+@Composable
+fun ArticleDetailsForDualPanes(
+    articleDetailsViewModel: ArticleDetailsViewModel,
+    onArticleClick: (Article) -> Unit,
+    webViewClient: AccompanistWebViewClient
+) {
+    val articleDetailsScreenState = rememberArticleDetailsScreenState()
+
+    val article by articleDetailsViewModel.article.observeAsState()
+    val readMoreArticles by articleDetailsViewModel.additionalArticles.collectAsState()
+    val browserIcon by articleDetailsViewModel.browserIcon.collectAsStateWithLifecycle()
+
+    val context = LocalContext.current
+
+    ArticleDetailsForDualPanes(
+        article = article,
+        browserIcon = browserIcon,
+        onEndOfArticleReached = {
+            articleDetailsViewModel.setArticleUnread(false)
+        },
+        onToggleUnreadClick = { articleDetailsViewModel.toggleArticleRead() },
+        onStarredChange = { articleDetailsViewModel.onStarChanged(it) },
+        onShareClick = { articleDetailsViewModel.shareArticle(context) },
+        onOpenInBrowserClick = {
+            article?.let { articleDetailsViewModel.openArticleInBrowser(context, it) }
+        },
+        articleDetailsScreenState = articleDetailsScreenState,
+    ) { article ->
+        ArticleDetailsHeroContent(
+            article,
+            readMoreArticles = readMoreArticles,
+            onArticleClick = onArticleClick,
+            modifier = Modifier
+                .padding(horizontal = 16.dp)
+                .padding(end = 56.dp),
+            scrollState = articleDetailsScreenState.scrollState,
+            webViewClient = webViewClient
+        )
+    }
+}
+
+@Composable
+fun ArticleDetailsForDualPanes(
+    article: Article?,
+    browserIcon: Drawable?,
+    onEndOfArticleReached: () -> Unit,
+    onToggleUnreadClick: () -> Unit,
+    onStarredChange: (Boolean) -> Unit,
+    onShareClick: () -> Unit,
+    onOpenInBrowserClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    articleDetailsScreenState: ArticleDetailsScreenState = rememberArticleDetailsScreenState(),
+    articleContent: @Composable (article: Article) -> Unit
+) {
+    Box(modifier.fillMaxSize()) {
+        article?.let {
+            articleContent(article)
+
+            LaunchedEffect(articleDetailsScreenState.isAtEndOfArticle) {
+                if (articleDetailsScreenState.isAtEndOfArticle) {
+                    if (articleDetailsScreenState.scrollState.value == 0) {
+                        delay(2000)
+                    }
+                    onEndOfArticleReached()
+                }
+            }
+        }
+
+        FloatingActionsBar(
+            browserApplicationIcon = browserIcon,
+            isUnread = article?.isTransientUnread == true,
+            isStarred = article?.isStarred ?: false,
+            onToggleUnreadClick = onToggleUnreadClick,
+            onStarredChange = onStarredChange,
+            onShareClick = onShareClick,
+            onOpenInBrowserClick = onOpenInBrowserClick,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(16.dp)
+                .padding(top = 24.dp)
+//                .offset(x = 32.dp)
+        )
+    }
+}
+
+
+@Preview
+@Composable
+private fun PreviewArticleDetailForSinglePane() {
+    AppTheme3 {
+        val article = Article(contentData = ArticleContentIndexed(
+            title = "My simple but hilariously and excessively long headline",
+            content = "<b>Hello world</b>"
+        ), isTransientUnread = true)
+        ArticleDetailsPaneLayout(
+            isSinglePane = true
+        ) {
+            ArticleDetailsForSinglePane(
+                article = article,
+                onNavigateUpClick = {},
+                onOpenInBrowserClick = {},
+                onEndOfArticleReached = {},
+                onStarredChange = {},
+                onShareClick = {},
+                onToggleUnreadClick = {},
+                browserIcon = null,
+            ) { article, contentPadding ->
+                ArticleDetailsContent(article = article,
+                    readMoreArticles = emptyList(),
+                    contentPadding = contentPadding,
+                    onArticleClick = {}) {
+                    Box(
+                        Modifier
+                            .size(width = 400.dp, height = 900.dp)
+                            .background(androidx.compose.ui.graphics.Color.Gray))
+                }
+            }
+        }
+    }
+}
+
+@Preview(device = "spec:id=reference_tablet,shape=Normal,width=1280,height=800,unit=dp,dpi=240")
+@Composable
+private fun PreviewArticleDetailsForDualPanes() {
+    AppTheme3 {
+        Row(Modifier.background(MaterialTheme.colorScheme.surface)) {
+            Spacer(Modifier.width(600.dp))
+
+            ArticleDetailsPaneLayout(
+                isSinglePane = false,
+                dualPanePadding = PaddingValues(16.dp)
+            ) {
+                val article = Article(contentData = ArticleContentIndexed(
+                    title = "My simple but hilariously and excessively long headline",
+                    content = "<b>Hello world</b>",
+                ), isTransientUnread = true)
+
+                ArticleDetailsForDualPanes(
+                    article = article,
+                    onOpenInBrowserClick = {},
+                    onEndOfArticleReached = {},
+                    onStarredChange = {},
+                    onShareClick = {},
+                    onToggleUnreadClick = {},
+                    browserIcon = null,
+                ) {
+                    ArticleDetailsHeroContent(
+                        article,
+                        readMoreArticles = emptyList(),
+                        onArticleClick = {},
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .padding(end = 56.dp),
+                    ) {
+                        Box(
+                            Modifier
+                                .fillMaxWidth()
+                                .height(height = 900.dp)
+                                .background(androidx.compose.ui.graphics.Color.Gray))
+                    }
+                }
+            }
+        }
     }
 }
