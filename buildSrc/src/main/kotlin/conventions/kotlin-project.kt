@@ -21,12 +21,20 @@
 package com.geekorum.build.conventions
 
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.assign
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
+import org.jetbrains.kotlin.gradle.dsl.KotlinCommonCompilerOptions
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinTopLevelExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinAndroidPluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePlugin
+import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+@OptIn(ExperimentalKotlinGradlePluginApi::class)
 fun Project.conventionForKotlinProject() {
     plugins.withType<KotlinBasePlugin> {
         extensions.configure<KotlinTopLevelExtension> {
@@ -34,9 +42,19 @@ fun Project.conventionForKotlinProject() {
         }
     }
 
-    tasks.withType<KotlinCompile> {
-        kotlinOptions {
-            freeCompilerArgs = listOf("-Xjvm-default=all")
+    val kotlinCompilerOptions: KotlinCommonCompilerOptions.() -> Unit = {
+        freeCompilerArgs = listOf("-Xjvm-default=all")
+    }
+
+    plugins.withType<KotlinAndroidPluginWrapper> {
+        extensions.configure<KotlinAndroidProjectExtension> {
+            compilerOptions(kotlinCompilerOptions)
+        }
+    }
+
+    plugins.withType<KotlinMultiplatformPluginWrapper> {
+        extensions.configure<KotlinMultiplatformExtension> {
+            compilerOptions(kotlinCompilerOptions)
         }
     }
 }

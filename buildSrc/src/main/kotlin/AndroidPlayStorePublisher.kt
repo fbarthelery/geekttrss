@@ -54,7 +54,7 @@ internal fun Project.configureAndroidPlayStorePublisher(): Unit {
         register("google") {
             // we always build the release as a separate step when publishing
             // use artifactDir to be sure that publish don't rebuild it
-            artifactDir.set(file("$buildDir/outputs/bundle/googleRelease"))
+            artifactDir.set(layout.buildDirectory.dir("outputs/bundle/googleRelease"))
         }
     }
 

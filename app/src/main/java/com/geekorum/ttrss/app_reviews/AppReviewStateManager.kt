@@ -35,7 +35,8 @@ class AppReviewStateManager @Inject constructor(
     private val appPreferences: SharedPreferences
 ) {
     var lastReviewRequestTimestamp: Instant?
-        get() = appPreferences.getString(PREF_LAST_REVIEW_REQUEST_TIMESTAMP, null)?.toInstant()
+        get() = appPreferences.getString(PREF_LAST_REVIEW_REQUEST_TIMESTAMP, null)
+            ?.let { Instant.parse(it) }
         set(value) = appPreferences.edit { putString(PREF_LAST_REVIEW_REQUEST_TIMESTAMP, value?.toString()) }
 
     val canAskForReview: Boolean

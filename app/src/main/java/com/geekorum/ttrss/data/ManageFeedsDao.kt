@@ -36,6 +36,7 @@ interface ManageFeedsDao {
     @Query("UPDATE feeds SET is_subscribed=:isSubscribed WHERE _id=:feedId")
     suspend fun updateIsSubscribedFeed(feedId: Long, isSubscribed: Boolean)
 
+    @Transaction
     @Query("SELECT * FROM feeds WHERE _id=:id")
     abstract fun getFeedById(id: Long): Flow<FeedWithFavIcon?>
 

@@ -26,17 +26,17 @@ androidx-arch-core-testing = "2.2.0"
 androidx-appcompat = "1.7.0"
 androidx-activity = "1.9.0"
 androidx-browser = "1.8.0"
-androidx-fragment = "1.7.1"
+androidx-fragment = "1.8.1"
 androidx-constraintlayout = "2.1.4"
 androidx-coordinatorlayout = "1.2.0"
-androidx-compose-bom = "2024.05.00"
+androidx-compose-bom = "2024.06.00"
 androidx-datastore = "1.1.1"
 androidx-hilt-compiler = "1.2.0"
 androidx-hilt-navigation-compose = "1.2.0"
 androidx-hilt-work = "1.2.0"
-androidx-lifecycle = "2.8.1"
+androidx-lifecycle = "2.8.2"
 #beta for type safe navigation dsl
-androidx-navigation = "2.8.0-beta02"
+androidx-navigation = "2.8.0-beta04"
 androidx-paging = "3.3.0"
 androidx-preferences = "1.2.1"
 androidx-room = "2.6.1"
@@ -44,21 +44,21 @@ androidx-startup = "1.1.1"
 androidx-work = "2.9.0"
 android-material = "1.12.0"
 avdl = "0.0.4"
-kotlinx-coroutines = "1.8.0"
+kotlinx-coroutines = "1.8.1"
 kotlinx-datetime = "0.6.0"
-kotlinx-serialization = "1.7.0"
+kotlinx-serialization = "1.7.1"
 dagger = "2.51.1"
 license-gradle-plugin = "0.16.1"
 materialKolor = "1.6.1"
 okio = "3.9.0"
 okhttp = "4.10.0"
-play-publisher = "3.9.1"
+play-publisher = "3.10.1"
 protobuf = "4.26.0"
 timber = "5.0.1"
 truth = "1.2.0"
 turbine = "1.0.0"
 mockk = "1.13.8"
-firebase-bom = "33.1.0"
+firebase-bom = "33.1.1"
 google-play-core = "2.1.0"
 google-play-core-review = "2.0.1"
 gms-play-services-base = "18.5.0"
@@ -85,7 +85,7 @@ google-gms-google-services = { id = "com.google.gms.google-services", version = 
 # google-gms-oss-license = { id = "com.google.android.gms.oss-licenses-plugin", version = "0.10.6.1" }
 com-geekorum-gms-oss-license = { id = "com.geekorum.gms.oss-licenses-plugin", version = "0.10.6" }
 com-geekorum-avdl-flydroid = { id = "com.geekorum.gradle.avdl.providers.flydroid", version.ref = "avdl" }
-firebase-crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.1" }
+firebase-crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.2" }
 androidx-navigation-safeargs-kotlin = { id = "androidx.navigation.safeargs.kotlin", version.ref = "androidx-navigation" }
 dagger-hilt-android = { id = "dagger.hilt.android.plugin", version.ref = "dagger" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
@@ -124,7 +124,7 @@ androidx-coordinatorlayout = { module = "androidx.coordinatorlayout:coordinatorl
 
 androidx-compose-bom = { module = "androidx.compose:compose-bom", version.ref = "androidx-compose-bom" }
 # beta for Modifier.animateItem()
-androidx-compose-foundation = { module = "androidx.compose.foundation:foundation", version = "1.7.0-beta01" }
+androidx-compose-foundation = { module = "androidx.compose.foundation:foundation", version = "1.7.0-beta04" }
 androidx-compose-animation-graphics = { module = "androidx.compose.animation:animation-graphics" }
 androidx-compose-material-icons-core = { module = "androidx.compose.material:material-icons-core" }
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
