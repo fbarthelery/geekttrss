@@ -48,9 +48,9 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.core.net.toUri
 import androidx.fragment.app.commit
+import androidx.fragment.compose.AndroidFragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.preference.ListPreference
@@ -59,7 +59,6 @@ import androidx.preference.PreferenceFragmentCompat
 import com.geekorum.ttrss.BuildConfig
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.core.BaseActivity
-import com.geekorum.ttrss.databinding.SettingsPreferencesContainerBinding
 import com.geekorum.ttrss.debugtools.withStrictMode
 import com.geekorum.ttrss.ui.AppTheme3
 import dagger.hilt.android.AndroidEntryPoint
@@ -251,7 +250,7 @@ private fun TabletLayoutContent(
 
 @Composable
 private fun PreferencesContainer(modifier: Modifier = Modifier) {
-    AndroidViewBinding(factory = SettingsPreferencesContainerBinding::inflate, modifier)
+    AndroidFragment<SettingsActivity.SettingsFragment>(modifier)
 }
 
 

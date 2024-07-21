@@ -203,6 +203,7 @@ dependencies {
     api(libs.androidx.compose.ui.tooling)
     api(libs.coil.compose)
     implementation(libs.materialKolor)
+    implementation(libs.androidx.fragment.compose)
 
 
     // for layout inspector
