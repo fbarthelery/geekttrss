@@ -46,14 +46,8 @@
     </style>
 
     <style name="AppTheme.ArticleDetailActivity" parent="AppTheme.NoActionBar">
-        <item name="android:statusBarColor">?android:windowBackground</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">false</item>
-    </style>
-
-    <!-- Widget styles -->
-    <style name="Widget.AppTheme.AppBar.CollapsingToolbar" parent="">
-        <item name="expandedTitleTextAppearance">@style/TextAppearance.AppTheme.CollapsingToolbar.Expanded.Surface</item>
-        <item name="collapsedTitleTextAppearance">@style/TextAppearance.AppTheme.CollapsingToolbar.Collapsed.Surface</item>
     </style>
 
 </resources>
