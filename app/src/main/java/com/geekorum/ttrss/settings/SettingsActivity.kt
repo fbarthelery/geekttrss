@@ -25,6 +25,7 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Bundle
 import android.os.StrictMode
+import android.view.View
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatDelegate
@@ -68,11 +69,17 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
 
+    private var fragmentContainerId = View.NO_ID
+
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         allowDiskReads()
+        // keep track of the FragmentContainer id
+        supportFragmentManager.addFragmentOnAttachListener { fragmentManager, fragment ->
+            fragmentContainerId = fragment.id
+        }
         setContent {
             AppTheme3 {
                 SettingsScreen(windowSizeClass = calculateWindowSizeClass(activity = this@SettingsActivity),
@@ -105,7 +112,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
         supportFragmentManager.commit {
             val fragment = daggerDelegateFragmentFactory.instantiate(classLoader, fragmentClass)
             addToBackStack("preferences_screen")
-            replace(R.id.preferences_container, fragment)
+            replace(fragmentContainerId, fragment)
         }
         return true
     }

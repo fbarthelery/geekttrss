@@ -33,7 +33,6 @@ android {
     namespace = "com.geekorum.ttrss.manage_feeds"
 
     buildFeatures {
-        dataBinding = true
         compose = true
     }
 
