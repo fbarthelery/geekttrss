@@ -25,6 +25,7 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -50,6 +51,7 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.ui.AppTheme3
+import com.geekorum.ttrss.ui.components.rememberWindowInsetsController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -123,6 +125,12 @@ private fun ArticleListScaffold(
             contentScaffold()
         }
     } else  {
+        val windowInsetsController = rememberWindowInsetsController()
+        val systemInDarkTheme = isSystemInDarkTheme()
+        LaunchedEffect(systemInDarkTheme, drawerState.isOpen) {
+            windowInsetsController.isAppearanceLightStatusBars = !drawerState.isOpen && !systemInDarkTheme
+        }
+
         ModalNavigationDrawer(
             modifier = modifier,
             drawerState = drawerState,
@@ -492,5 +500,3 @@ private fun PreviewUndoUnreadSnackbar() {
         }
     }
 }
-
-
