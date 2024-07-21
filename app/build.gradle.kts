@@ -60,7 +60,7 @@ android {
     namespace = "com.geekorum.ttrss"
     defaultConfig {
         applicationId = "com.geekorum.ttrss"
-        targetSdk = 34
+        targetSdk = 35
 
         sourceSets {
             named("androidTest") {

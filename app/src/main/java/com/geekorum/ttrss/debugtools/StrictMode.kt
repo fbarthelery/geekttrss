@@ -59,16 +59,17 @@ class StrictModeInitializer : Initializer<Unit> {
             .detectLeakedRegistrationObjects()
             .detectLeakedSqlLiteObjects()
             .apply {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    detectContentUriWithoutPermission()
-                    // because crashlytics don't tag its socket
-                    if (BuildConfig.FLAVOR != "google") {
-                        detectUntaggedSockets()
-                    }
+                detectContentUriWithoutPermission()
+                // because crashlytics don't tag its socket
+                if (BuildConfig.FLAVOR != "google") {
+                    detectUntaggedSockets()
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                     // appcompat use nonsdk
 //                        detectNonSdkApiUsage()
+                }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    detectUnsafeIntentLaunch()
                 }
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                     penaltyListener(listenerExecutor, violationListener)
