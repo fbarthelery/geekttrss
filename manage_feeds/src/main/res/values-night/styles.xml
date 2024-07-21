@@ -23,6 +23,6 @@
 -->
 <resources>
     <style name="AppTheme.ManageFeedsActivity" parent="AppTheme.NoActionBar">
-        <item name="android:navigationBarColor">?android:colorBackground</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 </resources>
