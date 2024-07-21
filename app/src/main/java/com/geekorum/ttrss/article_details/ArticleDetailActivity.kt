@@ -23,6 +23,7 @@ package com.geekorum.ttrss.article_details
 import android.app.assist.AssistContent
 import android.content.ContentUris
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -60,6 +61,9 @@ class ArticleDetailActivity : SessionActivity() {
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            window.isNavigationBarContrastEnforced = false
+        }
         val articleUri = requireNotNull(intent.data)
         articleDetailsViewModel.init(ContentUris.parseId(articleUri))
 

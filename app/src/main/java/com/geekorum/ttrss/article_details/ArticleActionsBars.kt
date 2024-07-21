@@ -22,6 +22,7 @@ package com.geekorum.ttrss.article_details
 
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
+import android.os.Build
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
@@ -43,6 +44,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
@@ -52,6 +54,7 @@ import androidx.compose.ui.unit.dp
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.ui.AppTheme3
 import com.geekorum.ttrss.ui.components.OpenInBrowserIcon
+import com.geekorum.ttrss.ui.components.rememberWindowInsetsController
 import com.materialkolor.ktx.harmonizeWithPrimary
 import kotlin.math.roundToInt
 
@@ -72,6 +75,14 @@ fun ArticleBottomAppBar(
         MaterialTheme.colorScheme.primary
     else
         MaterialTheme.colorScheme.surface
+    // sync 3 buttons navbar colors
+    val lightNavBar = containerColor.luminance() > 0.5
+    val windowInsetsController = rememberWindowInsetsController()
+    LaunchedEffect(lightNavBar) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            windowInsetsController.isAppearanceLightNavigationBars = lightNavBar
+        }
+    }
     BottomAppBar(
         containerColor = containerColor,
         actions = {
