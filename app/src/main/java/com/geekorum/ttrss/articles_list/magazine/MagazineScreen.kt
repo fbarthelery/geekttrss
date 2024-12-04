@@ -25,24 +25,34 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Surface
-import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
@@ -55,11 +65,17 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
-import com.geekorum.ttrss.articles_list.*
+import com.geekorum.ttrss.articles_list.ActivityViewModel
+import com.geekorum.ttrss.articles_list.ArticleCard
+import com.geekorum.ttrss.articles_list.CompactArticleListItem
+import com.geekorum.ttrss.articles_list.FeedEmptyText
+import com.geekorum.ttrss.articles_list.debouncedPagingViewStateFor
+import com.geekorum.ttrss.articles_list.isScrollingUp
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.data.ArticleWithFeed
 import com.geekorum.ttrss.share.createShareArticleIntent
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -141,38 +157,20 @@ private fun ArticlesMagazine(
         top = additionalPadding
     )
 
-    // trigger refresh and sync pull refresh state
-    if (pullRefreshState.isRefreshing) {
-        LaunchedEffect(isRefreshing) {
-            if (!isRefreshing) { // not making a full refresh
-                viewModel.refreshMagazine()
-                // display loading for a few frames
-                delay(700)
-                pullRefreshState.endRefresh()
+    val coroutineScope = rememberCoroutineScope()
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        state = pullRefreshState,
+        onRefresh = {
+            viewModel.refreshMagazine()
+            coroutineScope.launch {
+                // go back to hidden as isRefreshing is based on sync jobs not magazine
+                pullRefreshState.animateToHidden()
             }
-        }
-    } else if (isRefreshing){
-        LaunchedEffect(Unit) {
-            pullRefreshState.startRefresh()
-        }
-    }
-    if (!isRefreshing) {
-        LaunchedEffect(Unit) {
-            pullRefreshState.endRefresh()
-        }
-    }
-    // workaround vertical offset state not correctly restored
-    // https://issuetracker.google.com/issues/312220305
-    if (pullRefreshState.isRefreshing && pullRefreshState.verticalOffset == 0f) {
-        LaunchedEffect(Unit) {
-            pullRefreshState.startRefresh()
-        }
-    }
-
-    Box(
-        modifier
+        },
+        modifier = modifier
             .padding(pullRefreshBoxContentPadding)
-            .nestedScroll(pullRefreshState.nestedScrollConnection)) {
+    ) {
         val pagingItems = viewModel.articles.collectAsLazyPagingItems()
         val loadState by debouncedPagingViewStateFor(pagingItems)
         val isEmpty = pagingItems.itemCount == 0
@@ -202,18 +200,11 @@ private fun ArticlesMagazine(
                 onShareClick,
             )
         }
-
-        PullToRefreshContainer(
-            pullRefreshState,
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-        )
     }
 
 }
 
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
 private fun ArticlesList(
     viewModel: MagazineViewModel,
     pagingItems: LazyPagingItems<ArticleWithFeed>,

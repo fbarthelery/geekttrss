@@ -25,24 +25,46 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.calculateEndPadding
+import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.Archive
-import androidx.compose.material3.*
-import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshState
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -55,7 +77,12 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import com.geekorum.ttrss.R
-import com.geekorum.ttrss.data.*
+import com.geekorum.ttrss.data.Article
+import com.geekorum.ttrss.data.ArticleContentIndexed
+import com.geekorum.ttrss.data.ArticleWithFeed
+import com.geekorum.ttrss.data.Feed
+import com.geekorum.ttrss.data.FeedFavIcon
+import com.geekorum.ttrss.data.FeedWithFavIcon
 import com.geekorum.ttrss.ui.AppTheme3
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
@@ -100,27 +127,6 @@ fun ArticleCardList(
     val articles = viewModel.articles.collectAsLazyPagingItems()
     val isMultiFeedList by viewModel.isMultiFeed.collectAsState()
 
-    // trigger refresh and sync pull refresh state
-    if (pullRefreshState.isRefreshing) {
-        LaunchedEffect(Unit) {
-            viewModel.refresh()
-        }
-    } else if (isRefreshing){
-        pullRefreshState.startRefresh()
-    }
-    if (!isRefreshing) {
-        LaunchedEffect(Unit) {
-            pullRefreshState.endRefresh()
-        }
-    }
-    // workaround vertical offset state not correctly restored
-    // https://issuetracker.google.com/issues/312220305
-    if (pullRefreshState.isRefreshing && pullRefreshState.verticalOffset == 0f) {
-        LaunchedEffect(Unit) {
-            pullRefreshState.startRefresh()
-        }
-    }
-
     val loadState by debouncedPagingViewStateFor(articles)
     val isEmpty = articles.itemCount == 0
     var refreshIfEmpty by remember { mutableStateOf(true) }
@@ -154,6 +160,9 @@ fun ArticleCardList(
         onSwiped = {
             viewModel.setArticleUnread(it.id, false)
         },
+        onRefresh = {
+            viewModel.refresh()
+        },
         modifier = modifier,
         contentPadding = contentPadding
     )
@@ -169,6 +178,7 @@ private fun ArticleCardList(
     pullRefreshState: PullToRefreshState,
     browserApplicationIcon: Drawable?,
     displayCompactItems: Boolean,
+    onRefresh: () -> Unit,
     onCardClick: (Int, Article) -> Unit,
     onShareClick: (Article) -> Unit,
     onOpenInBrowserClick: (Article) -> Unit,
@@ -194,10 +204,12 @@ private fun ArticleCardList(
         top = additionalPadding
     )
 
-    Box(
-        modifier
+    PullToRefreshBox(
+        isRefreshing = isRefreshing,
+        onRefresh = onRefresh,
+        state = pullRefreshState,
+        modifier = modifier
             .padding(pullRefreshBoxContentPadding)
-            .nestedScroll(pullRefreshState.nestedScrollConnection)
     ) {
         val loadState by debouncedPagingViewStateFor(articles)
         val isEmpty = articles.itemCount == 0
@@ -219,16 +231,10 @@ private fun ArticleCardList(
                 onSwiped
             )
         }
-
-        PullToRefreshContainer(
-            pullRefreshState,
-            modifier = Modifier.align(Alignment.TopCenter)
-        )
     }
 }
 
 @Composable
-@OptIn(ExperimentalFoundationApi::class)
 private fun ArticlesList(
     articles: LazyPagingItems<ArticleWithFeed>,
     listState: LazyListState,
@@ -469,6 +475,7 @@ private fun ArticleCardList() {
         onToggleUnreadClick = {},
         onStarChanged = { _, _ -> },
         onSwiped = {},
+        onRefresh = {}
     )
 }
 
