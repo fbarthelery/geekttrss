@@ -38,7 +38,6 @@ import org.gradle.api.services.BuildService
 import org.gradle.api.services.BuildServiceParameters
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.configurationcache.extensions.capitalized
 import org.gradle.kotlin.dsl.*
 
 
@@ -156,3 +155,5 @@ abstract class OneInstrumentedTestService : BuildService<BuildServiceParameters.
 private fun Variant.connectedInstrumentTestProvider(tasks: TaskContainer): TaskProvider<Task> {
     return tasks.named("connected${name.capitalized()}AndroidTest")
 }
+
+private fun String.capitalized() = replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }

@@ -30,7 +30,6 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import org.gradle.configurationcache.extensions.capitalized
 import org.gradle.kotlin.dsl.register
 import org.gradle.process.ExecOperations
 import java.io.ByteArrayOutputStream
@@ -158,3 +157,5 @@ fun ApplicationAndroidComponentsExtension.configureVersionChangeset(project: Pro
         })
     }
 }
+
+private fun String.capitalized() = replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
