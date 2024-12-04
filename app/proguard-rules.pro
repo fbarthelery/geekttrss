@@ -99,3 +99,4 @@
 -dontwarn javax.lang.model.**
 -dontwarn javax.tools.Diagnostic$Kind
 -dontwarn com.google.j2objc.annotations.RetainedWith
+-dontwarn com.google.android.gms.common.annotation.NoNullnessRewrite
