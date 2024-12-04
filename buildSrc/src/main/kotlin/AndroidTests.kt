@@ -30,10 +30,10 @@ import org.gradle.api.artifacts.dsl.DependencyConstraintHandler
 import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.kotlin.dsl.*
 
-const val espressoVersion = "3.5.1"
-const val androidxTestRunnerVersion = "1.5.2"
-const val androidxTestCoreVersion = "1.5.0"
-const val robolectricVersion = "4.11.1"
+const val espressoVersion = "3.6.1"
+const val androidxTestRunnerVersion = "1.6.2"
+const val androidxTestCoreVersion = "1.6.1"
+const val robolectricVersion = "4.14.1"
 
 private typealias BaseExtension = CommonExtension<*, *, DefaultConfig, *, *, *>
 
@@ -63,17 +63,17 @@ internal fun Project.configureTests() {
     dependencies {
         dualTestImplementation(kotlin("test-junit"))
 
-        androidTestUtil("androidx.test:orchestrator:1.4.2")
+        androidTestUtil("androidx.test:orchestrator:1.5.1")
         androidTestImplementation("androidx.test:runner:$androidxTestRunnerVersion")
-        dualTestImplementation("androidx.test.ext:junit-ktx:1.1.5")
+        dualTestImplementation("androidx.test.ext:junit-ktx:1.2.1")
 
         dualTestImplementation("androidx.test:core-ktx:$androidxTestCoreVersion")
-        dualTestImplementation("androidx.test:rules:1.5.0")
+        dualTestImplementation("androidx.test:rules:1.6.1")
 
         // fragment testing is usually declared on debugImplementation configuration and need these dependencies
         constraints {
             debugImplementation("androidx.test:core:$androidxTestCoreVersion")
-            debugImplementation("androidx.test:monitor:1.6.1")
+            debugImplementation("androidx.test:monitor:1.7.2")
         }
 
         dualTestImplementation("androidx.test.espresso:espresso-core:$espressoVersion")
@@ -82,7 +82,7 @@ internal fun Project.configureTests() {
 
         // assertions
         dualTestImplementation("com.google.truth:truth:1.1.3")
-        dualTestImplementation("androidx.test.ext:truth:1.5.0")
+        dualTestImplementation("androidx.test.ext:truth:1.6.0")
 
         // mock
         testImplementation("io.mockk:mockk:1.13.8")
