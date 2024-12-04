@@ -44,8 +44,8 @@ abstract class SyncWorkerFactory(
 
     protected fun createSyncWorkerComponent(workerParameters: WorkerParameters): SyncWorkerComponent {
         val account = with(workerParameters.inputData) {
-            val accountName = getString(PARAM_ACCOUNT_NAME)
-            val accountType = getString(PARAM_ACCOUNT_TYPE)
+            val accountName = getString(PARAM_ACCOUNT_NAME)!!
+            val accountType = getString(PARAM_ACCOUNT_TYPE)!!
             Account(accountName, accountType)
         }
         return syncWorkerComponentBuilder
@@ -70,8 +70,8 @@ abstract class BaseSyncWorker(
 
     private fun createSyncWorkerComponent(workerParameters: WorkerParameters, syncWorkerComponentBuilder: SyncWorkerComponent.Builder): SyncWorkerComponent {
         val account = with(workerParameters.inputData) {
-            val accountName = getString(PARAM_ACCOUNT_NAME)
-            val accountType = getString(PARAM_ACCOUNT_TYPE)
+            val accountName = requireNotNull(getString(PARAM_ACCOUNT_NAME))
+            val accountType = requireNotNull(getString(PARAM_ACCOUNT_TYPE))
             Account(accountName, accountType)
         }
         return syncWorkerComponentBuilder

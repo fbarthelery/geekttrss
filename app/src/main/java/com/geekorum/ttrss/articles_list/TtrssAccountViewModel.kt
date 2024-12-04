@@ -64,8 +64,8 @@ class TtrssAccountViewModel @Inject constructor(
         val callback = AccountManagerCallback<Bundle> { accountManagerFuture ->
             try {
                 val result = accountManagerFuture.result
-                val accountName = result.getString(AccountManager.KEY_ACCOUNT_NAME)
-                val accountType = result.getString(AccountManager.KEY_ACCOUNT_TYPE)
+                val accountName = result.getString(AccountManager.KEY_ACCOUNT_NAME, "")
+                val accountType = result.getString(AccountManager.KEY_ACCOUNT_TYPE, "")
                 selectAccount(Account(accountName, accountType))
             } catch (e: Exception) {
                 Timber.w(e, "Unable to get auth token")

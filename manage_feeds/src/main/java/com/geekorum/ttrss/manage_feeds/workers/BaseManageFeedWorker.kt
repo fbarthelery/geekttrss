@@ -35,8 +35,8 @@ abstract class BaseManageFeedWorker(
 ) : CoroutineWorker(context, params) {
 
     val account = with(params.inputData) {
-        val accountName = getString("account_name")
-        val accountType = getString("account_type")
+        val accountName = requireNotNull(getString("account_name"))
+        val accountType = requireNotNull(getString("account_type"))
         Account(accountName, accountType)
     }
 
