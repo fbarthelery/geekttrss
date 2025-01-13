@@ -199,7 +199,7 @@ private fun FeedSelector(
         onExpandedChange = { expanded = !expanded },
     ) {
         val isSingleFeed = feeds.size == 1
-        val menuModifier = if (isSingleFeed) Modifier else Modifier.menuAnchor()
+        val menuModifier = if (isSingleFeed) Modifier else Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable)
         val focusedBorderColor = if (isSingleFeed) MaterialTheme.colorScheme.surface
                                         else MaterialTheme.colorScheme.primary
 
@@ -258,7 +258,7 @@ private fun AccountSelector(
             OutlinedTextField(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .menuAnchor(),
+                    .menuAnchor(MenuAnchorType.PrimaryNotEditable),
                 readOnly = true,
                 label = { Text(stringResource(R.string.activity_add_feed_account_subtitle))},
                 value = selectedAccount?.name ?: "",
