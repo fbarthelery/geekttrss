@@ -310,8 +310,9 @@ fun ArticleTopActionsBar(
     )
 }
 
-
-@OptIn(ExperimentalAnimationGraphicsApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalAnimationGraphicsApi::class,
+    ExperimentalMaterial3ExpressiveApi::class
+)
 @Composable
 fun FloatingActionsBar(
     browserApplicationIcon: Drawable?,
@@ -331,45 +332,40 @@ fun FloatingActionsBar(
         MaterialTheme.colorScheme.onPrimary
     else
         MaterialTheme.colorScheme.onSurface
-    
-    val colors = CardDefaults.elevatedCardColors(
-        containerColor = containerColor,
-        contentColor = contentColor
+
+    val colors = FloatingToolbarDefaults.vibrantFloatingToolbarColors(
+        toolbarContainerColor = containerColor,
+        toolbarContentColor = contentColor
     )
-    ElevatedCard(
-        shape = MaterialTheme.shapes.small,
-        colors = colors,
+    VerticalFloatingToolbar(
+        expanded = true,
+//        shape = MaterialTheme.shapes.small,
         modifier = modifier,
+        colors = colors,
+        floatingActionButton = {
+            FloatingToolbarDefaults.StandardFloatingActionButton(onClick = onOpenInBrowserClick) {
+                OpenInBrowserIcon(browserApplicationIcon, contentDescription = stringResource(R.string.open_article_in_browser))
+            }
+        },
     ) {
-        Column {
-            IconButton(onClick = onToggleUnreadClick) {
-                Icon(Icons.Default.Archive, contentDescription = null)
+        IconButton(onClick = onToggleUnreadClick) {
+            Icon(Icons.Default.Archive, contentDescription = null)
+        }
+        IconToggleButton(isStarred, onCheckedChange = onStarredChange) {
+            val image = AnimatedImageVector.animatedVectorResource(id = R.drawable.avd_ic_star_filled)
+            val starColor = if (isStarred) {
+                Color.Unspecified
+            } else {
+                LocalContentColor.current
             }
-            IconToggleButton(isStarred, onCheckedChange = onStarredChange) {
-                val image = AnimatedImageVector.animatedVectorResource(id = R.drawable.avd_ic_star_filled)
-                val starColor = if (isStarred) {
-                    Color.Unspecified
-                } else {
-                    LocalContentColor.current
-                }
-                Icon(
-                    painter = rememberAnimatedVectorPainter(image, atEnd = isStarred),
-                    contentDescription = null,
-                    tint = starColor,
-                )
-            }
-            IconButton(onClick = onShareClick) {
-                Icon(Icons.Default.Share, contentDescription = null)
-            }
-            Box(modifier = Modifier
-                .size(48.dp)
-                .clickable(onClick = onOpenInBrowserClick),
-                contentAlignment = Alignment.Center
-            ) {
-                OpenInBrowserIcon(browserApplicationIcon = browserApplicationIcon,
-                    contentDescription = stringResource(R.string.open_article_in_browser)
-                )
-            }
+            Icon(
+                painter = rememberAnimatedVectorPainter(image, atEnd = isStarred),
+                contentDescription = null,
+                tint = starColor,
+            )
+        }
+        IconButton(onClick = onShareClick) {
+            Icon(Icons.Default.Share, contentDescription = null)
         }
     }
 }
@@ -392,6 +388,7 @@ fun PreviewM3ArticleTopActionsBar() {
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Preview
 @Composable
 private fun PreviewFloatingActionsBar() {
