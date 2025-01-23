@@ -299,7 +299,7 @@ fun EditFeedScreen(
                     )
                 }
             },
-            colors = TopAppBarDefaults.largeTopAppBarColors(
+            colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
             ))
     }) {
@@ -444,7 +444,7 @@ fun EditSpecialFeedScreen(
                     )
                 }
             },
-            colors = TopAppBarDefaults.largeTopAppBarColors(
+            colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
             ))
     }) {

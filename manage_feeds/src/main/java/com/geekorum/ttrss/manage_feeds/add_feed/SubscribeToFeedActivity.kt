@@ -151,7 +151,7 @@ private fun SubscribeToFeedScaffold(
 @Composable
 private fun LargeTitleBar() {
     LargeTopAppBar(
-        colors = TopAppBarDefaults.largeTopAppBarColors(
+        colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
         ),
         title = {
