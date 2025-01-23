@@ -20,22 +20,19 @@
  */
 package com.geekorum.ttrss.articles_list
 
-import androidx.compose.animation.*
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.animateFloatingActionButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import com.geekorum.ttrss.R
 
@@ -46,7 +43,7 @@ internal class FabPresenter(
     private val navController: NavController
 ){
 
-    @OptIn(ExperimentalAnimationApi::class)
+    @OptIn(ExperimentalMaterial3ExpressiveApi::class)
     @Composable
     fun Content(isScrollingUpOrRest: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
         //TODO deal with module install
@@ -56,45 +53,13 @@ internal class FabPresenter(
             navBackStackEntry == null -> false
             else -> true
         }
-
         val fabVisible = fabVisibleInDestination && isScrollingUpOrRest
-        val targetState = if (fabVisible) {
-            val feedId = if (navBackStackEntry?.destination?.hasRoute<NavRoutes.ArticlesList>() == true) {
-                navBackStackEntry?.arguments?.getLong("feed_id")
-            } else null
-            DestinationWithFeedId(
-                destination = navBackStackEntry?.destination,
-                feedId = feedId
-            )
-        } else null
-        // as M3 scaffold remove the fab if size is 0 we need to have a size
-        // so that even when fab is not visible it is still added in composition
-        AnimatedContent(
-            modifier = modifier.size(56.dp),
-            targetState = targetState,
-            transitionSpec = {
-                scaleIn(tween(300, delayMillis = 100)) togetherWith
-                        scaleOut(tween(300)) using
-                        SizeTransform(clip = false) { _, _ ->
-                            // delay size transform to make scaleOut happens in place
-                            tween(300, delayMillis = if (targetState == null) 300 else 0)
-                        }
-            },
-            contentAlignment = Alignment.Center,
-            label = "AnimatedFabVisibility",
-        ) { state ->
-            if (state != null) {
-                FloatingActionButton(
-                    onClick = onClick
-                ) {
-                    Icon(Icons.Default.Refresh, stringResource(R.string.btn_refresh))
-                }
-            }
+
+        FloatingActionButton(
+            modifier = modifier.animateFloatingActionButton(visible = fabVisible, alignment = Alignment.BottomEnd),
+            onClick = onClick
+        ) {
+            Icon(Icons.Default.Refresh, stringResource(R.string.btn_refresh))
         }
     }
-
-    private data class DestinationWithFeedId(
-        val destination: NavDestination?,
-        val feedId: Long?
-    )
 }
