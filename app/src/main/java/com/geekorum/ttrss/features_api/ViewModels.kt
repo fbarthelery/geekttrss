@@ -157,6 +157,7 @@ private class HiltViewModelFactory(
                                 + " but none was found."
                     )
                 } else {
+                    @Suppress("UNCHECKED_CAST")
                     return provider.get() as T
                 }
             } else {
@@ -177,6 +178,7 @@ private class HiltViewModelFactory(
                                 + " was provided in CreationExtras.")
                     )
                 } else {
+                    @Suppress("UNCHECKED_CAST")
                     return creationCallback.invoke(assistedFactory) as T
                 }
             } else {

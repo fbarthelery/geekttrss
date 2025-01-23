@@ -539,7 +539,7 @@ object MigrationFrom12To13 : Migration(12, 13) {
                         .filter(String::isNotEmpty)
                         .distinct()
                     for (tag in tagsList) {
-                        execSQL("INSERT INTO `articles_tags` (`article_id`, `tag`) VALUES (?, ?)", arrayOf(articleId, tag))
+                        execSQL("INSERT INTO `articles_tags` (`article_id`, `tag`) VALUES (?, ?)", arrayOf<Any>(articleId, tag))
                     }
                 }
             }

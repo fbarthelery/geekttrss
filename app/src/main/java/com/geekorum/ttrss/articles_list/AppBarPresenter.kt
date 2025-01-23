@@ -110,8 +110,8 @@ internal class AppBarPresenter(
 
                 val suggestions by activityViewModel.articlesSearchHistory.collectAsStateWithLifecycle()
                 ArticlesSearchBar(
-                    active = active,
-                    onActiveChange = {
+                    expanded = active,
+                    onExpandedChange = {
                         if (!it && !hasSearched) navController.popBackStack()
                         active = it
                     },

@@ -21,7 +21,11 @@
 package com.geekorum.ttrss.articles_list
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.selection.selectable
@@ -33,11 +37,26 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
@@ -160,8 +179,8 @@ private fun SortMenuRadioGroup(
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun ArticlesSearchBar(
-    active: Boolean,
-    onActiveChange: (Boolean) -> Unit,
+    expanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
     query: String,
     onQueryChange: (String) -> Unit,
     onSearch: (String) -> Unit,
@@ -170,38 +189,45 @@ fun ArticlesSearchBar(
     suggestions: List<String> = emptyList(),
 ) {
     SearchBar(
-        query = query,
-        onQueryChange = onQueryChange,
-        onSearch = {
-            onSearch(it)
-            onActiveChange(false)
-        },
-        active = active,
-        onActiveChange = {
-            onActiveChange(it)
-        },
-        placeholder = {
-            Text(
-                stringResource(R.string.placeholder_textfield_search),
-            )
-        },
-        leadingIcon = {
-            IconButton(onClick = onUpClick) {
-                Icon(
-                    imageVector = AppTheme3.IconsAutoMirrored.ArrowBack,
-                    contentDescription = null
-                )
-            }
-        },
-        trailingIcon = {
-            if (query.isNotEmpty()) {
-                IconButton(onClick = { onQueryChange("") }) {
-                    Icon(
-                        Icons.Default.Clear,
-                        contentDescription = stringResource(R.string.content_desc_btn_clear)
+        expanded = expanded,
+        onExpandedChange = onExpandedChange,
+        inputField = {
+            SearchBarDefaults.InputField(
+                modifier = Modifier.fillMaxWidth(),
+                query = query,
+                onQueryChange = onQueryChange,
+                onSearch = {
+                    onSearch(it)
+                    onExpandedChange(false)
+                },
+                expanded = expanded,
+                onExpandedChange = {
+                    onExpandedChange(it)
+                },
+                placeholder = {
+                    Text(
+                        stringResource(R.string.placeholder_textfield_search),
                     )
-                }
-            }
+                },
+                leadingIcon = {
+                    IconButton(onClick = onUpClick) {
+                        Icon(
+                            imageVector = AppTheme3.IconsAutoMirrored.ArrowBack,
+                            contentDescription = null
+                        )
+                    }
+                },
+                trailingIcon = {
+                    if (query.isNotEmpty()) {
+                        IconButton(onClick = { onQueryChange("") }) {
+                            Icon(
+                                Icons.Default.Clear,
+                                contentDescription = stringResource(R.string.content_desc_btn_clear)
+                            )
+                        }
+                    }
+                },
+            )
         },
         shadowElevation = 3.dp,
         modifier = modifier,
@@ -218,7 +244,7 @@ fun ArticlesSearchBar(
                     modifier = Modifier.clickable {
                         onQueryChange(suggestion)
                         onSearch(suggestion)
-                        onActiveChange(false)
+                        onExpandedChange(false)
                     }
                 )
             }
@@ -273,8 +299,8 @@ private fun PreviewArticlesSearch() {
         Scaffold(
             topBar = {
                 ArticlesSearchBar(
-                    active = active,
-                    onActiveChange = {
+                    expanded = active,
+                    onExpandedChange = {
                         active = it
                     },
                     query = query,

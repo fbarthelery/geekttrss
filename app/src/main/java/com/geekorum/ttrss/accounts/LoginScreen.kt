@@ -91,7 +91,7 @@ fun LoginScreen(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         snackbarHost = { SnackbarHost(snackbarHostState)  },
         topBar = {
-            val colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+            val colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                 titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
             )
