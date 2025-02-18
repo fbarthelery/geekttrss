@@ -27,14 +27,20 @@ import android.os.PowerManager
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.lifecycle.LiveData
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.distinctUntilChanged
-import androidx.lifecycle.map
-import androidx.lifecycle.switchMap
-import com.geekorum.geekdroid.battery.BatterySaverLiveData
-import com.geekorum.geekdroid.battery.LowBatteryLiveData
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.viewModelScope
+import com.geekorum.geekdroid.battery.isPowerSaveModeFlow
+import com.geekorum.geekdroid.battery.lowBatteryFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -48,12 +54,16 @@ open class BatteryFriendlyActivity : AppCompatActivity() {
     @SuppressLint("WrongConstant")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        nightViewModel.forceNightMode.observe(this) {
-            // we need to reset the local night mode to unspecified
-            // otherwise the default night mode is not picked
-            val mode =
-                if (it) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_UNSPECIFIED
-            delegate.localNightMode = mode
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                nightViewModel.forceNightMode.collect {
+                    // we need to reset the local night mode to unspecified
+                    // otherwise the default night mode is not picked
+                    val mode =
+                        if (it) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_UNSPECIFIED
+                    delegate.localNightMode = mode
+                }
+            }
         }
     }
 }
@@ -63,19 +73,18 @@ open class BatteryFriendlyActivity : AppCompatActivity() {
  */
 @HiltViewModel
 class ForceNightModeViewModel(
-    private val batterySaverLiveData: LiveData<Boolean>,
-    private val lowBatteryLiveData: LiveData<Boolean>
+    private val batterySaverFlow: Flow<Boolean>,
+    private val lowBatteryFlow: Flow<Boolean>
 ) : ViewModel() {
 
     @Inject
     constructor(application: Application, powerManager: PowerManager) : this(
-        BatterySaverLiveData(application, powerManager), LowBatteryLiveData(application)
+        isPowerSaveModeFlow(application, powerManager), application.lowBatteryFlow()
     )
 
-    val forceNightMode = batterySaverLiveData.switchMap { saving ->
-        // need to provide a copy of batterySaverLiveData to be observed
-        if (saving) batterySaverLiveData.map { it } else lowBatteryLiveData
-    }.distinctUntilChanged()
+    val forceNightMode = batterySaverFlow.flatMapLatest { saving ->
+        if (saving) flowOf(true) else lowBatteryFlow
+    }
 
 }
 

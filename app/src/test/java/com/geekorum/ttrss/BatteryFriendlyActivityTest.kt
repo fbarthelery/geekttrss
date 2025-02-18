@@ -33,6 +33,8 @@ import androidx.lifecycle.Observer
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import app.cash.turbine.test
+import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.testing.HiltAndroidRule
@@ -40,6 +42,8 @@ import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.HiltTestApplication
 import io.mockk.mockk
 import io.mockk.verifySequence
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.test.runTest
 import org.junit.Rule
 import org.junit.runner.RunWith
 import org.robolectric.Shadows
@@ -106,60 +110,56 @@ class BatteryFriendlyActivityTest {
 class ForceNightModeViewModelTest {
 
     lateinit var viewModel: ForceNightModeViewModel
-    lateinit var batterySaverLivedate: MutableLiveData<Boolean>
-    lateinit var lowBatteryLiveData: MutableLiveData<Boolean>
+    lateinit var batterySaverLivedate: MutableStateFlow<Boolean>
+    lateinit var lowBatteryLiveData: MutableStateFlow<Boolean>
 
     @get:Rule
     val instantTaskExecutorRule = InstantTaskExecutorRule()
 
     @BeforeTest
     fun setUp() {
-        batterySaverLivedate = MutableLiveData()
-        lowBatteryLiveData = MutableLiveData()
+        batterySaverLivedate = MutableStateFlow(false)
+        lowBatteryLiveData = MutableStateFlow(false)
         viewModel = ForceNightModeViewModel(batterySaverLivedate, lowBatteryLiveData)
     }
 
     @Test
-    fun testThatWhenBatteryIsLowWeForceNight() {
-        val observer = mockk<Observer<Boolean>>(relaxed = true)
+    fun testThatWhenBatteryIsLowWeForceNight() = runTest {
         batterySaverLivedate.value = false
         lowBatteryLiveData.value = true
-        viewModel.forceNightMode.observeForever(observer)
-        verifySequence {
-            observer.onChanged(true)
+        viewModel.forceNightMode.test {
+            assertThat(awaitItem()).isTrue()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun testThatWhenSavingBatteryWeForceNight() {
-        val observer = mockk<Observer<Boolean>>(relaxed = true)
+    fun testThatWhenSavingBatteryWeForceNight() = runTest {
         batterySaverLivedate.value = true
         lowBatteryLiveData.value = false
-        viewModel.forceNightMode.observeForever(observer)
-        verifySequence {
-            observer.onChanged(true)
+        viewModel.forceNightMode.test {
+            assertThat(awaitItem()).isTrue()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun testThatWhenSavingBatteryAndLowBatteryWeForceNight() {
-        val observer = mockk<Observer<Boolean>>(relaxed = true)
+    fun testThatWhenSavingBatteryAndLowBatteryWeForceNight() = runTest {
         batterySaverLivedate.value = true
         lowBatteryLiveData.value = true
-        viewModel.forceNightMode.observeForever(observer)
-        verifySequence {
-            observer.onChanged(true)
+        viewModel.forceNightMode.test {
+            assertThat(awaitItem()).isTrue()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun testThatWhenNotSavingBatteryAndNotLowBatteryWeDontForceNight() {
-        val observer = mockk<Observer<Boolean>>(relaxed = true)
+    fun testThatWhenNotSavingBatteryAndNotLowBatteryWeDontForceNight() = runTest {
         batterySaverLivedate.value = false
         lowBatteryLiveData.value = false
-        viewModel.forceNightMode.observeForever(observer)
-        verifySequence {
-            observer.onChanged(false)
+        viewModel.forceNightMode.test {
+            assertThat(awaitItem()).isFalse()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 }
