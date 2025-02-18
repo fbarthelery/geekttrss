@@ -140,7 +140,7 @@ private fun ArticlesMagazine(
     contentPadding: PaddingValues = PaddingValues(0.dp),
 ) {
 
-    val isRefreshing by viewModel.isRefreshing.observeAsState(false)
+    val isRefreshing by viewModel.isRefreshing.collectAsStateWithLifecycle()
     val pullRefreshState = rememberPullToRefreshState()
     val ltr = LocalLayoutDirection.current
     val pullRefreshBoxContentPadding = PaddingValues(

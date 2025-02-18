@@ -31,7 +31,7 @@ import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import androidx.paging.cachedIn
 import androidx.paging.map
-import com.geekorum.geekdroid.accounts.SyncInProgressLiveData
+import com.geekorum.geekdroid.accounts.isSyncActiveFlow
 import com.geekorum.ttrss.background_job.BackgroundJobManager
 import com.geekorum.ttrss.data.ArticleWithFeed
 import com.geekorum.ttrss.data.Feed
@@ -57,10 +57,14 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+private const val STATE_NEED_UNREAD = "need_unread"
+private const val STATE_ORDER_MOST_RECENT_FIRST = "order_most_recent_first" // most_recent_first, oldest_first
+
 /**
  * Base [ViewModel] for a list of Articles.
  */
 abstract class BaseArticlesViewModel(
+    private val state: SavedStateHandle,
     componentFactory: SessionActivityComponent.Factory
 ) : ViewModel() {
 
@@ -80,15 +84,12 @@ abstract class BaseArticlesViewModel(
 
     abstract fun refresh()
 
-    protected val sortByMostRecentFirst = MutableStateFlow(false)
-    protected val needUnread = MutableStateFlow(false)
-
     fun setSortByMostRecentFirst(mostRecentFirst: Boolean) {
-        sortByMostRecentFirst.value = mostRecentFirst
+        state[STATE_ORDER_MOST_RECENT_FIRST] = mostRecentFirst
     }
 
     fun setNeedUnread(needUnread: Boolean) {
-        this.needUnread.value = needUnread
+        state[STATE_NEED_UNREAD] = needUnread
     }
 
     fun setArticleUnread(articleId: Long, newValue: Boolean) {
@@ -277,15 +278,15 @@ class ArticlesListViewModel @AssistedInject constructor(
 
     override val isRefreshing = refreshJobName.flatMapLatest {
         if (it == null)
-            SyncInProgressLiveData(account, ArticlesContract.AUTHORITY).asFlow()
+            isSyncActiveFlow(account, ArticlesContract.AUTHORITY)
         else
-            backgroundJobManager.isRefreshingStatus(feedId).asFlow()
+            backgroundJobManager.isRefreshingStatus(state.get<Long>(STATE_FEED_ID)!!).asFlow()
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     private fun getArticlesForFeed(feed: Feed): Flow<PagingData<ArticleWithFeed>> {
-        val isMostRecentOrderFlow = sortByMostRecentFirst
+        val isMostRecentOrderFlow = state.getStateFlow(STATE_ORDER_MOST_RECENT_FIRST, false)
         val needUnreadFlow = if (feed.isStarredFeed) flowOf(false) else
-            needUnread
+            state.getStateFlow(STATE_NEED_UNREAD, false)
         return isMostRecentOrderFlow.combine(needUnreadFlow) { mostRecentFirst, needUnread ->
             getArticleAccess(mostRecentFirst, needUnread)
         }.flatMapLatest { access ->
@@ -314,6 +315,11 @@ class ArticlesListViewModel @AssistedInject constructor(
             }
         }
     }
+
+    companion object {
+        private const val STATE_FEED_ID = "feed_id"
+    }
+
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -333,12 +339,13 @@ class ArticlesListByTagViewModel @AssistedInject constructor(
 
     private val account: Account = component.account
 
-    override val articles: Flow<PagingData<ArticleWithFeed>> =
-        getArticlesForTag(tag)
-            .map(::prepareArticlePagingData)
-            .cachedIn(viewModelScope)
+    override val articles: Flow<PagingData<ArticleWithFeed>> = tag
+        .flatMapLatest {
+            getArticlesForTag(it)
+        }.map(::prepareArticlePagingData)
+        .cachedIn(viewModelScope)
 
-    override val isRefreshing = SyncInProgressLiveData(account, ArticlesContract.AUTHORITY).asFlow()
+    override val isRefreshing = isSyncActiveFlow(account, ArticlesContract.AUTHORITY)
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     override fun refresh() {
@@ -348,8 +355,8 @@ class ArticlesListByTagViewModel @AssistedInject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun getArticlesForTag(tag: String): Flow<PagingData<ArticleWithFeed>> {
-        val isMostRecentOrderFlow = sortByMostRecentFirst
-        val needUnreadFlow = needUnread
+        val isMostRecentOrderFlow = state.getStateFlow(STATE_ORDER_MOST_RECENT_FIRST, false)
+        val needUnreadFlow = state.getStateFlow(STATE_NEED_UNREAD, false)
         return isMostRecentOrderFlow.combine(needUnreadFlow) { mostRecentFirst, needUnread ->
             getArticleAccess(mostRecentFirst, needUnread)
         }.flatMapLatest { access ->
@@ -359,6 +366,10 @@ class ArticlesListByTagViewModel @AssistedInject constructor(
             }
             pager.flow
         }
+    }
+
+    companion object {
+        private const val STATE_TAG = "tag"
     }
 
 }
