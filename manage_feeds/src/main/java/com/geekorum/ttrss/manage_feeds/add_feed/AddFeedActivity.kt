@@ -109,7 +109,7 @@ class AddFeedActivity : ModalBottomSheetActivity()
 private fun AddFeedContent(vm: AddFeedViewModel) {
     AppTheme3 {
         val feeds by vm.availableFeeds.collectAsStateWithLifecycle()
-        val accounts by vm.accounts.observeAsState(emptyArray())
+        val accounts by vm.accounts.collectAsStateWithLifecycle()
         AddFeedContent(
             isLoading = feeds == null,
             isSubscribeEnabled = vm.canSubscribe,
@@ -131,7 +131,7 @@ private fun AddFeedContent(
     isSubscribeEnabled: Boolean,
     feeds: Collection<FeedsFinder.FeedResult>,
     selectedFeed: FeedsFinder.FeedResult?,
-    accounts: Array<Account>,
+    accounts: List<Account>,
     selectedAccount: Account?,
     onFeedSelectionChange: (FeedsFinder.FeedResult) -> Unit,
     onAccountSelectionChange: (Account) -> Unit,
@@ -244,7 +244,7 @@ private fun FeedSelector(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AccountSelector(
-    accounts: Array<Account>,
+    accounts: List<Account>,
     selectedAccount: Account?,
     onSelectionChange: (Account) -> Unit,
     modifier: Modifier = Modifier
@@ -360,7 +360,7 @@ private fun PreviewAddFeedContent() {
                 title = "The github blog feed comment"
             )
         )
-        val accounts = listOf(Account("first", "wtv"), Account("second", "wet") ).toTypedArray()
+        val accounts = listOf(Account("first", "wtv"), Account("second", "wet") )
         var selectedAccount by remember { mutableStateOf(accounts.first()) }
         var selectedFeed by remember { mutableStateOf(feeds.firstOrNull()) }
 
