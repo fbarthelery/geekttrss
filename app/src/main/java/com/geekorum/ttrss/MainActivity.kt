@@ -23,12 +23,16 @@ package com.geekorum.ttrss
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.articles_list.ArticleListActivity
 import com.geekorum.ttrss.articles_list.TtrssAccountViewModel
 import com.geekorum.ttrss.core.BaseActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity() {
@@ -37,15 +41,19 @@ class MainActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        accountViewModel.selectedAccount.observe(this, Observer { account ->
-            if (account != null) {
-                val intent = Intent(this, ArticleListActivity::class.java)
-                startActivity(intent)
-                finish()
-            } else {
-                accountViewModel.startSelectAccountActivity(this)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                accountViewModel.selectedAccount.collect { account ->
+                    if (account != null) {
+                        val intent = Intent(this@MainActivity, ArticleListActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    } else {
+                        accountViewModel.startSelectAccountActivity(this@MainActivity)
+                    }
+                }
             }
-        })
+        }
         accountViewModel.noAccountSelectedEvent.observe(this, EventObserver { finish() })
     }
 }

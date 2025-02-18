@@ -35,8 +35,11 @@ import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.rememberNavController
@@ -72,11 +75,15 @@ class ArticleListActivity : SessionActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        accountViewModel.selectedAccount.observe(this) { account ->
-            if (account != null) {
-                activityViewModel.setAccount(account)
-            } else {
-                accountViewModel.startSelectAccountActivity(this)
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.CREATED) {
+                accountViewModel.selectedAccount.collect { account ->
+                    if (account != null) {
+                        activityViewModel.setAccount(account)
+                    } else {
+                        accountViewModel.startSelectAccountActivity(this@ArticleListActivity)
+                    }
+                }
             }
         }
 

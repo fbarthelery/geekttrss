@@ -32,12 +32,16 @@ import android.provider.Settings
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
+import androidx.lifecycle.viewModelScope
 import com.geekorum.geekdroid.accounts.AccountSelector
 import com.geekorum.geekdroid.accounts.AccountsListViewModel
 import com.geekorum.geekdroid.app.lifecycle.EmptyEvent
 import com.geekorum.ttrss.accounts.AccountAuthenticator
 import com.geekorum.ttrss.providers.ArticlesContract
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import timber.log.Timber
 import javax.inject.Inject
 import com.geekorum.geekdroid.app.lifecycle.EmptyEvent.Companion.makeEmptyEvent as NoAccountSelectedEvent
@@ -56,7 +60,7 @@ class TtrssAccountViewModel @Inject constructor(
             val url = accountManager.getUserData(account, AccountAuthenticator.USERDATA_URL)
             Uri.parse(url).host ?: ""
         } else ""
-    }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), "")
     private val noAccountSelectedEventSource = MutableLiveData<EmptyEvent>()
     val noAccountSelectedEvent:LiveData<EmptyEvent> = noAccountSelectedEventSource
 

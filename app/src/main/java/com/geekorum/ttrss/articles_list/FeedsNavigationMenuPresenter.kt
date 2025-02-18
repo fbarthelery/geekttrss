@@ -80,8 +80,8 @@ class FeedsNavigationMenuPresenter(
         }
         val isMagazineFeed = navBackStackEntry?.destination?.hasRoute<NavRoutes.Magazine>() == true
 
-        val account by accountViewModel.selectedAccount.observeAsState()
-        val server by accountViewModel.selectedAccountHost.observeAsState()
+        val account by accountViewModel.selectedAccount.collectAsStateWithLifecycle()
+        val server by accountViewModel.selectedAccountHost.collectAsStateWithLifecycle()
 
         val fab: (@Composable () -> Unit)? = if (!hasFab) null else {
             @Composable {
