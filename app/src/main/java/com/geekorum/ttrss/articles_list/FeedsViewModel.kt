@@ -131,12 +131,16 @@ class FeedsViewModel @Inject constructor(
 
     fun markFeedAsRead(feed: Feed) = viewModelScope.launch {
         withContext(dispatchers.io) {
-            apiService.markFeedAsRead(feed.id)
-            when {
-                feed.isAllArticlesFeed -> articlesRepository.setAllArticlesUnread(false)
-                else -> articlesRepository.setArticlesUnreadForFeed(feed.id, false)
+            try {
+                apiService.markFeedAsRead(feed.id)
+                when {
+                    feed.isAllArticlesFeed -> articlesRepository.setAllArticlesUnread(false)
+                    else -> articlesRepository.setArticlesUnreadForFeed(feed.id, false)
+                }
+                refreshFeeds()
+            } catch (e: ApiCallException) {
+                Timber.w(e, "Unable to mark feed as read")
             }
-            refreshFeeds()
         }
     }
 
