@@ -20,15 +20,25 @@
  */
 package com.geekorum.ttrss.htmlparsers
 
+import com.fleeksoft.ksoup.Ksoup
 import com.google.common.truth.Truth.assertThat
-import org.jsoup.Jsoup
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 private const val emptyHtmlDoc = ""
 private const val htmlDocWithoutImgs = "<html></html>"
 
-
+private val htmlDocWithOneInvalidImg = """
+    <html>
+    <body>
+    <div class="article-container ajax-container" id="container-post526156"  data-conf='{"prev":440463,"action":"singleVideo"}'>
+    <div class="post-cover cover-pop-culture">
+    <div class="post-cover__opacity-filter"></div>
+    <img class="post-cover__background-image" />
+    </div>
+    </body>
+    </html>
+""".trimIndent()
 private val htmlDocWithOneImg = """
     <html>
     <body>
@@ -75,28 +85,35 @@ class ImageUrlExtractorTest {
 
     @Test
     fun testThatWhenEmptyHtmlDocReturnsNoUrl() {
-        val doc = Jsoup.parse(emptyHtmlDoc)
+        val doc = Ksoup.parse(emptyHtmlDoc)
         val result = subject.extract(doc)
         assertThat(result).isEmpty()
     }
 
     @Test
     fun testThatWhenHtmlDocWithoutImgsReturnsNoUrl() {
-        val doc = Jsoup.parse(htmlDocWithoutImgs)
+        val doc = Ksoup.parse(htmlDocWithoutImgs)
+        val result = subject.extract(doc)
+        assertThat(result).isEmpty()
+    }
+
+    @Test
+    fun testThatWhenHtmlDocWitOneInvalidImgsReturnsNoUrl() {
+        val doc = Ksoup.parse(htmlDocWithOneInvalidImg)
         val result = subject.extract(doc)
         assertThat(result).isEmpty()
     }
 
     @Test
     fun testThatWhenHtmlDocWithOneImgReturnsCorrectUrl() {
-        val doc = Jsoup.parse(htmlDocWithOneImg)
+        val doc = Ksoup.parse(htmlDocWithOneImg)
         val result = subject.extract(doc)
         assertThat(result).containsExactly(htmlDocOneImgUrl)
     }
 
     @Test
     fun testThatWhenHtmlDocWithManysReturnCorrectUrls() {
-        val doc = Jsoup.parse(htmlDocWithManyImg)
+        val doc = Ksoup.parse(htmlDocWithManyImg)
         val result = subject.extract(doc)
         assertThat(result).containsExactlyElementsIn(htmlDocManyImgUrls)
     }

@@ -20,8 +20,9 @@
  */
 package com.geekorum.ttrss.htmlparsers
 
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
+import com.fleeksoft.ksoup.Ksoup
+import com.fleeksoft.ksoup.nodes.Document
+
 
 /**
  * Extract some data T from an HtmlDocument
@@ -29,5 +30,5 @@ import org.jsoup.nodes.Document
 abstract class HtmlExtractor<out T> {
     abstract fun extract(document: Document) : Collection<T>
 
-    fun extract(html: String, baseUri: String = "") = extract(Jsoup.parse(html, baseUri))
+    fun extract(html: String, baseUri: String = "") = extract(Ksoup.parse(html, baseUri))
 }

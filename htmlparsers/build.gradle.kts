@@ -27,7 +27,7 @@ dependencies {
     implementation(enforcedPlatform(kotlin("bom")))
 
     implementation(libs.javax.inject)
-    api(libs.jsoup)
+    api(libs.ksoup)
 
     testImplementation(libs.truth)
     testImplementation(kotlin("test-junit"))

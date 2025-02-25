@@ -20,8 +20,8 @@
  */
 package com.geekorum.ttrss.htmlparsers
 
+import com.fleeksoft.ksoup.Ksoup
 import com.google.common.truth.Truth.assertThat
-import org.jsoup.Jsoup
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -96,35 +96,35 @@ class FeedExtractorTest {
 
     @Test
     fun testThatWhenEmptyHtmlDocReturnNoFeedInformation() {
-        val doc = Jsoup.parse(emptyHtmlDoc)
+        val doc = Ksoup.parse(emptyHtmlDoc)
         val result = feedExtractor.extract(doc)
         assertThat(result).isEmpty()
     }
 
     @Test
     fun testThatWhenHtmlDocWithoutFeedsReturnNoFeedInformation() {
-        val doc = Jsoup.parse(htmlDocWithoutFeeds)
+        val doc = Ksoup.parse(htmlDocWithoutFeeds)
         val result = feedExtractor.extract(doc)
         assertThat(result).isEmpty()
     }
 
     @Test
     fun testThatWhenHtmlDocWithRssFeedsReturnCorrectFeedInfo() {
-        val doc = Jsoup.parse(htmlDocWithOneRssFeed)
+        val doc = Ksoup.parse(htmlDocWithOneRssFeed)
         val result = feedExtractor.extract(doc)
         assertThat(result).containsExactly(rssAdvisoryBoardFeedInfo)
     }
 
     @Test
     fun testThatWhenHtmlDocWithAtomFeedsReturnCorrectFeedInfo() {
-        val doc = Jsoup.parse(htmlDocWithOneAtomFeed)
+        val doc = Ksoup.parse(htmlDocWithOneAtomFeed)
         val result = feedExtractor.extract(doc)
         assertThat(result).containsExactly(githubRecentCommitsFeedInfo)
     }
 
     @Test
     fun testThatWhenHtmlDocWithRelativeRssFeedsReturnCorrectFeedInfo() {
-        val doc = Jsoup.parse(htmlDocWithOneRelativeRssFeed)
+        val doc = Ksoup.parse(htmlDocWithOneRelativeRssFeed)
         val result = feedExtractor.extract(doc)
         assertThat(result).containsExactly(rssAdvisoryBoardFeedInfoNoTitle)
     }

@@ -20,7 +20,7 @@
  */
 package com.geekorum.ttrss.htmlparsers
 
-import org.jsoup.nodes.Document
+import com.fleeksoft.ksoup.nodes.Document
 import javax.inject.Inject
 
 /**
@@ -31,9 +31,10 @@ class ImageUrlExtractor @Inject constructor() : HtmlExtractor<String>() {
     override fun extract(document: Document): Collection<String> {
         val imgs = document.select("img")
         return imgs.asSequence()
-            .mapNotNull {
+            .map {
                 it.attr("abs:src")
             }
+            .filter { it.isNotEmpty() }
             .toSet()
     }
 
