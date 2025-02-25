@@ -20,6 +20,7 @@
  */
 package com.geekorum.favikonsnoop.snoopers
 
+import com.fleeksoft.ksoup.Ksoup
 import com.geekorum.favikonsnoop.FaviconInfo
 import com.geekorum.favikonsnoop.Snooper
 import kotlinx.coroutines.CoroutineDispatcher
@@ -27,7 +28,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.HttpUrl
 import okio.BufferedSource
-import org.jsoup.Jsoup
 
 open class LinkRelSnooper internal constructor(
     private val relValue: String,
@@ -35,7 +35,7 @@ open class LinkRelSnooper internal constructor(
 ) : Snooper() {
 
     override suspend fun snoop(baseUrl: HttpUrl, content: BufferedSource): Collection<FaviconInfo> = withContext(ioDispatcher) {
-        val document = runCatching { Jsoup.parse(content.inputStream() , null, baseUrl.toString()) }
+        val document = runCatching { Ksoup.parse(content.inputStream().bufferedReader(), baseUri = baseUrl.toString()) }
 
         document.getOrNull()?.head()?.let { head ->
             head.getElementsByTag("link")

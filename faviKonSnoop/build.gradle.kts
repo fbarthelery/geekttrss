@@ -33,7 +33,7 @@ dependencies {
     implementation(platform(libs.kotlinx.coroutines.bom))
     api(libs.kotlinx.coroutines.core)
     implementation(libs.javax.inject)
-    implementation(libs.jsoup)
+    implementation(libs.ksoup)
     implementation(libs.kotlinx.serialization.json.okio)
 
     testImplementation(libs.truth)

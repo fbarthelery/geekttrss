@@ -20,6 +20,7 @@
  */
 package com.geekorum.favikonsnoop.snoopers
 
+import com.fleeksoft.ksoup.Ksoup
 import com.geekorum.favikonsnoop.FaviconInfo
 import com.geekorum.favikonsnoop.Snooper
 import com.geekorum.favikonsnoop.await
@@ -38,7 +39,6 @@ import okhttp3.Request
 import okio.BufferedSource
 import okio.buffer
 import okio.source
-import org.jsoup.Jsoup
 
 /**
  * https://www.w3.org/TR/appmanifest/
@@ -51,7 +51,7 @@ class AppManifestSnooper internal constructor(
     constructor(ioDispatcher: CoroutineDispatcher = Dispatchers.IO) : this(WebAppManifestParser(), ioDispatcher)
 
     override suspend fun snoop(baseUrl: HttpUrl, content: BufferedSource): Collection<FaviconInfo> = withContext(ioDispatcher) {
-        val document = runCatching { Jsoup.parse(content.inputStream() , null, baseUrl.toString()) }
+        val document = runCatching { Ksoup.parse(content.inputStream().bufferedReader(), baseUri = baseUrl.toString()) }
 
         val manifestUrl = document.getOrNull()?.head()?.let { head ->
             val manifestLinkElem = head.getElementsByTag("link").firstOrNull {

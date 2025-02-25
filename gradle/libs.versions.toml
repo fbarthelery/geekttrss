@@ -63,6 +63,7 @@ google-play-core-review = "2.0.2"
 gms-play-services-base = "18.5.0"
 javax-inject = "1"
 jsoup =  "1.15.3"
+ksoup =  "0.2.2"
 retrofit = "2.9.0"
 retrofit-kotlinx-serialization-converter = "1.0.0"
 leakcanary = "2.9.1"
@@ -203,6 +204,7 @@ kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.
 javax-inject = { module = "javax.inject:javax.inject", version.ref = "javax-inject" }
 
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup"}
+ksoup = {module = "com.fleeksoft.ksoup:ksoup", version.ref = "ksoup" }
 
 leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanary" }
 materialKolor = { module = "com.materialkolor:material-kolor", version.ref = "materialKolor" }
