@@ -20,11 +20,10 @@
  */
 package com.geekorum.ttrss.sync
 
+import com.fleeksoft.ksoup.Ksoup
+import com.fleeksoft.ksoup.nodes.Document
+import com.fleeksoft.ksoup.nodes.Element
 import com.geekorum.ttrss.data.Article
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
-import org.jsoup.nodes.Element
-import java.util.*
 import java.util.regex.Pattern
 
 private const val EXCERPT_MAX_LENGTH = 256
@@ -37,7 +36,7 @@ internal class ArticleAugmenter constructor(
     private val article: Article
 ) {
 
-    private val articleDocument: Document by lazy { Jsoup.parse(article.content) }
+    private val articleDocument: Document by lazy { Ksoup.parse(article.content) }
     private val flavorImageElement: Element? by lazy { findFlavorImageElement() }
 
     fun getFlavorImageUri(): String {

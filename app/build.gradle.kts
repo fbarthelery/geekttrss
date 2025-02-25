@@ -237,7 +237,7 @@ dependencies {
     testImplementation(libs.okhttp.mockwebserver)
     implementation(libs.coil)
 
-    implementation(libs.jsoup)
+    implementation(libs.ksoup)
     implementation(libs.androidx.datastore)
     api(libs.protobuf.kotlin.lite)
 
