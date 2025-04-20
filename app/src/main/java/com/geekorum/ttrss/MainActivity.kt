@@ -24,7 +24,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
@@ -33,6 +32,8 @@ import com.geekorum.ttrss.articles_list.TtrssAccountViewModel
 import com.geekorum.ttrss.core.BaseActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+
+private val UseSingleActivity = false
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity() {
@@ -45,7 +46,10 @@ class MainActivity : BaseActivity() {
             repeatOnLifecycle(Lifecycle.State.CREATED) {
                 accountViewModel.selectedAccount.collect { account ->
                     if (account != null) {
-                        val intent = Intent(this@MainActivity, ArticleListActivity::class.java)
+                        val intent = if (UseSingleActivity)
+                            Intent(this@MainActivity, SingleActivity::class.java)
+                        else
+                            Intent(this@MainActivity, ArticleListActivity::class.java)
                         startActivity(intent)
                         finish()
                     } else {
