@@ -158,13 +158,15 @@ class ArticleSynchronizer @AssistedInject constructor(
             }
         collectNewArticlesJobsTag = tag
 
-        workManager.enqueue(jobRequests).await()
+        if (jobRequests.isNotEmpty()) {
+            workManager.enqueue(jobRequests).await()
 
-        workManager.getWorkInfosByTagLiveData(tag).asFlow()
+            workManager.getWorkInfosByTagFlow(tag)
                 .takeWhile { workInfos ->
                     workInfos.any { !it.state.isFinished }
                 }
                 .collect()
+        }
     }
 
     private suspend fun isFeedSyncable(feed: Feed): Boolean {
@@ -201,13 +203,15 @@ class ArticleSynchronizer @AssistedInject constructor(
             }
         updateStatusJobsTag = tag
 
-        workManager.enqueue(jobRequests).await()
+        if (jobRequests.isNotEmpty()) {
+            workManager.enqueue(jobRequests).await()
 
-        workManager.getWorkInfosByTagLiveData(tag).asFlow()
+            workManager.getWorkInfosByTagFlow(tag)
                 .takeWhile { workInfos ->
                     workInfos.any { !it.state.isFinished }
                 }
                 .collect()
+        }
     }
 
     override fun onSyncCancelled() {
