@@ -26,19 +26,48 @@ import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.IconToggleButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxState
+import androidx.compose.material3.SwipeToDismissBoxValue
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberSwipeToDismissBoxState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -55,6 +84,10 @@ import com.geekorum.ttrss.ui.AppTheme3
 import com.geekorum.ttrss.ui.components.OpenInBrowserIcon
 import com.materialkolor.ktx.harmonizeWithPrimary
 import kotlin.math.roundToInt
+
+
+private val SwipePositionalThreshold: (totalDistance: Float) -> Float
+    @Composable get() = with(LocalDensity.current) { { 128.dp.toPx() } }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,7 +109,7 @@ fun SwipeableArticleCard(
     modifier: Modifier = Modifier,
     behindCardContent: @Composable (SwipeToDismissBoxValue?) -> Unit = { }
 ) {
-    val dismissState = rememberSwipeToDismissBoxState()
+    val dismissState = rememberSwipeToDismissBoxState(positionalThreshold = SwipePositionalThreshold)
     var isInit by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
         // state is restored because it user rememberSaveable
@@ -95,7 +128,8 @@ fun SwipeableArticleCard(
     SwipeToDismissBox(
         state = dismissState,
         modifier = modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .dismissProgressHapticFeedback(dismissState),
         backgroundContent = {
             behindCardContent(dismissState.dismissDirection)
         },
@@ -123,6 +157,18 @@ fun SwipeableArticleCard(
     )
 }
 
+@Composable
+private fun Modifier.dismissProgressHapticFeedback(dismissState: SwipeToDismissBoxState, skipInitial: SwipeToDismissBoxValue = SwipeToDismissBoxValue.Settled): Modifier {
+    val hapticFeedback = LocalHapticFeedback.current
+    var hasDoneFeedback by remember { mutableStateOf(false) }
+    LaunchedEffect(dismissState.targetValue) {
+        if (hasDoneFeedback || dismissState.targetValue != skipInitial) {
+            hapticFeedback.performHapticFeedback(HapticFeedbackType.GestureThresholdActivate)
+            hasDoneFeedback = true
+        }
+    }
+    return this
+}
 
 @Composable
 fun ArticleCard(
