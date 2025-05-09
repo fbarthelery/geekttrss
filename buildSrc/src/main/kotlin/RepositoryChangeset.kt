@@ -152,7 +152,7 @@ fun ApplicationAndroidComponentsExtension.configureVersionChangeset(project: Pro
         mainOutput.versionCode.set(versionCodeTask.map { it.versionCodeOutputFile.get().asFile.readText().toInt() })
         mainOutput.versionName.set("$major.$minor.$patch$versionNameSuffix")
 
-        it.buildConfigFields.put("REPOSITORY_CHANGESET", versionCodeTask.map {
+        it.buildConfigFields?.put("REPOSITORY_CHANGESET", versionCodeTask.map {
             BuildConfigField("String", "\"${it.changesetOutputFile.get().asFile.readText()}\"", "Repository changeset")
         })
     }
