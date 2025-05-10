@@ -224,7 +224,7 @@ dependencies {
         // and it is not supported
         exclude(group = "com.google.firebase", module = "firebase-firestore-ktx")
     }
-    implementation(libs.aboutoss.core)
+    implementation(libs.aboutoss.ui.material3)
 
     implementation(project(":htmlparsers"))
     implementation(project(":webapi"))

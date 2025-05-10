@@ -69,7 +69,7 @@ retrofit-kotlinx-serialization-converter = "1.0.0"
 leakcanary = "2.14"
 coil = "2.7.0"
 geekdroid = "master-SNAPSHOT"
-aboutoss = "0.1.0"
+aboutoss = "0.2.0"
 kotlin = "2.1.20"
 kotlin-ksp = "2.1.20-1.0.31"
 uiautomator = "2.3.0"
@@ -187,7 +187,7 @@ dagger-hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref
 
 geekdroid = { module = "com.geekorum.geekdroid:geekdroid", version.ref = "geekdroid" }
 geekdroid-firebase = { module = "com.geekorum.geekdroid:geekdroid-firebase", version.ref = "geekdroid" }
-aboutoss-core = { module = "com.geekorum.aboutoss:core", version.ref = "aboutoss" }
+aboutoss-ui-material3 = { module = "com.geekorum.aboutoss:ui-material3", version.ref = "aboutoss" }
 
 kotlinx-coroutines-bom = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-bom", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core" }

@@ -73,7 +73,7 @@
                 android:title="@string/pref_title_oss_license"
                 android:summary="@string/pref_summary_oss_license"
                 >
-            <intent android:targetClass="com.geekorum.ttrss.settings.licenses.OpenSourceLicensesActivity"
+            <intent android:targetClass="com.geekorum.aboutoss.ui.material3.OpenSourceLicensesActivity"
                     android:targetPackage="@string/package_name"
                     />
         </Preference>
