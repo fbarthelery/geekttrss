@@ -20,6 +20,7 @@
 [versions]
 android-gradle-plugin = "8.10.0"
 accompanist = "0.37.3"
+android-desugar-jdk = "2.1.5"
 androidx-annotation = "1.9.1"
 androidx-core = "1.16.0"
 androidx-arch-core-testing = "2.2.0"
@@ -104,6 +105,8 @@ android-gradle-plugin-api = { module = "com.android.tools.build:gradle-api", ver
 
 # app dependencies
 accompanist-drawablepainter = { module = "com.google.accompanist:accompanist-drawablepainter", version.ref = "accompanist" }
+
+android-desugar-jdk = { module = "com.android.tools:desugar_jdk_libs", version.ref = "android-desugar-jdk" }
 
 androidx-core = { module = "androidx.core:core-ktx", version.ref = "androidx-core" }
 androidx-arch-core-testing = { module = "androidx.arch.core:core-testing", version.ref = "androidx-arch-core-testing" }

@@ -69,6 +69,9 @@ android {
         }
     }
 
+    compileOptions {
+        isCoreLibraryDesugaringEnabled = true
+    }
 
     lint {
         abortOnError = false
@@ -318,6 +321,8 @@ dependencies {
 
     testImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+
+    coreLibraryDesugaring(libs.android.desugar.jdk)
 }
 
 apply {
