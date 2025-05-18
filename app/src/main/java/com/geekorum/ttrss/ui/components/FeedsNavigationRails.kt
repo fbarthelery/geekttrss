@@ -671,7 +671,7 @@ private val TopIconItemMinHeight = 64.0.dp
 
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
-private val WideNavigationRailValue.isExpanded
+internal val WideNavigationRailValue.isExpanded
     get() = this == WideNavigationRailValue.Expanded
 
 
