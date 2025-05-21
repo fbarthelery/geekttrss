@@ -261,6 +261,11 @@ fun ArticleTopActionsBar(
         MaterialTheme.colorScheme.primary
     else
         MaterialTheme.colorScheme.surface
+    val scrolledContainerColor = if (isUnread)
+        MaterialTheme.colorScheme.primary
+    else
+        MaterialTheme.colorScheme.surfaceContainer
+
     val contentColor = if (isUnread)
         MaterialTheme.colorScheme.onPrimary
     else
@@ -273,6 +278,7 @@ fun ArticleTopActionsBar(
 
     val colors = TopAppBarDefaults.topAppBarColors(
         containerColor = containerColor,
+        scrolledContainerColor = scrolledContainerColor,
         navigationIconContentColor = contentColor,
         titleContentColor = contentColor,
         actionIconContentColor = actionContentColor
