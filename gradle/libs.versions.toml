@@ -27,11 +27,11 @@ androidx-arch-core-testing = "2.2.0"
 androidx-appcompat = "1.7.0"
 androidx-activity = "1.10.1"
 androidx-browser = "1.8.0"
-androidx-fragment = "1.8.6"
+androidx-fragment = "1.8.7"
 androidx-constraintlayout = "2.2.1"
 androidx-coordinatorlayout = "1.3.0"
-androidx-compose-bom = "2025.05.00"
-androidx-datastore = "1.1.6"
+androidx-compose-bom = "2025.05.01"
+androidx-datastore = "1.1.7"
 androidx-hilt-compiler = "1.2.0"
 androidx-hilt-navigation-compose = "1.2.0"
 androidx-hilt-work = "1.2.0"
@@ -54,18 +54,18 @@ materialKolor = "2.1.1"
 okio = "3.11.0"
 okhttp = "4.12.0"
 play-publisher = "3.12.1"
-protobuf = "4.30.2"
+protobuf = "4.31.0"
 timber = "5.0.1"
 truth = "1.4.4"
 turbine = "1.2.0"
 mockk = "1.14.2"
-firebase-bom = "33.13.0"
+firebase-bom = "33.14.0"
 google-play-core = "2.1.0"
 google-play-core-review = "2.0.2"
 gms-play-services-base = "18.7.0"
 javax-inject = "1"
 ksoup =  "0.2.3"
-retrofit = "2.11.0"
+retrofit = "3.0.0"
 retrofit-kotlinx-serialization-converter = "1.0.0"
 leakcanary = "2.14"
 coil = "2.7.0"
@@ -96,7 +96,7 @@ kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "kotlin-ksp" }
 license-gradle-plugin = { id = "com.github.hierynomus.license", version.ref = "license-gradle-plugin" }
 gradle-play-publisher = { id = "com.github.triplet.play", version.ref = "play-publisher"}
-google-protobuf = { id = "com.google.protobuf", version = "0.9.4" }
+google-protobuf = { id = "com.google.protobuf", version = "0.9.5" }
 
 [libraries]
 # build plugins dependencies
