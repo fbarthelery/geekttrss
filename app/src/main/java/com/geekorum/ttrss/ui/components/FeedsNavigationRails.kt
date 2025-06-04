@@ -37,6 +37,7 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.MenuOpen
@@ -79,6 +80,7 @@ import androidx.compose.material3.rememberWideNavigationRailState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -124,7 +126,7 @@ fun ModalFeedNavigationRail(
     state: WideNavigationRailState = rememberWideNavigationRailState(),
     hideOnCollapse: Boolean = false,
     collapsedShape: Shape = WideNavigationRailDefaults.containerShape,
-    expandedShape: Shape = WideNavigationRailDefaults.modalContainerShape,
+    expandedShape: Shape = MaterialTheme.shapes.large.copy(topStart = CornerSize(0), bottomStart = CornerSize(0)),
     colors: WideNavigationRailColors = WideNavigationRailDefaults.colors(),
 ) {
     ModalWideNavigationRail(
@@ -136,9 +138,14 @@ fun ModalFeedNavigationRail(
         colors = colors,
         header = header,
     ) {
+        // WideNavigationRail has a top padding of 44.dp that pushes everything down
+        // we need to take it into account
+        // and we want an added 44.dp padding bottom for readability
         Column(Modifier
-            .verticalScroll(rememberScrollState()),
+            .verticalScroll(rememberScrollState())
+            .padding(bottom = WNRVerticalPadding * 2)
         ) {
+
             val isDisplayedInModalDialog = state.currentValue == WideNavigationRailValue.Expanded
             // add nav items using the same layout algorithm then WideNavigationRail
             // quick access feeds that are visible in collapse too
@@ -149,7 +156,6 @@ fun ModalFeedNavigationRail(
                 colors = colors,
                 content = quickFeedAccess
             )
-
             AnimatedVisibility(state.targetValue.isExpanded,
                 enter = fadeIn(),
                 exit = fadeOut(),
@@ -238,6 +244,25 @@ fun FeedNavigationRail(
 }
 
 
+
+
+@Composable
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+fun NavRailMenuButton(
+    isMenuOpen: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    IconButton(
+        modifier = modifier,
+        onClick = onClick
+    ) {
+        val icon = if (isMenuOpen)
+            Icons.AutoMirrored.Filled.MenuOpen
+        else Icons.Filled.Menu
+        Icon(icon, null)
+    }
+}
 
 @Composable
 fun SectionHeader(text: String, modifier: Modifier = Modifier) {
@@ -744,19 +769,14 @@ private fun PreviewTableModalFeedNavigationRail() {
                 state = state,
                 header = {
                     Column {
-                        IconButton(
-                            modifier = Modifier.padding(start = 24.dp),
+                        NavRailMenuButton(
+                            isMenuOpen = state.targetValue.isExpanded,
                             onClick = {
                                 coroutineScope.launch {
                                     state.toggle()
                                 }
-                            }
-                        ) {
-                            val icon = if (state.targetValue.isExpanded)
-                                Icons.AutoMirrored.Filled.MenuOpen
-                            else Icons.Filled.Menu
-                            Icon(icon, null)
-                        }
+                            },
+                            modifier = Modifier.padding(start = 24.dp))
 
                         ExtendedFloatingActionButton(
                             text = {
@@ -817,23 +837,20 @@ private fun PreviewTabletFeedNavigationRail() {
         val coroutineScope = rememberCoroutineScope()
         var selectedItem by remember { mutableIntStateOf(-1) }
         Row {
-            FeedNavigationRail(
-                state = state,
-                header = {
+            var showHeader by remember { mutableStateOf(true) }
+            val header: (@Composable () -> Unit)? = if (showHeader) null else {
+                {
                     Column {
-                        IconButton(
-                            modifier = Modifier.padding(start = 24.dp),
+                        Text("Header")
+                        NavRailMenuButton(
+                            isMenuOpen = state.targetValue.isExpanded,
                             onClick = {
                                 coroutineScope.launch {
                                     state.toggle()
                                 }
-                            }
-                        ) {
-                            val icon = if (state.targetValue.isExpanded)
-                                Icons.AutoMirrored.Filled.MenuOpen
-                            else Icons.Filled.Menu
-                            Icon(icon, null)
-                        }
+                            },
+                            modifier = Modifier.padding(start = 24.dp)
+                        )
 
                         ExtendedFloatingActionButton(
                             text = {
@@ -844,10 +861,15 @@ private fun PreviewTabletFeedNavigationRail() {
                             },
                             onClick = {},
                             expanded = state.targetValue.isExpanded,
-                            modifier = Modifier.padding(top = 16.dp, start =20.dp)
+                            modifier = Modifier.padding(top = 16.dp, start = 20.dp)
                         )
                     }
-                },
+                }
+            }
+
+            FeedNavigationRail(
+                state = state,
+                header = header,
                 quickFeedAccess = {
                     QuickFeedAccessForPreview(
                         state.targetValue.isExpanded,
@@ -869,10 +891,10 @@ private fun PreviewTabletFeedNavigationRail() {
                 settingsSection = {
                     SettingsWideNavigationRailItem(
                         selected = false,
-                        onClick = {},
+                        onClick = { showHeader = !showHeader },
                         railExpanded = state.targetValue.isExpanded
                     )
-                }
+                },
             )
 
             Scaffold(
