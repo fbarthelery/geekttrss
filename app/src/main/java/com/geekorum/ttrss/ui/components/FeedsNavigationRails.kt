@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
@@ -99,6 +100,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
@@ -140,10 +142,10 @@ fun ModalFeedNavigationRail(
     ) {
         // WideNavigationRail has a top padding of 44.dp that pushes everything down
         // we need to take it into account
-        // and we want an added 44.dp padding bottom for readability
+        val bottomPadding = if (header != null) WNRVerticalPadding else 0.dp
         Column(Modifier
             .verticalScroll(rememberScrollState())
-            .padding(bottom = WNRVerticalPadding * 2)
+            .padding(bottom = bottomPadding)
         ) {
 
             val isDisplayedInModalDialog = state.currentValue == WideNavigationRailValue.Expanded
@@ -204,10 +206,10 @@ fun FeedNavigationRail(
     ) {
         // WideNavigationRail has a top padding of 44.dp that pushes everything down
         // we need to take it into account
-        // and we want an added 44.dp padding bottom for readability
+        val bottomPadding = if (header != null) WNRVerticalPadding else 0.dp
         Column(Modifier
             .verticalScroll(rememberScrollState())
-            .padding(bottom = WNRVerticalPadding * 2)
+            .padding(bottom = bottomPadding)
         ) {
             InnerWideNavigationRailLayout(
                 isModal = false,
@@ -288,7 +290,7 @@ fun SettingsWideNavigationRailItem(
                 contentDescription = stringResource(R.string.activity_settings_title)
             )
         },
-        label = { Text(stringResource(R.string.activity_settings_title)) },
+        label = { RailItemLabel(stringResource(R.string.activity_settings_title), railExpanded) },
         selected = selected,
         onClick = onClick,
     )
@@ -311,7 +313,7 @@ fun MagazineWideNavigationRailItem(
                 contentDescription = stringResource(R.string.title_magazine)
             )
         },
-        label = { Text(stringResource(R.string.title_magazine)) },
+        label = { RailItemLabel(stringResource(R.string.title_magazine), railExpanded) },
         selected = selected,
         onClick = onClick,
     )
@@ -354,7 +356,7 @@ fun VirtualFeedWideNavigationRailItem(
                 badge = {
                     if (feed.unreadCount > 0) {
                         val text = if (feed.unreadCount > 999) "^_^" else "${feed.unreadCount}"
-                        Badge {
+                        Badge(containerColor = MaterialTheme.colorScheme.tertiary) {
                             Text(text)
                         }
                     }
@@ -366,7 +368,7 @@ fun VirtualFeedWideNavigationRailItem(
         },
         label = {
             val label = feed.displayTitle.takeIf { it.isNotBlank() } ?: feed.title
-            Text(label)
+            RailItemLabel(label, railExpanded)
         }
     )
 }
@@ -399,7 +401,7 @@ fun FeedWideNavigationRailItem(
                 badge = {
                     if (feed.unreadCount > 0) {
                         val text = if (feed.unreadCount > 999) "^_^" else "${feed.unreadCount}"
-                        Badge {
+                        Badge(containerColor = MaterialTheme.colorScheme.tertiary) {
                             Text(text)
                         }
                     }
@@ -415,9 +417,24 @@ fun FeedWideNavigationRailItem(
         },
         label = {
             val label = feed.displayTitle.takeIf { it.isNotBlank() } ?: feed.title
-            Text(label)
+            RailItemLabel(label, railExpanded)
         }
     )
+}
+
+@Composable
+private fun RailItemLabel(label: String, railExpanded:Boolean, modifier: Modifier = Modifier) {
+    val maxWidth = if (railExpanded) 260.dp else Dp.Unspecified
+    val maxLines = if (railExpanded) 1 else 2
+    Row(modifier.widthIn(max = maxWidth)) {
+        Text(label,
+            overflow = TextOverflow.Ellipsis,
+            maxLines = maxLines
+        )
+        if (railExpanded) {
+            Spacer(Modifier.weight(1f))
+        }
+    }
 }
 
 @Composable
