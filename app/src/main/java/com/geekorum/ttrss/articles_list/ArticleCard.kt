@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -82,6 +83,7 @@ import coil.request.ImageRequest
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.ui.AppTheme3
 import com.geekorum.ttrss.ui.components.OpenInBrowserIcon
+import com.geekorum.ttrss.ui.components.SwipeableItem
 import com.materialkolor.ktx.harmonizeWithPrimary
 import kotlin.math.roundToInt
 
@@ -107,7 +109,7 @@ fun SwipeableArticleCard(
     onToggleUnreadClick: () -> Unit,
     onSwiped: () -> Unit,
     modifier: Modifier = Modifier,
-    behindCardContent: @Composable (SwipeToDismissBoxValue?) -> Unit = { }
+    behindCardContent: @Composable RowScope.(dismissDirection: SwipeToDismissBoxValue, layoutWidthPx: Int, progress: Float) -> Unit = { _, _, _ -> }
 ) {
     val dismissState = rememberSwipeToDismissBoxState(positionalThreshold = SwipePositionalThreshold)
     var isInit by remember { mutableStateOf(false) }
@@ -125,14 +127,12 @@ fun SwipeableArticleCard(
 
     // we want the dismiss box to take full width so the card is completely
     // out of screen when dismissed
-    SwipeToDismissBox(
+    SwipeableItem(
         state = dismissState,
         modifier = modifier
             .fillMaxWidth()
             .dismissProgressHapticFeedback(dismissState),
-        backgroundContent = {
-            behindCardContent(dismissState.dismissDirection)
-        },
+        backgroundContent = behindCardContent,
         content = {
             ArticleCard(
                 title = title,
@@ -158,7 +158,7 @@ fun SwipeableArticleCard(
 }
 
 @Composable
-private fun Modifier.dismissProgressHapticFeedback(dismissState: SwipeToDismissBoxState, skipInitial: SwipeToDismissBoxValue = SwipeToDismissBoxValue.Settled): Modifier {
+fun Modifier.dismissProgressHapticFeedback(dismissState: SwipeToDismissBoxState, skipInitial: SwipeToDismissBoxValue = SwipeToDismissBoxValue.Settled): Modifier {
     val hapticFeedback = LocalHapticFeedback.current
     var hasDoneFeedback by remember { mutableStateOf(false) }
     LaunchedEffect(dismissState.targetValue) {

@@ -30,9 +30,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -84,6 +87,8 @@ import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.data.FeedFavIcon
 import com.geekorum.ttrss.data.FeedWithFavIcon
 import com.geekorum.ttrss.ui.AppTheme3
+import com.geekorum.ttrss.ui.components.SwipeableItemBackgroundContainer
+import com.geekorum.ttrss.ui.components.alignInSwipeableItemBackgroundContainer
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.debounce
@@ -379,10 +384,8 @@ private fun SwipeableArticleItem(
             onStarChanged = { onStarChanged(article, it) },
             onShareClick = { onShareClick(article) },
             onToggleUnreadClick = { onToggleUnreadClick(article) },
-            behindCardContent = { direction ->
-                if (direction != null) {
-                    ChangeReadBehindItem(direction)
-                }
+            behindCardContent = { direction, _, progress ->
+                ChangeReadBehindItem(direction, progress)
             },
             onSwiped = { onSwiped(article) },
             modifier = modifier
@@ -402,10 +405,8 @@ private fun SwipeableArticleItem(
             onStarChanged = { onStarChanged(article, it) },
             onShareClick = { onShareClick(article) },
             onToggleUnreadClick = { onToggleUnreadClick(article) },
-            behindCardContent = { direction ->
-                if (direction != null) {
-                    ChangeReadBehindItem(direction)
-                }
+            behindCardContent = { direction, _, progress ->
+                ChangeReadBehindItem(direction, progress)
             },
             onSwiped = { onSwiped(article) },
             modifier = modifier
@@ -444,6 +445,44 @@ private fun ChangeReadBehindItem(dismissDirection: SwipeToDismissBoxValue) {
                 modifier = Modifier.padding(start = 8.dp),
                 tint = MaterialTheme.colorScheme.secondary
             )
+        }
+    }
+}
+
+@Composable
+private fun ChangeReadBehindItem(dismissDirection: SwipeToDismissBoxValue, progress: Float) {
+    val containerHorizontalAlignment =
+        if (dismissDirection == SwipeToDismissBoxValue.EndToStart) Alignment.End else Alignment.Start
+
+    SwipeableItemBackgroundContainer(
+        color = MaterialTheme.colorScheme.secondaryContainer,
+        shape = MaterialTheme.shapes.extraLarge,
+        progress = progress,
+        modifier = Modifier.fillMaxWidth()
+            .wrapContentWidth(containerHorizontalAlignment)
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxHeight()
+                .wrapContentWidth(unbounded = true, // layout with Infinite MaxWidth
+                    align = alignInSwipeableItemBackgroundContainer(dismissDirection, Alignment.CenterHorizontally)
+                )
+        ){
+            val text = stringResource(id = R.string.mark_as_read)
+            // use inner padding to avoid to deal with it during alignment
+            Spacer(Modifier.width(24.dp))
+            if (dismissDirection == SwipeToDismissBoxValue.StartToEnd) {
+                Icon(AppTheme3.Icons.Archive, contentDescription = text,
+                    modifier = Modifier.padding(end = 8.dp),
+                )
+            }
+            Text(text)
+            if (dismissDirection == SwipeToDismissBoxValue.EndToStart) {
+                Icon(AppTheme3.Icons.Archive, contentDescription = text,
+                    modifier = Modifier.padding(start = 8.dp),
+                )
+            }
+            Spacer(Modifier.width(24.dp))
         }
     }
 }

@@ -57,6 +57,7 @@ import com.geekorum.ttrss.R
 import com.geekorum.ttrss.ui.AppTheme3
 import com.geekorum.ttrss.ui.components.MultiLineHeadlineListItem
 import com.geekorum.ttrss.ui.components.OpenInBrowserIcon
+import com.geekorum.ttrss.ui.components.SwipeableItem
 import com.geekorum.ttrss.ui.components.forwardingPainter
 import com.materialkolor.ktx.harmonizeWithPrimary
 import kotlinx.coroutines.delay
@@ -80,7 +81,7 @@ fun SwipeableCompactArticleListItem(
     onSwiped: () -> Unit,
     modifier: Modifier = Modifier,
     swipeToDismissState: SwipeToDismissBoxState = rememberSwipeToDismissBoxState(),
-    behindCardContent: @Composable (SwipeToDismissBoxValue?) -> Unit = { },
+    behindCardContent: @Composable RowScope.(dismissDirection: SwipeToDismissBoxValue, layoutWidthPx: Int, progress: Float) -> Unit = { _, _, _ -> }
 ) {
     var isInit by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) {
@@ -97,13 +98,12 @@ fun SwipeableCompactArticleListItem(
 
     // we want the dismiss box to take full width so the card is completely
     // out of screen when dismissed
-    SwipeToDismissBox(
+    SwipeableItem(
         state = swipeToDismissState,
         modifier = modifier
-            .fillMaxWidth(),
-        backgroundContent = {
-            behindCardContent(swipeToDismissState.dismissDirection)
-        },
+            .fillMaxWidth()
+            .dismissProgressHapticFeedback(swipeToDismissState),
+        backgroundContent = behindCardContent,
         content = {
             CompactArticleListItem(
                 title = title,
@@ -395,7 +395,7 @@ private fun PreviewSwipeableCompactArticleListItem() {
                         swipeToDismissState.reset()
                     }
                 },
-                behindCardContent = {
+                behindCardContent = { dismissDirection, layoutWidthPx, progress ->
                     Box(Modifier.fillMaxSize().background(Color.Blue))
                 },
                 swipeToDismissState = swipeToDismissState
