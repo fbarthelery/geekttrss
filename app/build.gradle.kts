@@ -156,21 +156,6 @@ protobuf {
     }
 }
 
-// TODO remove when fixed. Fix ksp/protobuf dependendencies
-// https://github.com/google/ksp/issues/1590
-androidComponents {
-    onVariants(selector().all()) { variant ->
-        afterEvaluate {
-            val protoTask =
-                project.tasks.named<GenerateProtoTask>("generate" + variant.name.replaceFirstChar { it.uppercaseChar() } + "Proto")
-
-            project.tasks.named<AbstractKotlinCompileTool<*>>("ksp" + variant.name.replaceFirstChar { it.uppercaseChar() } + "Kotlin") {
-                setSource(protoTask)
-            }
-        }
-    }
-}
-
 dependencies {
 
     implementation(libs.androidx.core)

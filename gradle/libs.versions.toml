@@ -74,8 +74,8 @@ leakcanary = "2.14"
 coil = "2.7.0"
 geekdroid = "geekttrss-1.6.8"
 aboutoss = "0.2.2"
-kotlin = "2.1.20"
-kotlin-ksp = "2.1.20-1.0.31"
+kotlin = "2.2.0"
+kotlin-ksp = "2.2.0-2.0.2"
 uiautomator = "2.3.0"
 
 [plugins]
