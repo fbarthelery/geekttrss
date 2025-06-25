@@ -40,7 +40,8 @@ androidx-navigation = "2.9.5"
 androidx-paging = "3.3.6"
 androidx-preferences = "1.2.1"
 # stay on 2.6.x until https://issuetracker.google.com/issues/413924560 is fixed
-androidx-room = "2.6.1"
+# kotlin 2.2.0 requires an update to room
+androidx-room = "2.7.2"
 androidx-startup = "1.2.0"
 # stay on 2.10.x until room update to >=2.7.x
 androidx-work = "2.10.5"

@@ -85,7 +85,9 @@ class MagazineViewModel @Inject constructor (
     private val recentUnreadArticleIds = flow {
         val freshTimeSec = System.currentTimeMillis() / 1000 - 3600 * 36
         val articlesByFeed = getRecentFeedIds().map { feedId ->
-            articlesRepository.getAllUnreadArticlesForFeedUpdatedAfterTimeRandomized(feedId, freshTimeSec)
+            //TODO once room issue with RANDOM() is fixed return to previous implementation
+//            articlesRepository.getAllUnreadArticlesForFeedUpdatedAfterTimeRandomized(feedId, freshTimeSec)
+            articlesRepository.getAllUnreadArticlesForFeedUpdatedAfterTime(feedId, freshTimeSec)
         }.filter {
             it.isNotEmpty()
         }
@@ -111,7 +113,9 @@ class MagazineViewModel @Inject constructor (
     }
 
     private suspend fun getUnreadArticlesIds(): List<Long> {
-        return articlesRepository.getUnreadArticlesRandomized(10)
+        //TODO once room issue with RANDOM() is fixed return to previous implementation
+//        return articlesRepository.getUnreadArticlesRandomized(10)
+        return articlesRepository.getUnreadArticles(10)
             .map { (article, _) -> article.id }
     }
 

@@ -56,6 +56,10 @@ interface ArticleDao {
     @Transaction
     suspend fun getUnreadArticlesRandomized(count: Int): List<ArticleWithFeed>
 
+    @Query("SELECT * FROM articles WHERE unread=1 LIMIT :count")
+    @Transaction
+    suspend fun getUnreadArticles(count: Int): List<ArticleWithFeed>
+
     @Query("SELECT * FROM articles WHERE feed_id=:feedId ORDER BY last_time_update DESC ")
     @Transaction
     fun getAllArticlesForFeed(feedId: Long): PagingSource<Int, ArticleWithFeed>
@@ -74,6 +78,10 @@ interface ArticleDao {
         "ORDER BY RANDOM()")
     @Transaction
     suspend fun getAllUnreadArticlesForFeedUpdatedAfterTimeRandomized(feedId: Long, time: Long): List<Article>
+
+    @Query("SELECT * FROM articles WHERE last_time_update>=:time AND unread=1 AND feed_id=:feedId ")
+    @Transaction
+    suspend fun getAllUnreadArticlesForFeedUpdatedAfterTime(feedId: Long, time: Long): List<Article>
 
     @Query("SELECT articles.* FROM articles " +
         " JOIN articles_tags ON (articles_tags.article_id = articles._id)" +

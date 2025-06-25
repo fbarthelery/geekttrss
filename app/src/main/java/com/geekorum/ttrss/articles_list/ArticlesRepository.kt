@@ -60,6 +60,11 @@ class ArticlesRepository
         return articleDao.getUnreadArticlesRandomized(count)
     }
 
+    suspend fun getUnreadArticles(count: Int): List<ArticleWithFeed> {
+        return articleDao.getUnreadArticles(count)
+    }
+
+
     fun getAllPublishedArticles(): PagingSource<Int, ArticleWithFeed> = articleDao.getAllPublishedArticles()
     fun getAllPublishedArticlesOldestFirst(): PagingSource<Int, ArticleWithFeed> = articleDao.getAllPublishedArticlesOldestFirst()
 
@@ -85,6 +90,11 @@ class ArticlesRepository
     suspend fun getAllUnreadArticlesForFeedUpdatedAfterTimeRandomized(feedId: Long, time: Long): List<Article> {
         return articleDao.getAllUnreadArticlesForFeedUpdatedAfterTimeRandomized(feedId, time)
     }
+
+    suspend fun getAllUnreadArticlesForFeedUpdatedAfterTime(feedId: Long, time: Long): List<Article> {
+        return articleDao.getAllUnreadArticlesForFeedUpdatedAfterTime(feedId, time)
+    }
+
 
     fun getAllArticlesForTag(tag: String): PagingSource<Int, ArticleWithFeed> = articleDao.getAllArticlesForTag(tag)
     fun getAllArticlesForTagOldestFirst(tag: String): PagingSource<Int, ArticleWithFeed> = articleDao.getAllArticlesForTagOldestFirst(tag)
