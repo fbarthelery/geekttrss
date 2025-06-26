@@ -26,14 +26,24 @@ import android.content.ContextWrapper
 import android.net.Uri
 import androidx.core.net.toUri
 import androidx.core.text.parseAsHtml
-import androidx.lifecycle.*
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.geekorum.ttrss.articles_list.ArticlesRepository
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.network.TtRssBrowserLauncher
 import com.geekorum.ttrss.session.SessionActivityComponent
 import com.geekorum.ttrss.share.createShareArticleIntent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 private const val STATE_ARTICLE_ID = "article_id"
@@ -42,6 +52,7 @@ private const val STATE_ARTICLE_ID = "article_id"
  * [ViewModel] for [ArticleDetailActivity] and [ArticleDetailFragment].
  */
 @HiltViewModel
+@OptIn(ExperimentalCoroutinesApi::class)
 class ArticleDetailsViewModel @Inject constructor(
     private val state: SavedStateHandle,
     private val browserLauncher: TtRssBrowserLauncher,
@@ -52,9 +63,9 @@ class ArticleDetailsViewModel @Inject constructor(
     private val articlesRepository: ArticlesRepository = sessionActivityComponent.articleRepository
     private val setFieldActionFactory = sessionActivityComponent.setArticleFieldActionFactory
 
-    private val articleId = state.getLiveData<Long>(STATE_ARTICLE_ID)
+    private val articleId = state.getStateFlow<Long>(STATE_ARTICLE_ID, 0L)
 
-    val article: LiveData<Article?> = articleId.switchMap {
+    val article = articleId.flatMapLatest {
         articlesRepository.getArticleById(it)
             .map(::prepareArticle)
             .onEach { article ->
@@ -62,11 +73,9 @@ class ArticleDetailsViewModel @Inject constructor(
                     browserLauncher.mayLaunchUrl(article.link.toUri())
                 }
             }
-            .asLiveData()
-    }
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     val additionalArticles = article
-        .asFlow()
         .map {
             it?.tags ?: ""
         }.distinctUntilChanged()

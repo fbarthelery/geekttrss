@@ -20,25 +20,61 @@
  */
 package com.geekorum.ttrss.article_details
 
-import android.app.Activity
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
+import androidx.activity.compose.LocalActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.annotation.ColorRes
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
+import androidx.compose.material3.BottomAppBarDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ColorScheme
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
-import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
@@ -120,9 +156,9 @@ fun ArticleDetailsScreenHero(
 ) {
     val articleDetailsScreenState = rememberArticleDetailsScreenState()
 
-    val article by articleDetailsViewModel.article.observeAsState()
+    val article by articleDetailsViewModel.article.collectAsStateWithLifecycle()
     val browserIcon by articleDetailsViewModel.browserIcon.collectAsStateWithLifecycle()
-    val activity = LocalContext.current as ComponentActivity
+    val activity = LocalActivity.current as ComponentActivity
     val statusBarStyle = when {
         // inverse of dark mode when is unread
         article?.isTransientUnread == true -> SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT) { resources ->
@@ -267,7 +303,7 @@ fun ArticleDetailsScreen(
     webViewClient: AccompanistWebViewClient,
 ) {
     val articleDetailsScreenState = rememberArticleDetailsScreenState()
-    val article by articleDetailsViewModel.article.observeAsState()
+    val article by articleDetailsViewModel.article.collectAsStateWithLifecycle()
     val browserIcon by articleDetailsViewModel.browserIcon.collectAsStateWithLifecycle()
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -409,7 +445,7 @@ private fun ArticleHeader(
     modifier: Modifier = Modifier
 ) {
     BoxWithConstraints(modifier = modifier) {
-        if (maxWidth < 600.dp) {
+        if (this.maxWidth < 600.dp) {
             ArticleHeaderWithoutImage(title = title, date = date)
         } else {
             ArticleHeaderWithFlavorImage(
@@ -672,7 +708,7 @@ fun ArticleDetailsPane(
             articleDetailsViewModel.init(articleId)
         }
 
-        val activity = LocalContext.current as Activity
+        val activity = LocalActivity.current!!
         val webViewClientFactory =  remember(activity) {
             EntryPointAccessors.fromActivity<ArticleDetailsEntryPoint>(activity)
                 .articleDetailsWebViewClientFactory
@@ -739,7 +775,7 @@ fun ArticleDetailsForSinglePane(
     onArticleClick: (Article) -> Unit,
     webViewClient: AccompanistWebViewClient
 ) {
-    val article by articleDetailsViewModel.article.observeAsState()
+    val article by articleDetailsViewModel.article.collectAsStateWithLifecycle()
     val readMoreArticles by articleDetailsViewModel.additionalArticles.collectAsState()
     val browserIcon by articleDetailsViewModel.browserIcon.collectAsStateWithLifecycle()
 
@@ -837,7 +873,7 @@ fun ArticleDetailsForDualPanes(
 ) {
     val articleDetailsScreenState = rememberArticleDetailsScreenState()
 
-    val article by articleDetailsViewModel.article.observeAsState()
+    val article by articleDetailsViewModel.article.collectAsStateWithLifecycle()
     val readMoreArticles by articleDetailsViewModel.additionalArticles.collectAsState()
     val browserIcon by articleDetailsViewModel.browserIcon.collectAsStateWithLifecycle()
 
