@@ -63,7 +63,13 @@ data class Feed(
     val isCategory: Boolean = false,
 
     @SerialName("always_display_as_feed")
-    val alwaysDisplayAsFeed: Boolean = false
+    val alwaysDisplayAsFeed: Boolean = false,
+
+    @SerialName("last_error")
+    val lastError:String = "",
+
+    @SerialName("update_interval")
+    val updateInterval: Long = 0
 ) {
 
     @delegate:Transient
