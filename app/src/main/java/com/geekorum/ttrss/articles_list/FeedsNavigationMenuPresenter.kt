@@ -235,7 +235,6 @@ private fun ManageFeedItem(
     modifier: Modifier = Modifier,
 ) {
     Surface(
-        color = MaterialTheme.colorScheme.surfaceContainerLow,
         modifier = modifier
             .height(56.dp)
     ) {
