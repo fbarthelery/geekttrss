@@ -22,7 +22,6 @@ package com.geekorum.ttrss.articles_list
 
 import android.accounts.Account
 import androidx.core.text.parseAsHtml
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
@@ -57,16 +56,11 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-
-private const val STATE_NEED_UNREAD = "need_unread"
-private const val STATE_ORDER_MOST_RECENT_FIRST = "order_most_recent_first" // most_recent_first, oldest_first
 
 /**
  * Base [ViewModel] for a list of Articles.
  */
 abstract class BaseArticlesViewModel(
-    private val state: SavedStateHandle,
     componentFactory: SessionActivityComponent.Factory
 ) : ViewModel() {
 
@@ -86,12 +80,15 @@ abstract class BaseArticlesViewModel(
 
     abstract fun refresh()
 
+    protected val sortByMostRecentFirst = MutableStateFlow(false)
+    protected val needUnread = MutableStateFlow(false)
+
     fun setSortByMostRecentFirst(mostRecentFirst: Boolean) {
-        state[STATE_ORDER_MOST_RECENT_FIRST] = mostRecentFirst
+        sortByMostRecentFirst.value = mostRecentFirst
     }
 
     fun setNeedUnread(needUnread: Boolean) {
-        state[STATE_NEED_UNREAD] = needUnread
+        this.needUnread.value = needUnread
     }
 
     fun setArticleUnread(articleId: Long, newValue: Boolean) {
@@ -255,11 +252,10 @@ abstract class BaseArticlesViewModel(
 @HiltViewModel(assistedFactory = ArticlesListViewModel.Factory::class)
 class ArticlesListViewModel @AssistedInject constructor(
     @Assisted val feedId: Long,
-    private val state: SavedStateHandle,
     feedsRepository: FeedsRepository,
     private val backgroundJobManager: BackgroundJobManager,
     componentFactory: SessionActivityComponent.Factory
-) : BaseArticlesViewModel(state, componentFactory) {
+) : BaseArticlesViewModel(componentFactory) {
 
     @AssistedFactory
     interface Factory {
@@ -287,9 +283,9 @@ class ArticlesListViewModel @AssistedInject constructor(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     private fun getArticlesForFeed(feed: Feed): Flow<PagingData<ArticleWithFeed>> {
-        val isMostRecentOrderFlow = state.getStateFlow(STATE_ORDER_MOST_RECENT_FIRST, false)
+        val isMostRecentOrderFlow = sortByMostRecentFirst
         val needUnreadFlow = if (feed.isStarredFeed) flowOf(false) else
-            state.getStateFlow(STATE_NEED_UNREAD, false)
+            needUnread
         return isMostRecentOrderFlow.combine(needUnreadFlow) { mostRecentFirst, needUnread ->
             getArticleAccess(mostRecentFirst, needUnread)
         }.flatMapLatest { access ->
@@ -323,11 +319,10 @@ class ArticlesListViewModel @AssistedInject constructor(
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel(assistedFactory = ArticlesListByTagViewModel.Factory::class)
 class ArticlesListByTagViewModel @AssistedInject constructor(
-    private val state: SavedStateHandle,
     @Assisted val tag: String,
     private val backgroundJobManager: BackgroundJobManager,
     componentFactory: SessionActivityComponent.Factory
-) : BaseArticlesViewModel(state, componentFactory) {
+) : BaseArticlesViewModel(componentFactory) {
 
     @AssistedFactory
     interface Factory {
@@ -353,8 +348,8 @@ class ArticlesListByTagViewModel @AssistedInject constructor(
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private fun getArticlesForTag(tag: String): Flow<PagingData<ArticleWithFeed>> {
-        val isMostRecentOrderFlow = state.getStateFlow(STATE_ORDER_MOST_RECENT_FIRST, false)
-        val needUnreadFlow = state.getStateFlow(STATE_NEED_UNREAD, false)
+        val isMostRecentOrderFlow = sortByMostRecentFirst
+        val needUnreadFlow = needUnread
         return isMostRecentOrderFlow.combine(needUnreadFlow) { mostRecentFirst, needUnread ->
             getArticleAccess(mostRecentFirst, needUnread)
         }.flatMapLatest { access ->
