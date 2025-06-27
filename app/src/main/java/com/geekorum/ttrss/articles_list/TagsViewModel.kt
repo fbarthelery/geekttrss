@@ -37,7 +37,6 @@ import javax.inject.Inject
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @HiltViewModel
 class TagsViewModel @Inject constructor(
-    private val state: SavedStateHandle,
     componentFactory: SessionActivityComponent.Factory
 ) : ViewModel() {
 

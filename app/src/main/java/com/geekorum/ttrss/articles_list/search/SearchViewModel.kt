@@ -20,7 +20,6 @@
  */
 package com.geekorum.ttrss.articles_list.search
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -30,23 +29,26 @@ import androidx.paging.cachedIn
 import com.geekorum.ttrss.articles_list.ArticlesRepository
 import com.geekorum.ttrss.data.ArticleWithFeed
 import com.geekorum.ttrss.session.SessionActivityComponent
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import javax.inject.Inject
 
-private val ARG_QUERY = "query"
-
-@HiltViewModel
-class SearchViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
+@HiltViewModel(assistedFactory = SearchViewModel.Factory::class)
+class SearchViewModel @AssistedInject constructor(
+    @Assisted val query: String,
     componentFactory: SessionActivityComponent.Factory
 ) : ViewModel() {
+
+    @AssistedFactory
+    interface Factory {
+        fun create(query: String): SearchViewModel
+    }
 
     val sessionActivityComponent = componentFactory.newComponent()
     private val articlesRepository: ArticlesRepository = sessionActivityComponent.articleRepository
     private val setFieldActionFactory = sessionActivityComponent.setArticleFieldActionFactory
-
-    val query = savedStateHandle.get<String>(ARG_QUERY)!!
 
     val articles: Flow<PagingData<ArticleWithFeed>> = Pager(PagingConfig(pageSize = 50)) {
         articlesRepository.searchArticles(query)

@@ -43,7 +43,6 @@ import javax.inject.Inject
 @HiltViewModel
 @OptIn(ExperimentalCoroutinesApi::class)
 class MagazineViewModel @Inject constructor (
-    private val state: SavedStateHandle,
     private val backgroundJobManager: BackgroundJobManager,
     private val feedsRepository: FeedsRepository,
     componentFactory: SessionActivityComponent.Factory

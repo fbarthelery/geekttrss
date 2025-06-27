@@ -215,9 +215,12 @@ private fun ArticleItem(
 // we always layout like we take fullscreen and there is a search bar on top of screen
 @Composable
 fun ArticlesSearchScreen(
+    query: String,
     windowSizeClass: WindowSizeClass,
     activityViewModel: ActivityViewModel,
-    searchViewModel: SearchViewModel = hiltViewModel(),
+    searchViewModel: SearchViewModel = hiltViewModel{ factory: SearchViewModel.Factory ->
+        factory.create(query)
+    },
 ) {
     val compactItemsInSmallScreens by activityViewModel.displayCompactItems.collectAsStateWithLifecycle()
     val displayCompactItems = compactItemsInSmallScreens

@@ -76,7 +76,6 @@ class ShareToPublishArticleActivity : ModalBottomSheetActivity() {
 
 @HiltViewModel
 class SharingToPublishViewModel @Inject constructor(
-    state: SavedStateHandle,
     componentFactory: SessionActivityComponent.Factory
 ) : ViewModel() {
     private val sessionActivityComponent = componentFactory.newComponent()

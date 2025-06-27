@@ -31,12 +31,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.*
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navDeepLink
+import androidx.navigation.navOptions
+import androidx.navigation.toRoute
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.article_details.ArticleDetailActivity
 import com.geekorum.ttrss.articles_list.magazine.MagazineScreen
@@ -124,7 +130,9 @@ fun ArticlesListNavHost(
         }
 
         composable<NavRoutes.Search> {
-            ArticlesSearchScreen(activityViewModel = activityViewModel, windowSizeClass = windowSizeClass)
+            ArticlesSearchScreen(
+                query = it.toRoute<NavRoutes.Search>().query,
+                activityViewModel = activityViewModel, windowSizeClass = windowSizeClass)
         }
     }
 }
