@@ -28,11 +28,39 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.automirrored.filled.AddToHomeScreen
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.CheckBox
+import androidx.compose.material.icons.filled.FolderOpen
+import androidx.compose.material.icons.filled.Inventory2
+import androidx.compose.material.icons.filled.LocalCafe
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.surfaceColorAtElevation
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -46,7 +74,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
@@ -71,40 +98,38 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 import com.geekorum.ttrss.R as appR
-
-private const val ARG_FEED_ID = "feedId"
 
 /**
  * ViewModel to edit preferences for a feed
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-@HiltViewModel
-class EditFeedViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = EditFeedViewModel.Factory::class)
+class EditFeedViewModel @AssistedInject constructor(
+    @Assisted private val feedId: Long,
     private val application: Application,
-    private val savedStateHandle: SavedStateHandle,
     private val account: Account,
     private val feedsDao: ManageFeedsDao,
     private val feedSettingsRepository: FeedSettingsRepository,
 ): ViewModel() {
 
-    private val canCreatePinShortcut = ShortcutManagerCompat.isRequestPinShortcutSupported(application)
-
-    private val feed = savedStateHandle.getStateFlow<Long?>(ARG_FEED_ID, null)
-        .filterNotNull()
-        .flatMapLatest {
-        feedsDao.getFeedById(it)
+    @AssistedFactory
+    interface Factory {
+        fun create(feedId: Long): EditFeedViewModel
     }
 
-    private val feedSettings = savedStateHandle.getStateFlow<Long?>(ARG_FEED_ID, null)
-        .filterNotNull()
-        .flatMapLatest {
-            feedSettingsRepository.getFeedSettings(it)
-        }
+    private val canCreatePinShortcut = ShortcutManagerCompat.isRequestPinShortcutSupported(application)
+
+    private val feed = feedsDao.getFeedById(feedId)
+
+    private val feedSettings = feedSettingsRepository.getFeedSettings(feedId)
 
     val uiState = feed.combine(feedSettings) { feedInfo, settings ->
         EditFeedUiState(feed = feedInfo?.feed,
@@ -165,7 +190,6 @@ class EditFeedViewModel @Inject constructor(
     }
 
     fun setSyncAutomatically(value: Boolean) = viewModelScope.launch {
-        val feedId: Long = savedStateHandle[ARG_FEED_ID]!!
         val feedSettings = feedSettingsRepository.getFeedSettings(feedId).firstOrNull() ?: FeedSettings.getDefaultInstance()
         val update = feedSettings.copy { syncPeriodically = value }
         feedSettingsRepository.updateFeedSettings(feedId, update)
@@ -246,12 +270,18 @@ fun EditFeedScreen(feedId: Long, navigateBack: () -> Unit) {
     if (Feed.isVirtualFeed(feedId)) {
         EditSpecialFeedScreen(feedId)
     } else {
-        EditFeedScreen(navigateBack = navigateBack)
+        EditNormalFeedScreen(feedId = feedId, navigateBack = navigateBack)
     }
 }
 
 @Composable
-fun EditFeedScreen(viewModel: EditFeedViewModel = dfmHiltViewModel(), navigateBack: () -> Unit) {
+fun EditNormalFeedScreen(
+    feedId: Long,
+    viewModel: EditFeedViewModel = dfmHiltViewModel { factory: EditFeedViewModel.Factory ->
+        factory.create(feedId)
+    },
+    navigateBack: () -> Unit,
+) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     LaunchedEffect(uiState.isSubscribed) {
         if (!uiState.isSubscribed) {
