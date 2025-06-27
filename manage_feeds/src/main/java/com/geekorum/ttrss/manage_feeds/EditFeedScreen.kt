@@ -66,6 +66,9 @@ import com.geekorum.ttrss.data.feedsettings.FeedSettingsRepository
 import com.geekorum.ttrss.data.feedsettings.copy
 import com.geekorum.ttrss.manage_feeds.workers.UnsubscribeWorker
 import com.geekorum.ttrss.ui.AppTheme3
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
@@ -184,23 +187,22 @@ class EditFeedViewModel @Inject constructor(
     private fun getShortcutId(feedId: Long) = "FEED_$feedId"
 }
 
-@HiltViewModel
-class EditSpecialFeedViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = EditSpecialFeedViewModel.Factory::class)
+class EditSpecialFeedViewModel @AssistedInject constructor(
+    @Assisted val feedId: Long,
     private val application: Application,
-    private val savedStateHandle: SavedStateHandle,
 ): ViewModel() {
 
-    private val canCreatePinShortcut = ShortcutManagerCompat.isRequestPinShortcutSupported(application)
+    @AssistedFactory
+    interface Factory {
+        fun create(feedId: Long): EditSpecialFeedViewModel
+    }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
-    private val feed = savedStateHandle.getStateFlow<Long?>(ARG_FEED_ID, null)
-        .filterNotNull()
-        .mapLatest {
-            Feed.createVirtualFeedForId(it)
-        }
-
-    val uiState = feed.map {
-        EditFeedUiState(feed = it, canCreatePinShortcut = canCreatePinShortcut)
+    val uiState = flow {
+        val canCreatePinShortcut = ShortcutManagerCompat.isRequestPinShortcutSupported(application)
+        val feed = Feed.createVirtualFeedForId(feedId)
+        val state = EditFeedUiState(feed = feed, canCreatePinShortcut = canCreatePinShortcut)
+        emit(state)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), EditFeedUiState())
 
     fun createShortcut(context: Context, title: String) = viewModelScope.launch {
@@ -242,7 +244,7 @@ data class EditFeedUiState(
 @Composable
 fun EditFeedScreen(feedId: Long, navigateBack: () -> Unit) {
     if (Feed.isVirtualFeed(feedId)) {
-        EditSpecialFeedScreen()
+        EditSpecialFeedScreen(feedId)
     } else {
         EditFeedScreen(navigateBack = navigateBack)
     }
@@ -389,7 +391,9 @@ private fun SwitchPreference(
 
 
 @Composable
-fun EditSpecialFeedScreen(viewModel: EditSpecialFeedViewModel = dfmHiltViewModel()) {
+fun EditSpecialFeedScreen(feedId: Long, viewModel: EditSpecialFeedViewModel = dfmHiltViewModel { factory: EditSpecialFeedViewModel.Factory ->
+    factory.create(feedId)
+}) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     EditSpecialFeedScreen(uiState = uiState,

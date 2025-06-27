@@ -32,6 +32,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.navigation.toRoute
 import com.geekorum.ttrss.manage_feeds.add_feed.SubscribeToFeedActivity
 import com.geekorum.ttrss.ui.AppTheme3
 import kotlinx.serialization.Serializable
@@ -85,7 +86,7 @@ fun ManageFeedNavHost(
         }
 
         composable<EditFeedDestination>{
-            val feedId = it.arguments!!.getLong("feedId")
+            val feedId = it.toRoute<EditFeedDestination>().feedId
             EditFeedScreen(feedId, navigateBack = {
                 navController.popBackStack()
             })

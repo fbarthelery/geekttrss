@@ -50,6 +50,7 @@ import com.geekorum.ttrss.manage_feeds.workers.WorkerComponent
 import com.geekorum.ttrss.manage_feeds.workers.WorkersModule
 import com.geekorum.ttrss.session.SessionAccountModule
 import dagger.*
+import dagger.hilt.android.lifecycle.withCreationCallback
 import dagger.hilt.migration.DisableInstallInCheck
 
 @Component(dependencies = [ManageFeedsDependencies::class],
@@ -136,6 +137,30 @@ internal inline fun <reified VM : ViewModel> dfmHiltViewModel(
     val actualFactory = factory ?: createHiltViewModelFactory(viewModelStoreOwner)
     return viewModel(viewModelStoreOwner, key = key, factory = actualFactory, extras = extras)
 }
+
+@Composable
+inline fun <reified VM : ViewModel, reified VMF> dfmHiltViewModel(
+    viewModelStoreOwner: ViewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current) {
+        "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
+    },
+    key: String? = null,
+    noinline creationCallback: (VMF) -> VM
+): VM {
+    val factory = createHiltViewModelFactory(viewModelStoreOwner)
+    return viewModel(
+        viewModelStoreOwner = viewModelStoreOwner,
+        key = key,
+        factory = factory,
+        extras = viewModelStoreOwner.run {
+            if (this is HasDefaultViewModelProviderFactory) {
+                this.defaultViewModelCreationExtras.withCreationCallback(creationCallback)
+            } else {
+                CreationExtras.Empty.withCreationCallback(creationCallback)
+            }
+        }
+    )
+}
+
 
 @Composable
 @PublishedApi
