@@ -45,7 +45,6 @@ private const val STATE_SELECTED_CATEGORY_ID = "selected_category_id"
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class FeedsViewModel @Inject constructor(
-    private val state: SavedStateHandle,
     private val dispatchers: CoroutineDispatchersProvider,
     private val feedsRepository: FeedsRepository,
     private val articlesRepository: ArticlesRepository,
@@ -55,9 +54,9 @@ class FeedsViewModel @Inject constructor(
     private val component = componentFactory.newComponent()
     private val apiService: ApiService = component.apiService
 
-    private val onlyUnread = state.getStateFlow(STATE_ONLY_UNREAD, true)
+    private val onlyUnread = MutableStateFlow(true)
 
-    private val selectedCategory = state.getStateFlow<Long?>(STATE_SELECTED_CATEGORY_ID, null)
+    private val selectedCategory = MutableStateFlow<Long?>(null)
 
     val feeds = onlyUnread.flatMapLatest { onlyUnread ->
         if (onlyUnread) feedsRepository.allUnreadFeeds else feedsRepository.allFeeds
@@ -84,11 +83,11 @@ class FeedsViewModel @Inject constructor(
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     fun setOnlyUnread(onlyUnread: Boolean) {
-        state[STATE_ONLY_UNREAD] = onlyUnread
+        this.onlyUnread.value = onlyUnread
     }
 
     fun setSelectedCategory(selectedCategoryId: Long) {
-        state[STATE_SELECTED_CATEGORY_ID] = selectedCategoryId
+        selectedCategory.value = selectedCategoryId
     }
 
     @Throws(ApiCallException::class)
