@@ -114,7 +114,9 @@ fun ArticlesListNavHost(
         }
 
         composable<NavRoutes.ArticlesListByTag> {
-            ArticlesListByTagScreen(activityViewModel = activityViewModel,
+            ArticlesListByTagScreen(
+                tag = it.toRoute<NavRoutes.ArticlesListByTag>().tag,
+                activityViewModel = activityViewModel,
                 windowSizeClass = windowSizeClass, contentPadding = contentPadding)
         }
 

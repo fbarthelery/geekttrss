@@ -35,6 +35,9 @@ import com.geekorum.ttrss.providers.ArticlesContract
 import com.geekorum.ttrss.session.Action
 import com.geekorum.ttrss.session.SessionActivityComponent
 import com.geekorum.ttrss.session.UndoManager
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
@@ -303,23 +306,27 @@ class ArticlesListViewModel @Inject constructor(
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@HiltViewModel
-class ArticlesListByTagViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = ArticlesListByTagViewModel.Factory::class)
+class ArticlesListByTagViewModel @AssistedInject constructor(
     private val state: SavedStateHandle,
+    @Assisted val tag: String,
     private val backgroundJobManager: BackgroundJobManager,
     componentFactory: SessionActivityComponent.Factory
 ) : BaseArticlesViewModel(state, componentFactory) {
 
-    val tag = state.getStateFlow(STATE_TAG, "")
+    @AssistedFactory
+    interface Factory {
+        fun create(tag: String): ArticlesListByTagViewModel
+    }
+
     override val isMultiFeed: StateFlow<Boolean> = MutableStateFlow(true)
 
     private val account: Account = component.account
 
-    override val articles: Flow<PagingData<ArticleWithFeed>> = tag
-        .flatMapLatest {
-            getArticlesForTag(it)
-        }.map(::prepareArticlePagingData)
-        .cachedIn(viewModelScope)
+    override val articles: Flow<PagingData<ArticleWithFeed>> =
+        getArticlesForTag(tag)
+            .map(::prepareArticlePagingData)
+            .cachedIn(viewModelScope)
 
     override val isRefreshing = SyncInProgressLiveData(account, ArticlesContract.AUTHORITY).asFlow()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
@@ -342,10 +349,6 @@ class ArticlesListByTagViewModel @Inject constructor(
             }
             pager.flow
         }
-    }
-
-    companion object {
-        private const val STATE_TAG = "tag"
     }
 
 }

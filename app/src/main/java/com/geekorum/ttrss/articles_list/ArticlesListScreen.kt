@@ -62,9 +62,12 @@ fun ArticlesListScreen(
 
 @Composable
 fun ArticlesListByTagScreen(
+    tag: String,
     windowSizeClass: WindowSizeClass,
     activityViewModel: ActivityViewModel,
-    articlesListByTagViewModel: ArticlesListByTagViewModel = hiltViewModel(),
+    articlesListByTagViewModel: ArticlesListByTagViewModel = hiltViewModel { factory: ArticlesListByTagViewModel.Factory ->
+        factory.create(tag)
+    },
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     val compactItemsInSmallScreens by activityViewModel.displayCompactItems.collectAsStateWithLifecycle()
