@@ -138,7 +138,6 @@ class FeedsNavigationMenuPresenter(
     }
 
     private fun navigateToFeed(feed: Feed) {
-        activityViewModel.setSelectedFeed(feed)
         val feedTitle = run {
             val titleRes = when (feed.id) {
                 Feed.FEED_ID_FRESH -> R.string.label_fresh_feeds_title

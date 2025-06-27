@@ -43,11 +43,12 @@ private const val STATE_ACCOUNT = "account"
  */
 @HiltViewModel
 class ActivityViewModel @Inject constructor(
-    private val state: SavedStateHandle,
     private val browserLauncher: TtRssBrowserLauncher,
     private val articlesListPreferencesRepository: ArticlesListPreferencesRepository,
     private val articlesSearchHistoryRepository: ArticlesSearchHistoryRepository,
 ) : ViewModel() {
+
+    private val account = MutableStateFlow<Account?>(null)
 
     private val _articleSelectedEvent = MutableLiveData<Event<ArticleSelectedParameters>>()
     val articleSelectedEvent: LiveData<Event<ArticleSelectedParameters>> = _articleSelectedEvent
@@ -101,11 +102,7 @@ class ActivityViewModel @Inject constructor(
     }
 
     fun setAccount(account: Account) {
-        state[STATE_ACCOUNT] = account
-    }
-
-    fun setSelectedFeed(feed: Feed) {
-        state[STATE_FEED_ID] = feed.id
+        this.account.value = account
     }
 
     fun refresh() {
