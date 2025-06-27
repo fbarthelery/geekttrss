@@ -109,7 +109,10 @@ fun ArticlesListNavHost(
             deepLinks = listOf(
                 navDeepLink { uriPattern = "app://feeds/{feed_id}?feed_name={feed_name}" }
             )) {
-            ArticlesListScreen(activityViewModel = activityViewModel, windowSizeClass = windowSizeClass,
+            ArticlesListScreen(
+                feedId = it.toRoute<NavRoutes.ArticlesList>().feedId,
+                activityViewModel = activityViewModel,
+                windowSizeClass = windowSizeClass,
                 contentPadding = contentPadding)
         }
 

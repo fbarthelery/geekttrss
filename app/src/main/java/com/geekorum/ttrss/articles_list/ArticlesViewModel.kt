@@ -26,7 +26,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
-import androidx.paging.*
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.PagingSource
+import androidx.paging.cachedIn
+import androidx.paging.map
 import com.geekorum.geekdroid.accounts.SyncInProgressLiveData
 import com.geekorum.ttrss.background_job.BackgroundJobManager
 import com.geekorum.ttrss.data.ArticleWithFeed
@@ -40,7 +45,17 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -237,15 +252,20 @@ abstract class BaseArticlesViewModel(
  * ViewModel for [ArticlesListScreen]
  */
 @OptIn(ExperimentalCoroutinesApi::class)
-@HiltViewModel
-class ArticlesListViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = ArticlesListViewModel.Factory::class)
+class ArticlesListViewModel @AssistedInject constructor(
+    @Assisted val feedId: Long,
     private val state: SavedStateHandle,
     feedsRepository: FeedsRepository,
     private val backgroundJobManager: BackgroundJobManager,
     componentFactory: SessionActivityComponent.Factory
 ) : BaseArticlesViewModel(state, componentFactory) {
 
-    val feedId: Long = state[STATE_FEED_ID]!!
+    @AssistedFactory
+    interface Factory {
+        fun create(feedId: Long): ArticlesListViewModel
+    }
+
 
     override val isMultiFeed: StateFlow<Boolean> = MutableStateFlow(Feed.isVirtualFeed(feedId))
 
@@ -263,7 +283,7 @@ class ArticlesListViewModel @Inject constructor(
         if (it == null)
             SyncInProgressLiveData(account, ArticlesContract.AUTHORITY).asFlow()
         else
-            backgroundJobManager.isRefreshingStatus(state.get<Long>(STATE_FEED_ID)!!).asFlow()
+            backgroundJobManager.isRefreshingStatus(feedId).asFlow()
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     private fun getArticlesForFeed(feed: Feed): Flow<PagingData<ArticleWithFeed>> {
@@ -298,11 +318,6 @@ class ArticlesListViewModel @Inject constructor(
             }
         }
     }
-
-    companion object {
-        private const val STATE_FEED_ID = "feed_id"
-    }
-
 }
 
 @OptIn(ExperimentalCoroutinesApi::class)

@@ -46,9 +46,12 @@ import kotlinx.coroutines.flow.onEach
 
 @Composable
 fun ArticlesListScreen(
+    feedId: Long,
     windowSizeClass: WindowSizeClass,
     activityViewModel: ActivityViewModel,
-    articlesListViewModel: ArticlesListViewModel = hiltViewModel(),
+    articlesListViewModel: ArticlesListViewModel = hiltViewModel { factory: ArticlesListViewModel.Factory ->
+        factory.create(feedId)
+    },
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     val compactItemsInSmallScreens by activityViewModel.displayCompactItems.collectAsStateWithLifecycle()
