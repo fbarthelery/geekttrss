@@ -26,7 +26,6 @@ import android.content.ContextWrapper
 import android.net.Uri
 import androidx.core.net.toUri
 import androidx.core.text.parseAsHtml
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.geekorum.ttrss.articles_list.ArticlesRepository
@@ -34,46 +33,47 @@ import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.network.TtRssBrowserLauncher
 import com.geekorum.ttrss.session.SessionActivityComponent
 import com.geekorum.ttrss.share.createShareArticleIntent
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-private const val STATE_ARTICLE_ID = "article_id"
 
 /**
  * [ViewModel] for [ArticleDetailActivity] and [ArticleDetailFragment].
  */
-@HiltViewModel
+@HiltViewModel(assistedFactory = ArticleDetailsViewModel.Factory::class)
 @OptIn(ExperimentalCoroutinesApi::class)
-class ArticleDetailsViewModel @Inject constructor(
-    private val state: SavedStateHandle,
+class ArticleDetailsViewModel @AssistedInject constructor(
+    @Assisted private val articleId: Long,
     private val browserLauncher: TtRssBrowserLauncher,
     componentFactory: SessionActivityComponent.Factory
 ) : ViewModel() {
+
+    @AssistedFactory
+    interface Factory {
+        fun create(articleId: Long): ArticleDetailsViewModel
+    }
 
     val sessionActivityComponent = componentFactory.newComponent()
     private val articlesRepository: ArticlesRepository = sessionActivityComponent.articleRepository
     private val setFieldActionFactory = sessionActivityComponent.setArticleFieldActionFactory
 
-    private val articleId = state.getStateFlow<Long>(STATE_ARTICLE_ID, 0L)
-
-    val article = articleId.flatMapLatest {
-        articlesRepository.getArticleById(it)
+    val article =
+        articlesRepository.getArticleById(articleId)
             .map(::prepareArticle)
             .onEach { article ->
                 article?.let {
                     browserLauncher.mayLaunchUrl(article.link.toUri())
                 }
             }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
+    .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), null)
 
     val additionalArticles = article
         .map {
@@ -88,9 +88,6 @@ class ArticleDetailsViewModel @Inject constructor(
         browserLauncher.warmUp()
     }
 
-    fun init(articleId: Long) {
-        state[STATE_ARTICLE_ID] = articleId
-    }
 
     private fun prepareArticle(article: Article?) = article?.copy(
         contentData = article.contentData.copy(
@@ -105,7 +102,7 @@ class ArticleDetailsViewModel @Inject constructor(
             .shuffled()
 
         val articles = randomizedTags.map { articlesRepository.getUnreadArticlesForTag(it)
-            .filterNot { it.article.id == articleId.value }
+            .filterNot { it.article.id == articleId }
             .toMutableList() }
         val articlesPerTag = randomizedTags.zip(articles)
         val result = sequence {

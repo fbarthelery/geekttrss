@@ -27,11 +27,12 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.viewModels
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.remember
 import androidx.core.net.toUri
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.get
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.articles_list.ArticleListActivity
 import com.geekorum.ttrss.data.Article
@@ -44,6 +45,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.lifecycle.withCreationCallback
 
 /**
  * An activity representing a single Article detail screen. This
@@ -54,7 +56,7 @@ import dagger.hilt.android.components.ActivityComponent
 @AndroidEntryPoint
 class ArticleDetailActivity : SessionActivity() {
 
-    private val articleDetailsViewModel: ArticleDetailsViewModel by viewModels()
+    private lateinit var articleDetailsViewModel: ArticleDetailsViewModel
 
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     public override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,7 +67,13 @@ class ArticleDetailActivity : SessionActivity() {
             window.isNavigationBarContrastEnforced = false
         }
         val articleUri = requireNotNull(intent.data)
-        articleDetailsViewModel.init(ContentUris.parseId(articleUri))
+        val articleId = ContentUris.parseId(articleUri)
+        articleDetailsViewModel = ViewModelProvider.create(
+            this, defaultViewModelProviderFactory,
+            extras = defaultViewModelCreationExtras.withCreationCallback<ArticleDetailsViewModel.Factory> {
+                it.create(articleId)
+            }
+        ).get()
 
         setContent {
             AppTheme3 {

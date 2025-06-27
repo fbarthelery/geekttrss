@@ -696,7 +696,11 @@ fun ArticleDetailsPane(
     isSinglePane: Boolean,
     onNavigateUpClick: () -> Unit,
     modifier: Modifier = Modifier,
-    articleDetailsViewModel: ArticleDetailsViewModel = hiltViewModel(),
+    articleDetailsViewModel: ArticleDetailsViewModel = hiltViewModel(
+        creationCallback = {factory: ArticleDetailsViewModel.Factory ->
+            factory.create(articleId)
+        }
+    ),
     dualPanePadding: PaddingValues = PaddingValues(0.dp)
 ) {
     ArticleDetailsPaneLayout(
@@ -704,10 +708,6 @@ fun ArticleDetailsPane(
         dualPanePadding = dualPanePadding,
         modifier = modifier
     ) {
-        LaunchedEffect(articleId) {
-            articleDetailsViewModel.init(articleId)
-        }
-
         val activity = LocalActivity.current!!
         val webViewClientFactory =  remember(activity) {
             EntryPointAccessors.fromActivity<ArticleDetailsEntryPoint>(activity)
