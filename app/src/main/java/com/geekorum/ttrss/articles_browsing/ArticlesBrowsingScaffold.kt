@@ -51,10 +51,12 @@ import androidx.compose.runtime.ExperimentalComposeRuntimeApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.ui.AppTheme3
 import com.geekorum.ttrss.ui.components.FeedNavigationRail
@@ -74,6 +76,7 @@ import kotlinx.coroutines.launch
 fun ArticleBrowsingScaffold(
     windowSizeClass: WindowSizeClass,
     feedsMenuState: FeedNavigationMenuState,
+    onMagazineClick: () -> Unit,
     onFeedClick: (Feed) -> Unit,
     onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -82,24 +85,26 @@ fun ArticleBrowsingScaffold(
     ArticleBrowsingScaffold(windowSizeClass,
         modifier = modifier,
         railState = feedsMenuState.railState,
-        railHeader = {
+        railHeader = { isInDrawer ->
             Column {
-                NavRailMenuButton(
-                    isMenuOpen = feedsMenuState.isMenuExpanded,
-                    onClick = {
-                        feedsMenuState.toggleMenu()
-                    },
-                    modifier = Modifier.padding(start = 24.dp)
-                )
+                if (!isInDrawer) {
+                    NavRailMenuButton(
+                        isMenuOpen = feedsMenuState.isMenuExpanded,
+                        onClick = {
+                            feedsMenuState.toggleMenu()
+                        },
+                        modifier = Modifier.padding(start = 24.dp)
+                    )
+                }
             }
         },
         railFeedSection = {
             val feeds by feedsMenuState.feeds.collectAsStateWithLifecycle(emptyList())
-            SectionHeader("Feeds")
+            SectionHeader(stringResource(R.string.title_feeds_menu))
             feeds.forEach {
                 FeedWideNavigationRailItem(
                     it,
-                    selected = false,
+                    selected = feedsMenuState.isFeedSelected(it.feed),
                     onClick = {
                         feedsMenuState.closeMenu { onFeedClick(it.feed) }
                     },
@@ -109,7 +114,7 @@ fun ArticleBrowsingScaffold(
         },
         railSettingsSection = {
             SettingsWideNavigationRailItem(
-                selected = false,
+                selected = feedsMenuState.isSettingsSelected,
                 onClick = {
                     feedsMenuState.closeMenu {
                         onSettingsClick()
@@ -121,8 +126,7 @@ fun ArticleBrowsingScaffold(
         railQuickFeeds = {
             MagazineWideNavigationRailItem(
                 selected = feedsMenuState.isMagazineSelected,
-                onClick = {
-                },
+                onClick = onMagazineClick,
                 railExpanded = feedsMenuState.isMenuExpanded
             )
             val virtualFeeds by feedsMenuState.virtualFeeds.collectAsStateWithLifecycle(
@@ -131,9 +135,22 @@ fun ArticleBrowsingScaffold(
             virtualFeeds.forEach {
                 VirtualFeedWideNavigationRailItem(
                     it,
-                    selected = false,
+                    selected = feedsMenuState.isFeedSelected(it),
                     onClick = {
                         feedsMenuState.closeMenu { onFeedClick(it) }
+                    },
+                    railExpanded = feedsMenuState.isMenuExpanded
+                )
+            }
+
+            val feeds by feedsMenuState.feeds.collectAsStateWithLifecycle(emptyList())
+            val selectedFeed = feeds.firstOrNull { feedsMenuState.isFeedSelected(it.feed) }
+            if (selectedFeed != null && !feedsMenuState.isMenuExpanded) {
+                FeedWideNavigationRailItem(
+                    selectedFeed,
+                    selected = feedsMenuState.isFeedSelected(selectedFeed.feed),
+                    onClick = {
+                        feedsMenuState.closeMenu { onFeedClick(selectedFeed.feed) }
                     },
                     railExpanded = feedsMenuState.isMenuExpanded
                 )
@@ -149,7 +166,7 @@ fun ArticleBrowsingScaffold(
     windowSizeClass: WindowSizeClass,
     modifier: Modifier = Modifier,
     railState: WideNavigationRailState = rememberWideNavigationRailState(),
-    railHeader: @Composable (() -> Unit)?,
+    railHeader: @Composable ((isInDrawer: Boolean) -> Unit)?,
     railQuickFeeds: @Composable (() -> Unit),
     railFeedSection: @Composable (() -> Unit),
     railSettingsSection: @Composable (() -> Unit),
@@ -213,7 +230,7 @@ private fun DrawerStatusBarProtection(modifier: Modifier = Modifier) {
 @Composable
 private fun CompactArticleBrowsingScaffold(
     railState: WideNavigationRailState,
-    railHeader: @Composable (() -> Unit)?,
+    railHeader: @Composable ((isDrawer: Boolean) -> Unit)?,
     railQuickFeeds: @Composable (() -> Unit),
     railFeedSection: @Composable (() -> Unit),
     railSettingsSection: @Composable (() -> Unit),
@@ -221,15 +238,15 @@ private fun CompactArticleBrowsingScaffold(
     content: @Composable () -> Unit
 ) {
     ModalFeedNavigationRail(
-            modifier = modifier,
-            state = railState,
+        modifier = modifier,
+        state = railState,
         hideOnCollapse = true,
-            quickFeedAccess = railQuickFeeds,
-            feedSection = railFeedSection,
-            settingsSection = railSettingsSection,
-            header = railHeader
-        )
-        content()
+        quickFeedAccess = railQuickFeeds,
+        feedSection = railFeedSection,
+        settingsSection = railSettingsSection,
+        header = railHeader?.let { { it.invoke(true) } }
+    )
+    content()
 }
 
 
@@ -238,7 +255,7 @@ private fun CompactArticleBrowsingScaffold(
 @Composable
 private fun MediumArticleBrowsingScaffold(
     railState: WideNavigationRailState,
-    railHeader: @Composable (() -> Unit)?,
+    railHeader: @Composable ((isDrawer: Boolean) -> Unit)?,
     railQuickFeeds: @Composable (() -> Unit),
     railFeedSection: @Composable (() -> Unit),
     railSettingsSection: @Composable (() -> Unit),
@@ -251,7 +268,7 @@ private fun MediumArticleBrowsingScaffold(
             quickFeedAccess = railQuickFeeds,
             feedSection = railFeedSection,
             settingsSection = railSettingsSection,
-            header = railHeader
+            header = railHeader?.let { { it.invoke(false) } }
         )
         content()
     }
@@ -262,7 +279,7 @@ private fun MediumArticleBrowsingScaffold(
 @Composable
 private fun ExpandedArticleBrowsingScaffold(
     railState: WideNavigationRailState,
-    railHeader: @Composable (() -> Unit)?,
+    railHeader: @Composable ((isDrawer: Boolean) -> Unit)?,
     railQuickFeeds: @Composable (() -> Unit),
     railFeedSection: @Composable (() -> Unit),
     railSettingsSection: @Composable (() -> Unit),
@@ -275,7 +292,7 @@ private fun ExpandedArticleBrowsingScaffold(
             quickFeedAccess = railQuickFeeds,
             feedSection = railFeedSection,
             settingsSection = railSettingsSection,
-            header = railHeader
+            header = railHeader?.let { { it.invoke(false) } }
         )
         content()
     }
