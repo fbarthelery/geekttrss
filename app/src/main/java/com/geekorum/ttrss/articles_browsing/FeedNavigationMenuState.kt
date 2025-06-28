@@ -27,8 +27,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.data.FeedWithFavIcon
 import com.geekorum.ttrss.ui.components.isExpanded
@@ -40,10 +38,10 @@ import kotlinx.coroutines.launch
 @Stable
 class FeedNavigationMenuState(
     private val coroutineScope: CoroutineScope,
-    private val navController: NavHostController,
     val railState: WideNavigationRailState,
     val virtualFeeds: Flow<List<Feed>>,
     val feeds: Flow<List<FeedWithFavIcon>>,
+    val selectedItem: SelectedItem,
 ) {
 
     val isMenuExpanded: Boolean
@@ -53,12 +51,13 @@ class FeedNavigationMenuState(
         railState.toggle()
     }
 
-    val isMagazineSelected: Boolean
-        get() = false //TODO
+    val isMagazineSelected: Boolean = selectedItem == MagazineSelectedItem
 
-    val isSettingsSelected: Boolean
-        get() = false //TODO
+    val isSettingsSelected: Boolean = selectedItem == SettingsSelectedItem
 
+    fun isFeedSelected(feed: Feed): Boolean {
+        return  feed.id == (selectedItem as? FeedSelectedItem)?.feedId
+    }
 
     fun closeMenu(doNext: () -> Unit = {}) {
         coroutineScope.launch {
@@ -66,6 +65,11 @@ class FeedNavigationMenuState(
         }
         doNext()
     }
+
+    sealed class SelectedItem
+    data object MagazineSelectedItem: SelectedItem()
+    data object SettingsSelectedItem: SelectedItem()
+    data class FeedSelectedItem(val feedId: Long): SelectedItem()
 }
 
 
@@ -75,16 +79,16 @@ fun rememberFeedNavigationMenuState(
     feeds: Flow<List<FeedWithFavIcon>>,
     virtualFeeds: Flow<List<Feed>>,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
-    navController: NavHostController = rememberNavController(),
     railState: WideNavigationRailState = rememberWideNavigationRailState(),
+    selectedItem: FeedNavigationMenuState.SelectedItem
 ): FeedNavigationMenuState {
-    return remember(coroutineScope, navController, railState, virtualFeeds, feeds) {
+    return remember(coroutineScope, railState, virtualFeeds, feeds, selectedItem) {
         FeedNavigationMenuState(
             coroutineScope = coroutineScope,
-            navController = navController,
             railState = railState,
             virtualFeeds = virtualFeeds,
             feeds = feeds,
+            selectedItem = selectedItem,
         )
     }
 }

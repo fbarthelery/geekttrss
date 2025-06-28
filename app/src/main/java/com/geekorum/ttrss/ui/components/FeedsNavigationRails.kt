@@ -100,6 +100,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.isTraversalGroup
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
@@ -426,10 +427,12 @@ fun FeedWideNavigationRailItem(
 private fun RailItemLabel(label: String, railExpanded:Boolean, modifier: Modifier = Modifier) {
     val maxWidth = if (railExpanded) 260.dp else Dp.Unspecified
     val maxLines = if (railExpanded) 1 else 2
-    Row(modifier.widthIn(max = maxWidth)) {
+    val horizontalPadding = if (railExpanded) 0.dp else 8.dp
+    Row(modifier.widthIn(max = maxWidth).padding(horizontal = horizontalPadding)) {
         Text(label,
             overflow = TextOverflow.Ellipsis,
-            maxLines = maxLines
+            maxLines = maxLines,
+            textAlign = TextAlign.Center
         )
         if (railExpanded) {
             Spacer(Modifier.weight(1f))
