@@ -20,7 +20,6 @@
  */
 package com.geekorum.ttrss.article_details
 
-import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Build
 import androidx.compose.animation.core.FastOutLinearInEasing
@@ -29,8 +28,18 @@ import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.exclude
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -38,8 +47,38 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Archive
 import androidx.compose.material.icons.filled.OpenInBrowser
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.BottomAppBarDefaults
+import androidx.compose.material3.BottomAppBarScrollBehavior
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingToolbarDefaults
+import androidx.compose.material3.FloatingToolbarExitDirection
+import androidx.compose.material3.FloatingToolbarScrollBehavior
+import androidx.compose.material3.HorizontalFloatingToolbar
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.IconToggleButton
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.material3.VerticalFloatingToolbar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -162,32 +201,6 @@ fun PreviewArticleBottomAppBar() {
                 }
             }
         }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun ArticleTopAppBar(
-    scrollBehavior: TopAppBarScrollBehavior? = null,
-    onNavigateUpClick: () -> Unit,
-) {
-    TopAppBar(
-        scrollBehavior = scrollBehavior,
-        title = {},
-        navigationIcon = {
-            IconButton(onClick = onNavigateUpClick) {
-                Icon(Icons.AutoMirrored.Default.ArrowBack, contentDescription = null)
-            }
-        }
-    )
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL)
-@Composable
-fun PreviewArticleTopAppBar() {
-    AppTheme3 {
-        ArticleTopAppBar(onNavigateUpClick = {})
     }
 }
 
@@ -316,11 +329,114 @@ fun ArticleTopActionsBar(
     )
 }
 
+@OptIn(ExperimentalAnimationGraphicsApi::class, ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3ExpressiveApi::class
+)
+@Composable
+fun ArticleHorizontalFloatingToolbar(
+    isUnread: Boolean,
+    isStarred: Boolean,
+    browserApplicationIcon: Drawable?,
+    modifier: Modifier = Modifier,
+    scrollBehavior: FloatingToolbarScrollBehavior? = null,
+    onToggleUnreadClick: () -> Unit,
+    onStarredChange: (Boolean) -> Unit,
+    onShareClick: () -> Unit,
+    onOpenInBrowserClick: () -> Unit,
+) {
+    val colors = if (isUnread) {
+        FloatingToolbarDefaults.vibrantFloatingToolbarColors()
+    } else
+        FloatingToolbarDefaults.vibrantFloatingToolbarColors(
+            toolbarContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+            toolbarContentColor = MaterialTheme.colorScheme.onSurface,
+//            fabContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+//            fabContentColor = MaterialTheme.colorScheme.onSurface
+        )
+
+    HorizontalFloatingToolbar(
+        modifier = modifier,
+        expanded = true,
+        floatingActionButton = {
+            FloatingToolbarDefaults.VibrantFloatingActionButton(
+                containerColor = colors.fabContainerColor,
+                contentColor = colors.fabContentColor,
+                onClick = onOpenInBrowserClick
+            ) {
+                OpenInBrowserIcon(browserApplicationIcon, contentDescription = stringResource(R.string.open_article_in_browser))
+            }
+        },
+        colors = colors,
+        scrollBehavior = scrollBehavior,
+    ) {
+        IconButton(onClick = onToggleUnreadClick) {
+            Icon(Icons.Default.Archive, contentDescription = null)
+        }
+        IconToggleButton(isStarred, onCheckedChange = onStarredChange,
+            colors = IconButtonDefaults.iconToggleButtonColors(
+                checkedContentColor = MaterialTheme.colorScheme.harmonizeWithPrimary(AppTheme3.Colors.MaterialGreenA700)
+            )
+        ) {
+            val image =
+                AnimatedImageVector.animatedVectorResource(id = R.drawable.avd_ic_star_filled)
+            Icon(
+                painter = rememberAnimatedVectorPainter(image, atEnd = isStarred),
+                contentDescription = null,
+            )
+        }
+        IconButton(onClick = onShareClick) {
+            Icon(Icons.Default.Share, contentDescription = null)
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
+@Preview(showSystemUi = true, device = "spec:parent=pixel_5,navigation=buttons")
+@Composable
+fun PreviewArticleHorizontalFloatingToolbar() {
+    AppTheme3 {
+        val toolbarScrollBehavior = FloatingToolbarDefaults.exitAlwaysScrollBehavior(
+            FloatingToolbarExitDirection.Bottom)
+        Scaffold(
+            modifier = Modifier.nestedScroll(toolbarScrollBehavior),
+            floatingActionButtonPosition = FabPosition.Center,
+            contentWindowInsets = ScaffoldDefaults.contentWindowInsets.exclude(WindowInsets.navigationBars)
+        ) {
+            Box(Modifier.padding(it)) {
+                val scrollState = rememberScrollState()
+                Column(Modifier.fillMaxWidth().verticalScroll(scrollState)) {
+                    repeat(199) {
+                        Text("text $it")
+                    }
+                }
+
+                var isUnread by remember { mutableStateOf(true) }
+                var isStarred by remember { mutableStateOf(false) }
+                ArticleHorizontalFloatingToolbar(
+                    modifier = Modifier.align(Alignment.BottomCenter)
+                        .windowInsetsPadding(WindowInsets.navigationBars)
+                        .offset(y = -FloatingToolbarDefaults.ScreenOffset)
+                    ,
+                    isUnread = isUnread,
+                    isStarred = isStarred,
+                    browserApplicationIcon = null,
+                    onToggleUnreadClick = { isUnread = !isUnread },
+                    onStarredChange = { isStarred = it},
+                    onShareClick = {},
+                    onOpenInBrowserClick = {},
+                    scrollBehavior = toolbarScrollBehavior
+                )
+            }
+        }
+    }
+}
+
+
 @OptIn(ExperimentalAnimationGraphicsApi::class,
     ExperimentalMaterial3ExpressiveApi::class
 )
 @Composable
-fun FloatingActionsBar(
+fun ArticleVerticalFloatingToolbar(
     browserApplicationIcon: Drawable?,
     isUnread: Boolean,
     isStarred: Boolean,
@@ -331,11 +447,11 @@ fun FloatingActionsBar(
     modifier: Modifier = Modifier
 ) {
     val containerColor = if (isUnread)
-        MaterialTheme.colorScheme.primary
+        MaterialTheme.colorScheme.primaryContainer
     else
         MaterialTheme.colorScheme.surface
     val contentColor = if (isUnread)
-        MaterialTheme.colorScheme.onPrimary
+        MaterialTheme.colorScheme.onPrimaryContainer
     else
         MaterialTheme.colorScheme.onSurface
 
@@ -349,7 +465,7 @@ fun FloatingActionsBar(
         modifier = modifier,
         colors = colors,
         floatingActionButton = {
-            FloatingToolbarDefaults.StandardFloatingActionButton(onClick = onOpenInBrowserClick) {
+            FloatingToolbarDefaults.VibrantFloatingActionButton(onClick = onOpenInBrowserClick) {
                 OpenInBrowserIcon(browserApplicationIcon, contentDescription = stringResource(R.string.open_article_in_browser))
             }
         },
@@ -380,7 +496,7 @@ fun FloatingActionsBar(
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
-fun PreviewM3ArticleTopActionsBar() {
+fun PreviewArticleTopActionsBar() {
     AppTheme3 {
         ArticleTopActionsBar(
             title = { Text("Article title") },
@@ -397,17 +513,18 @@ fun PreviewM3ArticleTopActionsBar() {
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Preview
 @Composable
-private fun PreviewFloatingActionsBar() {
+private fun PreviewArticleVerticalFloatingToolbar() {
     AppTheme3 {
+        var isUnread by remember { mutableStateOf(true) }
         Box(Modifier.height(400.dp)
             .width(100.dp)
             .background(MaterialTheme.colorScheme.surface)
         ) {
-            FloatingActionsBar(
+            ArticleVerticalFloatingToolbar(
                 browserApplicationIcon = null,
-                isUnread = true,
+                isUnread = isUnread,
                 isStarred = false,
-                onToggleUnreadClick = { },
+                onToggleUnreadClick = { isUnread = !isUnread },
                 onStarredChange = { },
                 onShareClick = { },
                 onOpenInBrowserClick = {},
