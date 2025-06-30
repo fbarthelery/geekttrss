@@ -37,16 +37,20 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -55,9 +59,12 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingToolbarDefaults
+import androidx.compose.material3.FloatingToolbarExitDirection
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -805,7 +812,7 @@ fun ArticleDetailsForSinglePane(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ArticleDetailsForSinglePane(
     article: Article?,
@@ -820,45 +827,45 @@ fun ArticleDetailsForSinglePane(
     articleDetailsScreenState: ArticleDetailsScreenState = rememberArticleDetailsScreenState(),
     articleContent: @Composable (article: Article, contentPadding: PaddingValues) -> Unit
 ) {
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-    val bottomAppBarScrollBehavior = BottomAppBarDefaults.exitAlwaysScrollBehavior()
-
+    val topAppBarScrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val toolbarScrollBehavior = FloatingToolbarDefaults.exitAlwaysScrollBehavior(
+        FloatingToolbarExitDirection.Bottom)
     Scaffold(
         modifier = modifier
-            .nestedScroll(scrollBehavior.nestedScrollConnection)
-//         TODO cause issues in pane or in articles list activity
-            .nestedScroll(bottomAppBarScrollBehavior.nestedScrollConnection),
+            .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection)
+            .nestedScroll(toolbarScrollBehavior),
         topBar = {
-            ArticleFloatingTopAppBar(scrollBehavior = scrollBehavior,
+            ArticleFloatingTopAppBar(scrollBehavior = topAppBarScrollBehavior,
                 onNavigateUpClick = onNavigateUpClick)
         },
-        bottomBar = {
-            ArticleBottomAppBar(isUnread = article?.isTransientUnread == true,
-                isStarred = article?.isStarred == true,
-                floatingActionButton = null,
-                scrollBehavior = bottomAppBarScrollBehavior,
-                onToggleUnreadClick = onToggleUnreadClick,
-                onStarredChange = onStarredChange,
-                onShareClick = onShareClick )
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = onOpenInBrowserClick) {
-                OpenInBrowserIcon(browserIcon, contentDescription = stringResource(R.string.open_article_in_browser))
-            }
-        },
-        floatingActionButtonPosition = FabPosition.EndOverlay
     ) { contentPadding ->
-        article?.let { article ->
-            articleContent(article, contentPadding)
+        Box(Modifier.fillMaxSize()) { // ignore content padding to place toolbar correctly
+            article?.let { article ->
+                articleContent(article, contentPadding)
 
-            LaunchedEffect(articleDetailsScreenState.isAtEndOfArticle) {
-                if (articleDetailsScreenState.isAtEndOfArticle) {
-                    if (articleDetailsScreenState.scrollState.value == 0) {
-                        delay(2000)
+                LaunchedEffect(articleDetailsScreenState.isAtEndOfArticle) {
+                    if (articleDetailsScreenState.isAtEndOfArticle) {
+                        if (articleDetailsScreenState.scrollState.value == 0) {
+                            delay(2000)
+                        }
+                        onEndOfArticleReached()
                     }
-                    onEndOfArticleReached()
                 }
             }
+
+            ArticleHorizontalFloatingToolbar(
+                modifier = Modifier.align(Alignment.BottomCenter)
+                    .windowInsetsPadding(WindowInsets.navigationBars)
+                    .offset(y = -FloatingToolbarDefaults.ScreenOffset),
+                isUnread = article?.isTransientUnread == true,
+                isStarred = article?.isStarred == true,
+                browserApplicationIcon = browserIcon,
+                onOpenInBrowserClick = onOpenInBrowserClick,
+                scrollBehavior = toolbarScrollBehavior,
+                onToggleUnreadClick = onToggleUnreadClick,
+                onStarredChange = onStarredChange,
+                onShareClick = onShareClick)
+
         }
     }
 }
@@ -906,6 +913,7 @@ fun ArticleDetailsForDualPanes(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun ArticleDetailsForDualPanes(
     article: Article?,
@@ -933,7 +941,7 @@ fun ArticleDetailsForDualPanes(
             }
         }
 
-        FloatingActionsBar(
+        ArticleVerticalFloatingToolbar(
             browserApplicationIcon = browserIcon,
             isUnread = article?.isTransientUnread == true,
             isStarred = article?.isStarred ?: false,
@@ -943,9 +951,7 @@ fun ArticleDetailsForDualPanes(
             onOpenInBrowserClick = onOpenInBrowserClick,
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(16.dp)
-                .padding(top = 24.dp)
-//                .offset(x = 32.dp)
+                .offset(x = -FloatingToolbarDefaults.ScreenOffset, y = 40.dp)
         )
     }
 }
