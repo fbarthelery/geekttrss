@@ -23,9 +23,9 @@ package com.geekorum.ttrss.app_reviews
 import android.app.Activity
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.datetime.Clock
 import timber.log.Timber
 import javax.inject.Inject
+import kotlin.time.Clock
 
 
 @HiltViewModel

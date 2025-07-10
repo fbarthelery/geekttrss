@@ -41,6 +41,7 @@ fun Project.conventionForKotlinProject() {
 
     val kotlinCompilerOptions: KotlinCommonCompilerOptions.() -> Unit = {
         freeCompilerArgs = listOf("-Xjvm-default=all")
+        optIn.add("kotlin.time.ExperimentalTime")
     }
 
     plugins.withType<KotlinAndroidPluginWrapper> {

@@ -27,3 +27,4 @@ plugins {
 }
 
 conventionForAndroidProject()
+conventionForKotlinProject()
