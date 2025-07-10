@@ -119,8 +119,8 @@ fun SwipeableArticleCard(
         dismissState.snapTo(SwipeToDismissBoxValue.Settled)
         isInit = true
     }
-    LaunchedEffect(isInit, dismissState.currentValue) {
-        if (isInit && dismissState.currentValue != SwipeToDismissBoxValue.Settled) {
+    LaunchedEffect(isInit, dismissState.settledValue) {
+        if (isInit && dismissState.settledValue != SwipeToDismissBoxValue.Settled) {
             onSwiped()
         }
     }

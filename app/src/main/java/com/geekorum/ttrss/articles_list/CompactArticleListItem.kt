@@ -90,8 +90,8 @@ fun SwipeableCompactArticleListItem(
         swipeToDismissState.snapTo(SwipeToDismissBoxValue.Settled)
         isInit = true
     }
-    LaunchedEffect(isInit, swipeToDismissState.currentValue) {
-        if (isInit && swipeToDismissState.currentValue != SwipeToDismissBoxValue.Settled) {
+    LaunchedEffect(isInit, swipeToDismissState.settledValue) {
+        if (isInit && swipeToDismissState.settledValue != SwipeToDismissBoxValue.Settled) {
             onSwiped()
         }
     }
