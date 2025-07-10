@@ -36,7 +36,7 @@ androidx-hilt-compiler = "1.2.0"
 androidx-hilt-navigation-compose = "1.2.0"
 androidx-hilt-work = "1.2.0"
 androidx-lifecycle = "2.9.1"
-androidx-navigation = "2.9.0"
+androidx-navigation = "2.9.1"
 androidx-paging = "3.3.6"
 androidx-preferences = "1.2.1"
 # stay on 2.6.x until https://issuetracker.google.com/issues/413924560 is fixed
@@ -51,18 +51,18 @@ kotlinx-serialization = "1.8.1"
 dagger = "2.56.2"
 license-gradle-plugin = "0.16.1"
 materialKolor = "2.1.1"
-okio = "3.13.0"
-okhttp = "4.12.0"
+okio = "3.15.0"
+okhttp = "5.0.0"
 play-publisher = "3.12.1"
 protobuf = "4.31.1"
 timber = "5.0.1"
 truth = "1.4.4"
 turbine = "1.2.1"
 mockk = "1.14.4"
-firebase-bom = "33.15.0"
+firebase-bom = "33.16.0"
 google-play-core = "2.1.0"
 google-play-core-review = "2.0.2"
-gms-play-services-base = "18.7.0"
+gms-play-services-base = "18.7.2"
 javax-inject = "1"
 ksoup =  "0.2.4"
 retrofit = "3.0.0"
@@ -80,7 +80,7 @@ uiautomator = "2.3.0"
 android-application = { id = "com.android.application", version.ref = "android-gradle-plugin" }
 android-dynamic-feature = { id = "com.android.dynamic-feature", version.ref = "android-gradle-plugin" }
 androidx-room = { id = "androidx.room", version.ref = "androidx-room" }
-google-gms-google-services = { id = "com.google.gms.google-services", version = "4.4.2" }
+google-gms-google-services = { id = "com.google.gms.google-services", version = "4.4.3" }
 # Use our fork of oss-license-plugin to have reproducible builds
 # Waiting for feedback on https://github.com/google/play-services-plugins/pull/268
 # google-gms-oss-license = { id = "com.google.android.gms.oss-licenses-plugin", version = "0.10.6.1" }
@@ -132,7 +132,7 @@ androidx-compose-animation-graphics = { module = "androidx.compose.animation:ani
 androidx-compose-material-icons-core = { module = "androidx.compose.material:material-icons-core" }
 androidx-compose-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 # alpha for M3 Expressive
-androidx-compose-material3 = { module = "androidx.compose.material3:material3", version="1.4.0-alpha16" }
+androidx-compose-material3 = { module = "androidx.compose.material3:material3", version="1.4.0-alpha17" }
 androidx-compose-material3-window-sizes = { module = "androidx.compose.material3:material3-window-size-class" }
 androidx-compose-runtime-livedata = { module = "androidx.compose.runtime:runtime-livedata" }
 androidx-compose-ui = { module = "androidx.compose.ui:ui" }

@@ -37,7 +37,6 @@ import com.geekorum.ttrss.debugtools.StrictModeInitializer
 import com.geekorum.ttrss.debugtools.withStrictMode
 import com.geekorum.ttrss.settings.SettingsActivity
 import com.geekorum.ttrss.settings.SettingsInitializer
-import okhttp3.internal.toHexString
 import timber.log.Timber
 
 @Keep
@@ -62,6 +61,7 @@ class DefaultNightModeInitializer : Initializer<Unit> {
  *
  * This is used to changes the configuration like [AppCompatDelegate.setDefaultNightMode]
  */
+@OptIn(ExperimentalStdlibApi::class)
 @Composable
 fun WithNightModePreferencesTheme(
     content : @Composable () -> Unit
