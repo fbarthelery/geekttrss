@@ -81,13 +81,9 @@ android {
 
     buildTypes {
         named("release") {
-            postprocessing {
-                isRemoveUnusedCode = true
-//                isRemoveUnusedResources = true
-                isObfuscate = false
-                isOptimizeCode = true
-                proguardFile("proguard-rules.pro")
-            }
+            isMinifyEnabled = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro")
         }
     }
 
