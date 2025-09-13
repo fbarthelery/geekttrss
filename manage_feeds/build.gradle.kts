@@ -137,3 +137,11 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
 
 }
+
+//TODO remove. Force room 2.6.1 for now has 2.7.x has critical bug for us
+// see  https://issuetracker.google.com/issues/413924560
+configurations.all {
+    resolutionStrategy {
+        force("androidx.room:room-runtime:2.6.1")
+    }
+}
