@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Tune
@@ -217,6 +218,7 @@ private fun ManageFeedSection(
 ) {
     Surface(onClick = onItemClick,
         color = Color.Transparent,
+        shape = CircleShape,
         modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
     ) {
         Column(Modifier.animateContentSize()) {
@@ -251,6 +253,8 @@ private fun ManageFeedItem(
     modifier: Modifier = Modifier,
 ) {
     Surface(
+        color = Color.Transparent,
+        shape = CircleShape,
         modifier = modifier
             .height(56.dp)
     ) {
