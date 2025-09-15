@@ -218,11 +218,7 @@ dependencies {
 
     //geekdroid
     implementation(libs.geekdroid)
-    "googleImplementation"(libs.geekdroid.firebase) {
-        // exclude firestore as it is not used in this project and put j2objc-annotation in compileOnly
-        // and it is not supported
-        exclude(group = "com.google.firebase", module = "firebase-firestore-ktx")
-    }
+    "googleImplementation"(libs.geekdroid.firebase)
     implementation(libs.aboutoss.ui.material3)
 
     implementation(project(":htmlparsers"))
@@ -325,7 +321,11 @@ dependencies {
 // see  https://issuetracker.google.com/issues/413924560
 configurations.all {
     resolutionStrategy {
+        force("androidx.room:room-ktx:2.6.1")
         force("androidx.room:room-runtime:2.6.1")
+        force("androidx.room:room-paging:2.6.1")
+        force("androidx.room:room-testing:2.6.1")
+        force("androidx.room:room-compiler:2.6.1")
     }
 }
 
