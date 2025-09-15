@@ -1,6 +1,1 @@
-Ajout d'une option pour afficher les articles dans une liste compacte sur de petits écrans
-Affichage des catégories de flux dans la gestion des flux
-Il est possible de créer des raccourcis pour ouvrir l'application sur un flux spécifique
-Il est possible de désactiver la synchronisation automatique d'un flux
-Refonte de l'interface utilisateur de recherche
 Diverses corrections de bugs et améliorations
