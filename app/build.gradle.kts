@@ -52,7 +52,7 @@ buildscript {
 androidComponents {
     val major = 1
     val minor = 6
-    val patch = 8
+    val patch = 9
     configureVersionChangeset(project, major, minor, patch)
 }
 
