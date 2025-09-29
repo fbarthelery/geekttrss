@@ -18,7 +18,8 @@
 # along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
 #
 [versions]
-android-gradle-plugin = "8.13.0"
+# stay on 8.11.1 until https://issuetracker.google.com/issues/438515318 is fixed
+android-gradle-plugin = "8.11.1"
 accompanist = "0.37.3"
 android-desugar-jdk = "2.1.5"
 androidx-annotation = "1.9.1"
