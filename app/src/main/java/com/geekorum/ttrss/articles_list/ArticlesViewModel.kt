@@ -22,6 +22,7 @@ package com.geekorum.ttrss.articles_list
 
 import android.accounts.Account
 import androidx.core.text.parseAsHtml
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
@@ -253,10 +254,11 @@ abstract class BaseArticlesViewModel(
 @HiltViewModel(assistedFactory = ArticlesListViewModel.Factory::class)
 class ArticlesListViewModel @AssistedInject constructor(
     @Assisted val feedId: Long,
+    private val state: SavedStateHandle,
     feedsRepository: FeedsRepository,
     private val backgroundJobManager: BackgroundJobManager,
     componentFactory: SessionActivityComponent.Factory
-) : BaseArticlesViewModel(componentFactory) {
+) : BaseArticlesViewModel(state, componentFactory) {
 
     @AssistedFactory
     interface Factory {
@@ -326,9 +328,10 @@ class ArticlesListViewModel @AssistedInject constructor(
 @HiltViewModel(assistedFactory = ArticlesListByTagViewModel.Factory::class)
 class ArticlesListByTagViewModel @AssistedInject constructor(
     @Assisted val tag: String,
+    private val state: SavedStateHandle,
     private val backgroundJobManager: BackgroundJobManager,
     componentFactory: SessionActivityComponent.Factory
-) : BaseArticlesViewModel(componentFactory) {
+) : BaseArticlesViewModel(state, componentFactory) {
 
     @AssistedFactory
     interface Factory {
@@ -339,10 +342,9 @@ class ArticlesListByTagViewModel @AssistedInject constructor(
 
     private val account: Account = component.account
 
-    override val articles: Flow<PagingData<ArticleWithFeed>> = tag
-        .flatMapLatest {
-            getArticlesForTag(it)
-        }.map(::prepareArticlePagingData)
+    override val articles: Flow<PagingData<ArticleWithFeed>> =
+        getArticlesForTag(tag)
+        .map(::prepareArticlePagingData)
         .cachedIn(viewModelScope)
 
     override val isRefreshing = isSyncActiveFlow(account, ArticlesContract.AUTHORITY)
@@ -366,10 +368,6 @@ class ArticlesListByTagViewModel @AssistedInject constructor(
             }
             pager.flow
         }
-    }
-
-    companion object {
-        private const val STATE_TAG = "tag"
     }
 
 }
