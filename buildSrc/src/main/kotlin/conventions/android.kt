@@ -20,26 +20,27 @@
  */
 package com.geekorum.build.conventions
 
+import com.android.build.api.dsl.CommonExtension
 import com.android.build.gradle.BaseExtension
-import com.geekorum.build.configureAnnotationProcessorDeps
-import com.geekorum.build.createComponentsPlatforms
 import org.gradle.api.Project
-import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.findByType
+
+const val ANDROID_COMPILE_SDK = 36
+const val ANDROID_MIN_SDK = 28
 
 fun Project.conventionForAndroidProject() {
     conventionForKotlinProject()
 
-    dependencies {
-        createComponentsPlatforms()
+    // new AGP 9 built-in kotlin use these configuration
+    extensions.findByType<CommonExtension>()?.apply {
+        compileSdk = ANDROID_COMPILE_SDK
+        defaultConfig.minSdk = ANDROID_MIN_SDK
     }
-    configureAnnotationProcessorDeps()
-
 
     extensions.findByType<BaseExtension>()?.apply {
-        setCompileSdkVersion(36)
+        setCompileSdkVersion(ANDROID_COMPILE_SDK)
         defaultConfig {
-            minSdk = 28
+            minSdk = ANDROID_MIN_SDK
         }
     }
 }

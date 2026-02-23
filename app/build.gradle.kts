@@ -28,7 +28,7 @@ import com.google.protobuf.gradle.id
 plugins {
     id("com.geekorum.build.conventions.android-application")
     alias(libs.plugins.kotlin.ksp)
-    alias(libs.plugins.com.geekorum.gms.oss.license)
+    alias(libs.plugins.google.gms.oss.license)
     id("com.geekorum.build.android-tests")
     id("com.geekorum.build.android-avdl")
     alias(libs.plugins.compose.compiler)

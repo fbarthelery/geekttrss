@@ -39,8 +39,6 @@ androidx-lifecycle = "2.10.0"
 androidx-navigation = "2.9.7"
 androidx-paging = "3.4.1"
 androidx-preferences = "1.2.1"
-# stay on 2.6.x until https://issuetracker.google.com/issues/413924560 is fixed
-# kotlin 2.2.0 requires an update to room
 androidx-room = "2.8.4"
 androidx-startup = "1.2.0"
 # stay on 2.10.x until room update to >=2.7.x
@@ -50,15 +48,13 @@ avdl = "0.0.4"
 kotlinx-coroutines = "1.10.2"
 kotlinx-datetime = "0.7.1"
 kotlinx-serialization = "1.10.0"
-dagger = "2.58"
+dagger = "2.59.2"
 license-gradle-plugin = "0.16.1"
 materialKolor = "4.1.1"
 okio = "3.16.4"
 okhttp = "5.3.2"
 play-publisher = "3.12.2"
-# downgrade protobuf to 4.26.1 because of conflict with firebase
-# https://github.com/firebase/firebase-android-sdk/issues/5997
-protobuf = "4.26.1"
+protobuf = "4.33.5"
 timber = "5.0.1"
 truth = "1.4.5"
 turbine = "1.2.1"
@@ -87,7 +83,7 @@ androidx-room = { id = "androidx.room", version.ref = "androidx-room" }
 google-gms-google-services = { id = "com.google.gms.google-services", version = "4.4.4" }
 # Use our fork of oss-license-plugin to have reproducible builds
 # Waiting for feedback on https://github.com/google/play-services-plugins/pull/268
-# google-gms-oss-license = { id = "com.google.android.gms.oss-licenses-plugin", version = "0.10.6.1" }
+google-gms-oss-license = { id = "com.google.android.gms.oss-licenses-plugin", version = "0.10.10" }
 com-geekorum-gms-oss-license = { id = "com.geekorum.gms.oss-licenses-plugin", version = "0.10.6" }
 com-geekorum-avdl-flydroid = { id = "com.geekorum.gradle.avdl.providers.flydroid", version.ref = "avdl" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version = "3.0.6" }
