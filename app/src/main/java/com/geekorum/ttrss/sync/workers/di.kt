@@ -30,6 +30,7 @@ import com.geekorum.ttrss.accounts.PerAccount
 import com.geekorum.ttrss.accounts.ServerInformation
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.network.ApiService
+import com.geekorum.ttrss.network.TinyrssApiModule
 import com.geekorum.ttrss.sync.DatabaseService
 import com.geekorum.ttrss.sync.FeedIconApiDownloader
 import com.geekorum.ttrss.sync.FeedIconSynchronizer
@@ -47,7 +48,8 @@ import okhttp3.OkHttpClient
 abstract class WorkersModule
 
 @Subcomponent(modules = [
-    NetworkLoginModule::class
+    NetworkLoginModule::class,
+    TinyrssApiModule::class,
 ])
 @PerAccount
 interface SyncWorkerComponent {

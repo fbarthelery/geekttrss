@@ -31,6 +31,7 @@ import com.geekorum.ttrss.accounts.PerAccount
 import com.geekorum.ttrss.articles_list.ArticlesRepository
 import com.geekorum.ttrss.articles_list.SetArticleFieldAction
 import com.geekorum.ttrss.network.ApiService
+import com.geekorum.ttrss.network.TinyrssApiModule
 import dagger.Module
 import dagger.Provides
 import dagger.Subcomponent
@@ -64,7 +65,8 @@ object AccountSelectorModule {
 
 @Subcomponent(modules = [
     NetworkLoginModule::class,
-    SessionAccountModule::class
+    SessionAccountModule::class,
+    TinyrssApiModule::class,
 ])
 @PerAccount
 interface SessionActivityComponent {

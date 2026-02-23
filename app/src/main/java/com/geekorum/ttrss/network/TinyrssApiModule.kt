@@ -29,6 +29,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import dagger.hilt.migration.DisableInstallInCheck
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -40,7 +41,7 @@ import java.util.*
  * This module provides an [ApiService] to access a TinyRss server
  */
 @Module
-@InstallIn(SingletonComponent::class)
+@DisableInstallInCheck
 abstract class TinyrssApiModule {
     @BindsOptionalOf
     abstract fun bindLoggedRequestInterceptorFactory(): LoggedRequestInterceptorFactory
