@@ -20,8 +20,9 @@
  */
 package com.geekorum.build
 
+import com.android.build.api.dsl.ApplicationExtension
 import com.android.build.api.dsl.CommonExtension
-import com.android.build.api.dsl.DefaultConfig
+import com.android.build.api.dsl.LibraryExtension
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.DependencyConstraint
@@ -35,22 +36,32 @@ const val androidxTestRunnerVersion = "1.6.2"
 const val androidxTestCoreVersion = "1.6.1"
 const val robolectricVersion = "4.14.1"
 
-private typealias BaseExtension = CommonExtension<*, *, DefaultConfig, *, *, *>
 
 /*
  * Configuration for espresso and robolectric usage in an Android project
  */
 internal fun Project.configureTests() {
-    extensions.configure<BaseExtension>("android") {
-        defaultConfig {
-            testInstrumentationRunner = "com.geekorum.ttrss.HiltRunner"
-            testInstrumentationRunnerArguments += mapOf(
-                "clearPackageData" to "true",
-                "disableAnalytics" to "true"
-            )
+    extensions.configure<CommonExtension>("android") {
+        if (this is ApplicationExtension) {
+            defaultConfig {
+                testInstrumentationRunner = "com.geekorum.ttrss.HiltRunner"
+                testInstrumentationRunnerArguments += mapOf(
+                    "clearPackageData" to "true",
+                    "disableAnalytics" to "true"
+                )
+            }
+        }
+        if (this is LibraryExtension) {
+            defaultConfig {
+                testInstrumentationRunner = "com.geekorum.ttrss.HiltRunner"
+                testInstrumentationRunnerArguments += mapOf(
+                    "clearPackageData" to "true",
+                    "disableAnalytics" to "true"
+                )
+            }
         }
 
-        testOptions {
+        testOptions.apply {
             execution = "ANDROIDX_TEST_ORCHESTRATOR"
             animationsDisabled = true
 
@@ -81,7 +92,7 @@ internal fun Project.configureTests() {
         dualTestImplementation("androidx.test.espresso:espresso-intents:$espressoVersion")
 
         // assertions
-        dualTestImplementation("com.google.truth:truth:1.1.3")
+        dualTestImplementation("com.google.truth:truth:1.4.4")
         dualTestImplementation("androidx.test.ext:truth:1.6.0")
 
         // mock
