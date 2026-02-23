@@ -41,10 +41,10 @@ androidx-paging = "3.3.6"
 androidx-preferences = "1.2.1"
 # stay on 2.6.x until https://issuetracker.google.com/issues/413924560 is fixed
 # kotlin 2.2.0 requires an update to room
-androidx-room = "2.7.2"
+androidx-room = "2.8.4"
 androidx-startup = "1.2.0"
 # stay on 2.10.x until room update to >=2.7.x
-androidx-work = "2.10.5"
+androidx-work = "2.11.1"
 android-material = "1.13.0"
 avdl = "0.0.4"
 kotlinx-coroutines = "1.10.2"
@@ -75,8 +75,8 @@ leakcanary = "2.14"
 coil = "2.7.0"
 geekdroid = "geekttrss-1.6.8"
 aboutoss = "0.2.2"
-kotlin = "2.2.0"
-kotlin-ksp = "2.2.0-2.0.2"
+kotlin = "2.3.10"
+kotlin-ksp = "2.3.5"
 uiautomator = "2.3.0"
 
 [plugins]

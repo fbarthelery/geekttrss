@@ -114,6 +114,7 @@ class MagazineViewModel @Inject constructor (
 
     private suspend fun getUnreadArticlesIds(): List<Long> {
         //TODO once room issue with RANDOM() is fixed return to previous implementation
+        // see  https://issuetracker.google.com/issues/413924560
 //        return articlesRepository.getUnreadArticlesRandomized(10)
         return articlesRepository.getUnreadArticles(10)
             .map { (article, _) -> article.id }

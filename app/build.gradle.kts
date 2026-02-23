@@ -23,9 +23,7 @@ import com.geekorum.build.configureVersionChangeset
 import com.geekorum.build.dualTestImplementation
 import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
 import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsPlugin
-import com.google.protobuf.gradle.GenerateProtoTask
 import com.google.protobuf.gradle.id
-import org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompileTool
 
 plugins {
     id("com.geekorum.build.conventions.android-application")
@@ -300,18 +298,6 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
 
     coreLibraryDesugaring(libs.android.desugar.jdk)
-}
-
-//TODO remove. Force room 2.6.1 for now has 2.7.x has critical bug for us
-// see  https://issuetracker.google.com/issues/413924560
-configurations.all {
-    resolutionStrategy {
-        force("androidx.room:room-ktx:2.6.1")
-        force("androidx.room:room-runtime:2.6.1")
-        force("androidx.room:room-paging:2.6.1")
-        force("androidx.room:room-testing:2.6.1")
-        force("androidx.room:room-compiler:2.6.1")
-    }
 }
 
 apply {
