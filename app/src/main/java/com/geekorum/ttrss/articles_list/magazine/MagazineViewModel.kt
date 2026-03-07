@@ -21,10 +21,13 @@
 package com.geekorum.ttrss.articles_list.magazine
 
 import androidx.core.text.parseAsHtml
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.*
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import androidx.paging.map
 import com.geekorum.geekdroid.accounts.isSyncActiveFlow
 import com.geekorum.ttrss.articles_list.FeedsRepository
 import com.geekorum.ttrss.background_job.BackgroundJobManager
@@ -34,7 +37,13 @@ import com.geekorum.ttrss.session.SessionActivityComponent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -44,6 +53,7 @@ import javax.inject.Inject
 class MagazineViewModel @Inject constructor (
     private val backgroundJobManager: BackgroundJobManager,
     private val feedsRepository: FeedsRepository,
+    private val magazineSelectionStrategy: MagazineSelectionStrategy,
     componentFactory: SessionActivityComponent.Factory
 ): ViewModel() {
     private val component = componentFactory.newComponent()
@@ -52,13 +62,6 @@ class MagazineViewModel @Inject constructor (
 
     private val articlesRepository = component.articleRepository
     private val setFieldActionFactory = component.setArticleFieldActionFactory
-
-    private val articleIds = flow {
-        val ids = (getRecentArticlesIds() + getUnreadArticlesIds())
-            .distinct()
-            .take(20)
-        emit(ids)
-    }
 
     private val getNewMagazineChannel = Channel<Unit>(Channel.CONFLATED)
     private val refreshMagazine = getNewMagazineChannel.receiveAsFlow()
@@ -72,52 +75,18 @@ class MagazineViewModel @Inject constructor (
 
     val articles: Flow<PagingData<ArticleWithFeed>> = refreshMagazine.flatMapLatest {
         Timber.i("Get new magazine articles")
-        articleIds.flatMapLatest { ids ->
-            val config = PagingConfig(pageSize = 20)
-            val pager = Pager(config) {
-                articlesRepository.getArticlesById(ids)
-            }
-            pager.flow
+        val articleIds = magazineSelectionStrategy.getArticlesIds()
+        val config = PagingConfig(pageSize = 20)
+        val pager = Pager(config) {
+            articlesRepository.getArticlesById(articleIds)
         }
+        pager.flow
     }.map(::prepareArticlePagingData)
         .cachedIn(viewModelScope)
-
-    private val recentUnreadArticleIds = flow {
-        val freshTimeSec = System.currentTimeMillis() / 1000 - 3600 * 36
-        val articlesByFeed = getRecentFeedIds().map { feedId ->
-            //TODO once room issue with RANDOM() is fixed return to previous implementation
-//            articlesRepository.getAllUnreadArticlesForFeedUpdatedAfterTimeRandomized(feedId, freshTimeSec)
-            articlesRepository.getAllUnreadArticlesForFeedUpdatedAfterTime(feedId, freshTimeSec)
-        }.filter {
-            it.isNotEmpty()
-        }
-
-        val maxArticlesByFeed = articlesByFeed.maxOfOrNull { it.size } ?: 0
-        for (i in 0 until maxArticlesByFeed) {
-            for (articles in articlesByFeed) {
-                articles.getOrNull(i)?.let {
-                    emit(it.id)
-                }
-            }
-        }
-    }
-
-    private suspend fun getRecentArticlesIds(): List<Long> {
-        return recentUnreadArticleIds.take(15).toList()
-    }
-
 
     private suspend fun getRecentFeedIds(): List<Long> {
         return feedsRepository.allFeeds.map { feeds -> feeds.map { it.feed.id } }
             .firstOrNull()?.shuffled() ?: emptyList()
-    }
-
-    private suspend fun getUnreadArticlesIds(): List<Long> {
-        //TODO once room issue with RANDOM() is fixed return to previous implementation
-        // see  https://issuetracker.google.com/issues/413924560
-//        return articlesRepository.getUnreadArticlesRandomized(10)
-        return articlesRepository.getUnreadArticles(10)
-            .map { (article, _) -> article.id }
     }
 
     fun setArticleUnread(articleId: Long, newValue: Boolean) {
