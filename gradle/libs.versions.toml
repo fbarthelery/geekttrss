@@ -18,7 +18,7 @@
 # along with Geekttrss.  If not, see <http://www.gnu.org/licenses/>.
 #
 [versions]
-android-gradle-plugin = "9.0.1"
+android-gradle-plugin = "9.1.0"
 accompanist = "0.37.3"
 android-desugar-jdk = "2.1.5"
 androidx-annotation = "1.9.1"
@@ -53,7 +53,7 @@ license-gradle-plugin = "0.16.1"
 materialKolor = "4.1.1"
 okio = "3.16.4"
 okhttp = "5.3.2"
-play-publisher = "3.12.2"
+play-publisher = "4.0.0"
 protobuf = "4.33.5"
 timber = "5.0.1"
 truth = "1.4.5"
