@@ -38,11 +38,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Surface
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
-import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
-import androidx.compose.material3.windowsizeclass.WindowSizeClass
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -64,6 +62,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
+import androidx.window.core.layout.WindowSizeClass
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.articles_list.ActivityViewModel
 import com.geekorum.ttrss.articles_list.ArticleCard
@@ -80,9 +79,9 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun MagazineScreen(
-    windowSizeClass: WindowSizeClass,
     activityViewModel: ActivityViewModel,
     magazineViewModel: MagazineViewModel = hiltViewModel(),
+    windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     val viewLifecycleOwner = LocalLifecycleOwner.current
@@ -103,8 +102,8 @@ fun MagazineScreen(
 
         val compactItemsInSmallScreens by activityViewModel.displayCompactItems.collectAsStateWithLifecycle()
         val displayCompactItems = compactItemsInSmallScreens
-                && (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact ||
-                        windowSizeClass.heightSizeClass == WindowHeightSizeClass.Compact)
+                && (!windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND) ||
+                !windowSizeClass.isHeightAtLeastBreakpoint(WindowSizeClass.HEIGHT_DP_MEDIUM_LOWER_BOUND))
 
         ArticlesMagazine(
             viewModel = magazineViewModel,

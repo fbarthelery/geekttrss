@@ -34,9 +34,7 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.*
-import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.WindowSizeClass
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -49,6 +47,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.window.core.layout.WindowSizeClass
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.ui.AppTheme3
 import com.geekorum.ttrss.ui.components.rememberWindowInsetsController
@@ -57,8 +56,8 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun ArticlesListScaffold(
-    windowSizeClass: WindowSizeClass,
     modifier: Modifier = Modifier,
+    windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass,
     drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     undoUnreadSnackbarHostState: UndoUnreadSnackbarHostState = remember { UndoUnreadSnackbarHostState() },
@@ -74,7 +73,7 @@ fun ArticlesListScaffold(
         drawerState = drawerState,
         snackbarHostState = snackbarHostState,
         undoUnreadSnackbarHostState = undoUnreadSnackbarHostState,
-        hasPermanentDrawer = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded,
+        hasPermanentDrawer = windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND),
         drawerGesturesEnabled = drawerGesturesEnabled,
         topBar = topBar,
         navigationMenu = navigationMenu,
@@ -309,150 +308,142 @@ private fun ContentWithBottomBanner(
     }
 }
 
-@OptIn(ExperimentalMaterial3WindowSizeClassApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Composable
 fun PreviewArticlesListScaffoldPhone() {
-    BoxWithConstraints {
-        val windowSizeClass = WindowSizeClass.calculateFromSize(DpSize(maxWidth, maxHeight) )
-        AppTheme3 {
-            val snackbarHostState = remember { SnackbarHostState() }
-            val undoUnreadSnackbarHostState = remember { UndoUnreadSnackbarHostState() }
-            val drawerState = rememberDrawerState(DrawerValue.Closed)
-            val coroutineScope = rememberCoroutineScope()
-            var showBanner by remember { mutableStateOf(false) }
+    AppTheme3 {
+        val snackbarHostState = remember { SnackbarHostState() }
+        val undoUnreadSnackbarHostState = remember { UndoUnreadSnackbarHostState() }
+        val drawerState = rememberDrawerState(DrawerValue.Closed)
+        val coroutineScope = rememberCoroutineScope()
+        var showBanner by remember { mutableStateOf(false) }
 
-            ArticlesListScaffold(
-                windowSizeClass = windowSizeClass,
-                snackbarHostState = snackbarHostState,
-                undoUnreadSnackbarHostState = undoUnreadSnackbarHostState,
-                drawerState = drawerState,
-                topBar = {
-                    TopAppBar(
-                        title = { Text("Magazine") },
-                        navigationIcon = {
-                            IconButton(
-                                onClick = {
-                                    coroutineScope.launch {
-                                        drawerState.open()
-                                    }
-                                }) {
-                                Icon(Icons.Default.Menu, contentDescription = null)
-                            }
+        ArticlesListScaffold(
+            snackbarHostState = snackbarHostState,
+            undoUnreadSnackbarHostState = undoUnreadSnackbarHostState,
+            drawerState = drawerState,
+            topBar = {
+                TopAppBar(
+                    title = { Text("Magazine") },
+                    navigationIcon = {
+                        IconButton(
+                            onClick = {
+                                coroutineScope.launch {
+                                    drawerState.open()
+                                }
+                            }) {
+                            Icon(Icons.Default.Menu, contentDescription = null)
                         }
-                    )
-                },
-                navigationMenu = {
-                    FeedListNavigationMenu(
-                        user = "user",
-                        server = "server",
-                        feedSection = {},
-                        manageFeedsSection = {
-                            NavigationItem(
-                                stringResource(R.string.title_manage_feeds),
-                                selected = false,
-                                onClick = {},
-                                icon = {
-                                    Icon(AppTheme3.Icons.Tune, contentDescription = null)
-                                },
-                            )
-                        },
-                        onSettingsClicked = { })
-                },
-                floatingActionButton = {
-                    FloatingActionButton(onClick = {
-                        showBanner = !showBanner
-                    }) {
-                        Icon(
-                            AppTheme3.Icons.Refresh,
-                            contentDescription = "refresh"
+                    }
+                )
+            },
+            navigationMenu = {
+                FeedListNavigationMenu(
+                    user = "user",
+                    server = "server",
+                    feedSection = {},
+                    manageFeedsSection = {
+                        NavigationItem(
+                            stringResource(R.string.title_manage_feeds),
+                            selected = false,
+                            onClick = {},
+                            icon = {
+                                Icon(AppTheme3.Icons.Tune, contentDescription = null)
+                            },
                         )
+                    },
+                    onSettingsClicked = { })
+            },
+            floatingActionButton = {
+                FloatingActionButton(onClick = {
+                    showBanner = !showBanner
+                }) {
+                    Icon(
+                        AppTheme3.Icons.Refresh,
+                        contentDescription = "refresh"
+                    )
+                }
+            },
+            bannerContent = {
+                SampleBanner(showBanner)
+            },
+            content = { contentPadding ->
+                val items = List(100) { "Item $it" }
+                LazyColumn(Modifier.fillMaxSize(), contentPadding = contentPadding ) {
+                    items(items) {
+                        Text(it)
                     }
-                },
-                bannerContent = {
-                    SampleBanner(showBanner)
-                },
-                content = { contentPadding ->
-                    val items = List(100) { "Item $it" }
-                    LazyColumn(Modifier.fillMaxSize(), contentPadding = contentPadding ) {
-                        items(items) {
-                            Text(it)
-                        }
-                    }
-                },
-            )
-        }
+                }
+            },
+        )
     }
 }
 
-@OptIn(ExperimentalMaterial3WindowSizeClassApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview(device = "spec:width=1280dp,height=800dp,dpi=240")
 @Composable
 fun PreviewArticlesListScaffoldTablet() {
-    BoxWithConstraints {
-        val windowSizeClass = WindowSizeClass.calculateFromSize(DpSize(maxWidth, maxHeight) )
-        AppTheme3 {
-            val snackbarHostState = remember { SnackbarHostState() }
-            val drawerState = rememberDrawerState(DrawerValue.Closed)
+    AppTheme3 {
+        val snackbarHostState = remember { SnackbarHostState() }
+        val drawerState = rememberDrawerState(DrawerValue.Closed)
 
-            var showBanner by remember { mutableStateOf(false) }
+        var showBanner by remember { mutableStateOf(false) }
 
-            ArticlesListScaffold(
-                windowSizeClass = windowSizeClass,
-                drawerState = drawerState,
-                snackbarHostState = snackbarHostState,
-                topBar = {
-                    TopAppBar(
-                        title = { Text("Magazine") },
-                    )
-                },
-                navigationMenu = {
-                    FeedListNavigationMenu(
-                        user = "user",
-                        server = "server",
-                        fab = {
-                            ExtendedFloatingActionButton(
-                                text = { Text(stringResource(R.string.btn_refresh)) },
-                                icon = { Icon(Icons.Default.Refresh, contentDescription = null) },
-                                onClick = {}
-                            )
-                        },
-                        feedSection = { },
-                        manageFeedsSection = {
-                            NavigationItem(
-                                stringResource(R.string.title_manage_feeds),
-                                selected = false,
-                                onClick = {},
-                                icon = {
-                                    Icon(AppTheme3.Icons.Tune, contentDescription = null)
-                                },
-                            )
-                        },
-                        onSettingsClicked = {})
-                },
-                floatingActionButton = {
-                    FloatingActionButton(onClick = {
-                        showBanner = !showBanner
-                    }) {
-                        Icon(
-                            AppTheme3.Icons.Refresh,
-                            contentDescription = "refresh"
+        ArticlesListScaffold(
+            drawerState = drawerState,
+            snackbarHostState = snackbarHostState,
+            topBar = {
+                TopAppBar(
+                    title = { Text("Magazine") },
+                )
+            },
+            navigationMenu = {
+                FeedListNavigationMenu(
+                    user = "user",
+                    server = "server",
+                    fab = {
+                        ExtendedFloatingActionButton(
+                            text = { Text(stringResource(R.string.btn_refresh)) },
+                            icon = { Icon(Icons.Default.Refresh, contentDescription = null) },
+                            onClick = {}
                         )
+                    },
+                    feedSection = { },
+                    manageFeedsSection = {
+                        NavigationItem(
+                            stringResource(R.string.title_manage_feeds),
+                            selected = false,
+                            onClick = {},
+                            icon = {
+                                Icon(AppTheme3.Icons.Tune, contentDescription = null)
+                            },
+                        )
+                    },
+                    onSettingsClicked = {})
+            },
+            floatingActionButton = {
+                FloatingActionButton(onClick = {
+                    showBanner = !showBanner
+                }) {
+                    Icon(
+                        AppTheme3.Icons.Refresh,
+                        contentDescription = "refresh"
+                    )
+                }
+            },
+            bannerContent = {
+                SampleBanner(showBanner = showBanner)
+            },
+            content = { contentPadding ->
+                val items = List(100) { "Item $it" }
+                LazyColumn(Modifier.fillMaxSize(), contentPadding = contentPadding ) {
+                    items(items) {
+                        Text(it)
                     }
-                },
-                bannerContent = {
-                    SampleBanner(showBanner = showBanner)
-                },
-                content = { contentPadding ->
-                    val items = List(100) { "Item $it" }
-                    LazyColumn(Modifier.fillMaxSize(), contentPadding = contentPadding ) {
-                        items(items) {
-                            Text(it)
-                        }
-                    }
-                },
-            )
-        }
+                }
+            },
+        )
     }
 }
 

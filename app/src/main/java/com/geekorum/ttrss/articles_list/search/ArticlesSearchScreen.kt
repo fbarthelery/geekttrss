@@ -34,9 +34,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
-import androidx.compose.material3.windowsizeclass.WindowSizeClass
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,6 +50,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
+import androidx.window.core.layout.WindowSizeClass
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.articles_list.ActivityViewModel
 import com.geekorum.ttrss.articles_list.ArticleCard
@@ -216,16 +215,16 @@ private fun ArticleItem(
 @Composable
 fun ArticlesSearchScreen(
     query: String,
-    windowSizeClass: WindowSizeClass,
     activityViewModel: ActivityViewModel,
     searchViewModel: SearchViewModel = hiltViewModel{ factory: SearchViewModel.Factory ->
         factory.create(query)
     },
+    windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass,
 ) {
     val compactItemsInSmallScreens by activityViewModel.displayCompactItems.collectAsStateWithLifecycle()
     val displayCompactItems = compactItemsInSmallScreens
-            && (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact ||
-            windowSizeClass.heightSizeClass == WindowHeightSizeClass.Compact)
+            && (!windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND) ||
+            !windowSizeClass.isHeightAtLeastBreakpoint(WindowSizeClass.HEIGHT_DP_MEDIUM_LOWER_BOUND))
 
     val browserApplicationIcon by activityViewModel.browserIcon.collectAsStateWithLifecycle()
     Surface(Modifier.fillMaxSize()) {

@@ -25,9 +25,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Surface
-import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
-import androidx.compose.material3.windowsizeclass.WindowSizeClass
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.window.core.layout.WindowSizeClass
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.share.createShareArticleIntent
@@ -56,8 +55,9 @@ fun ArticlesListScreen(
 ) {
     val compactItemsInSmallScreens by activityViewModel.displayCompactItems.collectAsStateWithLifecycle()
     val displayCompactItems = compactItemsInSmallScreens
-            && (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact ||
-            windowSizeClass.heightSizeClass == WindowHeightSizeClass.Compact)
+            && (!windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND) ||
+            !windowSizeClass.isHeightAtLeastBreakpoint(WindowSizeClass.HEIGHT_DP_MEDIUM_LOWER_BOUND))
+
 
     BaseArticlesListScreen(activityViewModel = activityViewModel, articlesListViewModel,
         displayCompactItems, contentPadding)
@@ -66,17 +66,17 @@ fun ArticlesListScreen(
 @Composable
 fun ArticlesListByTagScreen(
     tag: String,
-    windowSizeClass: WindowSizeClass,
     activityViewModel: ActivityViewModel,
     articlesListByTagViewModel: ArticlesListByTagViewModel = hiltViewModel { factory: ArticlesListByTagViewModel.Factory ->
         factory.create(tag)
     },
+    windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     val compactItemsInSmallScreens by activityViewModel.displayCompactItems.collectAsStateWithLifecycle()
     val displayCompactItems = compactItemsInSmallScreens
-            && (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact ||
-            windowSizeClass.heightSizeClass == WindowHeightSizeClass.Compact)
+            && (!windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND) ||
+            !windowSizeClass.isHeightAtLeastBreakpoint(WindowSizeClass.HEIGHT_DP_MEDIUM_LOWER_BOUND))
 
     BaseArticlesListScreen(activityViewModel = activityViewModel, articlesListByTagViewModel,
         displayCompactItems, contentPadding)

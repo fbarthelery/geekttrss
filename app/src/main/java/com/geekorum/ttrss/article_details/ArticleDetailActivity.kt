@@ -27,8 +27,6 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.remember
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModelProvider
@@ -38,8 +36,6 @@ import com.geekorum.ttrss.articles_list.ArticleListActivity
 import com.geekorum.ttrss.data.Article
 import com.geekorum.ttrss.session.SessionActivity
 import com.geekorum.ttrss.ui.AppTheme3
-import com.geekorum.ttrss.ui.component1
-import com.geekorum.ttrss.ui.component2
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.AndroidEntryPoint
@@ -58,7 +54,6 @@ class ArticleDetailActivity : SessionActivity() {
 
     private lateinit var articleDetailsViewModel: ArticleDetailsViewModel
 
-    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     public override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -77,8 +72,6 @@ class ArticleDetailActivity : SessionActivity() {
 
         setContent {
             AppTheme3 {
-                val (widthSizeClass, heightSizeClass) = calculateWindowSizeClass(this)
-
                 val webViewClientFactory =  remember {
                     EntryPointAccessors.fromActivity<ArticleDetailsEntryPoint>(this)
                         .articleDetailsWebViewClientFactory
@@ -88,8 +81,6 @@ class ArticleDetailActivity : SessionActivity() {
                         onPageFinishedCallback = { _, _ ->})
                 }
                 ArticleDetailsScreen(articleDetailsViewModel,
-                    widthSizeClass = widthSizeClass,
-                    heightSizeClass = heightSizeClass,
                     webViewClient = webViewClient,
                     onNavigateUpClick = {
                         // if we are on application backstack we can just call onBackPressed or finish the activity

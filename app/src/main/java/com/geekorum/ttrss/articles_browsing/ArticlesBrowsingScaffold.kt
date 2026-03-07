@@ -41,21 +41,20 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.WideNavigationRailState
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.rememberWideNavigationRailState
-import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
-import androidx.compose.material3.windowsizeclass.WindowSizeClass
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ExperimentalComposeRuntimeApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.window.core.layout.WindowSizeClass
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.ui.AppTheme3
@@ -74,16 +73,17 @@ import kotlinx.coroutines.launch
 @Composable
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 fun ArticleBrowsingScaffold(
-    windowSizeClass: WindowSizeClass,
     feedsMenuState: FeedNavigationMenuState,
     onMagazineClick: () -> Unit,
     onFeedClick: (Feed) -> Unit,
     onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier,
+    windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass,
     content: @Composable () -> Unit
 ) {
-    ArticleBrowsingScaffold(windowSizeClass,
+    ArticleBrowsingScaffold(
         modifier = modifier,
+        windowSizeClass = windowSizeClass,
         railState = feedsMenuState.railState,
         railHeader = { isInDrawer ->
             Column {
@@ -163,8 +163,8 @@ fun ArticleBrowsingScaffold(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalComposeRuntimeApi::class)
 @Composable
 fun ArticleBrowsingScaffold(
-    windowSizeClass: WindowSizeClass,
     modifier: Modifier = Modifier,
+    windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass,
     railState: WideNavigationRailState = rememberWideNavigationRailState(),
     railHeader: @Composable ((isInDrawer: Boolean) -> Unit)?,
     railQuickFeeds: @Composable (() -> Unit),
@@ -172,9 +172,10 @@ fun ArticleBrowsingScaffold(
     railSettingsSection: @Composable (() -> Unit),
     content: @Composable () -> Unit
 ) {
-    val compact = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact || windowSizeClass.heightSizeClass == WindowHeightSizeClass.Compact
-    val medium = windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Medium
-    val expanded = windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Expanded
+    val compact = !(windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND) &&
+            windowSizeClass.isHeightAtLeastBreakpoint(WindowSizeClass.HEIGHT_DP_MEDIUM_LOWER_BOUND))
+    val medium = windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
+    val expanded = windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND)
 
     when {
         // check compact first because we want it based on height
@@ -299,64 +300,60 @@ private fun ExpandedArticleBrowsingScaffold(
 }
 
 
-@OptIn(ExperimentalMaterial3WindowSizeClassApi::class, ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @PreviewScreenSizes
 @Composable
 private fun PreviewArticleBrowsingScaffold() {
-    BoxWithConstraints {
-        val windowSizeClass = WindowSizeClass.calculateFromSize(DpSize(maxWidth, maxHeight))
-        AppTheme3 {
-            val coroutineScope = rememberCoroutineScope()
-            val railState = rememberWideNavigationRailState()
-            ArticleBrowsingScaffold(
-                railState = railState,
-                windowSizeClass = windowSizeClass,
-                railHeader = {
-                    IconButton(
-                        modifier = Modifier.padding(start = 24.dp),
-                        onClick = {
-                            coroutineScope.launch {
-                                railState.toggle()
-                            }
-                        }) {
-                        Icon(Icons.Default.Menu, null)
-                    }
-                },
-                railFeedSection = {},
-                railSettingsSection = {
-                    SettingsWideNavigationRailItem(
-                        selected = false,
-                        onClick = {},
-                        railExpanded = railState.targetValue.isExpanded
-                    )
-                },
-                railQuickFeeds = {
-                    MagazineWideNavigationRailItem(
-                        selected = false,
-                        onClick = {}
-                    )
-                    val feed = Feed(
-                        id = Feed.FEED_ID_ALL_ARTICLES,
-                        title = "All articles",
-                        unreadCount = 1290,
-                    )
-                    VirtualFeedWideNavigationRailItem(feed,
-                        selected = false,
-                        onClick = {},
-                        railExpanded = railState.targetValue.isExpanded
-                    )
-                },
-                content = {
-                    Button(onClick = {
+    AppTheme3 {
+        val coroutineScope = rememberCoroutineScope()
+        val railState = rememberWideNavigationRailState()
+        ArticleBrowsingScaffold(
+            railState = railState,
+            railHeader = {
+                IconButton(
+                    modifier = Modifier.padding(start = 24.dp),
+                    onClick = {
                         coroutineScope.launch {
                             railState.toggle()
                         }
                     }) {
-                        Text("Toggle")
-                    }
+                    Icon(Icons.Default.Menu, null)
                 }
-            )
-        }
+            },
+            railFeedSection = {},
+            railSettingsSection = {
+                SettingsWideNavigationRailItem(
+                    selected = false,
+                    onClick = {},
+                    railExpanded = railState.targetValue.isExpanded
+                )
+            },
+            railQuickFeeds = {
+                MagazineWideNavigationRailItem(
+                    selected = false,
+                    onClick = {}
+                )
+                val feed = Feed(
+                    id = Feed.FEED_ID_ALL_ARTICLES,
+                    title = "All articles",
+                    unreadCount = 1290,
+                )
+                VirtualFeedWideNavigationRailItem(feed,
+                    selected = false,
+                    onClick = {},
+                    railExpanded = railState.targetValue.isExpanded
+                )
+            },
+            content = {
+                Button(onClick = {
+                    coroutineScope.launch {
+                        railState.toggle()
+                    }
+                }) {
+                    Text("Toggle")
+                }
+            }
+        )
     }
 }

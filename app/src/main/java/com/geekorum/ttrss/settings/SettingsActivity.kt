@@ -31,14 +31,25 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.browser.customtabs.CustomTabsService
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.*
-import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.WindowSizeClass
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,7 +58,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.fragment.app.commit
@@ -57,6 +67,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import androidx.window.core.layout.WindowSizeClass
 import com.geekorum.aboutoss.ui.material3.OpenSourceLicensesActivity
 import com.geekorum.ttrss.BuildConfig
 import com.geekorum.ttrss.R
@@ -72,7 +83,6 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 
     private var fragmentContainerId = View.NO_ID
 
-    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -88,7 +98,7 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 
         setContent {
             AppTheme3 {
-                SettingsScreen(windowSizeClass = calculateWindowSizeClass(activity = this@SettingsActivity),
+                SettingsScreen(
                     onNavigateUpClick = {
                         onSupportNavigateUp()
                     })
@@ -196,10 +206,10 @@ class SettingsActivity : BaseActivity(), PreferenceFragmentCompat.OnPreferenceSt
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
-    windowSizeClass: WindowSizeClass,
+    windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass,
     onNavigateUpClick: () -> Unit,
 ) {
-    val useTabletLayout = windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Medium
+    val useTabletLayout = windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -267,7 +277,6 @@ private fun PreferencesContainer(modifier: Modifier = Modifier) {
 }
 
 
-@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL)
 @Preview(device = Devices.TABLET)
@@ -276,9 +285,6 @@ private fun PreferencesContainer(modifier: Modifier = Modifier) {
 )@Composable
 fun PreviewSettingsScreen() {
     AppTheme3 {
-        BoxWithConstraints {
-            val windowSizeClass = WindowSizeClass.calculateFromSize(DpSize(maxWidth, maxHeight))
-            SettingsScreen(windowSizeClass = windowSizeClass, onNavigateUpClick = {})
-        }
+        SettingsScreen(onNavigateUpClick = {})
     }
 }

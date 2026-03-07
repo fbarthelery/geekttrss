@@ -174,7 +174,7 @@ dependencies {
     api(libs.androidx.compose.material3)
     api(libs.androidx.compose.material.icons.core)
     api(libs.androidx.compose.material.icons.extended)
-    api(libs.androidx.compose.material3.window.sizes)
+    api(libs.androidx.compose.material3.adaptive)
     api(libs.androidx.compose.ui.viewbinding)
     api(libs.androidx.activity.compose)
     api(libs.androidx.compose.runtime.livedata)

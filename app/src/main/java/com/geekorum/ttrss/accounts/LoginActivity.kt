@@ -27,8 +27,6 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.core.content.IntentCompat
 import com.geekorum.geekdroid.accounts.AccountAuthenticatorComponentActivity
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
@@ -54,7 +52,6 @@ class LoginActivity : AccountAuthenticatorComponentActivity () {
 
     private val loginViewModel: LoginViewModel by viewModels()
 
-    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val account = IntentCompat.getParcelableExtra(intent, EXTRA_ACCOUNT, Account::class.java)?.let {
@@ -73,8 +70,7 @@ class LoginActivity : AccountAuthenticatorComponentActivity () {
         enableEdgeToEdge()
         setContent {
             AppTheme3 {
-                LoginScreen(windowSizeClass = calculateWindowSizeClass(this@LoginActivity),
-                    viewModel = loginViewModel)
+                LoginScreen(viewModel = loginViewModel)
             }
         }
     }

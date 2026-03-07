@@ -28,11 +28,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.material3.rememberDrawerState
-import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
-import androidx.compose.runtime.*
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.lifecycle.Lifecycle
@@ -43,6 +47,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.rememberNavController
+import androidx.window.core.layout.WindowSizeClass
 import com.geekorum.geekdroid.app.lifecycle.EventObserver
 import com.geekorum.ttrss.app_reviews.AppReviewViewModel
 import com.geekorum.ttrss.article_details.ArticleDetailActivity
@@ -98,7 +103,7 @@ class ArticleListActivity : SessionActivity() {
         setContent()
     }
 
-    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class, ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3Api::class)
     private fun setContent() {
         setContent {
             val navController = rememberNavController()
@@ -134,8 +139,8 @@ class ArticleListActivity : SessionActivity() {
                 LaunchedEffect(undoUnreadSnackbarMessage) {
                     undoUnreadSnackbarHostState.currentSnackbarMessage = undoUnreadSnackbarMessage
                 }
-                val windowSizeClass = calculateWindowSizeClass(this)
-                val hasFabInFixedDrawer = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded
+                val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
+                val hasFabInFixedDrawer = windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND)
                 val fabPresenter = remember {
                     FabPresenter(navController)
                 }
@@ -192,7 +197,7 @@ class ArticleListActivity : SessionActivity() {
                             lastPaddingExceptSearch = contentPadding
                         }
                     }
-                    ArticlesListNavHost(windowSizeClass, activityViewModel, navController, lastPaddingExceptSearch)
+                    ArticlesListNavHost( activityViewModel, windowSizeClass, navController, lastPaddingExceptSearch)
                 }
             }
         }

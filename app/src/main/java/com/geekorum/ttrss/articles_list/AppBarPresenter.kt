@@ -30,9 +30,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
-import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -52,6 +50,7 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.*
 import androidx.navigation.NavDestination.Companion.hasRoute
+import androidx.window.core.layout.WindowSizeClass
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.data.Feed.Companion.FEED_ID_ALL_ARTICLES
 
@@ -72,11 +71,11 @@ internal class AppBarPresenter(
     var isSearchTransitioning: Boolean = false
         private set
 
-    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class, ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     fun ToolbarContent(modifier: Modifier = Modifier, scrollBehavior: TopAppBarScrollBehavior? = null, onNavigationMenuClick: () -> Unit) {
-        val windowSizeClass = calculateWindowSizeClass(activity)
-        val hasFixedDrawer = windowSizeClass.widthSizeClass == WindowWidthSizeClass.Expanded
+        val windowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
+        val hasFixedDrawer = windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_EXPANDED_LOWER_BOUND)
 
         val currentDestination by navController.currentBackStackEntryFlow.collectAsStateWithLifecycle(
             navController.currentBackStackEntry

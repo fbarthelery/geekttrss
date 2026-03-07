@@ -26,7 +26,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -43,6 +43,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
 import androidx.navigation.navOptions
 import androidx.navigation.toRoute
+import androidx.window.core.layout.WindowSizeClass
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.article_details.ArticleDetailActivity
 import com.geekorum.ttrss.articles_list.magazine.MagazineScreen
@@ -101,8 +102,8 @@ class ArticlesListScreenArgs(
 
 @Composable
 fun ArticlesListNavHost(
-    windowSizeClass: WindowSizeClass,
     activityViewModel: ActivityViewModel = hiltViewModel(),
+    windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass,
     navController: NavHostController = rememberNavController(),
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {

@@ -35,9 +35,7 @@ import androidx.compose.material.icons.filled.Password
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Web
 import androidx.compose.material3.*
-import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.WindowSizeClass
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,11 +51,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.window.core.layout.WindowSizeClass
+import androidx.window.core.layout.computeWindowSizeClass
 import com.geekorum.ttrss.R
 import com.geekorum.ttrss.ui.AppTheme3
 
 @Composable
-internal fun LoginScreen(windowSizeClass: WindowSizeClass, viewModel: LoginViewModel = hiltViewModel()) {
+internal fun LoginScreen(
+    windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass,
+    viewModel: LoginViewModel = hiltViewModel()
+) {
     val snackbarHostState = remember { SnackbarHostState() }
     LoginScreen(
         windowSizeClass = windowSizeClass,
@@ -79,13 +82,13 @@ internal fun LoginScreen(windowSizeClass: WindowSizeClass, viewModel: LoginViewM
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    windowSizeClass: WindowSizeClass,
     loginInProgress: Boolean,
     loginFormUiState: LoginFormUiState,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+    windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass,
     onLoginClick: () -> Unit
 ) {
-    val useTabletLayout = windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Medium
+    val useTabletLayout = windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND)
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -368,7 +371,6 @@ private fun OutlinedTextFieldWithError(
     }
 }
 
-@OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
 @Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL)
 @Preview(device = Devices.TABLET)
@@ -377,12 +379,9 @@ private fun OutlinedTextFieldWithError(
 )
 @Composable
 fun PreviewLoginScreen() {
-    BoxWithConstraints {
-        val windowSizeClass = WindowSizeClass.calculateFromSize(DpSize(maxWidth, maxHeight))
-        AppTheme3 {
-            LoginScreen(windowSizeClass, loginInProgress = false,
-                loginFormUiState = MutableLoginFormUiState(),
-                onLoginClick = {})
-        }
+    AppTheme3 {
+        LoginScreen(loginInProgress = false,
+            loginFormUiState = MutableLoginFormUiState(),
+            onLoginClick = {})
     }
 }

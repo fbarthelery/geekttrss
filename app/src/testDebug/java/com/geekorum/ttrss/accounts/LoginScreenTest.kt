@@ -54,8 +54,10 @@ class LoginScreenTest {
     fun testThatLargeScreenUseLargeLayout() {
         composeTestRule.setContent {
             AppTheme3 {
-                val sizeClass = WindowSizeClass.calculateFromSize(DpSize(width=1280.dp, height=800.dp))
-                LoginScreen(sizeClass, loginInProgress = false, loginFormUiState = MutableLoginFormUiState(), onLoginClick = {})
+                DeviceConfigurationOverride(DeviceConfigurationOverride.ForcedSize(DpSize(width=1280.dp, height=800.dp))) {
+                    LoginScreen(loginInProgress = false, loginFormUiState = MutableLoginFormUiState(), onLoginClick = {})
+                }
+
             }
         }
 
@@ -66,11 +68,11 @@ class LoginScreenTest {
     fun testThatSmallScreenUseNormalLayout() {
         composeTestRule.setContent {
             AppTheme3 {
-                val sizeClass = WindowSizeClass.calculateFromSize(DpSize(width=400.dp, height=700.dp))
-                LoginScreen(sizeClass, loginInProgress = false, loginFormUiState = MutableLoginFormUiState(), onLoginClick = {})
+                DeviceConfigurationOverride(DeviceConfigurationOverride.ForcedSize(DpSize(width=400.dp, height=700.dp))) {
+                    LoginScreen(loginInProgress = false, loginFormUiState = MutableLoginFormUiState(), onLoginClick = {})
+                }
             }
         }
-
         composeTestRule.onNodeWithTag("contentCard").assertDoesNotExist()
     }
 
@@ -78,13 +80,12 @@ class LoginScreenTest {
     fun testErrorsMessageAreDisplayed() {
         composeTestRule.setContent {
             AppTheme3 {
-                val sizeClass = WindowSizeClass.calculateFromSize(DpSize(width=400.dp, height=700.dp))
                 val uiState = MutableLoginFormUiState().apply {
                     serverUrlFieldErrorMsg = R.string.error_invalid_http_url
                     usernameFieldErrorMsg = R.string.error_field_required
                     passwordFieldErrorMsg = R.string.error_field_required
                 }
-                LoginScreen(sizeClass, loginInProgress = false, loginFormUiState = uiState, onLoginClick = {})
+                LoginScreen(loginInProgress = false, loginFormUiState = uiState, onLoginClick = {})
             }
         }
 
@@ -98,8 +99,7 @@ class LoginScreenTest {
         val uiState = MutableLoginFormUiState()
         composeTestRule.setContent {
             AppTheme3 {
-                val sizeClass = WindowSizeClass.calculateFromSize(DpSize(width=400.dp, height=700.dp))
-                LoginScreen(sizeClass, loginInProgress = false, loginFormUiState = uiState, onLoginClick = {})
+                LoginScreen(loginInProgress = false, loginFormUiState = uiState, onLoginClick = {})
             }
         }
 
@@ -129,8 +129,7 @@ class LoginScreenTest {
                     loginButtonEnabled = true
                 }
                 var loginInProgress by remember { mutableStateOf(false) }
-                val sizeClass = WindowSizeClass.calculateFromSize(DpSize(width=400.dp, height=700.dp))
-                LoginScreen(sizeClass, loginInProgress = loginInProgress, loginFormUiState = uiState, onLoginClick = {
+                LoginScreen(loginInProgress = loginInProgress, loginFormUiState = uiState, onLoginClick = {
                     loginInProgress = true
                 })
             }
@@ -157,8 +156,7 @@ class LoginScreenTest {
                 val uiState = MutableLoginFormUiState().apply {
                     canChangeUsernameOrUrl = false
                 }
-                val sizeClass = WindowSizeClass.calculateFromSize(DpSize(width=400.dp, height=700.dp))
-                LoginScreen(sizeClass, loginInProgress = false, loginFormUiState = uiState, onLoginClick = {})
+                LoginScreen(loginInProgress = false, loginFormUiState = uiState, onLoginClick = {})
             }
         }
 

@@ -71,8 +71,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.windowsizeclass.WindowHeightSizeClass
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.currentWindowSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -97,6 +97,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.window.core.layout.WindowSizeClass
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.geekorum.ttrss.R
@@ -130,13 +131,12 @@ class ArticleDetailsScreenState(
 @Composable
 fun ArticleDetailsScreen(
     articleDetailsViewModel: ArticleDetailsViewModel,
-    widthSizeClass: WindowWidthSizeClass,
-    heightSizeClass: WindowHeightSizeClass,
     onNavigateUpClick: () -> Unit,
     onArticleClick: (Article) -> Unit,
     webViewClient: AccompanistWebViewClient,
+    windowSizeClass: WindowSizeClass = currentWindowAdaptiveInfo().windowSizeClass
 ) {
-    if (widthSizeClass == WindowWidthSizeClass.Compact || heightSizeClass == WindowHeightSizeClass.Compact) {
+    if (!windowSizeClass.isWidthAtLeastBreakpoint(WindowSizeClass.WIDTH_DP_MEDIUM_LOWER_BOUND) || !windowSizeClass.isHeightAtLeastBreakpoint(WindowSizeClass.HEIGHT_DP_MEDIUM_LOWER_BOUND)) {
         ArticleDetailsScreen(
             articleDetailsViewModel = articleDetailsViewModel,
             onNavigateUpClick = onNavigateUpClick,
@@ -303,7 +303,7 @@ private fun ArticleDetailsHeroContent(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ArticleDetailsScreen(
+private fun ArticleDetailsScreen(
     articleDetailsViewModel: ArticleDetailsViewModel,
     onNavigateUpClick: () -> Unit,
     onArticleClick: (Article) -> Unit,
