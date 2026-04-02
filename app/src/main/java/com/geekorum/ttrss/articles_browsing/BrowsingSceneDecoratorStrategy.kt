@@ -58,13 +58,16 @@ class BrowsingSceneDecoratorStrategy<T: Any>(
     }
 
     internal sealed interface PaneMetadata {
+        /**
+         * the key to distinguish the BrowsingScene, in case
+         * multiple BrowsingScene are supported within the same NavDisplay.
+         */
         val sceneKey: Any
     }
 
     internal class BrowsingMetadata(
         override val sceneKey: Any,
         val feedSelectedItem: FeedNavigationMenuState.SelectedItem,
-        val articlePlaceHolder: @Composable () -> Unit,
     ): PaneMetadata
 
     internal class DetailMetadata(override val sceneKey: Any) : PaneMetadata
@@ -72,18 +75,44 @@ class BrowsingSceneDecoratorStrategy<T: Any>(
     companion object {
         internal object BrowsingRoleKey : NavMetadataKey<PaneMetadata>
 
+        /**
+         * Creates the metadata and configuration for a browsing pane.
+         *
+         * This function combines browsing-specific metadata (navigation state and placeholders)
+         * with the standard [ListDetailSceneStrategy.listPane] configuration.
+         *
+         * @param feedSelectedItem The currently selected item in the feed navigation menu (e.g., a specific feed or category).
+         * @param sceneKey A unique key identifying this scene within the navigation graph. Defaults to [Unit].
+         * @param listDetailsSceneKey The key used by the [ListDetailSceneStrategy] to manage the list pane state. Defaults to [Unit].
+         * @param articlePlaceHolder A composable lambda used to display content when no specific article is selected (e.g., an empty state or background).
+         * @return A map containing navigation metadata required by [BrowsingSceneDecoratorStrategy] and [ListDetailSceneStrategy].
+         */
         fun browsingPane(
             feedSelectedItem: FeedNavigationMenuState.SelectedItem,
             sceneKey: Any = Unit,
+            listDetailsSceneKey: Any = Unit,
             articlePlaceHolder: @Composable () -> Unit = {},
-        ): Map<String, Any> = metadata { put(BrowsingRoleKey, BrowsingMetadata(sceneKey, feedSelectedItem, articlePlaceHolder)) } +
-                ListDetailSceneStrategy.listPane(sceneKey, {
+        ): Map<String, Any> = metadata { put(BrowsingRoleKey, BrowsingMetadata(sceneKey, feedSelectedItem)) } +
+                ListDetailSceneStrategy.listPane(listDetailsSceneKey, {
                     articlePlaceHolder()
                 })
 
-        fun articlePane(sceneKey: Any = Unit): Map<String, Any> =
+        /**
+         * Creates the metadata and configuration for an article pane.
+         *
+         * This function marks the scene with the [BrowsingRoleKey] using [DetailMetadata]
+         * and integrates it with the [ListDetailSceneStrategy.detailPane] requirements.
+         *
+         * @param sceneKey A unique key identifying the specific browsing scene instance.
+         * @param listDetailsSceneKey The key used by [ListDetailSceneStrategy] to identify
+         * this pane within the adaptive scaffold.
+         * @return A map of navigation metadata to be applied to the scene.
+         */
+        fun articlePane(sceneKey: Any = Unit,
+                        listDetailsSceneKey: Any = Unit,
+        ): Map<String, Any> =
             metadata { put(BrowsingRoleKey, DetailMetadata(sceneKey)) } +
-                    ListDetailSceneStrategy.detailPane(sceneKey)
+                    ListDetailSceneStrategy.detailPane(listDetailsSceneKey)
     }
 }
 

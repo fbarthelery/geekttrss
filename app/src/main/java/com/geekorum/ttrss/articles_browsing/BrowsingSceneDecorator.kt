@@ -52,11 +52,8 @@ internal class BrowsingSceneDecorator<T: Any>(
     private val navigateToMagazine: () -> Unit,
     private val navigateToSettings: () -> Unit,
 ) : Scene<T> {
-//    TODO check if/how we want an unique browsing scene
-    // maybe one per account
-//    override val key: Any = "only one browsing" //listDetailsScene.key
-    override val key: Any = listDetailsScene.key
 
+    override val key: Any = listDetailsScene.metadata[BrowsingRoleKey]!!.sceneKey
 
     override val entries: List<NavEntry<T>> = listDetailsScene.entries
     override val previousEntries: List<NavEntry<T>> = listDetailsScene.previousEntries
