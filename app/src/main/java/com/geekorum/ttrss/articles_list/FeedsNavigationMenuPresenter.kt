@@ -137,8 +137,9 @@ class FeedsNavigationMenuPresenter(
                         },
                         onMarkFeedAsReadClick = feedsViewModel::markFeedAsRead,
                         onCategoryClick = { category ->
-                            navigateToCategory(category)
-                            onNavigation()
+                            if (navigateToCategory(category)) {
+                                onNavigation()
+                            }
                         }
                     )
                 } else {
@@ -179,9 +180,10 @@ class FeedsNavigationMenuPresenter(
         )
     }
 
-    private fun navigateToCategory(category: Category) {
-        if (category.id == -1L) return
+    private fun navigateToCategory(category: Category): Boolean {
+        if (category.id == UNCATEGORIZED_CATEGORY_ID) return false
         navController.navigateToCategory(category.id, category.title)
+        return true
     }
 
     private fun navigateToFeed(feed: Feed) {

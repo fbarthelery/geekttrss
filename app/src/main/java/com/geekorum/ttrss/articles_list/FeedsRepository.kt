@@ -31,6 +31,8 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
+const val UNCATEGORIZED_CATEGORY_ID = -1L
+
 /**
  * A Facade to access Feeds and Categories.
  */
@@ -92,8 +94,8 @@ class FeedsRepository
             val uncategorized = feeds.filter { it.feed.catId !in categoryIds }
             if (uncategorized.isNotEmpty()) {
                 val uncategorizedCategory = Category(
-                    id = -1L,
-                    title = "Uncategorized",
+                    id = UNCATEGORIZED_CATEGORY_ID,
+                    title = "",
                     unreadCount = uncategorized.sumOf { it.feed.unreadCount }
                 )
                 grouped + listOf(uncategorizedCategory to uncategorized)

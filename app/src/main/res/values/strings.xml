@@ -69,6 +69,7 @@
     <string name="pref_summary_articles_compact_list_items">Display compact list of articles on small screens</string>
     <string name="pref_title_categorized_feed_list">Categorized feed list</string>
     <string name="pref_summary_categorized_feed_list">Group feeds by category in the navigation drawer</string>
+    <string name="title_uncategorized_feed_category">Uncategorized</string>
     <string name="pref_title_in_app_browser_engine">In app browser engine</string>
     <string name="theme_system_default">Use system default</string>
     <string name="theme_light">Light</string>

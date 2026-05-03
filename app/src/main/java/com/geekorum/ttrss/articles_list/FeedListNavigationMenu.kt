@@ -209,7 +209,14 @@ fun CategorizedFeedSection(
         CategoryHeader(
             category = category,
             isExpanded = isExpanded,
-            onCategoryClick = { onCategoryClick(category) },
+            onCategoryClick = {
+                if (category.id == UNCATEGORIZED_CATEGORY_ID) {
+                    isExpanded = !isExpanded
+                } else {
+                    isExpanded = true
+                    onCategoryClick(category)
+                }
+            },
             onToggleExpand = { isExpanded = !isExpanded }
         )
         if (isExpanded) {
@@ -254,7 +261,10 @@ private fun CategoryHeader(
             )
             Spacer(Modifier.width(12.dp))
             Text(
-                text = category.title,
+                text = if (category.id == UNCATEGORIZED_CATEGORY_ID)
+                    stringResource(R.string.title_uncategorized_feed_category)
+                else
+                    category.title,
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 maxLines = 1,
