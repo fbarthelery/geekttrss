@@ -86,6 +86,10 @@ class ArticlesRepository
         return articleDao.getAllUnreadArticlesForFeedUpdatedAfterTimeRandomized(feedId, time)
     }
 
+    fun getAllArticlesForCategory(catId: Long): PagingSource<Int, ArticleWithFeed> = articleDao.getAllArticlesForCategory(catId)
+
+    fun getAllUnreadArticlesForCategory(catId: Long): PagingSource<Int, ArticleWithFeed> = articleDao.getAllUnreadArticlesForCategory(catId)
+
     fun getAllArticlesForTag(tag: String): PagingSource<Int, ArticleWithFeed> = articleDao.getAllArticlesForTag(tag)
     fun getAllArticlesForTagOldestFirst(tag: String): PagingSource<Int, ArticleWithFeed> = articleDao.getAllArticlesForTagOldestFirst(tag)
 
