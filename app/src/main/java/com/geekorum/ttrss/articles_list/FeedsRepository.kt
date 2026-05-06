@@ -31,8 +31,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-const val UNCATEGORIZED_CATEGORY_ID = -1L
-
 /**
  * A Facade to access Feeds and Categories.
  */
@@ -86,21 +84,9 @@ class FeedsRepository
         val categoriesFlow = if (onlyUnread) feedsDao.getAllUnreadCategories() else feedsDao.getAllCategories()
         return combine(feedsFlow, categoriesFlow) { feeds, categories ->
             val feedsByCatId = feeds.groupBy { it.feed.catId }
-            val categoryIds = categories.map { it.id }.toSet()
-            val grouped = categories.mapNotNull { category ->
+            categories.mapNotNull { category ->
                 val catFeeds = feedsByCatId[category.id] ?: emptyList()
                 if (catFeeds.isEmpty()) null else category to catFeeds
-            }
-            val uncategorized = feeds.filter { it.feed.catId !in categoryIds }
-            if (uncategorized.isNotEmpty()) {
-                val uncategorizedCategory = Category(
-                    id = UNCATEGORIZED_CATEGORY_ID,
-                    title = "",
-                    unreadCount = uncategorized.sumOf { it.feed.unreadCount }
-                )
-                grouped + listOf(uncategorizedCategory to uncategorized)
-            } else {
-                grouped
             }
         }.distinctUntilChanged()
     }

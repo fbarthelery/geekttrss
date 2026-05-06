@@ -36,7 +36,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
@@ -189,6 +188,7 @@ fun CategorizedFeedSection(
     feedsByCategory: List<Pair<Category, List<FeedWithFavIcon>>>,
     isMagazineSelected: Boolean,
     selectedFeed: Feed?,
+    selectedCategoryId: Long?,
     onMagazineSelected: () -> Unit,
     onFeedSelected: (Feed) -> Unit,
     onMarkFeedAsReadClick: (Feed) -> Unit,
@@ -205,88 +205,50 @@ fun CategorizedFeedSection(
         FeedItem(feedWithFavIcon, selectedFeed, onFeedSelected, onMarkFeedAsReadClick)
     }
     for ((category, feeds) in feedsByCategory) {
-        var isExpanded by rememberSaveable(key = "cat_expanded_${category.id}") { mutableStateOf(true) }
-        CategoryHeader(
-            category = category,
-            isExpanded = isExpanded,
-            onCategoryClick = {
-                if (category.id == UNCATEGORIZED_CATEGORY_ID) {
-                    isExpanded = !isExpanded
-                } else {
-                    isExpanded = true
-                    onCategoryClick(category)
+        // remember (not rememberSaveable): list is dynamic; categories reappear collapsed when new articles arrive
+        var isExpanded by key(category.id) { remember { mutableStateOf(false) } }
+        val chevronRotation by animateFloatAsState(
+            targetValue = if (isExpanded) 180f else 0f,
+            animationSpec = tween(300),
+            label = "chevronRotation"
+        )
+        NavigationDrawerItem(
+            label = {
+                Text(
+                    category.title,
+                    style = MaterialTheme.typography.labelLarge,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            },
+            selected = category.id == selectedCategoryId,
+            onClick = { onCategoryClick(category) },
+            icon = { Icon(Icons.Default.Folder, contentDescription = null) },
+            badge = {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (category.unreadCount > 0) {
+                        Text(
+                            text = category.unreadCount.toString(),
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                        Spacer(Modifier.width(4.dp))
+                    }
+                    Icon(
+                        imageVector = Icons.Default.KeyboardArrowDown,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(18.dp)
+                            .rotate(chevronRotation)
+                            .clickable { isExpanded = !isExpanded }
+                    )
                 }
             },
-            onToggleExpand = { isExpanded = !isExpanded }
+            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
         )
         if (isExpanded) {
             for (feedWithFavIcon in feeds) {
                 FeedItem(feedWithFavIcon, selectedFeed, onFeedSelected, onMarkFeedAsReadClick)
             }
-        }
-    }
-}
-
-@Composable
-private fun CategoryHeader(
-    category: Category,
-    isExpanded: Boolean,
-    onCategoryClick: () -> Unit,
-    onToggleExpand: () -> Unit,
-) {
-    val chevronRotation by animateFloatAsState(
-        targetValue = if (isExpanded) 180f else 0f,
-        animationSpec = tween(300),
-        label = "chevronRotation"
-    )
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(NavigationItemHeight)
-            .padding(start = NavigationItemPadding, end = 4.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Row(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight()
-                .clickable(onClick = onCategoryClick)
-                .padding(end = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Icon(
-                imageVector = Icons.Default.Folder,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Spacer(Modifier.width(12.dp))
-            Text(
-                text = if (category.id == UNCATEGORIZED_CATEGORY_ID)
-                    stringResource(R.string.title_uncategorized_feed_category)
-                else
-                    category.title,
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f)
-            )
-            if (category.unreadCount > 0) {
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    text = category.unreadCount.toString(),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-        IconButton(onClick = onToggleExpand) {
-            Icon(
-                imageVector = Icons.Default.KeyboardArrowDown,
-                contentDescription = null,
-                modifier = Modifier.rotate(chevronRotation),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
         }
     }
 }
@@ -605,6 +567,7 @@ fun PreviewCategorizedFeedListNavigationMenu() {
                             specialFeeds = specialFeeds,
                             feedsByCategory = feedsByCategory,
                             selectedFeed = selectedFeed,
+                            selectedCategoryId = null,
                             isMagazineSelected = isMagazineSelected,
                             onFeedSelected = {
                                 selectedFeed = it

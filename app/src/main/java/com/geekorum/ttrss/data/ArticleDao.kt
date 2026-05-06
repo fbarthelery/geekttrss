@@ -186,8 +186,20 @@ interface ArticleDao {
 
     @Query("SELECT articles.* FROM articles " +
         " JOIN feeds ON (articles.feed_id = feeds._id)" +
+        " WHERE feeds.cat_id=:catId ORDER BY articles.last_time_update ASC")
+    @Transaction
+    fun getAllArticlesForCategoryOldestFirst(catId: Long): PagingSource<Int, ArticleWithFeed>
+
+    @Query("SELECT articles.* FROM articles " +
+        " JOIN feeds ON (articles.feed_id = feeds._id)" +
         " WHERE feeds.cat_id=:catId AND articles.unread=1 ORDER BY articles.last_time_update DESC")
     @Transaction
     fun getAllUnreadArticlesForCategory(catId: Long): PagingSource<Int, ArticleWithFeed>
+
+    @Query("SELECT articles.* FROM articles " +
+        " JOIN feeds ON (articles.feed_id = feeds._id)" +
+        " WHERE feeds.cat_id=:catId AND articles.unread=1 ORDER BY articles.last_time_update ASC")
+    @Transaction
+    fun getAllUnreadArticlesForCategoryOldestFirst(catId: Long): PagingSource<Int, ArticleWithFeed>
 
 }

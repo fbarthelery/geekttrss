@@ -94,6 +94,12 @@ class FeedsNavigationMenuPresenter(
             }
         }
         val isMagazineFeed = navBackStackEntry?.destination?.hasRoute<NavRoutes.Magazine>() == true
+        val currentCategoryId: Long? =
+            if (navBackStackEntry?.destination?.hasRoute<NavRoutes.ArticlesListForCategory>() == true) {
+                navBackStackEntry?.toRoute<NavRoutes.ArticlesListForCategory>()?.catId
+            } else {
+                null
+            }
 
         val account by accountViewModel.selectedAccount.collectAsStateWithLifecycle()
         val server by accountViewModel.selectedAccountHost.collectAsStateWithLifecycle()
@@ -126,6 +132,7 @@ class FeedsNavigationMenuPresenter(
                         specialFeeds = specialFeeds,
                         feedsByCategory = feedsByCategory,
                         selectedFeed = selectedFeed,
+                        selectedCategoryId = currentCategoryId,
                         isMagazineSelected = isMagazineFeed,
                         onFeedSelected = {
                             navigateToFeed(it)
@@ -137,9 +144,8 @@ class FeedsNavigationMenuPresenter(
                         },
                         onMarkFeedAsReadClick = feedsViewModel::markFeedAsRead,
                         onCategoryClick = { category ->
-                            if (navigateToCategory(category)) {
-                                onNavigation()
-                            }
+                            navigateToCategory(category)
+                            onNavigation()
                         }
                     )
                 } else {
@@ -180,10 +186,8 @@ class FeedsNavigationMenuPresenter(
         )
     }
 
-    private fun navigateToCategory(category: Category): Boolean {
-        if (category.id == UNCATEGORIZED_CATEGORY_ID) return false
+    private fun navigateToCategory(category: Category) {
         navController.navigateToCategory(category.id, category.title)
-        return true
     }
 
     private fun navigateToFeed(feed: Feed) {

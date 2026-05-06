@@ -41,6 +41,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -63,17 +64,19 @@ class ArticlesListForCategoryViewModel @AssistedInject constructor(
     private val account = component.account
 
     override val articles: Flow<PagingData<ArticleWithFeed>> =
-        needUnread.flatMapLatest { needUnread ->
+        getArticlesForCategory(catId)
+            .map(::prepareArticlePagingData)
+            .cachedIn(viewModelScope)
+
+    private fun getArticlesForCategory(catId: Long): Flow<PagingData<ArticleWithFeed>> {
+        return sortByMostRecentFirst.combine(needUnread) { mostRecentFirst, needUnread ->
+            getArticleAccess(mostRecentFirst, needUnread)
+        }.flatMapLatest { access ->
             Pager(PagingConfig(pageSize = 50)) {
-                if (needUnread) {
-                    component.articleRepository.getAllUnreadArticlesForCategory(catId)
-                } else {
-                    component.articleRepository.getAllArticlesForCategory(catId)
-                }
+                access.articlesForCategory(catId)
             }.flow
         }
-        .map(::prepareArticlePagingData)
-        .cachedIn(viewModelScope)
+    }
 
     override val isRefreshing: StateFlow<Boolean> =
         SyncInProgressLiveData(account, ArticlesContract.AUTHORITY).asFlow()
