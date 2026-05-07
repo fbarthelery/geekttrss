@@ -132,6 +132,7 @@ abstract class BaseArticlesViewModel(
         val allArticles: PagingSource<Int, ArticleWithFeed>
         fun articlesForFeed(feedId: Long): PagingSource<Int, ArticleWithFeed>
         fun articlesForTag(tag: String): PagingSource<Int, ArticleWithFeed>
+        fun articlesForCategory(catId: Long): PagingSource<Int, ArticleWithFeed>
     }
 
     protected fun getArticleAccess(mostRecentFirst: Boolean, needUnread: Boolean): ArticlesAccess = when {
@@ -165,6 +166,10 @@ abstract class BaseArticlesViewModel(
         override fun articlesForTag(tag: String): PagingSource<Int, ArticleWithFeed> {
             return articlesRepository.getAllUnreadArticlesForTag(tag)
         }
+
+        override fun articlesForCategory(catId: Long): PagingSource<Int, ArticleWithFeed> {
+            return articlesRepository.getAllUnreadArticlesForCategory(catId)
+        }
     }
 
     class UnreadOldestAccess(private val articlesRepository: ArticlesRepository) : ArticlesAccess {
@@ -189,6 +194,10 @@ abstract class BaseArticlesViewModel(
 
         override fun articlesForTag(tag: String): PagingSource<Int, ArticleWithFeed> {
             return articlesRepository.getAllUnreadArticlesForTagOldestFirst(tag)
+        }
+
+        override fun articlesForCategory(catId: Long): PagingSource<Int, ArticleWithFeed> {
+            return articlesRepository.getAllUnreadArticlesForCategoryOldestFirst(catId)
         }
     }
 
@@ -216,6 +225,10 @@ abstract class BaseArticlesViewModel(
         override fun articlesForTag(tag: String): PagingSource<Int, ArticleWithFeed> {
             return articlesRepository.getAllArticlesForTag(tag)
         }
+
+        override fun articlesForCategory(catId: Long): PagingSource<Int, ArticleWithFeed> {
+            return articlesRepository.getAllArticlesForCategory(catId)
+        }
     }
 
     class OldestFirstAccess(private val articlesRepository: ArticlesRepository) : ArticlesAccess {
@@ -240,6 +253,10 @@ abstract class BaseArticlesViewModel(
 
         override fun articlesForTag(tag: String): PagingSource<Int, ArticleWithFeed> {
             return articlesRepository.getAllArticlesForTagOldestFirst(tag)
+        }
+
+        override fun articlesForCategory(catId: Long): PagingSource<Int, ArticleWithFeed> {
+            return articlesRepository.getAllArticlesForCategoryOldestFirst(catId)
         }
     }
 

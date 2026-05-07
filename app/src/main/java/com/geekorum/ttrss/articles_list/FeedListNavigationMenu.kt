@@ -39,6 +39,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -59,6 +60,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import coil.compose.rememberAsyncImagePainter
 import com.geekorum.ttrss.R
+import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.data.FeedWithFavIcon
 import com.geekorum.ttrss.ui.AppTheme3
@@ -175,77 +177,168 @@ fun FeedSection(
         onLongClick = null,
         onClick = onMagazineSelected)
     for (feedWithFavIcon in feeds) {
-        Box {
-            var displayDropdownMenu by remember { mutableStateOf(false) }
-            val feed = feedWithFavIcon.feed
-            val label = run {
-                val titleRes = when (feed.id) {
-                    Feed.FEED_ID_FRESH -> R.string.label_fresh_feeds_title
-                    Feed.FEED_ID_STARRED -> R.string.label_starred_feeds_title
-                    Feed.FEED_ID_ALL_ARTICLES -> R.string.label_all_articles_feeds_title
+        FeedItem(feedWithFavIcon, selectedFeed, onFeedSelected, onMarkFeedAsReadClick)
+    }
+}
+
+@Composable
+fun CategorizedFeedSection(
+    specialFeeds: List<FeedWithFavIcon>,
+    feedsByCategory: List<Pair<Category, List<FeedWithFavIcon>>>,
+    isMagazineSelected: Boolean,
+    selectedFeed: Feed?,
+    selectedCategoryId: Long?,
+    onMagazineSelected: () -> Unit,
+    onFeedSelected: (Feed) -> Unit,
+    onMarkFeedAsReadClick: (Feed) -> Unit,
+    onCategoryClick: (Category) -> Unit,
+) {
+    SectionLabel(stringResource(R.string.title_feeds_menu))
+    NavigationItem(stringResource(R.string.title_magazine),
+        icon = { Icon(AppTheme3.Icons.Newspaper, contentDescription = null) },
+        selected = isMagazineSelected,
+        selectedForAction = false,
+        onLongClick = null,
+        onClick = onMagazineSelected)
+    for (feedWithFavIcon in specialFeeds) {
+        FeedItem(feedWithFavIcon, selectedFeed, onFeedSelected, onMarkFeedAsReadClick)
+    }
+    for ((category, feeds) in feedsByCategory) {
+        key(category.id) {
+            var isExpanded by remember { mutableStateOf(false) }
+            CategoryHeader(
+                category = category,
+                isExpanded = isExpanded,
+                isSelected = category.id == selectedCategoryId,
+                onCategoryClick = {
+                    isExpanded = true
+                    onCategoryClick(category)
+                },
+                onToggleExpand = { isExpanded = !isExpanded }
+            )
+            if (isExpanded) {
+                for (feedWithFavIcon in feeds) {
+                    FeedItem(feedWithFavIcon, selectedFeed, onFeedSelected, onMarkFeedAsReadClick)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun CategoryHeader(
+    category: Category,
+    isExpanded: Boolean,
+    isSelected: Boolean,
+    onCategoryClick: () -> Unit,
+    onToggleExpand: () -> Unit,
+) {
+    val chevronRotation by animateFloatAsState(
+        targetValue = if (isExpanded) 180f else 0f,
+        animationSpec = tween(300),
+        label = "chevronRotation"
+    )
+    NavigationDrawerItem(
+        label = {
+            Text(
+                text = category.title,
+                style = MaterialTheme.typography.labelLarge,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        },
+        selected = isSelected,
+        onClick = onCategoryClick,
+        icon = { Icon(Icons.Default.Folder, contentDescription = null) },
+        badge = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (category.unreadCount > 0) {
+                    Text(category.unreadCount.toString())
+                    Spacer(Modifier.width(4.dp))
+                }
+                IconButton(onClick = onToggleExpand, modifier = Modifier.size(24.dp)) {
+                    Icon(
+                        imageVector = Icons.Default.KeyboardArrowDown,
+                        contentDescription = null,
+                        modifier = Modifier.rotate(chevronRotation),
+                    )
+                }
+            }
+        },
+        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+    )
+}
+
+@Composable
+private fun FeedItem(
+    feedWithFavIcon: FeedWithFavIcon,
+    selectedFeed: Feed?,
+    onFeedSelected: (Feed) -> Unit,
+    onMarkFeedAsReadClick: (Feed) -> Unit,
+) {
+    Box {
+        var displayDropdownMenu by remember { mutableStateOf(false) }
+        val feed = feedWithFavIcon.feed
+        val label = run {
+            val titleRes = when (feed.id) {
+                Feed.FEED_ID_FRESH -> R.string.label_fresh_feeds_title
+                Feed.FEED_ID_STARRED -> R.string.label_starred_feeds_title
+                Feed.FEED_ID_ALL_ARTICLES -> R.string.label_all_articles_feeds_title
+                else -> null
+            }
+            titleRes?.let { stringResource(it) }
+                ?: feed.displayTitle.takeIf { it.isNotBlank() } ?: feed.title
+        }
+        NavigationItem(
+            label,
+            selected = feed == selectedFeed,
+            selectedForAction = displayDropdownMenu,
+            onClick = { onFeedSelected(feed) },
+            onLongClick = { displayDropdownMenu = true },
+            icon = {
+                val iconVector = when {
+                    feed.isArchivedFeed -> AppTheme3.Icons.Inventory2
+                    feed.isStarredFeed -> AppTheme3.Icons.Star
+                    feed.isPublishedFeed -> AppTheme3.Icons.CheckBox
+                    feed.isFreshFeed -> AppTheme3.Icons.LocalCafe
+                    feed.isAllArticlesFeed -> AppTheme3.Icons.FolderOpen
                     else -> null
                 }
-                titleRes?.let { stringResource(it) }
-                    ?:feed.displayTitle.takeIf { it.isNotBlank() } ?: feed.title
+                if (iconVector != null) {
+                    Icon(iconVector, contentDescription = null)
+                } else {
+                    val feedIconPainter = rememberAsyncImagePainter(
+                        model = feedWithFavIcon.favIcon?.url,
+                        placeholder = painterResource(R.drawable.ic_rss_feed_orange),
+                        fallback = painterResource(R.drawable.ic_rss_feed_orange),
+                        error = painterResource(R.drawable.ic_rss_feed_orange),
+                    )
+                    Image(
+                        painter = feedIconPainter,
+                        contentDescription = null,
+                        contentScale = ContentScale.FillBounds,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
+            },
+            badge = {
+                if (feed.unreadCount > 0) {
+                    Text(feed.unreadCount.toString())
+                }
             }
-            NavigationItem(
-                label,
-                selected = feed == selectedFeed,
-                selectedForAction = displayDropdownMenu,
+        )
+        DropdownMenu(
+            expanded = displayDropdownMenu,
+            onDismissRequest = { displayDropdownMenu = false },
+            offset = DpOffset(x = 16.dp, y = (-8).dp)
+        ) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.menu_item_mark_feed_as_read)) },
                 onClick = {
-                    onFeedSelected(feed)
-                },
-                onLongClick = {
-                    displayDropdownMenu = true
-                },
-                icon = {
-                    val iconVector = when {
-                        feed.isArchivedFeed -> AppTheme3.Icons.Inventory2
-                        feed.isStarredFeed -> AppTheme3.Icons.Star
-                        feed.isPublishedFeed -> AppTheme3.Icons.CheckBox
-                        feed.isFreshFeed -> AppTheme3.Icons.LocalCafe
-                        feed.isAllArticlesFeed -> AppTheme3.Icons.FolderOpen
-                        else -> null
-                    }
-                    if (iconVector != null) {
-                        Icon(iconVector, contentDescription = null)
-                    } else {
-                        val feedIconPainter = rememberAsyncImagePainter(
-                            model = feedWithFavIcon.favIcon?.url,
-                            placeholder = painterResource(R.drawable.ic_rss_feed_orange),
-                            fallback = painterResource(R.drawable.ic_rss_feed_orange),
-                            error = painterResource(R.drawable.ic_rss_feed_orange),
-                        )
-                        Image(
-                            painter = feedIconPainter,
-                            contentDescription = null,
-                            contentScale = ContentScale.FillBounds,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                },
-                badge = {
-                    if (feed.unreadCount > 0) {
-                        Text(feed.unreadCount.toString())
-                    }
+                    onMarkFeedAsReadClick(feed)
+                    displayDropdownMenu = false
                 }
             )
-
-            DropdownMenu(
-                expanded = displayDropdownMenu,
-                onDismissRequest = { displayDropdownMenu = false },
-                offset = DpOffset(x = 16.dp, y = (-8).dp)
-            ) {
-                DropdownMenuItem(
-                    text = {
-                        Text(stringResource(R.string.menu_item_mark_feed_as_read))
-                    },
-                    onClick = {
-                        onMarkFeedAsReadClick(feed)
-                        displayDropdownMenu = false
-                    }
-                )
-            }
         }
     }
 }
@@ -440,6 +533,76 @@ fun PreviewFeedListNavigationMenu() {
                             icon = {
                                 Icon(AppTheme3.Icons.Tune, contentDescription = null)
                             },
+                        )
+                    },
+                    onSettingsClicked = {},
+                )
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun PreviewCategorizedFeedListNavigationMenu() {
+    AppTheme3 {
+        Surface(color = Color.Black.copy(alpha = 0.4f),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            ModalDrawerSheet {
+                val specialFeeds = listOf(
+                    FeedWithFavIcon(
+                        feed = Feed(id = Feed.FEED_ID_ALL_ARTICLES, title = "All articles", unreadCount = 290),
+                        favIcon = null
+                    ),
+                    FeedWithFavIcon(
+                        feed = Feed(id = Feed.FEED_ID_FRESH, title = "Fresh articles"),
+                        favIcon = null
+                    ),
+                    FeedWithFavIcon(
+                        feed = Feed(id = Feed.FEED_ID_STARRED, title = "Starred articles"),
+                        favIcon = null
+                    ),
+                )
+                val feedsByCategory = listOf(
+                    Category(id = 1, title = "Tech", unreadCount = 50) to listOf(
+                        FeedWithFavIcon(feed = Feed(id = 2, title = "Frandroid", unreadCount = 42), favIcon = null),
+                        FeedWithFavIcon(feed = Feed(id = 3, title = "LinuxFr", unreadCount = 8), favIcon = null),
+                    ),
+                    Category(id = 2, title = "News", unreadCount = 10) to listOf(
+                        FeedWithFavIcon(feed = Feed(id = 4, title = "Le Monde", unreadCount = 10), favIcon = null),
+                    ),
+                )
+                FeedListNavigationMenu(
+                    user = "test",
+                    server = "example.org",
+                    feedSection = {
+                        var selectedFeed by remember { mutableStateOf<Feed?>(null) }
+                        var isMagazineSelected by remember { mutableStateOf(false) }
+                        CategorizedFeedSection(
+                            specialFeeds = specialFeeds,
+                            feedsByCategory = feedsByCategory,
+                            selectedFeed = selectedFeed,
+                            selectedCategoryId = null,
+                            isMagazineSelected = isMagazineSelected,
+                            onFeedSelected = {
+                                selectedFeed = it
+                                isMagazineSelected = false
+                            },
+                            onMagazineSelected = {
+                                selectedFeed = null
+                                isMagazineSelected = true
+                            },
+                            onMarkFeedAsReadClick = {},
+                            onCategoryClick = {},
+                        )
+                    },
+                    manageFeedsSection = {
+                        NavigationItem(
+                            stringResource(R.string.title_manage_feeds),
+                            selected = false,
+                            onClick = {},
+                            icon = { Icon(AppTheme3.Icons.Tune, contentDescription = null) },
                         )
                     },
                     onSettingsClicked = {},

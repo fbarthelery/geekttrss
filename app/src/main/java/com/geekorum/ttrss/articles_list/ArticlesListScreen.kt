@@ -83,6 +83,25 @@ fun ArticlesListByTagScreen(
 }
 
 @Composable
+fun ArticlesListForCategoryScreen(
+    catId: Long,
+    windowSizeClass: WindowSizeClass,
+    activityViewModel: ActivityViewModel,
+    articlesListForCategoryViewModel: ArticlesListForCategoryViewModel = hiltViewModel { factory: ArticlesListForCategoryViewModel.Factory ->
+        factory.create(catId)
+    },
+    contentPadding: PaddingValues = PaddingValues(0.dp)
+) {
+    val compactItemsInSmallScreens by activityViewModel.displayCompactItems.collectAsStateWithLifecycle()
+    val displayCompactItems = compactItemsInSmallScreens
+            && (windowSizeClass.widthSizeClass == WindowWidthSizeClass.Compact ||
+            windowSizeClass.heightSizeClass == WindowHeightSizeClass.Compact)
+
+    BaseArticlesListScreen(activityViewModel = activityViewModel, articlesListForCategoryViewModel,
+        displayCompactItems, contentPadding)
+}
+
+@Composable
 private fun BaseArticlesListScreen(
     activityViewModel: ActivityViewModel,
     articlesListViewModel: BaseArticlesViewModel,

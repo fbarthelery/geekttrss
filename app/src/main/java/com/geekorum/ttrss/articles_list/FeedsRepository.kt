@@ -25,6 +25,8 @@ import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.data.FeedWithFavIcon
 import com.geekorum.ttrss.data.FeedsDao
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -75,6 +77,22 @@ class FeedsRepository
 
     fun getFeedsForCategory(catId: Long): Flow<List<Feed>> {
         return feedsDao.getFeedsForCategory(catId)
+    }
+
+    fun getFeedsByCategory(onlyUnread: Boolean): Flow<List<Pair<Category, List<FeedWithFavIcon>>>> {
+        val feedsFlow = if (onlyUnread) feedsDao.getAllUnreadFeeds() else feedsDao.getAllFeeds()
+        val categoriesFlow = if (onlyUnread) feedsDao.getAllUnreadCategories() else feedsDao.getAllCategories()
+        return combine(feedsFlow, categoriesFlow) { feeds, categories ->
+            val feedsByCatId = feeds.groupBy { it.feed.catId }
+            categories.mapNotNull { category ->
+                val catFeeds = feedsByCatId[category.id] ?: emptyList()
+                if (catFeeds.isEmpty()) {
+                    null
+                } else {
+                    category to catFeeds
+                }
+            }
+        }.distinctUntilChanged()
     }
 
     suspend fun setFeedsAndCategories(feeds: Collection<Feed>, categories: Collection<Category>) {

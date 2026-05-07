@@ -27,6 +27,7 @@ import androidx.lifecycle.viewModelScope
 import com.geekorum.ttrss.core.CoroutineDispatchersProvider
 import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
+import com.geekorum.ttrss.data.FeedWithFavIcon
 import com.geekorum.ttrss.network.ApiService
 import com.geekorum.ttrss.session.SessionActivityComponent
 import com.geekorum.ttrss.webapi.ApiCallException
@@ -80,6 +81,15 @@ class FeedsViewModel @Inject constructor(
         else
             feedsRepository.allCategories
     }.autoRefreshed()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val feedsByCategory: StateFlow<List<Pair<Category, List<FeedWithFavIcon>>>> = onlyUnread
+        .flatMapLatest { feedsRepository.getFeedsByCategory(it) }
+        .autoRefreshed()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val specialFeeds: StateFlow<List<FeedWithFavIcon>> = feeds
+        .map { it.filter { feedWithFavIcon -> Feed.isVirtualFeed(feedWithFavIcon.feed.id) } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     fun setOnlyUnread(onlyUnread: Boolean) {

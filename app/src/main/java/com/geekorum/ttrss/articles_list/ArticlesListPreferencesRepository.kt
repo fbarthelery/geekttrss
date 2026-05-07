@@ -30,6 +30,7 @@ import javax.inject.Inject
 private const val PREF_VIEW_MODE = "view_mode"
 private const val PREF_SORT_ORDER = "sort_order"
 private const val PREF_ARTICLES_COMPACT_LIST_ITEMS = "articles_compact_list_item"
+private const val PREF_CATEGORIZED_FEED_LIST = "categorized_feed_list"
 
 //TODO migrate to datastore
 class ArticlesListPreferencesRepository @Inject constructor(
@@ -82,6 +83,20 @@ class ArticlesListPreferencesRepository @Inject constructor(
         }
     }
 
+
+    fun getCategorizedFeedList() = callbackFlow {
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            if (key == PREF_CATEGORIZED_FEED_LIST) {
+                trySendBlocking(prefs.getBoolean(PREF_CATEGORIZED_FEED_LIST, false))
+            }
+        }
+        prefs.registerOnSharedPreferenceChangeListener(listener)
+        val initial = prefs.getBoolean(PREF_CATEGORIZED_FEED_LIST, false)
+        send(initial)
+        awaitClose {
+            prefs.unregisterOnSharedPreferenceChangeListener(listener)
+        }
+    }
 
     fun setSortByMostRecentFirst(mostRecentFirst: Boolean) {
         if (mostRecentFirst) {
