@@ -1,0 +1,66 @@
+# Generated files
+bin/
+gen/
+doc/javadoc
+
+# Local configuration (SDK path, signing config)
+local.properties
+
+# Built application files
+*.apk
+*.ap_
+
+# Keystore / signing
+*.keystore
+*.jks
+
+# Files for the dex VM
+*.dex
+
+# Java class files
+*.class
+
+# Maven output
+target/
+
+# IDE files
+.idea/
+*.iml
+.classpath
+.project
+.metadata
+.settings/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Vim swap files
+.*.sw?
+
+# Backup files
+*.bak
+*~
+*.orig
+
+# Gradle generated files
+build/
+.gradle/
+
+# Kotlin build tooling (daemon sessions, compiler error logs)
+.kotlin/
+
+# Google services keys
+google-services.json
+
+# Generated third-party license information
+res/raw/third_party_license*
+
+# Android Studio captures
+captures/
+
+# Claude Code — personal files
+.claude/settings.local.json
+.claude/local.md

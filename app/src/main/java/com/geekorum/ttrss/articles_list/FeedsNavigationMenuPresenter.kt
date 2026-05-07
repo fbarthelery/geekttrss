@@ -59,6 +59,7 @@ import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.toRoute
 import com.geekorum.ttrss.Features
 import com.geekorum.ttrss.R
+import com.geekorum.ttrss.data.Category
 import com.geekorum.ttrss.data.Feed
 import com.geekorum.ttrss.on_demand_modules.InstallModuleViewModel
 import com.geekorum.ttrss.on_demand_modules.InstallSession
@@ -92,6 +93,11 @@ class FeedsNavigationMenuPresenter(
                 null
             }
         }
+        val currentCategoryId = if (navBackStackEntry?.destination?.hasRoute<NavRoutes.ArticlesListForCategory>() == true) {
+            navBackStackEntry?.toRoute<NavRoutes.ArticlesListForCategory>()?.catId
+        } else {
+            null
+        }
         val isMagazineFeed = navBackStackEntry?.destination?.hasRoute<NavRoutes.Magazine>() == true
 
         val account by accountViewModel.selectedAccount.collectAsStateWithLifecycle()
@@ -109,26 +115,54 @@ class FeedsNavigationMenuPresenter(
             }
         }
 
+        val useCategorizedFeedList by activityViewModel.categorizedFeedList.collectAsStateWithLifecycle()
+
         FeedListNavigationMenu(
             modifier = modifier,
             user = account?.name ?: "",
             server = server ?: "",
             feedSection = {
                 val feeds by feedsViewModel.feeds.collectAsStateWithLifecycle()
-                FeedSection(
-                    feeds,
-                    selectedFeed = feeds.find { it.feed.id == currentFeedId }?.feed,
-                    isMagazineSelected = isMagazineFeed,
-                    onFeedSelected = {
-                        navigateToFeed(it)
-                        onNavigation()
-                    },
-                    onMagazineSelected = {
-                        navController.navigateToMagazine()
-                        onNavigation()
-                    },
-                    onMarkFeedAsReadClick = feedsViewModel::markFeedAsRead
-                )
+                val selectedFeed = feeds.find { it.feed.id == currentFeedId }?.feed
+                if (useCategorizedFeedList) {
+                    val feedsByCategory by feedsViewModel.feedsByCategory.collectAsStateWithLifecycle()
+                    val specialFeeds by feedsViewModel.specialFeeds.collectAsStateWithLifecycle()
+                    CategorizedFeedSection(
+                        specialFeeds = specialFeeds,
+                        feedsByCategory = feedsByCategory,
+                        selectedFeed = selectedFeed,
+                        selectedCategoryId = currentCategoryId,
+                        isMagazineSelected = isMagazineFeed,
+                        onFeedSelected = {
+                            navigateToFeed(it)
+                            onNavigation()
+                        },
+                        onMagazineSelected = {
+                            navController.navigateToMagazine()
+                            onNavigation()
+                        },
+                        onMarkFeedAsReadClick = feedsViewModel::markFeedAsRead,
+                        onCategoryClick = { category ->
+                            navigateToCategory(category)
+                            onNavigation()
+                        }
+                    )
+                } else {
+                    FeedSection(
+                        feeds,
+                        selectedFeed = selectedFeed,
+                        isMagazineSelected = isMagazineFeed,
+                        onFeedSelected = {
+                            navigateToFeed(it)
+                            onNavigation()
+                        },
+                        onMagazineSelected = {
+                            navController.navigateToMagazine()
+                            onNavigation()
+                        },
+                        onMarkFeedAsReadClick = feedsViewModel::markFeedAsRead
+                    )
+                }
             },
             manageFeedsSection = {
                 ManageFeedSection(
@@ -149,6 +183,10 @@ class FeedsNavigationMenuPresenter(
             },
             fab = fab
         )
+    }
+
+    private fun navigateToCategory(category: Category) {
+        navController.navigateToCategory(category.id, category.title)
     }
 
     private fun navigateToFeed(feed: Feed) {

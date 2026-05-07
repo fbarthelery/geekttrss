@@ -318,6 +318,7 @@ internal class AppBarPresenter(
         destination == null -> false
         destination.hasRoute<NavRoutes.ArticlesList>() -> true
         destination.hasRoute<NavRoutes.ArticlesListByTag>() -> true
+        destination.hasRoute<NavRoutes.ArticlesListForCategory>() -> true
 
         else -> false
     }

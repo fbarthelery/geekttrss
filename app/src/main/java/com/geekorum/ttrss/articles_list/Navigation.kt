@@ -75,10 +75,19 @@ object NavRoutes {
         val query: String = ""
     )
 
+    @Serializable
+    data class ArticlesListForCategory(
+        @SerialName("cat_id")
+        val catId: Long,
+        @SerialName("cat_name")
+        val catName: String?
+    )
+
     fun getLabelForDestination(context: Context, destination: NavDestination) = when {
         destination.hasRoute<Magazine>() -> context.getString(R.string.title_magazine)
         destination.hasRoute<ArticlesList>() -> "{feed_name}"
         destination.hasRoute<ArticlesListByTag>() -> "#{tag}"
+        destination.hasRoute<ArticlesListForCategory>() -> "{cat_name}"
         else -> null
     }
 
@@ -87,6 +96,7 @@ object NavRoutes {
         destination.hasRoute<Magazine>() -> true
         destination.hasRoute<ArticlesList>() -> true
         destination.hasRoute<ArticlesListByTag>() -> true
+        destination.hasRoute<ArticlesListForCategory>() -> true
         else -> false
     }
 }
@@ -135,6 +145,14 @@ fun ArticlesListNavHost(
                 query = it.toRoute<NavRoutes.Search>().query,
                 activityViewModel = activityViewModel, windowSizeClass = windowSizeClass)
         }
+
+        composable<NavRoutes.ArticlesListForCategory> {
+            ArticlesListForCategoryScreen(
+                catId = it.toRoute<NavRoutes.ArticlesListForCategory>().catId,
+                activityViewModel = activityViewModel,
+                windowSizeClass = windowSizeClass,
+                contentPadding = contentPadding)
+        }
     }
 }
 
@@ -154,6 +172,16 @@ fun NavController.navigateToTag(tag: String) {
     navigate(destination) {
         popUpTo<NavRoutes.ArticlesListByTag> {
             inclusive = true
+        }
+        launchSingleTop = true
+    }
+}
+
+fun NavController.navigateToCategory(catId: Long, catName: String?) {
+    val route = NavRoutes.ArticlesListForCategory(catId, catName)
+    navigate(route) {
+        popUpTo(graph.findStartDestination().route!!) {
+            saveState = true
         }
         launchSingleTop = true
     }

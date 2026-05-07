@@ -58,8 +58,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-private const val STATE_NEED_UNREAD = "need_unread"
-private const val STATE_ORDER_MOST_RECENT_FIRST = "order_most_recent_first" // most_recent_first, oldest_first
+internal const val STATE_NEED_UNREAD = "need_unread"
+internal const val STATE_ORDER_MOST_RECENT_FIRST = "order_most_recent_first" // most_recent_first, oldest_first
 
 /**
  * Base [ViewModel] for a list of Articles.
@@ -134,6 +134,7 @@ abstract class BaseArticlesViewModel(
         val allArticles: PagingSource<Int, ArticleWithFeed>
         fun articlesForFeed(feedId: Long): PagingSource<Int, ArticleWithFeed>
         fun articlesForTag(tag: String): PagingSource<Int, ArticleWithFeed>
+        fun articlesForCategory(catId: Long): PagingSource<Int, ArticleWithFeed>
     }
 
     protected fun getArticleAccess(mostRecentFirst: Boolean, needUnread: Boolean): ArticlesAccess = when {
@@ -167,6 +168,10 @@ abstract class BaseArticlesViewModel(
         override fun articlesForTag(tag: String): PagingSource<Int, ArticleWithFeed> {
             return articlesRepository.getAllUnreadArticlesForTag(tag)
         }
+
+        override fun articlesForCategory(catId: Long): PagingSource<Int, ArticleWithFeed> {
+            return articlesRepository.getAllUnreadArticlesForCategory(catId)
+        }
     }
 
     class UnreadOldestAccess(private val articlesRepository: ArticlesRepository) : ArticlesAccess {
@@ -191,6 +196,10 @@ abstract class BaseArticlesViewModel(
 
         override fun articlesForTag(tag: String): PagingSource<Int, ArticleWithFeed> {
             return articlesRepository.getAllUnreadArticlesForTagOldestFirst(tag)
+        }
+
+        override fun articlesForCategory(catId: Long): PagingSource<Int, ArticleWithFeed> {
+            return articlesRepository.getAllUnreadArticlesForCategoryOldestFirst(catId)
         }
     }
 
@@ -218,6 +227,10 @@ abstract class BaseArticlesViewModel(
         override fun articlesForTag(tag: String): PagingSource<Int, ArticleWithFeed> {
             return articlesRepository.getAllArticlesForTag(tag)
         }
+
+        override fun articlesForCategory(catId: Long): PagingSource<Int, ArticleWithFeed> {
+            return articlesRepository.getAllArticlesForCategory(catId)
+        }
     }
 
     class OldestFirstAccess(private val articlesRepository: ArticlesRepository) : ArticlesAccess {
@@ -242,6 +255,10 @@ abstract class BaseArticlesViewModel(
 
         override fun articlesForTag(tag: String): PagingSource<Int, ArticleWithFeed> {
             return articlesRepository.getAllArticlesForTagOldestFirst(tag)
+        }
+
+        override fun articlesForCategory(catId: Long): PagingSource<Int, ArticleWithFeed> {
+            return articlesRepository.getAllArticlesForCategoryOldestFirst(catId)
         }
     }
 
