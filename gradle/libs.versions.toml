@@ -56,7 +56,9 @@ materialKolor = "4.1.1"
 okio = "3.17.0"
 okhttp = "5.3.2"
 play-publisher = "4.0.0"
-protobuf = "4.34.1"
+# downgrade protobuf to 4.26.1 because of conflict with firebase
+# https://github.com/firebase/firebase-android-sdk/issues/5997
+protobuf = "4.26.1"
 timber = "5.0.1"
 truth = "1.4.5"
 turbine = "1.2.1"
