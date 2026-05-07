@@ -137,15 +137,3 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
 
 }
-
-//TODO remove. Force room 2.6.1 for now has 2.7.x has critical bug for us
-// see  https://issuetracker.google.com/issues/413924560
-configurations.all {
-    resolutionStrategy {
-        force("androidx.room:room-ktx:2.6.1")
-        force("androidx.room:room-runtime:2.6.1")
-        force("androidx.room:room-paging:2.6.1")
-        force("androidx.room:room-testing:2.6.1")
-        force("androidx.room:room-compiler:2.6.1")
-    }
-}
