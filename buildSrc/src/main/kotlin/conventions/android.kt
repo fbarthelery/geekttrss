@@ -25,7 +25,7 @@ import com.android.build.gradle.BaseExtension
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.findByType
 
-const val ANDROID_COMPILE_SDK = 36
+const val ANDROID_COMPILE_SDK = 37
 const val ANDROID_MIN_SDK = 28
 
 fun Project.conventionForAndroidProject() {
@@ -33,7 +33,9 @@ fun Project.conventionForAndroidProject() {
 
     // new AGP 9 built-in kotlin use these configuration
     extensions.findByType<CommonExtension>()?.apply {
-        compileSdk = ANDROID_COMPILE_SDK
+        compileSdk {
+            version = release(ANDROID_COMPILE_SDK)
+        }
         defaultConfig.minSdk = ANDROID_MIN_SDK
     }
 

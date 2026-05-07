@@ -126,36 +126,43 @@ abstract class VersionCodeTask : DefaultTask() {
 fun ApplicationAndroidComponentsExtension.configureVersionChangeset(project: Project, major: Int, minor: Int, patch: Int, versionNameSuffix: String = "") {
     // Note: Everything in there is incubating.
 
+    // create version Code generating task
+    val versionCodeTask = project.tasks.register<VersionCodeTask>("computeVersionCode") {
+        this.major.set(major)
+        this.minor.set(minor)
+        this.patch.set(patch)
+        repositoryDirectory.set(project.rootDir.absolutePath)
+        versionCodeOutputFile.set(project.layout.buildDirectory.file("intermediates/versionCode.txt"))
+        changesetOutputFile.set(project.layout.buildDirectory.file("intermediates/changeset.txt"))
+    }
+
     // onVariantProperties registers an action that configures variant properties during
     // variant computation (which happens during afterEvaluate)
-    onVariants {
+    onVariants { it ->
         // Because app module can have multiple output when using mutli-APK, versionCode/Name
         // are only available on the variant output.
         // Here gather the output when we are in single mode (ie no multi-apk)
         val mainOutput = it.outputs.single { it.outputType == OutputType.SINGLE }
-
-        // create version Code generating task
-        val versionCodeTask = project.tasks.register<VersionCodeTask>("computeVersionCodeFor${it.name.capitalized()}") {
-            this.major.set(major)
-            this.minor.set(minor)
-            this.patch.set(patch)
-            repositoryDirectory.set(project.rootDir.absolutePath)
-            versionCodeOutputFile.set(project.layout.buildDirectory.file("intermediates/versionCode.txt"))
-            changesetOutputFile.set(project.layout.buildDirectory.file("intermediates/changeset.txt"))
-        }
 
         // wire version code from the task output
         // map will create a lazy Provider that
         // 1. runs just before the consumer(s), ensuring that the producer (VersionCodeTask) has run
         //    and therefore the file is created.
         // 2. contains task dependency information so that the consumer(s) run after the producer.
-        mainOutput.versionCode.set(versionCodeTask.map { it.versionCodeOutputFile.get().asFile.readText().toInt() })
+        val versionCode = versionCodeTask.flatMap { task ->
+            task.versionCodeOutputFile.map {
+                it.asFile.readText().toInt()
+            }
+        }
+        mainOutput.versionCode.set(versionCode)
         mainOutput.versionName.set("$major.$minor.$patch$versionNameSuffix")
 
-        it.buildConfigFields?.put("REPOSITORY_CHANGESET", versionCodeTask.map {
-            BuildConfigField("String", "\"${it.changesetOutputFile.get().asFile.readText()}\"", "Repository changeset")
-        })
+        val changeset = versionCodeTask.flatMap { task ->
+            task.changesetOutputFile.map {
+                val changeset = it.asFile.readText()
+                BuildConfigField("String", "\"$changeset\"", "Repository changeset")
+            }
+        }
+        it.buildConfigFields?.put("REPOSITORY_CHANGESET", changeset)
     }
 }
-
-private fun String.capitalized() = replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
