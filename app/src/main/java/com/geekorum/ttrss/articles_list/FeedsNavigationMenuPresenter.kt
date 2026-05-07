@@ -93,13 +93,12 @@ class FeedsNavigationMenuPresenter(
                 null
             }
         }
+        val currentCategoryId = if (navBackStackEntry?.destination?.hasRoute<NavRoutes.ArticlesListForCategory>() == true) {
+            navBackStackEntry?.toRoute<NavRoutes.ArticlesListForCategory>()?.catId
+        } else {
+            null
+        }
         val isMagazineFeed = navBackStackEntry?.destination?.hasRoute<NavRoutes.Magazine>() == true
-        val currentCategoryId: Long? =
-            if (navBackStackEntry?.destination?.hasRoute<NavRoutes.ArticlesListForCategory>() == true) {
-                navBackStackEntry?.toRoute<NavRoutes.ArticlesListForCategory>()?.catId
-            } else {
-                null
-            }
 
         val account by accountViewModel.selectedAccount.collectAsStateWithLifecycle()
         val server by accountViewModel.selectedAccountHost.collectAsStateWithLifecycle()
@@ -127,7 +126,7 @@ class FeedsNavigationMenuPresenter(
                 val selectedFeed = feeds.find { it.feed.id == currentFeedId }?.feed
                 if (useCategorizedFeedList) {
                     val feedsByCategory by feedsViewModel.feedsByCategory.collectAsStateWithLifecycle()
-                    val specialFeeds = feeds.filter { Feed.isVirtualFeed(it.feed.id) }
+                    val specialFeeds by feedsViewModel.specialFeeds.collectAsStateWithLifecycle()
                     CategorizedFeedSection(
                         specialFeeds = specialFeeds,
                         feedsByCategory = feedsByCategory,

@@ -86,7 +86,11 @@ class FeedsRepository
             val feedsByCatId = feeds.groupBy { it.feed.catId }
             categories.mapNotNull { category ->
                 val catFeeds = feedsByCatId[category.id] ?: emptyList()
-                if (catFeeds.isEmpty()) null else category to catFeeds
+                if (catFeeds.isEmpty()) {
+                    null
+                } else {
+                    category to catFeeds
+                }
             }
         }.distinctUntilChanged()
     }

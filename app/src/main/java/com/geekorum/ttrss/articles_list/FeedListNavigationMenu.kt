@@ -25,7 +25,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
@@ -205,52 +204,69 @@ fun CategorizedFeedSection(
         FeedItem(feedWithFavIcon, selectedFeed, onFeedSelected, onMarkFeedAsReadClick)
     }
     for ((category, feeds) in feedsByCategory) {
-        // remember (not rememberSaveable): list is dynamic; categories reappear collapsed when new articles arrive
-        var isExpanded by key(category.id) { remember { mutableStateOf(false) } }
-        val chevronRotation by animateFloatAsState(
-            targetValue = if (isExpanded) 180f else 0f,
-            animationSpec = tween(300),
-            label = "chevronRotation"
-        )
-        NavigationDrawerItem(
-            label = {
-                Text(
-                    category.title,
-                    style = MaterialTheme.typography.labelLarge,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            },
-            selected = category.id == selectedCategoryId,
-            onClick = { onCategoryClick(category) },
-            icon = { Icon(Icons.Default.Folder, contentDescription = null) },
-            badge = {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    if (category.unreadCount > 0) {
-                        Text(
-                            text = category.unreadCount.toString(),
-                            style = MaterialTheme.typography.labelSmall
-                        )
-                        Spacer(Modifier.width(4.dp))
-                    }
-                    Icon(
-                        imageVector = Icons.Default.KeyboardArrowDown,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(18.dp)
-                            .rotate(chevronRotation)
-                            .clickable { isExpanded = !isExpanded }
-                    )
+        key(category.id) {
+            var isExpanded by remember { mutableStateOf(false) }
+            CategoryHeader(
+                category = category,
+                isExpanded = isExpanded,
+                isSelected = category.id == selectedCategoryId,
+                onCategoryClick = {
+                    isExpanded = true
+                    onCategoryClick(category)
+                },
+                onToggleExpand = { isExpanded = !isExpanded }
+            )
+            if (isExpanded) {
+                for (feedWithFavIcon in feeds) {
+                    FeedItem(feedWithFavIcon, selectedFeed, onFeedSelected, onMarkFeedAsReadClick)
                 }
-            },
-            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-        )
-        if (isExpanded) {
-            for (feedWithFavIcon in feeds) {
-                FeedItem(feedWithFavIcon, selectedFeed, onFeedSelected, onMarkFeedAsReadClick)
             }
         }
     }
+}
+
+@Composable
+private fun CategoryHeader(
+    category: Category,
+    isExpanded: Boolean,
+    isSelected: Boolean,
+    onCategoryClick: () -> Unit,
+    onToggleExpand: () -> Unit,
+) {
+    val chevronRotation by animateFloatAsState(
+        targetValue = if (isExpanded) 180f else 0f,
+        animationSpec = tween(300),
+        label = "chevronRotation"
+    )
+    NavigationDrawerItem(
+        label = {
+            Text(
+                text = category.title,
+                style = MaterialTheme.typography.labelLarge,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        },
+        selected = isSelected,
+        onClick = onCategoryClick,
+        icon = { Icon(Icons.Default.Folder, contentDescription = null) },
+        badge = {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (category.unreadCount > 0) {
+                    Text(category.unreadCount.toString())
+                    Spacer(Modifier.width(4.dp))
+                }
+                IconButton(onClick = onToggleExpand, modifier = Modifier.size(24.dp)) {
+                    Icon(
+                        imageVector = Icons.Default.KeyboardArrowDown,
+                        contentDescription = null,
+                        modifier = Modifier.rotate(chevronRotation),
+                    )
+                }
+            }
+        },
+        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+    )
 }
 
 @Composable

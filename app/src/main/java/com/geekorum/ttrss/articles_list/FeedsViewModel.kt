@@ -85,8 +85,11 @@ class FeedsViewModel @Inject constructor(
 
     val feedsByCategory: StateFlow<List<Pair<Category, List<FeedWithFavIcon>>>> = onlyUnread
         .flatMapLatest { feedsRepository.getFeedsByCategory(it) }
-        .distinctUntilChanged()
         .autoRefreshed()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val specialFeeds: StateFlow<List<FeedWithFavIcon>> = feeds
+        .map { it.filter { feedWithFavIcon -> Feed.isVirtualFeed(feedWithFavIcon.feed.id) } }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     fun setOnlyUnread(onlyUnread: Boolean) {

@@ -64,19 +64,15 @@ class ArticlesListForCategoryViewModel @AssistedInject constructor(
     private val account = component.account
 
     override val articles: Flow<PagingData<ArticleWithFeed>> =
-        getArticlesForCategory(catId)
-            .map(::prepareArticlePagingData)
-            .cachedIn(viewModelScope)
-
-    private fun getArticlesForCategory(catId: Long): Flow<PagingData<ArticleWithFeed>> {
-        return sortByMostRecentFirst.combine(needUnread) { mostRecentFirst, needUnread ->
+        sortByMostRecentFirst.combine(needUnread) { mostRecentFirst, needUnread ->
             getArticleAccess(mostRecentFirst, needUnread)
         }.flatMapLatest { access ->
             Pager(PagingConfig(pageSize = 50)) {
                 access.articlesForCategory(catId)
             }.flow
         }
-    }
+        .map(::prepareArticlePagingData)
+        .cachedIn(viewModelScope)
 
     override val isRefreshing: StateFlow<Boolean> =
         SyncInProgressLiveData(account, ArticlesContract.AUTHORITY).asFlow()
