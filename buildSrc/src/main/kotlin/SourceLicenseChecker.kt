@@ -23,6 +23,7 @@ package com.geekorum.build
 import com.hierynomus.gradle.license.LicenseBasePlugin
 import com.hierynomus.gradle.license.tasks.LicenseCheck
 import com.hierynomus.gradle.license.tasks.LicenseFormat
+import nl.javadude.gradle.plugins.license.License
 import nl.javadude.gradle.plugins.license.LicenseExtension
 import nl.javadude.gradle.plugins.license.LicensePlugin
 import org.gradle.api.Project
@@ -31,6 +32,7 @@ import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.invoke
 import org.gradle.kotlin.dsl.named
+import org.gradle.kotlin.dsl.withType
 
 internal fun Project.configureSourceLicenseChecker(): Unit {
     apply<LicensePlugin>()
@@ -64,4 +66,9 @@ internal fun Project.configureSourceLicenseChecker(): Unit {
         }
 
     }
+
+    tasks.withType<License>().configureEach {
+        notCompatibleWithConfigurationCache("License tasks calls getProject() at execution time")
+    }
+
 }
